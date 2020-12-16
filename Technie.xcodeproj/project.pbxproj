@@ -3,18 +3,24 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8A8F8521258A353500C4CEF9 /* ClientSearchVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A8F8520258A353500C4CEF9 /* ClientSearchVC.swift */; };
+		8A8F8526258A355700C4CEF9 /* ClientPostVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A8F8525258A355700C4CEF9 /* ClientPostVC.swift */; };
+		8A8F852E258A357200C4CEF9 /* ClientChatVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A8F852D258A357200C4CEF9 /* ClientChatVC.swift */; };
+		8A8F8533258A358400C4CEF9 /* ClientNotificationVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A8F8532258A358400C4CEF9 /* ClientNotificationVC.swift */; };
+		8A8F854E258A3D0500C4CEF9 /* FeedCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A8F854D258A3D0500C4CEF9 /* FeedCell.swift */; };
+		8A8F8554258A408700C4CEF9 /* LBTATools in Frameworks */ = {isa = PBXBuildFile; productRef = 8A8F8553258A408700C4CEF9 /* LBTATools */; };
 		8AC1B123258A2D8D000F2569 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AC1B122258A2D8D000F2569 /* AppDelegate.swift */; };
 		8AC1B125258A2D8D000F2569 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AC1B124258A2D8D000F2569 /* SceneDelegate.swift */; };
-		8AC1B127258A2D8D000F2569 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AC1B126258A2D8D000F2569 /* ViewController.swift */; };
-		8AC1B12A258A2D8D000F2569 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8AC1B128258A2D8D000F2569 /* Main.storyboard */; };
+		8AC1B127258A2D8D000F2569 /* ClientFeedVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AC1B126258A2D8D000F2569 /* ClientFeedVC.swift */; };
 		8AC1B12C258A2D8F000F2569 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8AC1B12B258A2D8F000F2569 /* Assets.xcassets */; };
 		8AC1B12F258A2D8F000F2569 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8AC1B12D258A2D8F000F2569 /* LaunchScreen.storyboard */; };
 		8AC1B13A258A2D8F000F2569 /* TechnieTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AC1B139258A2D8F000F2569 /* TechnieTests.swift */; };
 		8AC1B145258A2D8F000F2569 /* TechnieUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AC1B144258A2D8F000F2569 /* TechnieUITests.swift */; };
+		8AE258A6258A3156004EDB26 /* ClientTabController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AE258A5258A3156004EDB26 /* ClientTabController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -35,11 +41,21 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		8A8F8520258A353500C4CEF9 /* ClientSearchVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientSearchVC.swift; sourceTree = "<group>"; };
+		8A8F8525258A355700C4CEF9 /* ClientPostVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientPostVC.swift; sourceTree = "<group>"; };
+		8A8F852D258A357200C4CEF9 /* ClientChatVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientChatVC.swift; sourceTree = "<group>"; };
+		8A8F8532258A358400C4CEF9 /* ClientNotificationVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientNotificationVC.swift; sourceTree = "<group>"; };
+		8A8F8537258A38CC00C4CEF9 /* TechnieSearchVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnieSearchVC.swift; sourceTree = "<group>"; };
+		8A8F8538258A38CC00C4CEF9 /* TechnieTabController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnieTabController.swift; sourceTree = "<group>"; };
+		8A8F8539258A38CC00C4CEF9 /* TechnieFeedVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnieFeedVC.swift; sourceTree = "<group>"; };
+		8A8F853A258A38CC00C4CEF9 /* TechnieServiceVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnieServiceVC.swift; sourceTree = "<group>"; };
+		8A8F853B258A38CC00C4CEF9 /* TechnieNotificationVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnieNotificationVC.swift; sourceTree = "<group>"; };
+		8A8F853C258A38CC00C4CEF9 /* TechnieChatVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnieChatVC.swift; sourceTree = "<group>"; };
+		8A8F854D258A3D0500C4CEF9 /* FeedCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedCell.swift; sourceTree = "<group>"; };
 		8AC1B11F258A2D8D000F2569 /* Technie.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Technie.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8AC1B122258A2D8D000F2569 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		8AC1B124258A2D8D000F2569 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		8AC1B126258A2D8D000F2569 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		8AC1B129258A2D8D000F2569 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		8AC1B126258A2D8D000F2569 /* ClientFeedVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientFeedVC.swift; sourceTree = "<group>"; };
 		8AC1B12B258A2D8F000F2569 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8AC1B12E258A2D8F000F2569 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		8AC1B130258A2D8F000F2569 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -49,6 +65,7 @@
 		8AC1B140258A2D8F000F2569 /* TechnieUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TechnieUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8AC1B144258A2D8F000F2569 /* TechnieUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnieUITests.swift; sourceTree = "<group>"; };
 		8AC1B146258A2D8F000F2569 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8AE258A5258A3156004EDB26 /* ClientTabController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientTabController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +73,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8A8F8554258A408700C4CEF9 /* LBTATools in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -76,6 +94,87 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		8A8F8543258A3BBA00C4CEF9 /* FeedVC */ = {
+			isa = PBXGroup;
+			children = (
+				8AC1B126258A2D8D000F2569 /* ClientFeedVC.swift */,
+				8A8F854D258A3D0500C4CEF9 /* FeedCell.swift */,
+			);
+			path = FeedVC;
+			sourceTree = "<group>";
+		};
+		8A8F8544258A3BCC00C4CEF9 /* SearchVC */ = {
+			isa = PBXGroup;
+			children = (
+				8A8F8520258A353500C4CEF9 /* ClientSearchVC.swift */,
+			);
+			path = SearchVC;
+			sourceTree = "<group>";
+		};
+		8A8F8545258A3BD600C4CEF9 /* PostVC */ = {
+			isa = PBXGroup;
+			children = (
+				8A8F8525258A355700C4CEF9 /* ClientPostVC.swift */,
+			);
+			path = PostVC;
+			sourceTree = "<group>";
+		};
+		8A8F8546258A3BE100C4CEF9 /* ChatVC */ = {
+			isa = PBXGroup;
+			children = (
+				8A8F852D258A357200C4CEF9 /* ClientChatVC.swift */,
+			);
+			path = ChatVC;
+			sourceTree = "<group>";
+		};
+		8A8F8547258A3BE900C4CEF9 /* NotificationVC */ = {
+			isa = PBXGroup;
+			children = (
+				8A8F8532258A358400C4CEF9 /* ClientNotificationVC.swift */,
+			);
+			path = NotificationVC;
+			sourceTree = "<group>";
+		};
+		8A8F8548258A3C3100C4CEF9 /* FeedVC */ = {
+			isa = PBXGroup;
+			children = (
+				8A8F8539258A38CC00C4CEF9 /* TechnieFeedVC.swift */,
+			);
+			path = FeedVC;
+			sourceTree = "<group>";
+		};
+		8A8F8549258A3C3900C4CEF9 /* SearchVC */ = {
+			isa = PBXGroup;
+			children = (
+				8A8F8537258A38CC00C4CEF9 /* TechnieSearchVC.swift */,
+			);
+			path = SearchVC;
+			sourceTree = "<group>";
+		};
+		8A8F854A258A3C4400C4CEF9 /* ChatVC */ = {
+			isa = PBXGroup;
+			children = (
+				8A8F853C258A38CC00C4CEF9 /* TechnieChatVC.swift */,
+			);
+			path = ChatVC;
+			sourceTree = "<group>";
+		};
+		8A8F854B258A3C4D00C4CEF9 /* ServiceVC */ = {
+			isa = PBXGroup;
+			children = (
+				8A8F853A258A38CC00C4CEF9 /* TechnieServiceVC.swift */,
+			);
+			path = ServiceVC;
+			sourceTree = "<group>";
+		};
+		8A8F854C258A3C5600C4CEF9 /* NotificationVC */ = {
+			isa = PBXGroup;
+			children = (
+				8A8F853B258A38CC00C4CEF9 /* TechnieNotificationVC.swift */,
+			);
+			path = NotificationVC;
+			sourceTree = "<group>";
+		};
 		8AC1B116258A2D8D000F2569 = {
 			isa = PBXGroup;
 			children = (
@@ -99,13 +198,11 @@
 		8AC1B121258A2D8D000F2569 /* Technie */ = {
 			isa = PBXGroup;
 			children = (
-				8AC1B122258A2D8D000F2569 /* AppDelegate.swift */,
-				8AC1B124258A2D8D000F2569 /* SceneDelegate.swift */,
-				8AC1B126258A2D8D000F2569 /* ViewController.swift */,
-				8AC1B128258A2D8D000F2569 /* Main.storyboard */,
-				8AC1B12B258A2D8F000F2569 /* Assets.xcassets */,
-				8AC1B12D258A2D8F000F2569 /* LaunchScreen.storyboard */,
 				8AC1B130258A2D8F000F2569 /* Info.plist */,
+				8AC1B155258A2DAB000F2569 /* App */,
+				8AC1B15C258A2E05000F2569 /* Model */,
+				8AC1B15D258A2E18000F2569 /* View */,
+				8AC1B15E258A2E29000F2569 /* ViewModel */,
 			);
 			path = Technie;
 			sourceTree = "<group>";
@@ -128,6 +225,98 @@
 			path = TechnieUITests;
 			sourceTree = "<group>";
 		};
+		8AC1B155258A2DAB000F2569 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				8AC1B122258A2D8D000F2569 /* AppDelegate.swift */,
+				8AC1B124258A2D8D000F2569 /* SceneDelegate.swift */,
+				8AC1B12B258A2D8F000F2569 /* Assets.xcassets */,
+				8AC1B12D258A2D8F000F2569 /* LaunchScreen.storyboard */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		8AC1B15C258A2E05000F2569 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				8AE258A1258A30AD004EDB26 /* TechnieModel */,
+				8AE2589D258A3074004EDB26 /* ClientModel */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		8AC1B15D258A2E18000F2569 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				8AE258A0258A30A2004EDB26 /* TechnieView */,
+				8AE2589C258A305D004EDB26 /* ClientView */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		8AC1B15E258A2E29000F2569 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				8AE2589F258A308B004EDB26 /* TechnieViewModel */,
+				8AE2589E258A307F004EDB26 /* ClientViewModel */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		8AE2589C258A305D004EDB26 /* ClientView */ = {
+			isa = PBXGroup;
+			children = (
+				8AE258A5258A3156004EDB26 /* ClientTabController.swift */,
+				8A8F8543258A3BBA00C4CEF9 /* FeedVC */,
+				8A8F8544258A3BCC00C4CEF9 /* SearchVC */,
+				8A8F8545258A3BD600C4CEF9 /* PostVC */,
+				8A8F8546258A3BE100C4CEF9 /* ChatVC */,
+				8A8F8547258A3BE900C4CEF9 /* NotificationVC */,
+			);
+			path = ClientView;
+			sourceTree = "<group>";
+		};
+		8AE2589D258A3074004EDB26 /* ClientModel */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = ClientModel;
+			sourceTree = "<group>";
+		};
+		8AE2589E258A307F004EDB26 /* ClientViewModel */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = ClientViewModel;
+			sourceTree = "<group>";
+		};
+		8AE2589F258A308B004EDB26 /* TechnieViewModel */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = TechnieViewModel;
+			sourceTree = "<group>";
+		};
+		8AE258A0258A30A2004EDB26 /* TechnieView */ = {
+			isa = PBXGroup;
+			children = (
+				8A8F8538258A38CC00C4CEF9 /* TechnieTabController.swift */,
+				8A8F8548258A3C3100C4CEF9 /* FeedVC */,
+				8A8F8549258A3C3900C4CEF9 /* SearchVC */,
+				8A8F854B258A3C4D00C4CEF9 /* ServiceVC */,
+				8A8F854A258A3C4400C4CEF9 /* ChatVC */,
+				8A8F854C258A3C5600C4CEF9 /* NotificationVC */,
+			);
+			path = TechnieView;
+			sourceTree = "<group>";
+		};
+		8AE258A1258A30AD004EDB26 /* TechnieModel */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = TechnieModel;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -144,6 +333,9 @@
 			dependencies = (
 			);
 			name = Technie;
+			packageProductDependencies = (
+				8A8F8553258A408700C4CEF9 /* LBTATools */,
+			);
 			productName = Technie;
 			productReference = 8AC1B11F258A2D8D000F2569 /* Technie.app */;
 			productType = "com.apple.product-type.application";
@@ -215,6 +407,9 @@
 				Base,
 			);
 			mainGroup = 8AC1B116258A2D8D000F2569;
+			packageReferences = (
+				8A8F8552258A408700C4CEF9 /* XCRemoteSwiftPackageReference "LBTATools" */,
+			);
 			productRefGroup = 8AC1B120258A2D8D000F2569 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -233,7 +428,6 @@
 			files = (
 				8AC1B12F258A2D8F000F2569 /* LaunchScreen.storyboard in Resources */,
 				8AC1B12C258A2D8F000F2569 /* Assets.xcassets in Resources */,
-				8AC1B12A258A2D8D000F2569 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -258,9 +452,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8AC1B127258A2D8D000F2569 /* ViewController.swift in Sources */,
+				8AC1B127258A2D8D000F2569 /* ClientFeedVC.swift in Sources */,
 				8AC1B123258A2D8D000F2569 /* AppDelegate.swift in Sources */,
+				8AE258A6258A3156004EDB26 /* ClientTabController.swift in Sources */,
+				8A8F852E258A357200C4CEF9 /* ClientChatVC.swift in Sources */,
+				8A8F8533258A358400C4CEF9 /* ClientNotificationVC.swift in Sources */,
+				8A8F8521258A353500C4CEF9 /* ClientSearchVC.swift in Sources */,
 				8AC1B125258A2D8D000F2569 /* SceneDelegate.swift in Sources */,
+				8A8F8526258A355700C4CEF9 /* ClientPostVC.swift in Sources */,
+				8A8F854E258A3D0500C4CEF9 /* FeedCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -296,14 +496,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		8AC1B128258A2D8D000F2569 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				8AC1B129258A2D8D000F2569 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
 		8AC1B12D258A2D8F000F2569 /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -593,6 +785,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		8A8F8552258A408700C4CEF9 /* XCRemoteSwiftPackageReference "LBTATools" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/bhlvoong/LBTATools";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.17;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		8A8F8553258A408700C4CEF9 /* LBTATools */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8A8F8552258A408700C4CEF9 /* XCRemoteSwiftPackageReference "LBTATools" */;
+			productName = LBTATools;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 8AC1B117258A2D8D000F2569 /* Project object */;
 }
