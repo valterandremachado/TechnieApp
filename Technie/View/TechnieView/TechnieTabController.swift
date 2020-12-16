@@ -25,7 +25,7 @@ class TechnieTabController: UITabBarController {
     
     // MARK: - Methods
     fileprivate func setupTabController() {
-        
+        // Tabs
         viewControllers = [
             createTabController(unselectedImage: "homepod", selectedImage: "homepod.fill", vc: feedVC),
             createTabController(unselectedImage: "bell", selectedImage: "bell.fill", vc: searchVC),
