@@ -14,14 +14,14 @@ class TechnieRankingCell: UICollectionViewCell {
     lazy var technieRankingCollectionView: UICollectionView = {
         let collectionLayout = UICollectionViewFlowLayout()
         collectionLayout.scrollDirection = .horizontal
-        collectionLayout.minimumLineSpacing = 5
+        collectionLayout.minimumLineSpacing = 10
         collectionLayout.minimumInteritemSpacing = 5
         
         let cv = UICollectionView(frame: .zero, collectionViewLayout: collectionLayout)
         cv.translatesAutoresizingMaskIntoConstraints = false
         cv.backgroundColor = .clear
         cv.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        
+        cv.showsHorizontalScrollIndicator = false
         cv.delegate = self
         cv.dataSource = self
         
@@ -32,7 +32,7 @@ class TechnieRankingCell: UICollectionViewCell {
     // MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: .zero)
-        backgroundColor = .darkGray
+        backgroundColor = .white
         setupViews()
     }
     
@@ -62,12 +62,13 @@ extension TechnieRankingCell: CollectionDataSourceAndDelegate {
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: innerCellID, for: indexPath) as! TechnieRankingInnerCell
+
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let screenSize = UIScreen.main.bounds
-        return CGSize(width: screenSize.width/1.5, height: frame.height - 30)
+        return CGSize(width: screenSize.width/1.8, height: frame.height - 5)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
@@ -76,6 +77,8 @@ extension TechnieRankingCell: CollectionDataSourceAndDelegate {
     
     
 }
+
+
 
 // MARK: - InnerCell of the TechnieRankingCell
 class TechnieRankingInnerCell: UICollectionViewCell {
@@ -98,11 +101,12 @@ class TechnieRankingInnerCell: UICollectionViewCell {
     lazy var profileImageView: UIImageView = {
         let iv = UIImageView(frame: CGRect(x: 0, y: 0, width: 80, height: 80))
         iv.translatesAutoresizingMaskIntoConstraints = false
-        iv.withSize(CGSize(width: 80, height: 80))
+//        iv.withSize(CGSize(width: 80, height: 80))
         iv.layer.cornerRadius = iv.frame.size.height/2
         iv.layer.masksToBounds = false
         iv.clipsToBounds = true
-        iv.backgroundColor = .brown
+//        iv.backgroundColor = .brown
+        iv.image = UIImage(named: "technieDummyPhoto")
         return iv
     }()
     
@@ -112,8 +116,9 @@ class TechnieRankingInnerCell: UICollectionViewCell {
         lbl.text = "Valter A. Machado"
         lbl.textAlignment = .center
         lbl.withHeight(25)
-        lbl.backgroundColor = .brown
+//        lbl.backgroundColor = .brown
         lbl.numberOfLines = 0
+        lbl.textColor = UIColor(named: "LabelPrimaryAppearance")
         return lbl
     }()
     
@@ -126,7 +131,7 @@ class TechnieRankingInnerCell: UICollectionViewCell {
 //        lbl.withHeight(80)
         lbl.textAlignment = .center
         lbl.font = .systemFont(ofSize: 15)
-        lbl.backgroundColor = .yellow
+//        lbl.backgroundColor = .yellow
 
         lbl.text = "Best worker of this week"
         return lbl
@@ -135,11 +140,13 @@ class TechnieRankingInnerCell: UICollectionViewCell {
     lazy var numberOfServiceLabel: UILabel = {
         let lbl = UILabel()
         lbl.translatesAutoresizingMaskIntoConstraints = false
-        lbl.backgroundColor = .systemPink
+        lbl.backgroundColor = UIColor.systemPink.withAlphaComponent(0.5)
         lbl.layer.cornerRadius = 15
         lbl.clipsToBounds = true
         lbl.text = "300 services"
         lbl.textAlignment = .center
+        lbl.textColor = UIColor(named: "LabelPrimaryAppearance")
+
         lbl.withWidth(140)
         lbl.withHeight(33)
         return lbl
@@ -148,19 +155,25 @@ class TechnieRankingInnerCell: UICollectionViewCell {
     lazy var ratingLabel: UILabel = {
         let lbl = UILabel()
         lbl.translatesAutoresizingMaskIntoConstraints = false
-        lbl.text = "4.9      "
+        lbl.text = "4.9"
         lbl.font = .systemFont(ofSize: 15)
         lbl.textAlignment = .center
-        
+        lbl.numberOfLines = .zero
+        lbl.textColor = UIColor(named: "LabelPrimaryAppearance")
+//        lbl.backgroundColor = .blue
+//        lbl.withWidth(35)
         return lbl
     }()
     
     lazy var reviewLabel: UILabel = {
         let lbl = UILabel()
         lbl.translatesAutoresizingMaskIntoConstraints = false
-        lbl.text = "300 Reviews"
+        lbl.text = "300" //Reviews
         lbl.font = .systemFont(ofSize: 15)
-        lbl.textAlignment = .center
+        lbl.numberOfLines = .zero
+        lbl.textAlignment = .left
+        lbl.textColor = UIColor(named: "LabelPrimaryAppearance")
+//        lbl.backgroundColor = .red
         return lbl
     }()
     
@@ -171,14 +184,16 @@ class TechnieRankingInnerCell: UICollectionViewCell {
         let iconIV = UIImageView()
         iconIV.contentMode = .scaleAspectFit
         iconIV.image = wiredProfileImage
-        
+//        iconIV.backgroundColor = .brown
+        iconIV.withWidth(20)
         let sv = UIStackView(arrangedSubviews: [iconIV, ratingLabel])
+        sv.translatesAutoresizingMaskIntoConstraints = false
         sv.axis = .horizontal
-        sv.spacing = 1
+        sv.spacing = 0
         sv.alignment = .center
         sv.distribution = .fillProportionally
-//        sv.addBackground(color: .red)
-        sv.withWidth(110)
+//        sv.addBackground(color: .lightGray)
+//        sv.withWidth(110)
         return sv
     }()
     
@@ -189,30 +204,73 @@ class TechnieRankingInnerCell: UICollectionViewCell {
         let iconIV = UIImageView()
         iconIV.contentMode = .scaleAspectFit
         iconIV.image = wiredProfileImage
-        
+//        iconIV.backgroundColor = .brown
+        iconIV.withWidth(20)
         let sv = UIStackView(arrangedSubviews: [iconIV, reviewLabel])
+        sv.translatesAutoresizingMaskIntoConstraints = false
         sv.axis = .horizontal
         sv.spacing = 1
         sv.alignment = .center
         sv.distribution = .fillProportionally
-        sv.addBackground(color: .brown)
-        sv.withWidth(110)
+//        sv.addBackground(color: .cyan)
+//        sv.withWidth(110)
         return sv
+    }()
+    
+    lazy var ratingCustomView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+//        view.backgroundColor = .yellow
+        return view
+    }()
+    
+    lazy var reviewCustomView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+//        view.backgroundColor = .brown
+        return view
     }()
     
     lazy var ratingAndReviewtackView: UIStackView = {
         var separatorView = UIView()
         separatorView.translatesAutoresizingMaskIntoConstraints = false
-        separatorView.backgroundColor = .black
-        separatorView.withWidth(1)
-        separatorView.withHeight(40)
-        let sv = UIStackView(arrangedSubviews: [ratingStackView, separatorView, reviewStackView])
+        separatorView.backgroundColor = .lightGray
+
+        let sv = UIStackView(arrangedSubviews: [ratingCustomView, reviewCustomView])
+        sv.translatesAutoresizingMaskIntoConstraints = false
+
         sv.axis = .horizontal
-        sv.alignment = .center
-        sv.spacing = 2
-        sv.distribution = .equalSpacing
-        sv.addBackground(color: .red)
+//        sv.alignment = .center
+        sv.spacing = 0
+        sv.distribution = .fillEqually
+//        sv.addBackground(color: .gray)
         sv.withHeight(40)
+
+        // Add stackView inside the views in the ratingAndReviewtackView
+        ratingCustomView.addSubview(ratingStackView)
+        NSLayoutConstraint.activate([
+            ratingStackView.centerXAnchor.constraint(equalTo: ratingCustomView.centerXAnchor),
+            ratingStackView.centerYAnchor.constraint(equalTo: ratingCustomView.centerYAnchor),
+            ratingStackView.heightAnchor.constraint(equalToConstant: 40),
+            ratingStackView.widthAnchor.constraint(equalToConstant: 44)
+        ])
+        
+        reviewCustomView.addSubview(reviewStackView)
+        NSLayoutConstraint.activate([
+            reviewStackView.centerXAnchor.constraint(equalTo: reviewCustomView.centerXAnchor),
+            reviewStackView.centerYAnchor.constraint(equalTo: reviewCustomView.centerYAnchor),
+            reviewStackView.heightAnchor.constraint(equalToConstant: 40),
+            reviewStackView.widthAnchor.constraint(equalToConstant: 57)
+        ])
+        
+        sv.addSubview(separatorView)
+        NSLayoutConstraint.activate([
+            separatorView.centerXAnchor.constraint(equalTo: sv.centerXAnchor),
+            separatorView.centerYAnchor.constraint(equalTo: sv.centerYAnchor),
+            separatorView.heightAnchor.constraint(equalToConstant: 25),
+            separatorView.widthAnchor.constraint(equalToConstant: 1)
+        ])
+        
         return sv
     }()
     
@@ -238,7 +296,9 @@ class TechnieRankingInnerCell: UICollectionViewCell {
     // MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: .zero)
-        backgroundColor = .blue
+        backgroundColor = .darkGray
+        layer.cornerRadius = 16
+        clipsToBounds = true
         setupViews()
     }
     
@@ -248,9 +308,9 @@ class TechnieRankingInnerCell: UICollectionViewCell {
         
         NSLayoutConstraint.activate([
             profileImageView.centerXAnchor.constraint(equalTo: self.centerXAnchor),
-            profileImageView.topAnchor.constraint(equalTo: self.topAnchor, constant: 10),
-//            profileImageView.heightAnchor.constraint(equalToConstant: 80),
-//            profileImageView.widthAnchor.constraint(equalToConstant: 80)
+            profileImageView.topAnchor.constraint(equalTo: self.topAnchor, constant: 20),
+            profileImageView.heightAnchor.constraint(equalToConstant: 80),
+            profileImageView.widthAnchor.constraint(equalToConstant: 80)
         ])
         
         stackView2.anchor(top: profileImageView.bottomAnchor, leading: self.leadingAnchor, bottom: nil, trailing: self.trailingAnchor, padding: UIEdgeInsets(top: 10, left: 10, bottom: 0, right: 10))
@@ -271,3 +331,14 @@ class TechnieRankingInnerCell: UICollectionViewCell {
     
 }
 
+
+// MARK: - TechnieRankingCellPreviews
+import SwiftUI
+
+struct TechnieRankingCellPreviews: PreviewProvider {
+   
+    static var previews: some View {
+        let cell = TechnieRankingCell()
+        return cell.liveView
+    }
+}

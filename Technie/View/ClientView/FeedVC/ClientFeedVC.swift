@@ -154,7 +154,7 @@ extension ClientFeedVC: CollectionDataSourceAndDelegate {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let viewSize = view.frame.size
-        var collectionViewSize = CGSize(width: viewSize.width - 10, height: 300)
+        var collectionViewSize = CGSize(width: viewSize.width - 10, height: 290)
         
         if indexPath.section != 0 {
             collectionViewSize = CGSize(width: viewSize.width - 10, height: 150)
@@ -165,7 +165,7 @@ extension ClientFeedVC: CollectionDataSourceAndDelegate {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         // Section 0 EdgeInsets
-        var collectionViewEdgeInsets = UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0)
+        var collectionViewEdgeInsets = UIEdgeInsets(top: 10, left: 0, bottom: 25, right: 0)
         
         if section != 0 {
             // Section 1 EdgeInsets
@@ -228,5 +228,18 @@ extension ClientFeedVC: TableViewDataSourceAndDelegate {
         return cell
     }
     
+    
+}
+
+
+// MARK: - ClientFeedPreviews
+import SwiftUI
+
+struct ClientFeedPreviews: PreviewProvider {
+    
+    static var previews: some View {
+        let vc = ClientFeedVC()
+        return vc.liveViewController
+    }
     
 }

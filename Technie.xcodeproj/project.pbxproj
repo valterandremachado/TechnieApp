@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8A60EEBB258CDB2E0061A830 /* LivePreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A60EEBA258CDB2E0061A830 /* LivePreview.swift */; };
 		8A8F8521258A353500C4CEF9 /* ClientSearchVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A8F8520258A353500C4CEF9 /* ClientSearchVC.swift */; };
 		8A8F8526258A355700C4CEF9 /* ClientPostVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A8F8525258A355700C4CEF9 /* ClientPostVC.swift */; };
 		8A8F852E258A357200C4CEF9 /* ClientChatVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A8F852D258A357200C4CEF9 /* ClientChatVC.swift */; };
@@ -53,6 +54,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		8A60EEBA258CDB2E0061A830 /* LivePreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LivePreview.swift; sourceTree = "<group>"; };
 		8A8F8520258A353500C4CEF9 /* ClientSearchVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientSearchVC.swift; sourceTree = "<group>"; };
 		8A8F8525258A355700C4CEF9 /* ClientPostVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientPostVC.swift; sourceTree = "<group>"; };
 		8A8F852D258A357200C4CEF9 /* ClientChatVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientChatVC.swift; sourceTree = "<group>"; };
@@ -276,6 +278,7 @@
 		8AC1B15D258A2E18000F2569 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				8A60EEBA258CDB2E0061A830 /* LivePreview.swift */,
 				8AE258A0258A30A2004EDB26 /* TechnieView */,
 				8AE2589C258A305D004EDB26 /* ClientView */,
 			);
@@ -522,6 +525,7 @@
 				8AF76A77258B440D00ED14C2 /* KeyboardLayoutConstraint.swift in Sources */,
 				8A8F8533258A358400C4CEF9 /* ClientNotificationVC.swift in Sources */,
 				8AF76A86258B64FC00ED14C2 /* TechnieRankingCell.swift in Sources */,
+				8A60EEBB258CDB2E0061A830 /* LivePreview.swift in Sources */,
 				8AF76A8E258B671500ED14C2 /* Header.swift in Sources */,
 				8AF76A79258B440D00ED14C2 /* TrashBinCode.swift in Sources */,
 				8AF76A78258B440D00ED14C2 /* UIFeedBackGenerator.swift in Sources */,

@@ -18,7 +18,8 @@ class NearbyTechniesCell: UICollectionViewCell {
         iv.layer.cornerRadius = iv.frame.size.height/2
         iv.layer.masksToBounds = false
         iv.clipsToBounds = true
-        iv.backgroundColor = .blue
+//        iv.backgroundColor = .blue
+        iv.image = UIImage(named: "technieDummyPhoto")
         return iv
     }()
     
@@ -198,7 +199,7 @@ class NearbyTechniesCell: UICollectionViewCell {
         
         profileImageView.anchor(top: self.topAnchor, leading: self.leadingAnchor, bottom: nil, trailing: nil, padding: UIEdgeInsets(top: 10, left: 5, bottom: 0, right: 0))
 //        mainStackView.withHeight(160)
-        mainStackView.anchor(top: profileImageView.topAnchor, leading: profileImageView.trailingAnchor, bottom: nil, trailing: self.trailingAnchor, padding: UIEdgeInsets(top: 5, left: 12, bottom: 0, right: 0))
+        mainStackView.anchor(top: profileImageView.topAnchor, leading: profileImageView.trailingAnchor, bottom: nil, trailing: self.trailingAnchor, padding: UIEdgeInsets(top: 5, left: 8, bottom: 0, right: 0))
 
         separatorView.anchor(top: nil, leading: nil, bottom: self.bottomAnchor, trailing: self.trailingAnchor, padding: UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0))
         
@@ -211,4 +212,16 @@ class NearbyTechniesCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+}
+
+
+// MARK: - NearbyTechniesCellPreviews
+import SwiftUI
+
+struct NearbyTechniesCellPreviews: PreviewProvider {
+   
+    static var previews: some View {
+        let cell = NearbyTechniesCell()
+        return cell.liveView
+    }
 }
