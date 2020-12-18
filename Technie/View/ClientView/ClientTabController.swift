@@ -25,10 +25,10 @@ class ClientTabController: UITabBarController {
     
     // MARK: - Methods
     fileprivate func setupTabController() {
-        
+//        tabBar.isTranslucent = true
         viewControllers = [
             createTabController(unselectedImage: "homepod", selectedImage: "homepod.fill", vc: feedVC),
-            createTabController(unselectedImage: "bell", selectedImage: "bell.fill", vc: searchVC),
+            createTabController2(unselectedImage: "search", selectedImage: "search.fill", vc: searchVC),
             createTabController(unselectedImage: "plus.app", selectedImage: "plus.app.fill", vc: postVC),
             createTabController(unselectedImage: "message", selectedImage: "message.fill", vc: chatVC),
             createTabController(unselectedImage: "bell", selectedImage: "bell.fill", vc: notificationVC)
@@ -41,7 +41,17 @@ class ClientTabController: UITabBarController {
         let currentVC = UINavigationController(rootViewController: vc)
 //        currentVC.tabBarItem.title = title
         currentVC.tabBarItem.image = UIImage(systemName: unselectedImage)
-        currentVC.tabBarItem.selectedImage = UIImage(systemName: selectedImage)
+        currentVC.tabBarItem.selectedImage =  UIImage(systemName: selectedImage)
+        
+        return currentVC
+    }
+    
+    fileprivate func createTabController2(unselectedImage: String, selectedImage: String, vc: UIViewController) -> UINavigationController {
+        
+        let currentVC = UINavigationController(rootViewController: vc)
+//        currentVC.tabBarItem.title = title
+        currentVC.tabBarItem.image = UIImage(named: unselectedImage)
+        currentVC.tabBarItem.selectedImage =  UIImage(named: selectedImage)
         
         return currentVC
     }
