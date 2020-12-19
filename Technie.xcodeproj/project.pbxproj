@@ -8,6 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		8A60EEBB258CDB2E0061A830 /* LivePreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A60EEBA258CDB2E0061A830 /* LivePreview.swift */; };
+		8A76FA4F258DE3EF0094C524 /* RankedTechnieVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A76FA4E258DE3EF0094C524 /* RankedTechnieVC.swift */; };
+		8A76FA57258DEBB20094C524 /* FullRankingVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A76FA56258DEBB20094C524 /* FullRankingVC.swift */; };
+		8A76FA5F258DF2F40094C524 /* NearbyDetailVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A76FA5E258DF2F40094C524 /* NearbyDetailVC.swift */; };
+		8A76FA67258E1CDF0094C524 /* SearchResultCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A76FA66258E1CDF0094C524 /* SearchResultCell.swift */; };
 		8A8F8521258A353500C4CEF9 /* ClientSearchVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A8F8520258A353500C4CEF9 /* ClientSearchVC.swift */; };
 		8A8F8526258A355700C4CEF9 /* ClientPostVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A8F8525258A355700C4CEF9 /* ClientPostVC.swift */; };
 		8A8F852E258A357200C4CEF9 /* ClientChatVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A8F852D258A357200C4CEF9 /* ClientChatVC.swift */; };
@@ -55,6 +59,10 @@
 
 /* Begin PBXFileReference section */
 		8A60EEBA258CDB2E0061A830 /* LivePreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LivePreview.swift; sourceTree = "<group>"; };
+		8A76FA4E258DE3EF0094C524 /* RankedTechnieVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RankedTechnieVC.swift; sourceTree = "<group>"; };
+		8A76FA56258DEBB20094C524 /* FullRankingVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullRankingVC.swift; sourceTree = "<group>"; };
+		8A76FA5E258DF2F40094C524 /* NearbyDetailVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NearbyDetailVC.swift; sourceTree = "<group>"; };
+		8A76FA66258E1CDF0094C524 /* SearchResultCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResultCell.swift; sourceTree = "<group>"; };
 		8A8F8520258A353500C4CEF9 /* ClientSearchVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientSearchVC.swift; sourceTree = "<group>"; };
 		8A8F8525258A355700C4CEF9 /* ClientPostVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientPostVC.swift; sourceTree = "<group>"; };
 		8A8F852D258A357200C4CEF9 /* ClientChatVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientChatVC.swift; sourceTree = "<group>"; };
@@ -120,14 +128,26 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		8A76FA6E258E1D300094C524 /* Cells */ = {
+			isa = PBXGroup;
+			children = (
+				8AF76A8D258B671500ED14C2 /* Header.swift */,
+				8A76FA66258E1CDF0094C524 /* SearchResultCell.swift */,
+				8AF76A85258B64FC00ED14C2 /* TechnieRankingCell.swift */,
+				8A8F854D258A3D0500C4CEF9 /* NearbyTechniesCell.swift */,
+				8AF76A52258B23BF00ED14C2 /* FeedCell2.swift */,
+			);
+			path = Cells;
+			sourceTree = "<group>";
+		};
 		8A8F8543258A3BBA00C4CEF9 /* FeedVC */ = {
 			isa = PBXGroup;
 			children = (
 				8AC1B126258A2D8D000F2569 /* ClientFeedVC.swift */,
-				8AF76A85258B64FC00ED14C2 /* TechnieRankingCell.swift */,
-				8A8F854D258A3D0500C4CEF9 /* NearbyTechniesCell.swift */,
-				8AF76A52258B23BF00ED14C2 /* FeedCell2.swift */,
-				8AF76A8D258B671500ED14C2 /* Header.swift */,
+				8A76FA4E258DE3EF0094C524 /* RankedTechnieVC.swift */,
+				8A76FA56258DEBB20094C524 /* FullRankingVC.swift */,
+				8A76FA5E258DF2F40094C524 /* NearbyDetailVC.swift */,
+				8A76FA6E258E1D300094C524 /* Cells */,
 			);
 			path = FeedVC;
 			sourceTree = "<group>";
@@ -521,11 +541,14 @@
 				8AE258A6258A3156004EDB26 /* ClientTabController.swift in Sources */,
 				8AF76A4E258B0B0700ED14C2 /* UserProfileVC.swift in Sources */,
 				8AF76A7D258B440D00ED14C2 /* SpeechService.swift in Sources */,
+				8A76FA67258E1CDF0094C524 /* SearchResultCell.swift in Sources */,
 				8A8F852E258A357200C4CEF9 /* ClientChatVC.swift in Sources */,
 				8AF76A77258B440D00ED14C2 /* KeyboardLayoutConstraint.swift in Sources */,
 				8A8F8533258A358400C4CEF9 /* ClientNotificationVC.swift in Sources */,
 				8AF76A86258B64FC00ED14C2 /* TechnieRankingCell.swift in Sources */,
 				8A60EEBB258CDB2E0061A830 /* LivePreview.swift in Sources */,
+				8A76FA4F258DE3EF0094C524 /* RankedTechnieVC.swift in Sources */,
+				8A76FA57258DEBB20094C524 /* FullRankingVC.swift in Sources */,
 				8AF76A8E258B671500ED14C2 /* Header.swift in Sources */,
 				8AF76A79258B440D00ED14C2 /* TrashBinCode.swift in Sources */,
 				8AF76A78258B440D00ED14C2 /* UIFeedBackGenerator.swift in Sources */,
@@ -533,6 +556,7 @@
 				8AF76A7B258B440D00ED14C2 /* Extensions.swift in Sources */,
 				8AC1B125258A2D8D000F2569 /* SceneDelegate.swift in Sources */,
 				8AF76A7C258B440D00ED14C2 /* Typealias.swift in Sources */,
+				8A76FA5F258DF2F40094C524 /* NearbyDetailVC.swift in Sources */,
 				8A8F8526258A355700C4CEF9 /* ClientPostVC.swift in Sources */,
 				8AF76A53258B23BF00ED14C2 /* FeedCell2.swift in Sources */,
 				8A8F854E258A3D0500C4CEF9 /* NearbyTechniesCell.swift in Sources */,

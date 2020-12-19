@@ -28,7 +28,7 @@ class TechnieRankingCell: UICollectionViewCell {
         cv.register(TechnieRankingInnerCell.self, forCellWithReuseIdentifier: innerCellID)
         return cv
     }()
-    
+    var indexPath: IndexPath = IndexPath(item: 0, section: 0)
     // MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: .zero)
@@ -40,7 +40,7 @@ class TechnieRankingCell: UICollectionViewCell {
     fileprivate func setupViews() {
         [technieRankingCollectionView].forEach {self.addSubview($0)}
 
-        technieRankingCollectionView.anchor(top: self.topAnchor, leading: self.leadingAnchor, bottom: self.bottomAnchor, trailing: self.trailingAnchor)
+        technieRankingCollectionView.anchor(top: self.topAnchor, leading: self.leadingAnchor, bottom: self.bottomAnchor, trailing: self.trailingAnchor, padding: UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0))
         
     }
     
@@ -53,7 +53,7 @@ class TechnieRankingCell: UICollectionViewCell {
     
 }
 
-// MARK: - Extension
+// MARK: - TechnieRankingCell Extension
 extension TechnieRankingCell: CollectionDataSourceAndDelegate {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -75,9 +75,21 @@ extension TechnieRankingCell: CollectionDataSourceAndDelegate {
         return UIEdgeInsets(top: 0, left: 14, bottom: 0, right: 14)
     }
     
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        self.indexPath = indexPath
+        let vc = RankedTechnieVC()
+        vc.stringPrint = "\(indexPath.item)"
+        
+        guard let presentVCFromCell = UIApplication.cellDidPresentViewController() else { return }
+//        presentVCFromCell.navigationController?.show(rankedTechnieVC, sender: nil)
+        
+        presentVCFromCell.present(vc, animated: true)
+
+//        print("IndexPath: \(indexPath.item)")
+    }
+    
     
 }
-
 
 
 // MARK: - InnerCell of the TechnieRankingCell

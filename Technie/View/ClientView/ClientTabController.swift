@@ -12,7 +12,8 @@ class ClientTabController: UITabBarController {
     // MARK: - Properties
     // VCs
     private let feedVC = ClientFeedVC()
-    private let searchVC = ClientSearchVC()
+//    private let searchVC = ClientSearchVC()
+    private let profileVC = ClientSearchVC()
     private let postVC = ClientPostVC()
     private let chatVC = ClientChatVC()
     private let notificationVC = ClientNotificationVC()
@@ -28,10 +29,10 @@ class ClientTabController: UITabBarController {
 //        tabBar.isTranslucent = true
         viewControllers = [
             createTabController(unselectedImage: "homepod", selectedImage: "homepod.fill", vc: feedVC),
-            createTabController2(unselectedImage: "search", selectedImage: "search.fill", vc: searchVC),
-            createTabController(unselectedImage: "plus.app", selectedImage: "plus.app.fill", vc: postVC),
             createTabController(unselectedImage: "message", selectedImage: "message.fill", vc: chatVC),
-            createTabController(unselectedImage: "bell", selectedImage: "bell.fill", vc: notificationVC)
+            createTabController(unselectedImage: "plus.app", selectedImage: "plus.app.fill", vc: postVC),
+            createTabController(unselectedImage: "bell", selectedImage: "bell.fill", vc: notificationVC),
+            createTabController(unselectedImage: "person.circle", selectedImage: "person.circle.fill", vc: profileVC)
         ]
         
     }

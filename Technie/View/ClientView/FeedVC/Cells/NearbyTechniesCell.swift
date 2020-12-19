@@ -180,7 +180,8 @@ class NearbyTechniesCell: UICollectionViewCell {
         view.backgroundColor = .systemGray2
         
         let screenSize = UIScreen.main.bounds
-        view.withSize(CGSize(width: screenSize.width - 10, height: 1))
+//        view.withSize(CGSize(width: screenSize.width - 10, height: 1))
+        view.withHeight(0.7)
         return view
     }()
     
@@ -201,7 +202,7 @@ class NearbyTechniesCell: UICollectionViewCell {
 //        mainStackView.withHeight(160)
         mainStackView.anchor(top: profileImageView.topAnchor, leading: profileImageView.trailingAnchor, bottom: nil, trailing: self.trailingAnchor, padding: UIEdgeInsets(top: 5, left: 8, bottom: 0, right: 0))
 
-        separatorView.anchor(top: nil, leading: nil, bottom: self.bottomAnchor, trailing: self.trailingAnchor, padding: UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0))
+        separatorView.anchor(top: nil, leading: self.leadingAnchor, bottom: self.bottomAnchor, trailing: self.trailingAnchor, padding: UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 5))
         
     }
     

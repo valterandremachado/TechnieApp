@@ -14,6 +14,36 @@ import UIKit
 //    }
 //}
 
+// Helps present a viewController from anywhere
+extension UIApplication
+{
+    class func cellDidPresentViewController(_ base: UIViewController? = UIApplication.shared.windows.filter {$0.isKeyWindow}.first?
+                                                .rootViewController) -> UIViewController? {
+        
+        if let nav = base as? UINavigationController
+        {
+            let top = cellDidPresentViewController(nav.visibleViewController)
+            return top
+        }
+
+        if let tab = base as? UITabBarController
+        {
+            if let selected = tab.selectedViewController
+            {
+                let top = cellDidPresentViewController(selected)
+                return top
+            }
+        }
+
+        if let presented = base?.presentedViewController
+        {
+            let top = cellDidPresentViewController(presented)
+            return top
+        }
+        return base
+    }
+}
+
 /// setupToHideKeyboardOnTapOnView
 extension UIViewController {
     func setupToHideKeyboardOnTapOnView()
