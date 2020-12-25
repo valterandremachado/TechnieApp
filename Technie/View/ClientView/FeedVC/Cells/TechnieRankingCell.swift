@@ -78,6 +78,7 @@ extension TechnieRankingCell: CollectionDataSourceAndDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         self.indexPath = indexPath
         let vc = RankedTechnieVC()
+        vc.modalTransitionStyle = .crossDissolve
         vc.stringPrint = "\(indexPath.item)"
         
         guard let presentVCFromCell = UIApplication.cellDidPresentViewController() else { return }

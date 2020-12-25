@@ -37,7 +37,7 @@
 		8AF76A7D258B440D00ED14C2 /* SpeechService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AF76A75258B440D00ED14C2 /* SpeechService.swift */; };
 		8AF76A7E258B440D00ED14C2 /* UIScrollView+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AF76A76258B440D00ED14C2 /* UIScrollView+.swift */; };
 		8AF76A86258B64FC00ED14C2 /* TechnieRankingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AF76A85258B64FC00ED14C2 /* TechnieRankingCell.swift */; };
-		8AF76A8E258B671500ED14C2 /* Header.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AF76A8D258B671500ED14C2 /* Header.swift */; };
+		8AF76A8E258B671500ED14C2 /* HeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AF76A8D258B671500ED14C2 /* HeaderView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -99,7 +99,7 @@
 		8AF76A75258B440D00ED14C2 /* SpeechService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SpeechService.swift; sourceTree = "<group>"; };
 		8AF76A76258B440D00ED14C2 /* UIScrollView+.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIScrollView+.swift"; sourceTree = "<group>"; };
 		8AF76A85258B64FC00ED14C2 /* TechnieRankingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnieRankingCell.swift; sourceTree = "<group>"; };
-		8AF76A8D258B671500ED14C2 /* Header.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Header.swift; sourceTree = "<group>"; };
+		8AF76A8D258B671500ED14C2 /* HeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -131,7 +131,7 @@
 		8A76FA6E258E1D300094C524 /* Cells */ = {
 			isa = PBXGroup;
 			children = (
-				8AF76A8D258B671500ED14C2 /* Header.swift */,
+				8AF76A8D258B671500ED14C2 /* HeaderView.swift */,
 				8A76FA66258E1CDF0094C524 /* SearchResultCell.swift */,
 				8AF76A85258B64FC00ED14C2 /* TechnieRankingCell.swift */,
 				8A8F854D258A3D0500C4CEF9 /* NearbyTechniesCell.swift */,
@@ -549,7 +549,7 @@
 				8A60EEBB258CDB2E0061A830 /* LivePreview.swift in Sources */,
 				8A76FA4F258DE3EF0094C524 /* RankedTechnieVC.swift in Sources */,
 				8A76FA57258DEBB20094C524 /* FullRankingVC.swift in Sources */,
-				8AF76A8E258B671500ED14C2 /* Header.swift in Sources */,
+				8AF76A8E258B671500ED14C2 /* HeaderView.swift in Sources */,
 				8AF76A79258B440D00ED14C2 /* TrashBinCode.swift in Sources */,
 				8AF76A78258B440D00ED14C2 /* UIFeedBackGenerator.swift in Sources */,
 				8A8F8521258A353500C4CEF9 /* ClientSearchVC.swift in Sources */,

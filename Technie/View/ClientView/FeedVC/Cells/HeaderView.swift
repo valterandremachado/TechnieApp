@@ -7,7 +7,7 @@
 
 import UIKit
 
-class Header: UICollectionReusableView {
+class HeaderView: UICollectionReusableView {
     
     lazy var sectionTitle: UILabel = {
         let lbl = UILabel()
@@ -44,6 +44,8 @@ class Header: UICollectionReusableView {
         return sv
     }()
     
+    var headerDynamicLeadingAnchor: NSLayoutConstraint!
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         //       self.backgroundColor = UIColor.purple
@@ -53,7 +55,10 @@ class Header: UICollectionReusableView {
     fileprivate func setupView(){
         self.addSubview(stackView)
         
-        stackView.anchor(top: self.topAnchor, leading: self.leadingAnchor, bottom: self.bottomAnchor, trailing: self.trailingAnchor, padding: UIEdgeInsets(top: 0, left: 14, bottom: 0, right: 14))
+        stackView.anchor(top: self.topAnchor, leading: nil, bottom: self.bottomAnchor, trailing: self.trailingAnchor, padding: UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 14))
+        
+        headerDynamicLeadingAnchor = stackView.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 14)
+        headerDynamicLeadingAnchor.isActive = true
     }
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)

@@ -10,16 +10,31 @@ import LBTATools
 
 
 class ClientFeedVC: UIViewController {
-
+    
     // Cells ID
     private let feedCellOnSection1ID = "feedCellID1"
     private let feedCellOnSection2ID = "feedCellID2"
     private let searchResultCellID = "searchCellID"
     private let headerID = "headerID"
     
+    private let searchResultHeaderID = "searchViewHeaderID"
+    
     let sections = ["Technician's Ranking", "Nearby Technicians"]
-
+    
     // MARK: - Properties
+    var customindexPath = IndexPath(item: 0, section: 0)
+    
+    lazy var layoutForCollection: UICollectionViewFlowLayout = {
+        let collectionLayout = UICollectionViewFlowLayout()
+        collectionLayout.scrollDirection = .vertical
+        collectionLayout.minimumLineSpacing = 5
+        let viewSize = view.frame.size
+        let collectionViewSize = CGSize(width: viewSize.width, height: 100)
+        collectionLayout.itemSize = collectionViewSize
+        
+        return collectionLayout
+    }()
+    
     lazy var clientFeedCollectionView: UICollectionView = {
         let collectionLayout = UICollectionViewFlowLayout()
         collectionLayout.scrollDirection = .vertical
@@ -29,49 +44,54 @@ class ClientFeedVC: UIViewController {
         cv.translatesAutoresizingMaskIntoConstraints = false
         cv.backgroundColor = .clear 
         cv.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-
+        
         cv.delegate = self
         cv.dataSource = self
+        //        cv.collectionViewLayout.invalidateLayout()
         
         // Registration of the cells
         cv.register(NearbyTechniesCell.self, forCellWithReuseIdentifier: feedCellOnSection1ID)
         cv.register(TechnieRankingCell.self, forCellWithReuseIdentifier: feedCellOnSection2ID)
         // header
-        cv.register(Header.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: headerID)
+        cv.register(HeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: headerID)
         return cv
     }()
     
     lazy var searchResultCollectionView: UICollectionView = {
         let collectionLayout = UICollectionViewFlowLayout()
         collectionLayout.scrollDirection = .vertical
-        collectionLayout.minimumLineSpacing = 5
+        collectionLayout.minimumLineSpacing = 8
+        collectionLayout.minimumInteritemSpacing = 8
+        collectionLayout.estimatedItemSize = .zero
         
         let cv = UICollectionView(frame: .zero, collectionViewLayout: collectionLayout)
         cv.translatesAutoresizingMaskIntoConstraints = false
-        cv.backgroundColor = .clear
+        cv.backgroundColor = .white
         cv.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-
+        // Avoid collectionView to self adjust its size
+        //        cv.contentInsetAdjustmentBehavior = .never
+        
         cv.delegate = self
         cv.dataSource = self
-        
+        //        cv.collectionViewLayout.invalidateLayout()
         // Registration of the cell
         cv.register(SearchResultCell.self, forCellWithReuseIdentifier: searchResultCellID)
         // header
-        cv.register(Header.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: headerID)
+        cv.register(HeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: headerID)
         return cv
     }()
     
     let stringArray = ["Lalala", "Lalala", "Lalala", "Lalala", "Lalala", "Lalala", "Lalala", "Lalala"]
     let detailArray = ["LalalaLalalaLalala", "LalalaLalalaLalala", "LalalaLalalaLalala", "LalalaLalalaLalala", "LalalaLalalaLalala", "LalalaLalalaLalala", "LalalaLalalaLalala", "LalalaLalalaLalala"]
     let imageArray = ["person.crop.circle.fill", "person.crop.circle.fill", "person.crop.circle.fill", "person.crop.circle.fill", "person.crop.circle.fill", "person.crop.circle.fill", "person.crop.circle.fill", "person.crop.circle.fill"]
-
+    
     lazy var clientFeedTableView: UITableView = {
         let tv = UITableView(frame: .zero, style: .plain)
         tv.translatesAutoresizingMaskIntoConstraints = false
         tv.backgroundColor = .clear
         tv.tableFooterView = UIView()
         tv.rowHeight = 100
-
+        
         
         tv.delegate = self
         tv.dataSource = self
@@ -83,22 +103,22 @@ class ClientFeedVC: UIViewController {
     lazy var wiredProfileImage = UIImage(systemName: "person.crop.circle.fill", withConfiguration: config)?.withTintColor(.lightGray, renderingMode: .alwaysOriginal)
     
     lazy var userProfileNavBarBtn: UIButton = {
-    let btn = UIButton(type: .custom)
-    btn.imageView?.contentMode = .scaleAspectFill
-    btn.setImage(wiredProfileImage, for: .normal)
-    btn.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
-    btn.layer.cornerRadius = btn.frame.size.height/2
-    btn.layer.masksToBounds = false
-    btn.clipsToBounds = true
-    btn.sizeToFit()
-    
-    /// height and width constrainnts of profileBtn
-    let widthConstraint = btn.widthAnchor.constraint(equalToConstant: 30)
-    let heightConstraint = btn.heightAnchor.constraint(equalToConstant: 30)
-    heightConstraint.isActive = true
-    widthConstraint.isActive = true
-    
-//    profileBtn.addTarget(self, action: #selector(profileImagePressed), for: .touchUpInside)
+        let btn = UIButton(type: .custom)
+        btn.imageView?.contentMode = .scaleAspectFill
+        btn.setImage(wiredProfileImage, for: .normal)
+        btn.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
+        btn.layer.cornerRadius = btn.frame.size.height/2
+        btn.layer.masksToBounds = false
+        btn.clipsToBounds = true
+        btn.sizeToFit()
+        
+        /// height and width constrainnts of profileBtn
+        let widthConstraint = btn.widthAnchor.constraint(equalToConstant: 30)
+        let heightConstraint = btn.heightAnchor.constraint(equalToConstant: 30)
+        heightConstraint.isActive = true
+        widthConstraint.isActive = true
+        
+        //    profileBtn.addTarget(self, action: #selector(profileImagePressed), for: .touchUpInside)
         return btn
     }()
     
@@ -114,81 +134,74 @@ class ClientFeedVC: UIViewController {
         return search
     }
     
-//    var isShowingSearchResultView = false
+    var isShowingSearchResultView = false
     
     lazy var searchResultView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
         view.clipsToBounds = true
         view.backgroundColor = .white
-//        view.isHidden = true
+        //        view.isHidden = true
         view.alpha = 0
-//        isShowingSearchResultView = false
-        // Add collection view to the resultView
-//        if view.alpha == 1 {
-//        view.addSubview(searchResultCollectionView)
-//        searchResultCollectionView.anchor(top: view.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor)
-//            print("working")
-//        }
+        
+        // Checks if resultView is showed
+        didShowSearchResultViewObservable.observe(on: self) { isLoading in
+            if isLoading != false {
+                // Add collection view to the resultView
+                view.addSubview(self.searchResultCollectionView)
+                //                guard let navBarHeight = self.navigationController?.navigationBar.frame.height else { return }
+                //                self.searchResultCollectionView.withHeight(view.frame.height)
+                self.searchResultCollectionView.anchor(top: self.view.safeAreaLayoutGuide.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor, padding: .init(top: 0, left: 8, bottom: 0, right: 8))
+            }
+            
+        }
         
         return view
     }()
     
     let screenSize = UIScreen.main.bounds.size
-    var isChecked: Bool? = nil
-    var tryout: CGFloat = 0.0
-
-    var alphaNo: CGFloat = 0.0 {
-      willSet(newValue) {
-        print ("Will change to: \(newValue)")
-        tryout = newValue
-      }
-      didSet(oldValue){
-//        print ("Changed from: \(oldValue)")
-      }
     
-    }
+    private var didShowSearchResultViewObservable = Observable(false)
     
     lazy var defaults = UserDefaults.standard
-
+    
+    var collectionViewSize: CGSize = .zero {
+        willSet (newValue) {
+            print("didSet: \(newValue)")
+        }
+    }
+        
     // MARK: - Init
     override func loadView() {
         super.loadView()
         setupNavBar()
     }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         view.backgroundColor = UIColor(named: "BackgroundAppearance")
         setupViews()
-//        searchController.searchBar.showsCancelButton = false
-
-//        let isShowingSearchView = defaults.bool(forKey: "didShowSearchResultView")
-
-//        print("working: \(searchController.searchBar.showsCancelButton)")
-
- 
+        
+        
     }
     
     
-    override func viewWillLayoutSubviews() {
-        super.viewWillLayoutSubviews()
-       
-
-        if searchResultView.alpha != 0 {
-            searchResultView.addSubview(searchResultCollectionView)
-            searchResultCollectionView.anchor(top: searchResultView.topAnchor, leading: searchResultView.leadingAnchor, bottom: searchResultView.bottomAnchor, trailing: searchResultView.trailingAnchor)
+    fileprivate func collectionViewFlowLayoutSetup(with Width: CGFloat){
+        
+        if let flowLayout = clientFeedCollectionView.collectionViewLayout as? UICollectionViewFlowLayout {
+            flowLayout.estimatedItemSize = CGSize(width: Width, height: 300)
         }
+        
     }
-
     // MARK: - Methods
     fileprivate func setupViews(){
         [clientFeedCollectionView, searchResultView].forEach {view.addSubview($0)}
         
         clientFeedCollectionView.anchor(top: view.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor)
-
+        
         guard let navBarHeight = navigationController?.navigationBar.frame.height else { return }
-      
+        
         searchResultView.anchor(top: view.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor, padding: UIEdgeInsets(top: navBarHeight , left: 0, bottom: 0, right: 0))
     }
     
@@ -196,36 +209,39 @@ class ClientFeedVC: UIViewController {
         guard let navBar = navigationController?.navigationBar else { return }
         navBar.topItem?.title = "Feeds"
         navBar.prefersLargeTitles = true
-        navigationItem.largeTitleDisplayMode = .always
+        navigationItem.largeTitleDisplayMode = .automatic
         
         // Left navigation bar item
-//        let leftBarItemUserProfile = UIBarButtonItem(image: wiredProfileImage, style: .plain, target: self, action: #selector(leftBarItemPressed))
-//        let customBarItem = UIBarButtonItem(customView: userProfileNavBarBtn)
-//        navigationItem.leftBarButtonItem = leftBarItemUserProfile
+        //        let leftBarItemUserProfile = UIBarButtonItem(image: wiredProfileImage, style: .plain, target: self, action: #selector(leftBarItemPressed))
+        //        let customBarItem = UIBarButtonItem(customView: userProfileNavBarBtn)
+        //        navigationItem.leftBarButtonItem = leftBarItemUserProfile
         navigationItem.searchController = searchController
         
     }
     
-    fileprivate func showSearchResultView(_ searchBar: UISearchBar) {
-        defaults.setValue(true, forKey: "didShowSearchResultView")
+    fileprivate func showSearchResultView() {
         
         UIView.animate(withDuration: 0.5, delay: 0.15, usingSpringWithDamping: 1.0, initialSpringVelocity: 0, options: .curveEaseInOut, animations: { [self] in
-            searchResultView.isHidden = false
+            didShowSearchResultViewObservable.value = true
             searchResultView.alpha = 1
-            alphaNo = 1
-//            let vc = ClientSearchVC()
-
+            // Remove the collectionView from it's parentView to avoid clientFeedCollectionView ItemSize collapse with the searchResultCollectionView itemSize
+            self.clientFeedCollectionView.removeFromSuperview()
         }, completion: nil)
- 
     }
     
-    fileprivate func hideSearchResultView(_ searchBar: UISearchBar) {
-        defaults.setValue(false, forKey: "didShowSearchResultView")
-
-        UIView.animate(withDuration: 0.35, delay: 0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0, options: .curveEaseInOut, animations: { [self] in
+    fileprivate func hideSearchResultView() {
+        
+        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0, options: .transitionCrossDissolve, animations: { [self] in
             searchResultView.alpha = 0
-            alphaNo = 0
-//            isShowingSearchResultView = false
+            didShowSearchResultViewObservable.value = false
+            
+            /// Completion outside of the completion block to avoid delay
+            // Remove the collectionViewFrom it's parentView for a better memory efficiency
+            searchResultCollectionView.removeFromSuperview()
+            // searchResultView is placed there to give the navigationBar its original collapse animation
+            [clientFeedCollectionView, searchResultView].forEach {view.addSubview($0)}
+            clientFeedCollectionView.anchor(top: view.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor)
+            
         }, completion: nil)
         
     }
@@ -233,7 +249,7 @@ class ClientFeedVC: UIViewController {
     // MARK: - Selectors
     @objc fileprivate func leftBarItemPressed(){
         let userProfileVC = UserProfileVC()
-//        userProfileVC.navigationController?.navigationBar.topItem?.backButtonTitle = ""
+        //        userProfileVC.navigationController?.navigationBar.topItem?.backButtonTitle = ""
         navigationController?.pushViewController(userProfileVC, animated: true)
     }
     
@@ -241,52 +257,39 @@ class ClientFeedVC: UIViewController {
         let vc = FullRankingVC()
         navigationController?.pushViewController(vc, animated: true)
     }
-
+    
 }
 
 // MARK: - UISearchBarDelegate Extension
 extension ClientFeedVC: UISearchBarDelegate {
     
-//    func updateSearchResults(for searchController: UISearchController) {
-//        searchController.searchResultsController?.view.isHidden = false
-//    }
-    
     func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
-//        let vc = ClientSearchVC()
-//        vc.modalTransitionStyle = .crossDissolve
-//        present(vc, animated: true, completion: nil)
-//          self.present(UINavigationController(rootViewController: ClientSearchVC()), animated: false, completion: nil)
-        showSearchResultView(searchBar)
-      }
+        showSearchResultView()
+    }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        hideSearchResultView(searchBar)
-        searchResultView.isHidden = true
+        hideSearchResultView()
     }
-
+    
 }
 
 // MARK: - CollectionViewDelegateAndDataSource Extension
 extension ClientFeedVC: CollectionDataSourceAndDelegate {
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        if searchResultView.alpha == 1 {
-            return 1
-        }
-        return sections.count
+        return didShowSearchResultViewObservable.value == true ? (1) : (sections.count) //sections.count
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if searchResultView.alpha == 1 {
-            return 6
-        }
-        return section == 0 ? (1) : (5)
+        return didShowSearchResultViewObservable.value == true ? (6) : (section == 0 ? (1) : (5)) //section == 0 ? (1) : (5)
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-       
-        if searchResultView.alpha == 1 {
+        
+        // this cell is only showed when this condition is true
+        if didShowSearchResultViewObservable.value == true && indexPath.section == 0 {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: searchResultCellID, for: indexPath) as! SearchResultCell
+            cell.backgroundColor = .green
             return cell
         }
         
@@ -295,41 +298,87 @@ extension ClientFeedVC: CollectionDataSourceAndDelegate {
             // Technie Ranking cell
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: feedCellOnSection2ID, for: indexPath) as! TechnieRankingCell
             return cell
+            
         case 1:
             // Nearby Technie cell
-            let cell = clientFeedCollectionView.dequeueReusableCell(withReuseIdentifier: feedCellOnSection1ID, for: indexPath) as! NearbyTechniesCell
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: feedCellOnSection1ID, for: indexPath) as! NearbyTechniesCell
             return cell
         default:
             break
         }
-
         return UICollectionViewCell()
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let vc = NearbyDetailVC()
-        navigationController?.pushViewController(vc, animated: true)
+        
+        switch didShowSearchResultViewObservable.value {
+        case true:
+            print("resultView Showing now")
+        case false:
+            let vc = NearbyDetailVC()
+            navigationController?.pushViewController(vc, animated: true)
+        }
+        
     }
     
     // CollectionView layouts
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        
+        let noOfCellsInRow = 2
+        /// changing sizeForItem when user switches through the segnment
+        let flowLayout = collectionViewLayout as! UICollectionViewFlowLayout
+        let totalSpace = flowLayout.sectionInset.left
+            + flowLayout.sectionInset.right
+            + (flowLayout.minimumInteritemSpacing * CGFloat(noOfCellsInRow - 1))
+        //        flowLayout.sectionInset.left = 5
+        //        flowLayout.sectionInset.right = 5
+        
+        let size = ((collectionView.bounds.width) - totalSpace) / CGFloat(noOfCellsInRow)
+        let finalSize = CGSize(width: size, height: size)
+        
         let viewSize = view.frame.size
-        var collectionViewSize = CGSize(width: viewSize.width, height: 290)
+        var collectionViewSize = CGSize(width: 0, height: 0)
         
-        if searchResultView.alpha == 1 {
-            return collectionViewSize
+        if didShowSearchResultViewObservable.value == true {
+            switch indexPath.section {
+            case 0:
+                //                if indexPath.item == 0 {
+                //                    collectionViewSize = CGSize(width: viewSize.width, height: 250)
+                //                    return collectionViewSize
+                //                }
+                return finalSize
+            case 1:
+                collectionViewSize = CGSize(width: viewSize.width, height: 150)
+                return collectionViewSize
+            default:
+                break
+            }
+            
+        } else {
+            
+            switch indexPath.section {
+            case 0:
+                collectionViewSize = CGSize(width: viewSize.width, height: 290)
+                return collectionViewSize
+            case 1:
+                collectionViewSize = CGSize(width: viewSize.width - 10, height: 150)
+                return collectionViewSize
+            default:
+                break
+            }
         }
         
-        if indexPath.section != 0 {
-            collectionViewSize = CGSize(width: viewSize.width - 10, height: 150)
-        }
-        
-        return collectionViewSize
+        return CGSize.init()
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         // Section 0 EdgeInsets
         var collectionViewEdgeInsets = UIEdgeInsets(top: 10, left: 0, bottom: 25, right: 0)
+        
+        if didShowSearchResultViewObservable.value == true {
+            collectionViewEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 10, right: 0)
+            return collectionViewEdgeInsets
+        }
         
         if section != 0 {
             // Section 1 EdgeInsets
@@ -344,23 +393,27 @@ extension ClientFeedVC: CollectionDataSourceAndDelegate {
     // MARK: - Multi-section handler (CollectionView Methods)
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind:
                             String, at indexPath: IndexPath) -> UICollectionReusableView {
-        let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier:
-                                                                        headerID, for: indexPath) as! Header
         
-        if searchResultView.alpha == 1 {
-            header.sectionTitle.text = "Recommended"
-            print("header")
+        let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: headerID, for: indexPath) as! HeaderView
+        
+        if didShowSearchResultViewObservable.value == true {
+            header.sectionTitle.text = "Search by category"
+//            header.backgroundColor = .red
+//            header.sectionTitle.backgroundColor = .brown
+//            header.stackView.addBackground(color: .cyan)
+            header.headerDynamicLeadingAnchor.constant = 0
             return header
         }
         
         switch indexPath.section {
         case 0:
             header.sectionTitle.text = sections[indexPath.section]
-//            header.backgroundColor = .red
+            //            header.backgroundColor = .red
             // Show seeAllBtn only for this section
             header.seeAllBtn.isHidden = false
             header.seeAllBtn.addTarget(self, action: #selector(seeAllBtnPressed), for: .touchUpInside)
 //            header.backgroundColor = .red
+//            header.sectionTitle.backgroundColor = .brown
             return header
         case 1:
             header.sectionTitle.text = sections[indexPath.section]
@@ -373,6 +426,9 @@ extension ClientFeedVC: CollectionDataSourceAndDelegate {
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+        if didShowSearchResultViewObservable.value == true {
+            return CGSize(width: collectionView.frame.width, height: 45)
+        }
         return CGSize(width: collectionView.frame.width, height: 25)
     }
     
@@ -417,4 +473,52 @@ struct ClientFeedPreviews: PreviewProvider {
         return vc.liveViewController
     }
     
+}
+
+
+class Observer<Value> {
+    typealias ObserverBlock  = (Value) -> Void
+    
+    weak var observer: AnyObject?
+    let block: ObserverBlock
+    
+    init(observer: AnyObject, block: @escaping ObserverBlock) {
+        self.observer = observer
+        self.block = block
+    }
+}
+
+public class Observable<Value> {
+    
+    //MARK: - Private properties
+    private var observers  = [Observer<Value>]()
+    
+    //MARK: - Public properties
+    public var value : Value {
+        didSet {
+            self.notifyObservers()
+        }
+    }
+    
+    //MARK: - Struct lifecycle
+    public init(_ value: Value) {
+        self.value = value
+    }
+    
+    //MARK: - Observation
+    func observe(on observer: AnyObject, observerBlock: @escaping Observer<Value>.ObserverBlock) {
+        self.observers.append(Observer(observer: observer, block: observerBlock))
+        observerBlock(value)
+    }
+    
+    func remove(observer: AnyObject) {
+        self.observers = self.observers.filter({ $0.observer !== observer })
+    }
+    
+    //MARK: - Helpers
+    private func notifyObservers() {
+        for observer in self.observers {
+            observer.block(value)
+        }
+    }
 }
