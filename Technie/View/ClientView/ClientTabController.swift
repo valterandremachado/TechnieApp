@@ -13,7 +13,7 @@ class ClientTabController: UITabBarController {
     // VCs
     private let feedVC = ClientFeedVC()
 //    private let searchVC = ClientSearchVC()
-    private let profileVC = ClientSearchVC()
+    private let profileVC = UserProfileVC()
     private let postVC = ClientPostVC()
     private let chatVC = ClientChatVC()
     private let notificationVC = ClientNotificationVC()

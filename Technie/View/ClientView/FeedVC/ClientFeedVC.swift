@@ -85,20 +85,6 @@ class ClientFeedVC: UIViewController {
     let detailArray = ["LalalaLalalaLalala", "LalalaLalalaLalala", "LalalaLalalaLalala", "LalalaLalalaLalala", "LalalaLalalaLalala", "LalalaLalalaLalala", "LalalaLalalaLalala", "LalalaLalalaLalala"]
     let imageArray = ["person.crop.circle.fill", "person.crop.circle.fill", "person.crop.circle.fill", "person.crop.circle.fill", "person.crop.circle.fill", "person.crop.circle.fill", "person.crop.circle.fill", "person.crop.circle.fill"]
     
-    lazy var clientFeedTableView: UITableView = {
-        let tv = UITableView(frame: .zero, style: .plain)
-        tv.translatesAutoresizingMaskIntoConstraints = false
-        tv.backgroundColor = .clear
-        tv.tableFooterView = UIView()
-        tv.rowHeight = 100
-        
-        
-        tv.delegate = self
-        tv.dataSource = self
-        tv.register(FeedCell2.self, forCellReuseIdentifier: feedCellOnSection1ID)
-        return tv
-    }()
-    
     let config = UIImage.SymbolConfiguration(pointSize: CGFloat(30))
     lazy var wiredProfileImage = UIImage(systemName: "person.crop.circle.fill", withConfiguration: config)?.withTintColor(.lightGray, renderingMode: .alwaysOriginal)
     
@@ -160,16 +146,10 @@ class ClientFeedVC: UIViewController {
     }()
     
     let screenSize = UIScreen.main.bounds.size
-    
     private var didShowSearchResultViewObservable = Observable(false)
     
-    lazy var defaults = UserDefaults.standard
-    
-    var collectionViewSize: CGSize = .zero {
-        willSet (newValue) {
-            print("didSet: \(newValue)")
-        }
-    }
+    let professionArray = ["Handyman", "Electrician", "Repairer", "Others"]//Household Appliances Repairers
+
         
     // MARK: - Init
     override func loadView() {
@@ -215,8 +195,10 @@ class ClientFeedVC: UIViewController {
         //        let leftBarItemUserProfile = UIBarButtonItem(image: wiredProfileImage, style: .plain, target: self, action: #selector(leftBarItemPressed))
         //        let customBarItem = UIBarButtonItem(customView: userProfileNavBarBtn)
         //        navigationItem.leftBarButtonItem = leftBarItemUserProfile
-        navigationItem.searchController = searchController
         
+        navigationItem.searchController = searchController
+//        searchController.isActive = true
+//        searchController.searchBar.becomeFirstResponder()
     }
     
     fileprivate func showSearchResultView() {
@@ -271,6 +253,9 @@ extension ClientFeedVC: UISearchBarDelegate {
         hideSearchResultView()
     }
     
+//    func presentSearchController(_ searchController: UISearchController) {
+//        searchController.searchBar.becomeFirstResponder()
+//    }
 }
 
 // MARK: - CollectionViewDelegateAndDataSource Extension
@@ -281,7 +266,7 @@ extension ClientFeedVC: CollectionDataSourceAndDelegate {
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return didShowSearchResultViewObservable.value == true ? (6) : (section == 0 ? (1) : (5)) //section == 0 ? (1) : (5)
+        return didShowSearchResultViewObservable.value == true ? (professionArray.count) : (section == 0 ? (1) : (5)) //section == 0 ? (1) : (5)
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -289,7 +274,9 @@ extension ClientFeedVC: CollectionDataSourceAndDelegate {
         // this cell is only showed when this condition is true
         if didShowSearchResultViewObservable.value == true && indexPath.section == 0 {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: searchResultCellID, for: indexPath) as! SearchResultCell
-            cell.backgroundColor = .green
+            cell.backgroundColor = .systemGray4
+            cell.title.text = professionArray[indexPath.item]
+            cell.dynamicWidth.constant = cell.frame.width
             return cell
         }
         
@@ -427,40 +414,13 @@ extension ClientFeedVC: CollectionDataSourceAndDelegate {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         if didShowSearchResultViewObservable.value == true {
-            return CGSize(width: collectionView.frame.width, height: 45)
+            return CGSize(width: collectionView.frame.width, height: 50)
         }
         return CGSize(width: collectionView.frame.width, height: 25)
     }
     
 }
 
-// MARK: - TableViewDelegateAndDataSource Extension
-extension ClientFeedVC: TableViewDataSourceAndDelegate {
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return stringArray.count
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        var cell = tableView.dequeueReusableCell(withIdentifier: feedCellOnSection1ID, for: indexPath) as! FeedCell2
-        // Enables detailTextLabel visibility
-        cell = FeedCell2(style: .subtitle, reuseIdentifier: feedCellOnSection1ID)
-        
-        
-        // Customize Cell
-        cell.textLabel?.textColor = .black
-        cell.detailTextLabel?.textColor = .black
-        cell.backgroundColor = .white
-        
-        // Pass data
-        cell.textLabel?.text = stringArray[indexPath.row]
-        cell.detailTextLabel?.text = detailArray[indexPath.row]
-        cell.imageView?.image = UIImage(systemName: imageArray[indexPath.row])
-        return cell
-    }
-    
-    
-}
 
 
 // MARK: - ClientFeedPreviews

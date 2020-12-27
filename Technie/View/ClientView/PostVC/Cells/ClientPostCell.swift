@@ -1,14 +1,15 @@
 //
-//  searchResultCell.swift
+//  ClientPostCell.swift
 //  Technie
 //
-//  Created by Valter A. Machado on 12/19/20.
+//  Created by Valter A. Machado on 12/25/20.
 //
 
 import UIKit
 
-class SearchResultCell: UICollectionViewCell {
-        
+
+class ClientPostCell: UICollectionViewCell {
+
     // MARK: - Properties
     lazy var title: UILabel = {
         let lbl = UILabel()
@@ -32,12 +33,9 @@ class SearchResultCell: UICollectionViewCell {
         
         return sv
     }()
-    
-    var dynamicWidth: NSLayoutConstraint!
     // MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: .zero)
-//        backgroundColor = .darkGray
         setupViews()
     }
     
@@ -46,28 +44,27 @@ class SearchResultCell: UICollectionViewCell {
         // Customize Cell
         self.layer.cornerRadius = 10
         self.clipsToBounds = true
-
-        [stackView].forEach {self.addSubview($0)}
+        
+        [title].forEach {self.addSubview($0)}
         
         NSLayoutConstraint.activate([
-            stackView.centerXAnchor.constraint(equalTo: self.centerXAnchor),
-            stackView.centerYAnchor.constraint(equalTo: self.centerYAnchor),
-//            stackView.topAnchor.constraint(equalTo: self.topAnchor),
-//            stackView.bottomAnchor.constraint(equalTo: self.bottomAnchor)
+            title.centerXAnchor.constraint(equalTo: self.centerXAnchor),
+            title.centerYAnchor.constraint(equalTo: self.centerYAnchor),
+            title.topAnchor.constraint(equalTo: self.topAnchor),
+            title.bottomAnchor.constraint(equalTo: self.bottomAnchor)
 
-            stackView.heightAnchor.constraint(equalToConstant: 100),
+//            stackView.heightAnchor.constraint(equalToConstant: 100),
 //            stackView.widthAnchor.constraint(equalToConstant: self.frame.width)
 
         ])
-        dynamicWidth = stackView.widthAnchor.constraint(equalToConstant: 0)
-        dynamicWidth.isActive = true
+//        dynamicWidth = stackView.widthAnchor.constraint(equalToConstant: 0)
+//        dynamicWidth.isActive = true
 
     }
+    
     // MARK: - Selectors
 
-    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
 }
