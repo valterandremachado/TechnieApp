@@ -117,11 +117,24 @@ extension ClientPostVC: CollectionDataSourceAndDelegate {
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let vc = PostSectionVC()
-        vc.postSectionVCIndexPath = indexPath
-        vc.navigationItem.title = navigationItem.title
-        vc.sectionTitle = professionArray[indexPath.item]
-        navigationController?.pushViewController(vc, animated: true)
+        
+        switch indexPath.item {
+        case 1:
+            print("index 0")
+            let vc = PostFormVC()
+            navigationController?.pushViewController(vc, animated: true)
+        case 3:
+            print("index 3")
+            let vc = PostFormVC()
+            navigationController?.pushViewController(vc, animated: true)
+        default:
+            // present postSubSections
+            let vc = PostSectionVC()
+            vc.postSectionVCIndexPath = indexPath
+            vc.navigationItem.title = navigationItem.title
+            vc.sectionTitle = professionArray[indexPath.item]
+            navigationController?.pushViewController(vc, animated: true)
+        }
     }
     
 }

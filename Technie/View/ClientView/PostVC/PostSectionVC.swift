@@ -19,7 +19,7 @@ class PostSectionVC: UIViewController {
         tv.translatesAutoresizingMaskIntoConstraints = false
         tv.backgroundColor = .white
         tv.tableFooterView = UIView()
-        
+
 //        tv.isScrollEnabled = false
         tv.showsVerticalScrollIndicator = false
 //        tv.rowHeight = 40
@@ -32,11 +32,12 @@ class PostSectionVC: UIViewController {
         return tv
     }()
     
-    let stringArray = ["Refrigerator", "Washing Machine", "Freezer", "Ice Cream Machine", "TV", "Microwave", "Heat Pump", "Commercial Oven", "Dryer Machine"]
+    let repairerSectionArray = ["Refrigerator", "Washing Machine", "Freezer", "Ice Cream Machine", "TV", "Microwave", "Heat Pump", "Commercial Oven", "Dryer Machine", "Others"]
+    
+    let handymanSectionArray = ["Plumbing Installation/Leaking Plumbing", "Drywall Installation", "Fixture Replacement", "Painting for the Interior and Exterior", "Power Washing", "Tile Installation", "Deck/Door/Window Repair", "Carpenter", "Cabinetmaker", "Others"]
+    
+    let electricianSectionArray = ["Refrigerator", "Drywall Installation", "Freezer", "Machine", "TV", "Microwave", "Pump", "Commercial", "Machine"]
 
-    let stringArray2 = ["Lalala", "Lalala", "Lalala", "Lalala", "Lalala", "Lalala", "Lalala", "Lalala"]
-
-    let stringArray3 = ["Lelele", "Lelele", "Lelele", "Lelele", "Lelele", "Lelele", "Lelele", "Lelele"]
 
     // MARK: - Inits
     override func viewDidLoad() {
@@ -48,9 +49,8 @@ class PostSectionVC: UIViewController {
     
 //    override func viewWillDisappear(_ animated: Bool) {
 //        super.viewWillDisappear(animated)
-//        navigationController?.navigationBar.prefersLargeTitles = true
 //    }
-//
+
     // MARK: - Methods
     fileprivate func setupViews() {
         [tableView].forEach {view.addSubview($0)}
@@ -81,13 +81,13 @@ extension PostSectionVC: TableViewDataSourceAndDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch postSectionVCIndexPath.item {
         case 0:
-            return stringArray2.count
-        case 1:
-            return stringArray3.count
+            return handymanSectionArray.count
+//        case 1:
+//            return stringArray3.count
         case 2:
-            return stringArray.count
-        case 3:
-            return 1
+            return repairerSectionArray.count
+//        case 3:
+//            return 1
         default:
             return 0
         }
@@ -96,21 +96,39 @@ extension PostSectionVC: TableViewDataSourceAndDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: tableCellID, for: indexPath) as! PostSectionCell
 //        cell.textLabel?.text = stringArray[indexPath.row]
-        
+        // custom selectionHighlight color
+//        cell.selectedBackgroundView = UIView(frame: CGRect.zero)
+//        cell.selectedBackgroundView?.backgroundColor = UIColor(red:0.27, green:0.71, blue:0.73, alpha:1.0)
+
         switch postSectionVCIndexPath.item {
         case 0:
-            cell.textLabel?.text = stringArray2[indexPath.row]
-        case 1:
-            cell.textLabel?.text = stringArray3[indexPath.row]
+            cell.textLabel?.text = handymanSectionArray[indexPath.row]
+//        case 1:
+//            cell.textLabel?.text = stringArray3[indexPath.row]
         case 2:
-            cell.textLabel?.text = stringArray[indexPath.row]
-        case 3:
-            cell.textLabel?.text = "One"
+            cell.textLabel?.text = repairerSectionArray[indexPath.row]
+//        case 3:
+//            cell.textLabel?.text = "One"
         default:
             break
         }
         
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        switch postSectionVCIndexPath.item {
+        case 0:
+            let vc = PostFormVC()
+            navigationController?.pushViewController(vc, animated: true)
+        case 2:
+            let vc = PostFormVC()
+            navigationController?.pushViewController(vc, animated: true)
+        default:
+           break
+        }
+        
     }
     
     

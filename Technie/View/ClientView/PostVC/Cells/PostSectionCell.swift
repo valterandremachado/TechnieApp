@@ -15,7 +15,7 @@ class PostSectionCell: UITableViewCell {
         /// Adding tableView right indicator
         self.accessoryType = .disclosureIndicator
         /// Changing selection style
-//        self.selectionStyle = .none
+//        self.selectionStyle = .blue
         
 //        self.layer.cornerRadius = 15
 //        self.clipsToBounds = true

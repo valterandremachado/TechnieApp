@@ -14,6 +14,55 @@ import UIKit
 //    }
 //}
 
+// -> Helps Create an dynamic observable variable
+class Observer<Value> {
+    typealias ObserverBlock  = (Value) -> Void
+    
+    weak var observer: AnyObject?
+    let block: ObserverBlock
+    
+    init(observer: AnyObject, block: @escaping ObserverBlock) {
+        self.observer = observer
+        self.block = block
+    }
+}
+
+public class Observable<Value> {
+    
+    //MARK: - Private properties
+    private var observers  = [Observer<Value>]()
+    
+    //MARK: - Public properties
+    public var value : Value {
+        didSet {
+            self.notifyObservers()
+        }
+    }
+    
+    //MARK: - Struct lifecycle
+    public init(_ value: Value) {
+        self.value = value
+    }
+    
+    //MARK: - Observation
+    func observe(on observer: AnyObject, observerBlock: @escaping Observer<Value>.ObserverBlock) {
+        self.observers.append(Observer(observer: observer, block: observerBlock))
+        observerBlock(value)
+    }
+    
+    func remove(observer: AnyObject) {
+        self.observers = self.observers.filter({ $0.observer !== observer })
+    }
+    
+    //MARK: - Helpers
+    private func notifyObservers() {
+        for observer in self.observers {
+            observer.block(value)
+        }
+    }
+}
+// < -
+
 // Helps present a viewController from anywhere
 extension UIApplication
 {
