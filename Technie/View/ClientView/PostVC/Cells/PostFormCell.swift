@@ -94,7 +94,7 @@ class PostFormProjectTypeCell: UITableViewCell {
         let seg = UISegmentedControl(items: items)
         seg.translatesAutoresizingMaskIntoConstraints = false
         seg.selectedSegmentIndex = 0
-        seg.backgroundColor = .brown
+        seg.backgroundColor = .systemGray4
         
 //        seg.frame = CGRect(x: 35, y: 200, width: 250, height: 50)
 //        seg.addTarget(self, action: #selector(segmentAction(_:)), for: .valueChanged)
@@ -228,28 +228,44 @@ class PostFormBudgetCell: UITableViewCell {
 // MARK: - PostFormSkillCell
 class PostFormSkillCell: UITableViewCell {
     static var cellID = "PostFormSkillCell"
+    
+    var addSkillsBtn: UIButton = {
+        var btn = UIButton(type: .system)
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        btn.setTitle("Add Skills", for: .normal)
+        btn.contentHorizontalAlignment = .left
+        btn.isHidden = true
+        return btn
+    }()
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-//        backgroundColor = .white
+        //        backgroundColor = .white
         /// Adding tableView right indicator
-//        self.accessoryType = .disclosureIndicator
+        //        self.accessoryType = .disclosureIndicator
         /// Changing selection style
         self.selectionStyle = .none
-        backgroundColor = .cyan
-
-//        self.layer.cornerRadius = 15
-//        self.clipsToBounds = true
+        backgroundColor = .white
+        
+        //        self.layer.cornerRadius = 15
+        //        self.clipsToBounds = true
     }
     
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
-
+        
         // Configure the view for the selected state
+    }
+    
+    func setupViews() {
+        [addSkillsBtn].forEach {self.contentView.addSubview($0)}
+        addSkillsBtn.isHidden = false
+        addSkillsBtn.anchor(top: self.contentView.topAnchor, leading: self.contentView.safeAreaLayoutGuide.leadingAnchor, bottom: self.contentView.bottomAnchor, trailing: self.contentView.safeAreaLayoutGuide.trailingAnchor, padding: UIEdgeInsets(top: 0, left: self.separatorInset.left + 5, bottom: 0, right: self.separatorInset.right + 15))
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-
+    
 }

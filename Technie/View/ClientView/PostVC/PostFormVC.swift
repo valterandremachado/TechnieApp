@@ -7,7 +7,7 @@
 
 import UIKit
 
-class SectionTitle {
+struct SectionTitle {
     var title: String?
     var description: [String]
     
@@ -131,18 +131,34 @@ class PostFormVC: UIViewController {
     let handymanSectionArray = ["Plumbing Installation/Leaking Plumbing", "Drywall Installation", "Fixture Replacement", "Painting for the Interior and Exterior", "Power Washing", "Tile Installation", "Deck/Door/Window Repair", "Carpenter", "Cabinetmaker", "Others"]
 
     var finalPick = ""
+    var pickerIndex = 0
+    let userDefaults = UserDefaults.standard
+//    lazy var pickerStoredIndex = userDefaults.integer(forKey: Keys.pickerStoredIndex)
+
+    struct Keys {
+        static let pickerStoredIndex = "pickerIndex"
+    }
+
+    var skillArray = [""]
+    
     // MARK: - Inits
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         view.backgroundColor = .cyan
         setupViews()
-        
+
         sections.append(SectionTitle.init(title: "Project Title & Description", description: ["0", "1", ""]))
         sections.append(SectionTitle.init(title: "Project Type", description: ["0"]))
         sections.append(SectionTitle.init(title: "Project Budget", description: ["0"]))
-        sections.append(SectionTitle.init(title: "Skills Required", description: ["Skill 1", "Skill 2", "Skill 3", "Add Skills"]))
+        sections.append(SectionTitle.init(title: "Skills Required", description: skillArray))
 
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        // Reset userDefaults
+        userDefaults.removeObject(forKey: Keys.pickerStoredIndex)
     }
 
     // MARK: - Methods
@@ -151,9 +167,47 @@ class PostFormVC: UIViewController {
         tableView.anchor(top: view.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor)
     }
     
+    fileprivate func addSkillData(_ skillTitle: String?) {
+        guard let skill = skillTitle else { return }
+        let existingSkill = self.sections[3].description.first
+        
+        if skill != existingSkill && skill != "" {
+        // Insert items instead of append to give a smooth relead transition
+            self.skillArray.insert(skill, at: 0)
+            self.sections[3].description = self.skillArray
+            // Reloads items from the top
+            self.tableView.beginUpdates()
+            self.tableView.insertRows(at: [IndexPath(row: 0, section: 3)], with: .top)
+            self.tableView.endUpdates()
+        } else {
+            print("existing Name")
+        }
+    }
+    
+    fileprivate func presentActionSheet() {
+        var textField = UITextField()
+        let alert = UIAlertController(title: "Add New Schedule", message: "", preferredStyle: .alert)
+        
+        let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
+            self.addSkillData(textField.text)
+        }
+        
+        alert.addTextField { (addTextField) in
+            addTextField.placeholder = "Creat new item"
+            textField = addTextField
+        }
+        
+        alert.addAction(action)
+        
+        self.present(alert, animated: true, completion: nil)
+    }
+    
     // MARK: - Selectors
-
-
+    @objc func addSkillsBtnTapped() {
+        presentActionSheet()
+    }
+    
+    
 
 }
 
@@ -182,6 +236,7 @@ extension PostFormVC: TableViewDataSourceAndDelegate {
         //        cell.textLabel?.text = title //handymanSectionArray[indexPath.row]
         switch indexPath.section {
         case 0:
+            // PostFormCell
             let cell = tableView.dequeueReusableCell(withIdentifier: tableCellID, for: indexPath) as! PostFormCell
             cell.backgroundColor = .white
             
@@ -212,10 +267,12 @@ extension PostFormVC: TableViewDataSourceAndDelegate {
             
             return cell
         case 1:
+            // PostFormProjectTypeCell
             let cell = tableView.dequeueReusableCell(withIdentifier: PostFormProjectTypeCell.cellID, for: indexPath) as! PostFormProjectTypeCell
             cell.setupViews()
             return cell
         case 2:
+            // PostFormBudgetCell
             let cell = tableView.dequeueReusableCell(withIdentifier: PostFormBudgetCell.cellID, for: indexPath) as! PostFormBudgetCell
             [stackView].forEach {cell.contentView.addSubview($0)}
             stackView.anchor(top: cell.contentView.topAnchor, leading: cell.contentView.safeAreaLayoutGuide.leadingAnchor, bottom: cell.contentView.bottomAnchor, trailing: cell.contentView.safeAreaLayoutGuide.trailingAnchor, padding: UIEdgeInsets(top: 0, left: cell.separatorInset.left + 5, bottom: 0, right: cell.separatorInset.right + 15))
@@ -223,59 +280,26 @@ extension PostFormVC: TableViewDataSourceAndDelegate {
             budgetPickerBtn.addTarget(self, action: #selector(budgetPickerBtnTapped), for: .touchUpInside)
             return cell
         case 3:
+            // PostFormSkillCell
             let cell = tableView.dequeueReusableCell(withIdentifier: PostFormSkillCell.cellID, for: indexPath) as! PostFormSkillCell
-            cell.textLabel?.text = title
+            
+            let lastRowIndex = tableView.numberOfRows(inSection: tableView.numberOfSections-1)
+            let lastIndex = lastRowIndex - 1
 
+            if indexPath.row == lastIndex {
+                cell.setupViews()
+                cell.addSkillsBtn.addTarget(self, action: #selector(addSkillsBtnTapped), for: .touchUpInside)
+            } else {
+                cell.textLabel?.text = title
+                cell.addSkillsBtn.isHidden = true
+            }
+            
             return cell
         default:
             break
         }
 
         return UITableViewCell()
-    }
-   
-    fileprivate func setupPickerView() {
-        self.view.addSubview(pickerCustomView)
-        NSLayoutConstraint.activate([
-            pickerCustomView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            pickerCustomView.heightAnchor.constraint(equalToConstant: 140),
-            pickerCustomView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            pickerCustomView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-        ])
-        pickerCustomView.fadeIn()
-
-//        NSLayoutConstraint.activate([
-//            picker.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-////            picker.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
-//            picker.heightAnchor.constraint(equalToConstant: 100),
-////            projectTypeSwitcher.widthAnchor.constraint(equalToConstant: 100),
-//            picker.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 15),
-//            picker.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -15),
-//        ])
-
-    }
-    
-    @objc func budgetPickerBtnTapped(_ sender: UIButton) {
-        setupPickerView()
-    }
-    
-    @objc func doneBtnTapped() {
-        pickerCustomView.removeFromSuperview()
-        print("123: "+finalPick)
-        if finalPick != "" {
-        budgetPickerBtn.setTitle(finalPick, for: .normal)
-        }
-        pickerCustomView.fadeOut()
-    }
-    
-    @objc func cancelBtnTapped() {
-        pickerCustomView.fadeOut()
-        pickerCustomView.removeFromSuperview()
-//        if finalPick == "" {
-        budgetPicker.selectRow(0, inComponent: 0, animated: true)
-//        } else {
-//            print("finalPick is not empty")
-//        }
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
@@ -288,6 +312,7 @@ extension PostFormVC: TableViewDataSourceAndDelegate {
     
 }
 
+// MARK: - UIPickerViewDelegate Extension
 extension PostFormVC: UIPickerViewDelegate, UIPickerViewDataSource {
     
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
@@ -304,10 +329,46 @@ extension PostFormVC: UIPickerViewDelegate, UIPickerViewDataSource {
     }
         
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-//        print(customArray[row])
+        // Store row index in order to use it outside of its method
+        pickerIndex = row
+        print("didselect: "+customArray[row])
         finalPick = customArray[row]
     }
     
+    fileprivate func setupPickerView() {
+        self.view.addSubview(pickerCustomView)
+        NSLayoutConstraint.activate([
+            pickerCustomView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            pickerCustomView.heightAnchor.constraint(equalToConstant: 140),
+            pickerCustomView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            pickerCustomView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+        ])
+        pickerCustomView.fadeIn()
+    }
+    
+    @objc func budgetPickerBtnTapped(_ sender: UIButton) {
+        setupPickerView()
+    }
+    
+    @objc func doneBtnTapped() {
+        pickerCustomView.removeFromSuperview()
+        print("123: "+finalPick)
+        userDefaults.set(pickerIndex, forKey: Keys.pickerStoredIndex)
+        let pickerStoredIndex = userDefaults.integer(forKey: Keys.pickerStoredIndex)
+
+        if finalPick != "" {
+        budgetPicker.selectRow(pickerStoredIndex, inComponent: 0, animated: true)
+        budgetPickerBtn.setTitle(finalPick, for: .normal)
+        }
+        pickerCustomView.fadeOut()
+    }
+    
+    @objc func cancelBtnTapped() {
+        pickerCustomView.fadeOut()
+        pickerCustomView.removeFromSuperview()
+        let pickerStoredIndex = userDefaults.integer(forKey: Keys.pickerStoredIndex)
+        budgetPicker.selectRow(pickerStoredIndex, inComponent: 0, animated: true)
+    }
 }
 
 
