@@ -33,7 +33,7 @@ class PostFormCell: UITableViewCell {
         btn.contentHorizontalAlignment = .left
 //        btn.isHidden = true
         btn.withWidth(80)
-        //        btn.addTarget(self, action: #selector(loginBtnPressed), for: .touchUpInside)
+        //        
         return btn
     }()
     
@@ -125,10 +125,10 @@ class PostFormProjectTypeCell: UITableViewCell {
         NSLayoutConstraint.activate([
             projectTypeSwitcher.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             projectTypeSwitcher.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            projectTypeSwitcher.heightAnchor.constraint(equalToConstant: 30),
+            projectTypeSwitcher.heightAnchor.constraint(equalToConstant: 35),
 //            projectTypeSwitcher.widthAnchor.constraint(equalToConstant: 100),
-            projectTypeSwitcher.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 25),
-            projectTypeSwitcher.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -25),
+            projectTypeSwitcher.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 30),
+            projectTypeSwitcher.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -30),
         ])
 //        projectTypeSwitcher.anchor(top: contentView.topAnchor, leading: contentView.safeAreaLayoutGuide.leadingAnchor, bottom: contentView.bottomAnchor, trailing: contentView.safeAreaLayoutGuide.trailingAnchor, padding: UIEdgeInsets(top: 0, left: self.separatorInset.left + 5, bottom: 0, right: self.separatorInset.right + 15))
     }

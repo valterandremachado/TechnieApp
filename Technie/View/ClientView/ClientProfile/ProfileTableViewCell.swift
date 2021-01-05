@@ -15,7 +15,7 @@ class ProfileTableViewCell: UITableViewCell {
         /// Adding tableView right indicator
         self.accessoryType = .disclosureIndicator
         /// Changing selection style
-        self.selectionStyle = .none
+//        self.selectionStyle = .none
         
 //        self.layer.cornerRadius = 15
 //        self.clipsToBounds = true

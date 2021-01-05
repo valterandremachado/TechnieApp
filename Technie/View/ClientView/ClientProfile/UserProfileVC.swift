@@ -106,9 +106,15 @@ class UserProfileVC: UIViewController {
         
         stackView1.anchor(top: profileImageView.bottomAnchor, leading: view.leadingAnchor, bottom: nil, trailing: view.trailingAnchor, padding: UIEdgeInsets(top: 10, left: 10, bottom: 0, right: 10), size: CGSize(width: 0, height: 50))
         
-        tableView.anchor(top: stackView1.bottomAnchor, leading: view.leadingAnchor, bottom: nil, trailing: view.trailingAnchor, padding: UIEdgeInsets(top: 20, left: 20, bottom: 0, right: 20), size: CGSize(width: 0, height: 160))
+        let tableViewHeight = 40*5
+        tableView.anchor(top: stackView1.bottomAnchor, leading: view.leadingAnchor, bottom: nil, trailing: view.trailingAnchor, padding: UIEdgeInsets(top: 20, left: 20, bottom: 0, right: 20), size: CGSize(width: 0, height: tableViewHeight))
         
-        
+        setupNavBar()
+    }
+    
+    fileprivate func setupNavBar() {
+        guard let navBar = navigationController?.navigationBar else { return }
+        navigationItem.title = "@username"
     }
     
     // MARK: - Selectors
@@ -121,7 +127,7 @@ class UserProfileVC: UIViewController {
 extension UserProfileVC: TableViewDataSourceAndDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 4 //stringArray.count
+        return 5 //stringArray.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -129,13 +135,16 @@ extension UserProfileVC: TableViewDataSourceAndDelegate {
         // Enables detailTextLabel visibility
         cell = ProfileTableViewCell(style: .subtitle, reuseIdentifier: tableViewID)
         
-        let tableViewOptions = TableViewOptions(rawValue: indexPath.row)
+        let lastRowIndex = tableView.numberOfRows(inSection: tableView.numberOfSections-1)
+        let lastIndex = lastRowIndex - 1
         
         // Customize Cell
-        cell.textLabel?.textColor = .black
-        cell.detailTextLabel?.textColor = .black
-        cell.backgroundColor = .white
-        
+//        cell.textLabel?.textColor = .black
+//        cell.detailTextLabel?.textColor = .black
+//        cell.backgroundColor = .white
+        indexPath.row == lastIndex ? (cell.textLabel?.textColor = .red) : (cell.textLabel?.textColor = .black)
+        indexPath.row == lastIndex ? (cell.accessoryType = .none) : (cell.accessoryType = .disclosureIndicator)
+        let tableViewOptions = TableViewOptions(rawValue: indexPath.row)
         // Pass data
         cell.textLabel?.text = tableViewOptions?.description
 //        cell.detailTextLabel?.text = detailArray[indexPath.row]
@@ -143,5 +152,21 @@ extension UserProfileVC: TableViewDataSourceAndDelegate {
         return cell
     }
     
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
+    
+    
+}
+
+// MARK: - UserProfileVCPreviews
+import SwiftUI
+
+struct UserProfileVCPreviews: PreviewProvider {
+    
+    static var previews: some View {
+        let vc = UserProfileVC()
+        return vc.liveViewController
+    }
     
 }
