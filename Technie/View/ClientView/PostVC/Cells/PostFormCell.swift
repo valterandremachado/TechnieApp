@@ -18,22 +18,19 @@ class PostFormCell: UITableViewCell {
         lbl.font = .systemFont(ofSize: 12)
 //        lbl.backgroundColor = .cyan
         lbl.textAlignment = .right
-        lbl.text = "Max size is 20 MB"
+        lbl.text = "Max size is 30 MB"
         return lbl
     }()
     
     lazy var attachFileBtn: UIButton = {
         var btn = UIButton(type: .system)
         btn.translatesAutoresizingMaskIntoConstraints = false
-//        btn.backgroundColor = UIColor(displayP3Red: 235/255, green: 51/255, blue: 72/255, alpha: 0.2)
 //        btn.backgroundColor = .brown
+        btn.setImage(UIImage(systemName: "plus.circle.fill"), for: .normal)
         btn.setTitle("Attach File", for: .normal)
-//        btn.titleLabel?.font = .boldSystemFont(ofSize: 20)
-//        btn.tintColor = .systemPink
+        btn.titleEdgeInsets = .init(top: 0, left: 5, bottom: 0, right: 0)
         btn.contentHorizontalAlignment = .left
-//        btn.isHidden = true
-        btn.withWidth(80)
-        //        
+        btn.withWidth(110)
         return btn
     }()
     
@@ -49,6 +46,23 @@ class PostFormCell: UITableViewCell {
         return sv
     }()
     
+    lazy var customImageView: UIImageView = {
+        let iv = UIImageView()
+        iv.contentMode = .scaleAspectFill
+        iv.clipsToBounds = true
+        iv.layer.cornerRadius = 10
+        return iv
+    }()
+    
+    lazy var customLabel2: UILabel = {
+        let lbl = UILabel()
+        lbl.translatesAutoresizingMaskIntoConstraints = false
+        lbl.font = .systemFont(ofSize: 11.3)
+//        lbl.backgroundColor = .cyan
+        lbl.textAlignment = .left
+        return lbl
+    }()
+    
     // MARK: - Inits
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -57,7 +71,6 @@ class PostFormCell: UITableViewCell {
 //        self.accessoryType = .disclosureIndicator
         /// Changing selection style
         self.selectionStyle = .none
-        
 //        self.layer.cornerRadius = 15
 //        self.clipsToBounds = true
         backgroundColor = .yellow
@@ -73,8 +86,17 @@ class PostFormCell: UITableViewCell {
     // MARK: - Methods
     func setupViews() {
         [stackView].forEach {addSubview($0)}
-        stackView.anchor(top: contentView.topAnchor, leading: contentView.safeAreaLayoutGuide.leadingAnchor, bottom: contentView.bottomAnchor, trailing: contentView.safeAreaLayoutGuide.trailingAnchor, padding: UIEdgeInsets(top: 0, left: self.separatorInset.left + 5, bottom: 0, right: self.separatorInset.right + 15))
+        stackView.anchor(top: contentView.topAnchor, leading: contentView.safeAreaLayoutGuide.leadingAnchor, bottom: contentView.bottomAnchor, trailing: contentView.safeAreaLayoutGuide.trailingAnchor, padding: UIEdgeInsets(top: 0, left: self.separatorInset.left, bottom: 0, right: self.separatorInset.right + 15))
     }
+    
+    func setupNewViews() {
+        [customImageView, customLabel2].forEach {addSubview($0)}
+        
+        customImageView.anchor(top: self.topAnchor, leading: textLabel?.leadingAnchor, bottom: nil, trailing: nil, padding: UIEdgeInsets(top: 5, left: 0, bottom: 0, right: 0), size: CGSize(width: 50, height: 50))
+        
+        customLabel2.anchor(top: customImageView.topAnchor, leading: customImageView.trailingAnchor, bottom: customImageView.bottomAnchor, trailing: self.trailingAnchor, padding: UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 0), size: CGSize(width: 0, height: 0))
+    }
+    
     // MARK: - Selectors
 
     required init?(coder: NSCoder) {
@@ -232,7 +254,10 @@ class PostFormSkillCell: UITableViewCell {
     var addSkillsBtn: UIButton = {
         var btn = UIButton(type: .system)
         btn.translatesAutoresizingMaskIntoConstraints = false
+//        btn.backgroundColor = .brown
+        btn.setImage(UIImage(systemName: "plus.circle.fill"), for: .normal)
         btn.setTitle("Add Skills", for: .normal)
+        btn.titleEdgeInsets = .init(top: 0, left: 5, bottom: 0, right: 0)
         btn.contentHorizontalAlignment = .left
         btn.isHidden = true
         return btn
@@ -260,7 +285,7 @@ class PostFormSkillCell: UITableViewCell {
     func setupViews() {
         [addSkillsBtn].forEach {self.contentView.addSubview($0)}
         addSkillsBtn.isHidden = false
-        addSkillsBtn.anchor(top: self.contentView.topAnchor, leading: self.contentView.safeAreaLayoutGuide.leadingAnchor, bottom: self.contentView.bottomAnchor, trailing: self.contentView.safeAreaLayoutGuide.trailingAnchor, padding: UIEdgeInsets(top: 0, left: self.separatorInset.left + 5, bottom: 0, right: self.separatorInset.right + 15))
+        addSkillsBtn.anchor(top: self.contentView.topAnchor, leading: self.contentView.safeAreaLayoutGuide.leadingAnchor, bottom: self.contentView.bottomAnchor, trailing: self.contentView.safeAreaLayoutGuide.trailingAnchor, padding: UIEdgeInsets(top: 0, left: self.separatorInset.left, bottom: 0, right: self.separatorInset.right + 15))
     }
     
     required init?(coder: NSCoder) {

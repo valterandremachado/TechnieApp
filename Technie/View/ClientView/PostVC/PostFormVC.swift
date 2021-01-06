@@ -203,11 +203,31 @@ class PostFormVC: UIViewController {
         self.present(alert, animated: true, completion: nil)
     }
     
+    fileprivate func presentActionSheet() {
+        let actionSheet = UIAlertController(title: nil, message: "Attach file (jpeg, png)", preferredStyle: .actionSheet)
+        
+        let gallery = UIAlertAction(title: "Gallery", style: .default) { (action) in
+            let imagePicker = UIImagePickerController()
+            imagePicker.delegate = self
+            self.present(imagePicker, animated: true, completion: nil)
+        }
+        
+        let cancel = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+                
+        actionSheet.addAction(gallery)
+        actionSheet.addAction(cancel)
+        self.present(actionSheet, animated: true, completion: nil)
+        actionSheet.fixActionSheetConstraintsError()
+    }
+    
     // MARK: - Selectors
     @objc func addSkillsBtnTapped() {
         presentAlertSheet()
     }
     
+    @objc func attachFileBtnTapped() {
+        presentActionSheet()
+    }
     
     
 }
@@ -235,6 +255,7 @@ extension PostFormVC: TableViewDataSourceAndDelegate {
         //            viewC.anchor(top: cell.topAnchor, leading: cell.leadingAnchor, bottom: cell.bottomAnchor, trailing: cell.trailingAnchor)
         //        }
         //        cell.textLabel?.text = title //handymanSectionArray[indexPath.row]
+      
         switch indexPath.section {
         case 0:
             // PostFormCell
@@ -247,9 +268,14 @@ extension PostFormVC: TableViewDataSourceAndDelegate {
 //            let lastIndex = lastRowIndex - 1
 //
             if indexPath.row >= 3 {
-                cell.textLabel?.font = .systemFont(ofSize: 11.4)
-                cell.textLabel?.text = imageNameArray[indexPath.row - 3]
-                cell.imageView?.image = UIImage(data: imageDataArray[indexPath.row - 3])
+                cell.setupNewViews()
+//                cell.textLabel?.font = .systemFont(ofSize: 11.4)
+//                cell.textLabel?.text = imageNameArray[indexPath.row - 3]
+//                cell.imageView?.image = UIImage(data: imageDataArray[indexPath.row - 3])
+                cell.textLabel?.isHidden = true
+                cell.imageView?.isHidden = true
+                cell.customLabel2.text = imageNameArray[indexPath.row - 3]
+                cell.customImageView.image = UIImage(data: imageDataArray[indexPath.row - 3])
                 print("if")
             }
 //            else {
@@ -304,7 +330,7 @@ extension PostFormVC: TableViewDataSourceAndDelegate {
             // PostFormSkillCell
             let cell = tableView.dequeueReusableCell(withIdentifier: PostFormSkillCell.cellID, for: indexPath) as! PostFormSkillCell
             
-            let lastRowIndex = tableView.numberOfRows(inSection: tableView.numberOfSections-1)
+            let lastRowIndex = tableView.numberOfRows(inSection: tableView.numberOfSections - 1)
             let lastIndex = lastRowIndex - 1
             
             if indexPath.row == lastIndex {
@@ -323,27 +349,6 @@ extension PostFormVC: TableViewDataSourceAndDelegate {
         return UITableViewCell()
     }
     
-    @objc func attachFileBtnTapped() {
-        presentActionSheet()
-    }
-    
-    fileprivate func presentActionSheet() {
-        let actionSheet = UIAlertController(title: nil, message: "Attach file (jpeg, png)", preferredStyle: .actionSheet)
-        
-        let gallery = UIAlertAction(title: "Gallery", style: .default) { (action) in
-            let imagePicker = UIImagePickerController()
-            imagePicker.delegate = self
-            self.present(imagePicker, animated: true, completion: nil)
-        }
-        
-        let cancel = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
-                
-        actionSheet.addAction(gallery)
-        actionSheet.addAction(cancel)
-        self.present(actionSheet, animated: true, completion: nil)
-        actionSheet.fixActionSheetConstraintsError()
-    }
-    
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         if section > 0 {
             return sections[section].title
@@ -355,6 +360,9 @@ extension PostFormVC: TableViewDataSourceAndDelegate {
         
         switch indexPath.section {
         case 0:
+            if indexPath.row >= 3 {
+                return 60
+            }
             return 40
         case 1:
             return 60
@@ -367,8 +375,15 @@ extension PostFormVC: TableViewDataSourceAndDelegate {
     }
     
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Gives the slide delete feature to the section 3 cells only but not the last cell in it
-        if indexPath.section == 3 {
+        // Gives the slide delete feature to the section 0 (but not the 2nd cell in it) and 3 (but not the last cell in it) cells
+        switch indexPath.section {
+        case 0:
+            if indexPath.row <= 2 {
+                return false
+            } else {
+                return true
+            }
+        case 3:
             let lastRowIndex = tableView.numberOfRows(inSection: tableView.numberOfSections-1)
             let lastIndex = lastRowIndex - 1
             if indexPath.row == lastIndex {
@@ -376,6 +391,8 @@ extension PostFormVC: TableViewDataSourceAndDelegate {
             } else {
                 return true
             }
+        default:
+            break
         }
         return false
     }
@@ -384,12 +401,31 @@ extension PostFormVC: TableViewDataSourceAndDelegate {
         if (editingStyle == .delete) {
             // handle delete (by removing the data from your array and updating the tableview)
 
-            // Delete item in the array
-            self.sections[3].description.remove(at: indexPath.row)
-            // Reload smoothly the cells after removal of an item in the array (beginUpdates & endUpdates are be called because an deletion is happening)
-            self.tableView.beginUpdates()
-            self.tableView.deleteRows(at: [indexPath], with: .left)
-            self.tableView.endUpdates()
+            switch indexPath.section {
+            case 0:
+                // Delete item in the arrays
+                imageDataArray.remove(at: indexPath.row - 3)
+                imageNameArray.remove(at: indexPath.row - 3)
+                attachedFileArray["imageData"] = imageDataArray
+                attachedFileArray["imageName"] = imageNameArray
+                //
+                sections[0].description.remove(at: indexPath.row)
+                // Reload smoothly the cells after removal of an item in the array (beginUpdates & endUpdates are be called because an deletion is happening)
+                tableView.beginUpdates()
+                tableView.deleteRows(at: [indexPath], with: .left)
+                tableView.endUpdates()
+                
+                print(self.sections[0].description)
+                print("attachedFileArray2: \(attachedFileArray)")
+            case 3:
+                sections[3].description.remove(at: indexPath.row)
+                tableView.beginUpdates()
+                tableView.deleteRows(at: [indexPath], with: .left)
+                tableView.endUpdates()
+            default:
+                break
+            }
+            
            
         }
     }
@@ -481,8 +517,6 @@ extension PostFormVC: UIImagePickerControllerDelegate, UINavigationControllerDel
             
         
             print(self.sections[0].description)
-//            print(fileUrl.lastPathComponent)
-//            print(fileUrl.pathExtension)
             print("attachedFileArray: \(attachedFileArray)")
         }
         
