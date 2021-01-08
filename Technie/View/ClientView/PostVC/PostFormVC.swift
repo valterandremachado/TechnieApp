@@ -7,19 +7,9 @@
 
 import UIKit
 
-struct SectionTitle {
-    var title: String?
-    var description: [String]
-    
-    init(title: String, description: [String]) {
-        self.title = title
-        self.description = description
-    }
-}
-
 class PostFormVC: UIViewController {
     private let tableCellID = "cellID"
-    var sections = [SectionTitle]()
+    var sections = [SectionHandler]()
     // MARK: - Properties
     lazy var tableView: UITableView = {
         let tv = UITableView()
@@ -35,6 +25,7 @@ class PostFormVC: UIViewController {
         
         tv.delegate = self
         tv.dataSource = self
+        // Register Custom Cells for each section
         tv.register(PostFormCell.self, forCellReuseIdentifier: tableCellID)
         tv.register(PostFormProjectTypeCell.self, forCellReuseIdentifier: PostFormProjectTypeCell.cellID)
         tv.register(PostFormBudgetCell.self, forCellReuseIdentifier: PostFormBudgetCell.cellID)
@@ -150,10 +141,10 @@ class PostFormVC: UIViewController {
         view.backgroundColor = .cyan
         setupViews()
         
-        sections.append(SectionTitle(title: "Project Title & Description", description: ["0", "1", ""]))
-        sections.append(SectionTitle(title: "Project Type", description: ["0"]))
-        sections.append(SectionTitle(title: "Project Budget", description: ["0"]))
-        sections.append(SectionTitle(title: "Skills Required", description: [""]))
+        sections.append(SectionHandler(title: "Project Title & Description", detail: ["0", "1", ""]))
+        sections.append(SectionHandler(title: "Project Type", detail: ["0"]))
+        sections.append(SectionHandler(title: "Project Budget", detail: ["0"]))
+        sections.append(SectionHandler(title: "Skills Required", detail: [""]))
         
     }
     
@@ -171,11 +162,11 @@ class PostFormVC: UIViewController {
     
     fileprivate func addSkillData(_ skillTitle: String?) {
         guard let skill = skillTitle else { return }
-        let existingSkill = self.sections[3].description.first
+        let existingSkill = self.sections[3].sectionDetail.first
         
         if skill != existingSkill && skill != "" {
             // Insert items instead of append to give a smooth reload transition
-            self.sections[3].description.insert(skill, at: 0)
+            self.sections[3].sectionDetail.insert(skill, at: 0)
             // Reloads items from the top (beginUpdates & endUpdates are be called because an insertion is happening)
             self.tableView.beginUpdates()
             self.tableView.insertRows(at: [IndexPath(row: 0, section: 3)], with: .top)
@@ -222,7 +213,11 @@ class PostFormVC: UIViewController {
     
     // MARK: - Selectors
     @objc func addSkillsBtnTapped() {
-        presentAlertSheet()
+//        presentAlertSheet()
+        let vc = SkillSelectionVC()
+//        vc.modalPresentationStyle = .fullScreen
+        let vcWithEmbeddedNav = UINavigationController(rootViewController: vc)
+        present(vcWithEmbeddedNav, animated: true, completion: nil)
     }
     
     @objc func attachFileBtnTapped() {
@@ -232,6 +227,7 @@ class PostFormVC: UIViewController {
     
 }
 
+// MARK: - TableViewDataSourceAndDelegate Extension
 extension PostFormVC: TableViewDataSourceAndDelegate {
     
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -239,12 +235,12 @@ extension PostFormVC: TableViewDataSourceAndDelegate {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return sections[section].description.count//handymanSectionArray.count
+        return sections[section].sectionDetail.count//handymanSectionArray.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let titles =  sections[indexPath.section]
-        let title = titles.description[indexPath.row]
+        let title = titles.sectionDetail[indexPath.row]
         
         //        if indexPath.section == 0 && indexPath.row == 0 {
         ////            tableView.rowHeight = 90
@@ -343,15 +339,13 @@ extension PostFormVC: TableViewDataSourceAndDelegate {
             
             return cell
         default:
-            break
+            return UITableViewCell()
         }
-        
-        return UITableViewCell()
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         if section > 0 {
-            return sections[section].title
+            return sections[section].sectionTitle
         }
         return ""
     }
@@ -409,16 +403,16 @@ extension PostFormVC: TableViewDataSourceAndDelegate {
                 attachedFileArray["imageData"] = imageDataArray
                 attachedFileArray["imageName"] = imageNameArray
                 //
-                sections[0].description.remove(at: indexPath.row)
+                sections[0].sectionDetail.remove(at: indexPath.row)
                 // Reload smoothly the cells after removal of an item in the array (beginUpdates & endUpdates are be called because an deletion is happening)
                 tableView.beginUpdates()
                 tableView.deleteRows(at: [indexPath], with: .left)
                 tableView.endUpdates()
                 
-                print(self.sections[0].description)
+                print(self.sections[0].sectionDetail)
                 print("attachedFileArray2: \(attachedFileArray)")
             case 3:
-                sections[3].description.remove(at: indexPath.row)
+                sections[3].sectionDetail.remove(at: indexPath.row)
                 tableView.beginUpdates()
                 tableView.deleteRows(at: [indexPath], with: .left)
                 tableView.endUpdates()
@@ -510,13 +504,13 @@ extension PostFormVC: UIImagePickerControllerDelegate, UINavigationControllerDel
             attachedFileArray["imageData"] = imageDataArray
             attachedFileArray["imageName"] = imageNameArray
             
-            self.sections[0].description.insert(fileName, at: 3)
+            self.sections[0].sectionDetail.insert(fileName, at: 3)
             self.tableView.beginUpdates()
             self.tableView.insertRows(at: [IndexPath(row: 3, section: 0)], with: .top)
             self.tableView.endUpdates()
             
         
-            print(self.sections[0].description)
+            print(self.sections[0].sectionDetail)
             print("attachedFileArray: \(attachedFileArray)")
         }
         
