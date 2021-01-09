@@ -74,50 +74,59 @@ class SkillSelectionVC: UIViewController {
         self.navigationItem.rightBarButtonItem = rightNavBarButton
 //        navigationItem.searchController = searchController
     }
-    
-    var customInt = ""
-    
+        
     fileprivate func removeSkill(_ index: Int) {
-//        customInt = self.sections[0].sectionDetail[index]
+        var sectionOneIndexPath = IndexPath.init(row: 0, section: 0)
+        
+        for i in 0..<tableView.numberOfSections {
+            for j in 0..<tableView.numberOfRows(inSection: i) {
+                let indexPath = IndexPath(row: j, section: i)
+                
+                switch indexPath.section {
+                case 1:
+                    sectionOneIndexPath = indexPath
+                    let cell = tableView.cellForRow(at: sectionOneIndexPath) as! SkillsTVCell // accessing SkillsTVCell outside of its domain
+                    let skillFromAddSection = self.sections[1].sectionDetail // list of the items in the selection section
+                    let skillFromRemoveSection = self.sections[0].sectionDetail[index] // item to be deleted from the list of the selected section
+                    // Check the index of the item to be diselected in the skillFromAddSection
+                    let indexOfTappedItem = skillFromAddSection.firstIndex(of: skillFromRemoveSection) ?? 400
+                    
+                    if arrayOfStringContains(skillFromRemoveSection, section: 1) && sectionOneIndexPath.row == indexOfTappedItem {
+                        let modifiedImage = UIImage(systemName: "plus.circle.fill")
+                        cell.addSkillBtn.setImage(modifiedImage, for: .normal)
+                        print("the same: \(skillFromRemoveSection)")
+                    } else {
+                        print("different")
+                    }
+                default:
+                    break
+                }
+                
+            }
+        }
+        
         self.sections[0].sectionDetail.remove(at: index)
         self.tableView.beginUpdates()
         self.tableView.deleteRows(at: [IndexPath(row: index, section: 0)], with: .left)
         self.tableView.endUpdates()
     }
     
-//    func restoreAddSkillBtnImage(_ sender: UIButton) {
-////        tableView.reloadData()
-//        let newSkill = self.sections[1].sectionDetail //[customInt]
-//        let selectedSkill = self.sections[0].sectionDetail
-//        if customInt == newSkill.first {
-//            print("remove area: \(customInt)")
-//            print("add area: \(newSkill)")
-//            let modifiedImage = UIImage(systemName: "plus.circle.fill")
-//            sender.setImage(modifiedImage, for: .normal)
-//        } else {
-////            print("else")
-//            print("ELSE remove area: \(customInt)")
-//            print("ELSE add area: \(newSkill.first)")
-//        }
-//
-//
-//    }
-    func isValid(_ item: String)  -> Bool {
-
-        let whitelist = self.sections[0].sectionDetail
-
-        return whitelist.contains { $0 == item }
+    func arrayOfStringContains(_ item: String, section index: Int)  -> Bool {
+        let arrayOfString = self.sections[index].sectionDetail
+        return arrayOfString.contains { $0 == item }
     }
     
     fileprivate func addSkill(_ index: Int, _ sender: UIButton) {
 
-        let newSkill = self.sections[1].sectionDetail[index]
-        let selectedSkill = self.sections[0].sectionDetail
-        
-        if selectedSkill.count < 5 {
-            if !isValid(newSkill) {
+        let skillFromAddSection = self.sections[1].sectionDetail[index] // item to be selected from the list of the selection section
+        let skillFromRemoveSection = self.sections[0].sectionDetail // list of the items in the selected section
+        // Check the index of the item to be diselected in the skillFromAddSection
+        let indexOfTappedItem = skillFromRemoveSection.firstIndex(of: skillFromAddSection) ?? 400
+
+        if skillFromRemoveSection.count < 5 {
+            if !arrayOfStringContains(skillFromAddSection, section: 0) {
                 // Insert items instead of append to give a smooth reload transition
-                self.sections[0].sectionDetail.insert(newSkill, at: 0)
+                self.sections[0].sectionDetail.insert(skillFromAddSection, at: 0)
                 // Reloads items from the top (beginUpdates & endUpdates are be called because an insertion is happening)
                 self.tableView.beginUpdates()
                 self.tableView.insertRows(at: [IndexPath(row: 0, section: 0)], with: .top)
@@ -126,35 +135,25 @@ class SkillSelectionVC: UIViewController {
                 sender.setImage(modifiedImage, for: .normal)
             } else {
                 print("existing Name")
-                // refresh the cell with the latest array index in order to pass the correct index to the cellBtnIndex variable
-                tableView.reloadData()
-                // 1 milisec queue in order to avoid distortion on the deletion animation
-                DispatchQueue.global().asyncAfter(deadline: .now() + .milliseconds(1)) {
-//                     UI components must be in the main Grand Center Dispatch (GCD)
-                    DispatchQueue.main.async {
-                        let cellBtnIndex2 = sender.tag
-                        self.removeSkill(cellBtnIndex2)
-                        let modifiedImage = UIImage(systemName: "plus.circle.fill")
-                        sender.setImage(modifiedImage, for: .normal)
-                    }
-                }
+                self.removeSkill(indexOfTappedItem)
+                let modifiedImage = UIImage(systemName: "plus.circle.fill")
+                sender.setImage(modifiedImage, for: .normal)
             }
         } else {
-            print("Exceeded")
-            if newSkill == selectedSkill.first {
-            tableView.reloadData()
-            // 1 milisec queue in order to avoid distortion on the deletion animation
-            DispatchQueue.global().asyncAfter(deadline: .now() + .milliseconds(1)) {
-                // UI components must be in the main Grand Center Dispatch (GCD)
-                DispatchQueue.main.async {
-                    let cellBtnIndex2 = sender.tag
-                    self.removeSkill(cellBtnIndex2)
-                    let modifiedImage = UIImage(systemName: "plus.circle.fill")
-                    sender.setImage(modifiedImage, for: .normal)
-                }
+            // if exists remove it else do nothing
+            if arrayOfStringContains(skillFromAddSection, section: 0) {
+                print("existing Name2")
+                self.removeSkill(indexOfTappedItem)
+                let modifiedImage = UIImage(systemName: "plus.circle.fill")
+                sender.setImage(modifiedImage, for: .normal)
+            } else {
+                print("Exceeded")
             }
-            }
+           
         }
+        
+        print("selectedSkill4: \(skillFromRemoveSection)")
+
 
     }
     
@@ -176,53 +175,14 @@ class SkillSelectionVC: UIViewController {
             DispatchQueue.main.async { [self] in
                 let cellBtnIndex = sender.tag
                 self.removeSkill(cellBtnIndex)
-               
-//                for i in 0..<tableView.numberOfSections {
-//                    for j in 0..<tableView.numberOfRows(inSection: i) {
-//                        let indexPath = IndexPath(row: j, section: i)
-//                        if indexPath.section == 1 && indexPath.row == cellBtnIndex {
-//                            let modifiedImage = UIImage(systemName: "plus.circle.fill")
-//                            sender.setImage(modifiedImage, for: .normal)
-//                        }
-//                    }
-//                }
-                
             }
         }
 
     }
     
     @objc fileprivate func addSkillBtnTapped(_ sender: UIButton) {
-        
         let cellBtnIndex = sender.tag
-        
-//        let newSkill = self.sections[1].sectionDetail[cellBtnIndex]
-//        let selectedSkill = self.sections[0].sectionDetail
-        
-//        if selectedSkill.count < 5 {
-//            /// checks if the skill tapped is already part of the array of skill (if it's not, add to it then change the btn image to a minus.circle.fill image. If it's already in the array remove it from the array then change the btn image to a plus.circle.fill image  )
-//            if newSkill == selectedSkill.first {
-//                // refresh the cell with the latest array index in order to pass the correct index to the cellBtnIndex variable
-//                tableView.reloadData()
-//                // 1 milisec queue in order to avoid distortion on the deletion animation
-//                DispatchQueue.global().asyncAfter(deadline: .now() + .milliseconds(1)) {
-//                    // UI components must be in the main Grand Center Dispatch (GCD)
-//                    DispatchQueue.main.async {
-//                        let cellBtnIndex2 = sender.tag
-//                        self.removeSkill(cellBtnIndex2)
-//                        let modifiedImage = UIImage(systemName: "plus.circle.fill")
-//                        sender.setImage(modifiedImage, for: .normal)
-//                    }
-//                }
-//            } else {
-                addSkill(cellBtnIndex, sender)
-//                let modifiedImage = UIImage(systemName: "minus.circle.fill")?.withTintColor(.red, renderingMode: .alwaysOriginal)
-//                sender.setImage(modifiedImage, for: .normal)
-//            }
-//        } else {
-//            print("greater")
-//        }
-       
+        addSkill(cellBtnIndex, sender)
     }
     
     
@@ -251,6 +211,8 @@ extension SkillSelectionVC: TableViewDataSourceAndDelegate {
             cell.customLabel.text = title
             cell.removeSkillBtn.tag = indexPath.row
             cell.removeSkillBtn.addTarget(self, action: #selector(removeSkillBtnTapped), for: .touchUpInside)
+//            print("added: \(self.sections[0].sectionDetail)")
+
             return cell
         case 1:
             let cell = tableView.dequeueReusableCell(withIdentifier: SkillsTVCell.cellID, for: indexPath) as! SkillsTVCell
@@ -260,11 +222,6 @@ extension SkillSelectionVC: TableViewDataSourceAndDelegate {
             cell.customLabel.text = title
             cell.addSkillBtn.tag = indexPath.row
             cell.addSkillBtn.addTarget(self, action: #selector(addSkillBtnTapped), for: .touchUpInside)
-//            restoreAddSkillBtnImage(cell.addSkillBtn)
-//            if sections[0].sectionDetail != sections[1].sectionDetail {
-//                let modifiedImage = UIImage(systemName: "plus.circle.fill")
-//                cell.addSkillBtn.setImage(modifiedImage, for: .normal)
-//            }
             return cell
         default:
             return UITableViewCell()
