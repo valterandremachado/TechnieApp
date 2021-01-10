@@ -7,10 +7,17 @@
 
 import UIKit
 
+// Singleton
+protocol SkillSelectionVCDelegate: class {
+    func fetchSelectedSkills(skills: [String], didDelete: Bool)
+}
 class SkillSelectionVC: UIViewController {
     
+    weak var skillSelectionVCDelegate: SkillSelectionVCDelegate?
+//    static let shared = SkillSelectionVC()
+    
     // MARK: - Properties
-    fileprivate var sections = [SectionHandler]()
+    var sections = [SectionHandler]()
 
     lazy var searchBar: UISearchBar = {
         let sb = UISearchBar(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: 0))
@@ -37,6 +44,11 @@ class SkillSelectionVC: UIViewController {
     }()
     
     var customArray = [String]()
+    let userDefaults = UserDefaults.standard
+
+    var selectedSkill = [String]()
+    var didDelete = false
+    var didAdd = false
     // MARK: - Inits
     override func loadView() {
         super.loadView()
@@ -47,9 +59,10 @@ class SkillSelectionVC: UIViewController {
         view.backgroundColor = .white
         setupViews()
         
-        sections.append(SectionHandler(title: "Selected skills", detail: ["skill 0", "skill 1", "skill 2"]))
+//        let defaultArray = userDefaults.set(selectedSkill, forKey: Keys.selectedSkills) // save
+//        let selectedSkill = userDefaults.stringArray(forKey: Keys.selectedSkills) ?? [String]() // retrieve
+        sections.append(SectionHandler(title: "Selected skills", detail: selectedSkill.first == "" ? ([String]()) : (selectedSkill)))
         sections.append(SectionHandler(title: "Suggested skills", detail: ["skill 3", "skill 4", "skill 5", "skill 6"]))
-//        customArray.append(contentsOf: sections[0].sectionDetail)
     }
     
 
@@ -76,6 +89,7 @@ class SkillSelectionVC: UIViewController {
     }
         
     fileprivate func removeSkill(_ index: Int) {
+        didDelete = true
         var sectionOneIndexPath = IndexPath.init(row: 0, section: 0)
         
         for i in 0..<tableView.numberOfSections {
@@ -109,6 +123,40 @@ class SkillSelectionVC: UIViewController {
         self.tableView.beginUpdates()
         self.tableView.deleteRows(at: [IndexPath(row: index, section: 0)], with: .left)
         self.tableView.endUpdates()
+    }
+    
+    func updateAddButtonState() {
+        print("updateAddButtonState")
+        var sectionOneIndexPath = IndexPath.init(row: 0, section: 0)
+        
+        for i in 0..<tableView.numberOfSections {
+            for j in 0..<tableView.numberOfRows(inSection: i) {
+                let indexPath = IndexPath(row: j, section: i)
+                
+                switch indexPath.section {
+                case 1:
+                    sectionOneIndexPath = indexPath
+                    let cell = tableView.cellForRow(at: sectionOneIndexPath) as! SkillsTVCell // accessing SkillsTVCell outside of its domain
+                    let skillFromAddSection = self.sections[1].sectionDetail // list of the items in the selection section
+                    let skillFromRemoveSection = self.sections[0].sectionDetail // item to be deleted from the list of the selected section
+                    // Check the index of the item to be diselected in the skillFromAddSection
+                    skillFromRemoveSection.forEach { mutualSkill in
+                        let indexOfTappedItem = skillFromAddSection.firstIndex(of: mutualSkill) ?? 400
+                        
+                        if arrayOfStringContains(mutualSkill, section: 1) && sectionOneIndexPath.row == indexOfTappedItem {
+                            let modifiedImage = UIImage(systemName: "minus.circle.fill")?.withTintColor(.red, renderingMode: .alwaysOriginal)
+                            cell.addSkillBtn.setImage(modifiedImage, for: .normal)
+//                            print("not different")
+                        } else {
+//                            print("different")
+                        }
+                    }
+                default:
+                    break
+                }
+                
+            }
+        }
     }
     
     func arrayOfStringContains(_ item: String, section index: Int)  -> Bool {
@@ -152,8 +200,6 @@ class SkillSelectionVC: UIViewController {
            
         }
         
-        print("selectedSkill4: \(skillFromRemoveSection)")
-
 
     }
     
@@ -163,6 +209,18 @@ class SkillSelectionVC: UIViewController {
     }
     
     @objc fileprivate func rightNavBarBtnTapped() {
+//        userDefaults.set(sections[0].sectionDetail, forKey: Keys.selectedSkills)
+//        print("saved: \(sections[0].sectionDetail)")
+//        NotificationCenter.default.post(name: Notification.Name("UpdateDefaultsArrayNotification"), object: nil, userInfo: nil)
+//        print("rightNavBarBtnTapped: \(selectedSkill)")
+
+        print("rightNavBarBtnTapped: \(sections[0].sectionDetail)")
+//        sections[0].sectionDetail.forEach { skills in
+//            if arrayOfStringContains(skills, section: 0) {
+        skillSelectionVCDelegate?.fetchSelectedSkills(skills: sections[0].sectionDetail, didDelete: didDelete)
+//            }
+//        }
+        
         dismiss(animated: true, completion: nil)
     }
     

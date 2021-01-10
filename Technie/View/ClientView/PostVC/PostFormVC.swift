@@ -7,6 +7,12 @@
 
 import UIKit
 
+
+struct Keys {
+    static let pickerStoredIndex = "pickerIndex"
+    static let selectedSkills = "selectedSkillsUserDefaults"
+}
+
 class PostFormVC: UIViewController {
     private let tableCellID = "cellID"
     var sections = [SectionHandler]()
@@ -126,38 +132,77 @@ class PostFormVC: UIViewController {
     let userDefaults = UserDefaults.standard
     //    lazy var pickerStoredIndex = userDefaults.integer(forKey: Keys.pickerStoredIndex)
     
-    struct Keys {
-        static let pickerStoredIndex = "pickerIndex"
-    }
-    
     var imageDataArray = [Data]()
     var imageNameArray = [String]()
     lazy var attachedFileArray = ["imageData" : imageDataArray, "imageName": imageNameArray] as [String : Any]
-        
+    
+    var initialSelectedSkill = [""]
+    
+    let singleton = SkillSelectionVC()//.shared
     // MARK: - Inits
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         view.backgroundColor = .cyan
+//        singleton.delegate = self
         setupViews()
-        
+
         sections.append(SectionHandler(title: "Project Title & Description", detail: ["0", "1", ""]))
         sections.append(SectionHandler(title: "Project Type", detail: ["0"]))
         sections.append(SectionHandler(title: "Project Budget", detail: ["0"]))
-        sections.append(SectionHandler(title: "Skills Required", detail: [""]))
-        
+        sections.append(SectionHandler(title: "Skills Required", detail: initialSelectedSkill))
+        print("viewDidLoad")
     }
+    
+    override func loadView() {
+        super.loadView()
+        print("loadView")
+    }
+    
+//    override func viewWillLayoutSubviews() {
+//        super.viewWillLayoutSubviews()
+//        print("viewWillLayoutSubviews
+//    }
+    
+//    override func viewWillAppear(_ animated: Bool) {
+//        super.viewWillAppear(animated)
+//        print("viewWillAppear")
+//        
+//        let selectedSkill2 = userDefaults.stringArray(forKey: Keys.selectedSkills) ?? [String]()
+//        print(selectedSkill2)
+//        if selectedSkill2.first != "" && !selectedSkill2.isEmpty {
+//            print("12")
+//            let selectedSkill = userDefaults.stringArray(forKey: Keys.selectedSkills) ?? [String]() // retrieve
+//            sections.append(SectionHandler(title: "Skills Required", detail: selectedSkill))
+////            tableView.reloadData()
+//        } else {
+//            print("34")
+//
+//            userDefaults.set(selectedSkillEmpty, forKey: Keys.selectedSkills) // save
+//            let selectedSkill = userDefaults.stringArray(forKey: Keys.selectedSkills) ?? [String]() // retrieve
+//            sections.append(SectionHandler(title: "Skills Required", detail: selectedSkill))
+//        }
+//    }
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         // Reset userDefaults
         userDefaults.removeObject(forKey: Keys.pickerStoredIndex)
+        userDefaults.removeObject(forKey: Keys.selectedSkills)
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
     // MARK: - Methods
     fileprivate func setupViews() {
         [tableView].forEach {view.addSubview($0)}
         tableView.anchor(top: view.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor)
+        navigationItem.largeTitleDisplayMode = .never
+        
+//        NotificationCenter.default.addObserver(self, selector: #selector(UpdateDefaultsArrayObserver), name: NSNotification.Name("UpdateDefaultsArrayNotification"), object: nil)
+//        NotificationCenter.default.removeObserver(self)
     }
     
     fileprivate func addSkillData(_ skillTitle: String?) {
@@ -216,12 +261,123 @@ class PostFormVC: UIViewController {
 //        presentAlertSheet()
         let vc = SkillSelectionVC()
 //        vc.modalPresentationStyle = .fullScreen
+//        vc.customArray = selectedSkill
+        vc.skillSelectionVCDelegate = self
+        if initialSelectedSkill.last == "" && initialSelectedSkill.count == 1 {
+            print("array is empty")
+        } else {
+            print("array is not empty")
+            DispatchQueue.global().asyncAfter(deadline: .now() + .milliseconds(10)) {
+                // UI components must be in the main Grand Center Dispatch (GCD)
+                DispatchQueue.main.async { [self] in
+//                    print(vc.sections[1].sectionDetail.count)
+                    for skills in initialSelectedSkill {
+                        if skills != "" {
+                            vc.sections[0].sectionDetail.insert(skills, at: 0)
+                            vc.tableView.beginUpdates()
+                            vc.tableView.insertRows(at: [IndexPath(row: 0, section: 0)], with: .top)
+                            vc.tableView.endUpdates()
+                            vc.updateAddButtonState()
+                        }
+                    }
+                }
+            }
+        }
+        
         let vcWithEmbeddedNav = UINavigationController(rootViewController: vc)
+//        vcWithEmbeddedNav.modalPresentationStyle = .fullScreen
+//        vcWithEmbeddedNav.modalTransitionStyle = .crossDissolve
         present(vcWithEmbeddedNav, animated: true, completion: nil)
     }
     
     @objc func attachFileBtnTapped() {
         presentActionSheet()
+    }
+    
+    
+}
+
+// MARK: - SkillSelectionVCSingleton Extension
+extension PostFormVC: SkillSelectionVCDelegate {
+    
+    fileprivate func arrayOfStringContains(_ item: String)  -> Bool {
+        let arrayOfString = initialSelectedSkill
+        return arrayOfString.contains { $0 == item }
+    }
+    
+    func fetchSelectedSkills(skills: [String], didDelete: Bool) {
+        
+        print("workingggg: \(skills), \(didDelete)")
+
+        //        if selectedSkillEmpty.isEmpty
+//        selectedSkillEmpty.append(contentsOf: skills)
+        if !skills.isEmpty {
+            for skill in skills {
+                if !arrayOfStringContains(skill) || didDelete == false {
+                    initialSelectedSkill.append(skill)
+                    let uniquePosts = initialSelectedSkill.unique{$0}
+                    initialSelectedSkill.removeAll()
+                    initialSelectedSkill.append(contentsOf: uniquePosts)
+                    self.sections[3].sectionDetail.insert(skill, at: 0)
+                    print("new item: \(initialSelectedSkill), \(uniquePosts) "+skill)
+                    self.tableView.beginUpdates()
+                    self.tableView.insertRows(at: [IndexPath(row: 0, section: 3)], with: .top)
+                    self.tableView.endUpdates()
+                    print(self.sections[3].sectionDetail.count)
+                    
+                    if uniquePosts.count < self.sections[3].sectionDetail.count {
+                        self.sections[3].sectionDetail.removeAll()
+                        self.sections[3].sectionDetail.append(contentsOf: uniquePosts)
+                        self.tableView.deleteRows(at: [IndexPath(row: 0, section: 3)], with: .fade)
+                    }
+                    
+                } else {
+//                    initialSelectedSkill.removeAll()
+//                    selectedSkillEmpty.append(skill)
+//                    tableView.reloadData()
+                    print("inside else")
+//                    let indexToDelete = initialSelectedSkill.firstIndex(of: skill) ?? 400
+                    
+//                    initialSelectedSkill.forEach { skilll in
+//
+//                        if skill == skilll || skilll == "" {
+//                            print("good")
+//                        } else {
+//                            if skill != initialSelectedSkill.first && skill != "" {
+//                                print("new item 2")
+                            let indexToDelete = initialSelectedSkill.firstIndex(of: skill) ?? 400
+                            print("item already exists: \(indexToDelete)")
+                            print("item already exists: \(initialSelectedSkill)")
+                            print("item already exists: \(initialSelectedSkill.count)")
+
+                            initialSelectedSkill.remove(at: indexToDelete)
+                            self.sections[3].sectionDetail.removeAll()
+                            self.sections[3].sectionDetail.append(contentsOf: initialSelectedSkill)
+                            self.tableView.deleteRows(at: [IndexPath(row: 0, section: 3)], with: .fade)
+//                        }
+//                    }
+                }
+            }
+            let uniquePosts = initialSelectedSkill.unique{$0 ?? ""}
+
+            print("workingggg2: \(initialSelectedSkill)")
+            print("notEmpty: \(uniquePosts)")
+        } else {
+            
+            initialSelectedSkill.forEach { skill in
+                if skill != "" {
+                    let indexToDelete = initialSelectedSkill.firstIndex(of: skill) ?? 400
+                    initialSelectedSkill.remove(at: indexToDelete)
+                    self.sections[3].sectionDetail.removeAll()
+                    self.sections[3].sectionDetail.append(contentsOf: initialSelectedSkill)
+                    self.tableView.deleteRows(at: [IndexPath(row: 0, section: 3)], with: .fade)
+                    
+                    print("Empty1: \(self.sections[3].sectionDetail)")
+                    print("Empty1: \(initialSelectedSkill)")
+                }
+            }
+        }
+        
     }
     
     
@@ -328,8 +484,9 @@ extension PostFormVC: TableViewDataSourceAndDelegate {
             
             let lastRowIndex = tableView.numberOfRows(inSection: tableView.numberOfSections - 1)
             let lastIndex = lastRowIndex - 1
-            
+           
             if indexPath.row == lastIndex {
+                cell.textLabel?.isHidden = true
                 cell.setupViews()
                 cell.addSkillsBtn.addTarget(self, action: #selector(addSkillsBtnTapped), for: .touchUpInside)
             } else {
@@ -341,6 +498,43 @@ extension PostFormVC: TableViewDataSourceAndDelegate {
         default:
             return UITableViewCell()
         }
+    }
+    
+    @objc func UpdateDefaultsArrayObserver() {
+//        tableView.reloadData()
+        print("workin")
+
+        let selectedSkill2 = userDefaults.stringArray(forKey: Keys.selectedSkills) ?? [String]()
+        print(selectedSkill2)
+        if selectedSkill2.first != "" || !selectedSkill2.isEmpty {
+            print("56")
+//            let selectedSkill = userDefaults.stringArray(forKey: Keys.selectedSkills) ?? [String]() // retrieve
+//            sections.append(SectionHandler(title: "Skills Required", detail: selectedSkill))
+//            sections[3].sectionDetail.append(contentsOf: selectedSkill2)
+//            sections[3].sectionDetail += selectedSkill
+            tableView.reloadData()
+//            let uniquePosts = selectedSkill2.unique{$0 ?? ""}
+
+            print(selectedSkill2.filter { $0 != $0})
+            for skills in selectedSkill2 {
+                self.sections[3].sectionDetail.insert(skills, at: 0)
+                print("try: \(self.sections[3].sectionDetail)")
+                self.tableView.beginUpdates()
+                self.tableView.insertRows(at: [IndexPath(row: 0, section: 3)], with: .top)
+                self.tableView.endUpdates()
+            }
+//            tableView.reloadData()
+
+        } else {
+            print("67")
+
+            userDefaults.set(initialSelectedSkill, forKey: Keys.selectedSkills) // save
+            let selectedSkill = userDefaults.stringArray(forKey: Keys.selectedSkills) ?? [String]() // retrieve
+            sections[3].sectionDetail.append(contentsOf: selectedSkill)
+            tableView.reloadData()
+
+        }
+
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
@@ -426,6 +620,20 @@ extension PostFormVC: TableViewDataSourceAndDelegate {
     
 }
 
+extension Array {
+    func unique<T:Hashable>(map: ((Element) -> (T)))  -> [Element] {
+        var set = Set<T>() //the unique list kept in a Set for fast retrieval
+        var arrayOrdered = [Element]() //keeping the unique list of elements but ordered
+        for value in self {
+            if !set.contains(map(value)) {
+                set.insert(map(value))
+                arrayOrdered.append(value)
+            }
+        }
+
+        return arrayOrdered
+    }
+}
 // MARK: - UIPickerViewDelegate Extension
 extension PostFormVC: UIPickerViewDelegate, UIPickerViewDataSource {
     
