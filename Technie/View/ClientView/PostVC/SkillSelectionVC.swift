@@ -11,6 +11,7 @@ import UIKit
 protocol SkillSelectionVCDelegate: class {
     func fetchSelectedSkills(skills: [String], didDelete: Bool)
 }
+
 class SkillSelectionVC: UIViewController {
     
     weak var skillSelectionVCDelegate: SkillSelectionVCDelegate?
@@ -62,9 +63,14 @@ class SkillSelectionVC: UIViewController {
 //        let defaultArray = userDefaults.set(selectedSkill, forKey: Keys.selectedSkills) // save
 //        let selectedSkill = userDefaults.stringArray(forKey: Keys.selectedSkills) ?? [String]() // retrieve
         sections.append(SectionHandler(title: "Selected skills", detail: selectedSkill.first == "" ? ([String]()) : (selectedSkill)))
-        sections.append(SectionHandler(title: "Suggested skills", detail: ["skill 3", "skill 4", "skill 5", "skill 6"]))
+        sections.append(SectionHandler(title: "Suggested skills", detail: ["skill 1", "skill 2", "skill 3", "skill 4", "skill 5", "skill 6", "skill 7", "skill 8", "skill 9", "skill 10", "skill 11", "skill 12"]))
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+//        tableView.reloadData()
+//        print("viewWillAppear")
+    }
 
     // MARK: - Methods
     fileprivate func setupViews() {
@@ -89,6 +95,7 @@ class SkillSelectionVC: UIViewController {
     }
         
     fileprivate func removeSkill(_ index: Int) {
+//        tableView.reloadData()
         didDelete = true
         var sectionOneIndexPath = IndexPath.init(row: 0, section: 0)
         
@@ -99,7 +106,8 @@ class SkillSelectionVC: UIViewController {
                 switch indexPath.section {
                 case 1:
                     sectionOneIndexPath = indexPath
-                    let cell = tableView.cellForRow(at: sectionOneIndexPath) as! SkillsTVCell // accessing SkillsTVCell outside of its domain
+//                    guard let cell2 = tableView.dequeueReusableCell(withIdentifier: SkillsTVCell.cellID, for: sectionOneIndexPath) as? SkillsTVCell else { return }
+                    guard let cell = tableView.cellForRow(at: IndexPath(row: self.sections[1].sectionDetail.count, section: sectionOneIndexPath.section)) as? SkillsTVCell else { return } // accessing SkillsTVCell outside of its domain
                     let skillFromAddSection = self.sections[1].sectionDetail // list of the items in the selection section
                     let skillFromRemoveSection = self.sections[0].sectionDetail[index] // item to be deleted from the list of the selected section
                     // Check the index of the item to be diselected in the skillFromAddSection
@@ -109,8 +117,10 @@ class SkillSelectionVC: UIViewController {
                         let modifiedImage = UIImage(systemName: "plus.circle.fill")
                         cell.addSkillBtn.setImage(modifiedImage, for: .normal)
                         print("the same: \(skillFromRemoveSection)")
+                        print("row 1: \(sectionOneIndexPath.row)")
                     } else {
-                        print("different")
+                        
+//                        print("different: \(skillFromAddSection), \(skillFromRemoveSection), \(indexOfTappedItem), \(sectionOneIndexPath.row)")
                     }
                 default:
                     break
@@ -126,7 +136,7 @@ class SkillSelectionVC: UIViewController {
     }
     
     func updateAddButtonState() {
-        print("updateAddButtonState")
+        print("updateAddButtonState: \(selectedSkill)")
         var sectionOneIndexPath = IndexPath.init(row: 0, section: 0)
         
         for i in 0..<tableView.numberOfSections {
@@ -136,7 +146,9 @@ class SkillSelectionVC: UIViewController {
                 switch indexPath.section {
                 case 1:
                     sectionOneIndexPath = indexPath
-                    let cell = tableView.cellForRow(at: sectionOneIndexPath) as! SkillsTVCell // accessing SkillsTVCell outside of its domain
+                    //                    print(sectionOneIndexPath.row)
+                    //                    let testIndex = tableView.indexPathForSelectedRow
+                    guard let cell = tableView.cellForRow(at: sectionOneIndexPath) as? SkillsTVCell else { return } // accessing SkillsTVCell outside of its domain
                     let skillFromAddSection = self.sections[1].sectionDetail // list of the items in the selection section
                     let skillFromRemoveSection = self.sections[0].sectionDetail // item to be deleted from the list of the selected section
                     // Check the index of the item to be diselected in the skillFromAddSection
@@ -146,17 +158,17 @@ class SkillSelectionVC: UIViewController {
                         if arrayOfStringContains(mutualSkill, section: 1) && sectionOneIndexPath.row == indexOfTappedItem {
                             let modifiedImage = UIImage(systemName: "minus.circle.fill")?.withTintColor(.red, renderingMode: .alwaysOriginal)
                             cell.addSkillBtn.setImage(modifiedImage, for: .normal)
-//                            print("not different")
+                            print("not different")
                         } else {
-//                            print("different")
+                            print("different")
                         }
                     }
                 default:
                     break
                 }
-                
             }
-        }
+        } // End of loop
+        
     }
     
     func arrayOfStringContains(_ item: String, section index: Int)  -> Bool {
@@ -212,15 +224,9 @@ class SkillSelectionVC: UIViewController {
 //        userDefaults.set(sections[0].sectionDetail, forKey: Keys.selectedSkills)
 //        print("saved: \(sections[0].sectionDetail)")
 //        NotificationCenter.default.post(name: Notification.Name("UpdateDefaultsArrayNotification"), object: nil, userInfo: nil)
-//        print("rightNavBarBtnTapped: \(selectedSkill)")
 
-        print("rightNavBarBtnTapped: \(sections[0].sectionDetail)")
-//        sections[0].sectionDetail.forEach { skills in
-//            if arrayOfStringContains(skills, section: 0) {
+//        print("rightNavBarBtnTapped: \(sections[0].sectionDetail)")
         skillSelectionVCDelegate?.fetchSelectedSkills(skills: sections[0].sectionDetail, didDelete: didDelete)
-//            }
-//        }
-        
         dismiss(animated: true, completion: nil)
     }
     
@@ -235,6 +241,7 @@ class SkillSelectionVC: UIViewController {
                 self.removeSkill(cellBtnIndex)
             }
         }
+        tableView.reloadData()
 
     }
     
@@ -280,6 +287,7 @@ extension SkillSelectionVC: TableViewDataSourceAndDelegate {
             cell.customLabel.text = title
             cell.addSkillBtn.tag = indexPath.row
             cell.addSkillBtn.addTarget(self, action: #selector(addSkillBtnTapped), for: .touchUpInside)
+            print("row 2: \(indexPath.row)")
             return cell
         default:
             return UITableViewCell()
