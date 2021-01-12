@@ -45,8 +45,14 @@ class ClientPostVC: UIViewController {
    
 //    override func viewWillDisappear(_ animated: Bool) {
 //        super.viewWillDisappear(animated)
-//        navigationController?.navigationBar.prefersLargeTitles = false
+//        navigationItem.title = ""
 //    }
+//    
+//    override func viewWillAppear(_ animated: Bool) {
+//        super.viewWillAppear(animated)
+//        print("viewWillAppear")
+//    }
+    
     
     // MARK: - Methods
     fileprivate func setupViews() {
@@ -131,7 +137,8 @@ extension ClientPostVC: CollectionDataSourceAndDelegate {
             // present postSubSections
             let vc = PostSectionVC()
             vc.postSectionVCIndexPath = indexPath
-            vc.navigationItem.title = navigationItem.title
+//            vc.navigationItem.title = navigationItem.title
+//            vc.navigationItem.backBarButtonItem?.title = ""
             vc.sectionTitle = professionArray[indexPath.item]
             navigationController?.pushViewController(vc, animated: true)
         }

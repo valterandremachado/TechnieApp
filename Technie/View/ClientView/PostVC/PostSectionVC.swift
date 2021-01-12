@@ -60,8 +60,9 @@ class PostSectionVC: UIViewController {
     }
     
     fileprivate func setupNavBar() {
-//        let backButton = UIBarButtonItem()
-//        guard let navBar = navigationController?.navigationBar else { return }
+        let backButton = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+        guard let navBar = navigationController?.navigationBar else { return }
+        navBar.topItem?.backBarButtonItem = backButton
 //        backButton.title = sectionTitle
 //        navBar.topItem?.backButtonTitle = sectionTitle
 //        navBar.backgroundColor = .white

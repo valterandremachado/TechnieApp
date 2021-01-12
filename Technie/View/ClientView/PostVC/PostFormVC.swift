@@ -188,21 +188,57 @@ class PostFormVC: UIViewController {
         super.viewDidDisappear(animated)
         // Reset userDefaults
         userDefaults.removeObject(forKey: Keys.pickerStoredIndex)
-        userDefaults.removeObject(forKey: Keys.selectedSkills)
+//        userDefaults.removeObject(forKey: Keys.selectedSkills)
     }
     
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
+//    override func viewWillAppear(_ animated: Bool) {
+//        super.viewWillAppear(animated)
+////        hideBackText()
+//    }
+//    deinit {
+//        NotificationCenter.default.removeObserver(self)
+//    }
     
     // MARK: - Methods
     fileprivate func setupViews() {
         [tableView].forEach {view.addSubview($0)}
         tableView.anchor(top: view.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor)
-        navigationItem.largeTitleDisplayMode = .never
         
 //        NotificationCenter.default.addObserver(self, selector: #selector(UpdateDefaultsArrayObserver), name: NSNotification.Name("UpdateDefaultsArrayNotification"), object: nil)
 //        NotificationCenter.default.removeObserver(self)
+        
+        setupNavBar()
+    }
+    
+//    private func hideBackText() {
+//        let appearance = UINavigationBarAppearance()
+//        appearance.configureWithDefaultBackground()
+//
+//        let backButtonAppearance = UIBarButtonItemAppearance()
+//        backButtonAppearance.normal.titleTextAttributes = [.font: UIFont(name: "Arial", size: 0)!]
+//        appearance.backButtonAppearance = backButtonAppearance
+//
+//        navigationItem.standardAppearance = appearance
+//        navigationItem.scrollEdgeAppearance = appearance
+//        navigationItem.compactAppearance = appearance
+//    }
+    
+    fileprivate func setupNavBar() {
+        let backButton = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+        guard let navBar = navigationController?.navigationBar else { return }
+//        navBar.setBackgroundImage(UIImage(), for: .default)
+//        navBar.hideNavBarSeperator()
+        navBar.topItem?.backBarButtonItem = backButton
+
+//        navBar.topItem?.title = "Add Skills"
+//        navBar.prefersLargeTitles = true
+//        navigationItem.largeTitleDisplayMode = .automatic
+        let rightNavBarButton = UIBarButtonItem(title: "Post", style: .done, target: self, action: #selector(rightNavBarBtnTapped))
+            //UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(leftNavBarBtnTapped))
+
+//        self.navigationItem.leftBarButtonItem = leftNavBarButton
+        self.navigationItem.rightBarButtonItem = rightNavBarButton
+        navigationItem.largeTitleDisplayMode = .never
     }
     
     fileprivate func addSkillData(_ skillTitle: String?) {
@@ -219,24 +255,6 @@ class PostFormVC: UIViewController {
         } else {
             print("existing Name")
         }
-    }
-    
-    fileprivate func presentAlertSheet() {
-        var textField = UITextField()
-        let alert = UIAlertController(title: "Add New Schedule", message: "", preferredStyle: .alert)
-        
-        let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
-            self.addSkillData(textField.text)
-        }
-        
-        alert.addTextField { (addTextField) in
-            addTextField.placeholder = "Creat new item"
-            textField = addTextField
-        }
-        
-        alert.addAction(action)
-        
-        self.present(alert, animated: true, completion: nil)
     }
     
     fileprivate func presentActionSheet() {
@@ -257,8 +275,11 @@ class PostFormVC: UIViewController {
     }
     
     // MARK: - Selectors
+    @objc fileprivate func rightNavBarBtnTapped() {
+        dismiss(animated: true, completion: nil)
+    }
+    
     @objc func addSkillsBtnTapped() {
-//        presentAlertSheet()
         let vc = SkillSelectionVC()
         vc.skillSelectionVCDelegate = self // set delegate in order to have access of the data used in the SkillSelectionVC
         
@@ -277,7 +298,6 @@ class PostFormVC: UIViewController {
                             vc.tableView.beginUpdates()
                             vc.tableView.insertRows(at: [IndexPath(row: 0, section: 0)], with: .top)
                             vc.tableView.endUpdates()
-//                            vc.tableView.reloadData()
                             vc.updateAddButtonState()
 //                            print(vc.sections[0].sectionDetail)
                         } else {
@@ -319,98 +339,99 @@ extension PostFormVC: SkillSelectionVCDelegate {
         
         if !skills.isEmpty {
             for skill in skills {
-//                if !arrayOfStringContains(skill) || didDelete == false {
-//                    initialSelectedSkill.append(skill)
-//                    let uniqueItems = initialSelectedSkill.uniqueItemInTheArray{$0}
-//                    initialSelectedSkill.removeAll()
-//                    initialSelectedSkill.append(contentsOf: uniqueItems)
-//                    self.sections[3].sectionDetail.insert(skill, at: 0)
-//                    self.tableView.beginUpdates()
-//                    self.tableView.insertRows(at: [IndexPath(row: 0, section: 3)], with: .top)
-//                    self.tableView.endUpdates()
-//
-//                    if uniqueItems.count < self.sections[3].sectionDetail.count {
-//                        self.sections[3].sectionDetail.removeAll()
-//                        self.sections[3].sectionDetail.append(contentsOf: uniqueItems)
-//                        self.tableView.deleteRows(at: [IndexPath(row: 0, section: 3)], with: .fade)
-//                    }
+                //                if !arrayOfStringContains(skill) || didDelete == false {
+                //                    initialSelectedSkill.append(skill)
+                //                    let uniqueItems = initialSelectedSkill.uniqueItemInTheArray{$0}
+                //                    initialSelectedSkill.removeAll()
+                //                    initialSelectedSkill.append(contentsOf: uniqueItems)
+                //                    self.sections[3].sectionDetail.insert(skill, at: 0)
+                //                    self.tableView.beginUpdates()
+                //                    self.tableView.insertRows(at: [IndexPath(row: 0, section: 3)], with: .top)
+                //                    self.tableView.endUpdates()
+                //
+                //                    if uniqueItems.count < self.sections[3].sectionDetail.count {
+                //                        self.sections[3].sectionDetail.removeAll()
+                //                        self.sections[3].sectionDetail.append(contentsOf: uniqueItems)
+                //                        self.tableView.deleteRows(at: [IndexPath(row: 0, section: 3)], with: .fade)
+                //                    }
                 // MARK: WORKING
-//                    initialSelectedSkill.append(skill)
-                    var uniqueItems = skills.uniqueItemInTheArray{$0}
-                    initialSelectedSkill.removeAll()
-//                    uniqueItems.removeAll()
-//                    uniqueItems.append(contentsOf: skills)
-                    uniqueItems.insert("", at: uniqueItems.count)
-                    initialSelectedSkill.append(contentsOf: uniqueItems)
-                    self.sections[3].sectionDetail.removeAll()
-                    self.sections[3].sectionDetail.insert(contentsOf: uniqueItems, at: 0)
-//                    self.tableView.beginUpdates()
-//                    self.tableView.insertRows(at: [IndexPath(row: 0, section: 3)], with: .top)
-//                    self.tableView.endUpdates()
-                    tableView.reloadData()
-                    print("new item: \(self.sections[3].sectionDetail)")
-
-                    
-//                } else {
-//                    print("inside else")
-//                    let indexToDelete = initialSelectedSkill.firstIndex(of: skill) ?? 400
-//                    initialSelectedSkill.remove(at: indexToDelete)
-//                    self.sections[3].sectionDetail.removeAll()
-//                    self.sections[3].sectionDetail.append(contentsOf: initialSelectedSkill)
-//                    self.tableView.deleteRows(at: [IndexPath(row: 0, section: 3)], with: .fade)
-                    
-//                    initialSelectedSkill.append(skill)
-//                    var uniqueItems = initialSelectedSkill.uniqueItemInTheArray{$0}
-//                    initialSelectedSkill.removeAll()
-//                    uniqueItems.removeAll()
-//                    uniqueItems.append(contentsOf: skills)
-//                    uniqueItems.insert("", at: uniqueItems.count)
-//                    initialSelectedSkill.append(contentsOf: uniqueItems)
-//                    self.sections[3].sectionDetail.removeAll()
-//                    self.sections[3].sectionDetail.insert(contentsOf: uniqueItems, at: 0)
-////                    self.tableView.beginUpdates()
-////                    self.tableView.insertRows(at: [IndexPath(row: 0, section: 3)], with: .top)
-////                    self.tableView.endUpdates()
-//                    tableView.reloadData()
-                    
-//                    if uniqueItems.count < self.sections[3].sectionDetail.count {
-//                        self.sections[3].sectionDetail.removeAll()
-//                        self.sections[3].sectionDetail.append(contentsOf: uniqueItems)
-//                        self.tableView.deleteRows(at: [IndexPath(row: 0, section: 3)], with: .fade)
-//                        print("hahaha")
-//                    }
-//                    print(skills)
-//                    print(initialSelectedSkill)
-//                    print(sections[3].sectionDetail)
-
-//                    initialSelectedSkill.forEach { skilll in
-                        //
-//                        if skill == skilll || skilll == "" {
-//                            print("good")
-//                        } else {
-//                        if initialSelectedSkill.uniqueItemInTheArray(map: {$0}).count < self.sections[3].sectionDetail.count {
-//                                self.sections[3].sectionDetail.removeAll()
-//                                self.sections[3].sectionDetail.append(contentsOf: initialSelectedSkill.uniqueItemInTheArray{$0})
-//                                self.tableView.deleteRows(at: [IndexPath(row: 0, section: 3)], with: .fade)
-//                            print("hahaha")
-//                            }
-//                            if skill != initialSelectedSkill.first && skill != "" {
-                                //                                print("new item 2")
-//                                let indexToDelete = initialSelectedSkill.firstIndex(of: skill) ?? 400
-//                                //                            print("item already exists: \(indexToDelete)")
-//                                //                            print("item already exists: \(initialSelectedSkill)")
-//                                //                            print("item already exists: \(initialSelectedSkill.count)")
-//
-//                                initialSelectedSkill.remove(at: indexToDelete)
-//                                self.sections[3].sectionDetail.removeAll()
-//                                self.sections[3].sectionDetail.append(contentsOf: initialSelectedSkill)
-//                                self.tableView.deleteRows(at: [IndexPath(row: 0, section: 3)], with: .fade)
-//                            } else {
-//
-//                            }
-//                        }
-//                    }
-                } // End of first inner conditional statement
+                //                    initialSelectedSkill.append(skill)
+                var uniqueItems = skills.uniqueItemInTheArray{$0}
+                initialSelectedSkill.removeAll()
+                //                    uniqueItems.removeAll()
+                //                    uniqueItems.append(contentsOf: skills)
+                uniqueItems.insert("", at: uniqueItems.count)
+                initialSelectedSkill.append(contentsOf: uniqueItems)
+                self.sections[3].sectionDetail.removeAll()
+                self.sections[3].sectionDetail.insert(contentsOf: uniqueItems, at: 0)
+                self.tableView.beginUpdates()
+                self.tableView.reloadSections(IndexSet(integersIn: 3...3), with: .none) // reloads solely section 3
+//                //                self.tableView.insertRows(at: [IndexPath(row: 0, section: 3)], with: .fade)
+                self.tableView.endUpdates()
+//                tableView.reloadData()
+                print("new item: \(self.sections[3].sectionDetail)")
+                
+                
+                //                } else {
+                //                    print("inside else")
+                //                    let indexToDelete = initialSelectedSkill.firstIndex(of: skill) ?? 400
+                //                    initialSelectedSkill.remove(at: indexToDelete)
+                //                    self.sections[3].sectionDetail.removeAll()
+                //                    self.sections[3].sectionDetail.append(contentsOf: initialSelectedSkill)
+                //                    self.tableView.deleteRows(at: [IndexPath(row: 0, section: 3)], with: .fade)
+                
+                //                    initialSelectedSkill.append(skill)
+                //                    var uniqueItems = initialSelectedSkill.uniqueItemInTheArray{$0}
+                //                    initialSelectedSkill.removeAll()
+                //                    uniqueItems.removeAll()
+                //                    uniqueItems.append(contentsOf: skills)
+                //                    uniqueItems.insert("", at: uniqueItems.count)
+                //                    initialSelectedSkill.append(contentsOf: uniqueItems)
+                //                    self.sections[3].sectionDetail.removeAll()
+                //                    self.sections[3].sectionDetail.insert(contentsOf: uniqueItems, at: 0)
+                ////                    self.tableView.beginUpdates()
+                ////                    self.tableView.insertRows(at: [IndexPath(row: 0, section: 3)], with: .top)
+                ////                    self.tableView.endUpdates()
+                //                    tableView.reloadData()
+                
+                //                    if uniqueItems.count < self.sections[3].sectionDetail.count {
+                //                        self.sections[3].sectionDetail.removeAll()
+                //                        self.sections[3].sectionDetail.append(contentsOf: uniqueItems)
+                //                        self.tableView.deleteRows(at: [IndexPath(row: 0, section: 3)], with: .fade)
+                //                        print("hahaha")
+                //                    }
+                //                    print(skills)
+                //                    print(initialSelectedSkill)
+                //                    print(sections[3].sectionDetail)
+                
+                //                    initialSelectedSkill.forEach { skilll in
+                //
+                //                        if skill == skilll || skilll == "" {
+                //                            print("good")
+                //                        } else {
+                //                        if initialSelectedSkill.uniqueItemInTheArray(map: {$0}).count < self.sections[3].sectionDetail.count {
+                //                                self.sections[3].sectionDetail.removeAll()
+                //                                self.sections[3].sectionDetail.append(contentsOf: initialSelectedSkill.uniqueItemInTheArray{$0})
+                //                                self.tableView.deleteRows(at: [IndexPath(row: 0, section: 3)], with: .fade)
+                //                            print("hahaha")
+                //                            }
+                //                            if skill != initialSelectedSkill.first && skill != "" {
+                //                                print("new item 2")
+                //                                let indexToDelete = initialSelectedSkill.firstIndex(of: skill) ?? 400
+                //                                //                            print("item already exists: \(indexToDelete)")
+                //                                //                            print("item already exists: \(initialSelectedSkill)")
+                //                                //                            print("item already exists: \(initialSelectedSkill.count)")
+                //
+                //                                initialSelectedSkill.remove(at: indexToDelete)
+                //                                self.sections[3].sectionDetail.removeAll()
+                //                                self.sections[3].sectionDetail.append(contentsOf: initialSelectedSkill)
+                //                                self.tableView.deleteRows(at: [IndexPath(row: 0, section: 3)], with: .fade)
+                //                            } else {
+                //
+                //                            }
+                //                        }
+                //                    }
+            } // End of first inner conditional statement
 //            } // End of loop
         } else {
             
@@ -474,7 +495,6 @@ extension PostFormVC: TableViewDataSourceAndDelegate {
                 cell.imageView?.isHidden = true
                 cell.customLabel2.text = imageNameArray[indexPath.row - 3]
                 cell.customImageView.image = UIImage(data: imageDataArray[indexPath.row - 3])
-                print("if")
             }
 //            else {
 //                cell.stackView.isHidden = false

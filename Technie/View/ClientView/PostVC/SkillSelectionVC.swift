@@ -106,8 +106,8 @@ class SkillSelectionVC: UIViewController {
                 switch indexPath.section {
                 case 1:
                     sectionOneIndexPath = indexPath
-//                    guard let cell2 = tableView.dequeueReusableCell(withIdentifier: SkillsTVCell.cellID, for: sectionOneIndexPath) as? SkillsTVCell else { return }
-                    guard let cell = tableView.cellForRow(at: IndexPath(row: self.sections[1].sectionDetail.count, section: sectionOneIndexPath.section)) as? SkillsTVCell else { return } // accessing SkillsTVCell outside of its domain
+                    guard let cell = tableView.dequeueReusableCell(withIdentifier: SkillsTVCell.cellID, for: sectionOneIndexPath) as? SkillsTVCell else { return }
+//                    guard let cell = tableView.cellForRow(at: sectionOneIndexPath) as? SkillsTVCell else { return } // accessing SkillsTVCell outside of its domain
                     let skillFromAddSection = self.sections[1].sectionDetail // list of the items in the selection section
                     let skillFromRemoveSection = self.sections[0].sectionDetail[index] // item to be deleted from the list of the selected section
                     // Check the index of the item to be diselected in the skillFromAddSection
@@ -116,6 +116,7 @@ class SkillSelectionVC: UIViewController {
                     if arrayOfStringContains(skillFromRemoveSection, section: 1) && sectionOneIndexPath.row == indexOfTappedItem {
                         let modifiedImage = UIImage(systemName: "plus.circle.fill")
                         cell.addSkillBtn.setImage(modifiedImage, for: .normal)
+                        self.tableView.reloadRows(at: [sectionOneIndexPath], with: .none) // reloads solely the removed rows
                         print("the same: \(skillFromRemoveSection)")
                         print("row 1: \(sectionOneIndexPath.row)")
                     } else {
@@ -208,11 +209,21 @@ class SkillSelectionVC: UIViewController {
                 sender.setImage(modifiedImage, for: .normal)
             } else {
                 print("Exceeded")
+                presentAlertSheet()
             }
            
         }
         
 
+    }
+    
+    fileprivate func presentAlertSheet() {
+        let alert = UIAlertController(title: "5 Skills Selected", message: "You have selected the maximum required number of skills.", preferredStyle: .alert)
+        
+        let cancelAction = UIAlertAction(title: "Ok", style: .cancel)
+        alert.addAction(cancelAction)
+        
+        self.present(alert, animated: true, completion: nil)
     }
     
     // MARK: - Selectors
@@ -270,6 +281,7 @@ extension SkillSelectionVC: TableViewDataSourceAndDelegate {
         switch indexPath.section {
         case 0:
             let cell = tableView.dequeueReusableCell(withIdentifier: SelectedTVCell.cellID, for: indexPath) as! SelectedTVCell
+            cell.selectionStyle = .none
 //            cell.separatorInset = .init(top: 0, left: 20, bottom: 0, right: 20)
             //            cell.textLabel?.text = title
             cell.setupViews()
@@ -281,6 +293,7 @@ extension SkillSelectionVC: TableViewDataSourceAndDelegate {
             return cell
         case 1:
             let cell = tableView.dequeueReusableCell(withIdentifier: SkillsTVCell.cellID, for: indexPath) as! SkillsTVCell
+            cell.selectionStyle = .none
 //            cell.separatorInset = .init(top: 0, left: 20, bottom: 0, right: 20)
 //            cell.textLabel?.text = title
             cell.setupViews()

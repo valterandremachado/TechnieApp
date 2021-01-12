@@ -78,13 +78,15 @@ extension TechnieRankingCell: CollectionDataSourceAndDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         self.indexPath = indexPath
         let vc = RankedTechnieVC()
-        vc.modalTransitionStyle = .crossDissolve
+//        vc.modalTransitionStyle = .crossDissolve
         vc.stringPrint = "\(indexPath.item)"
         
         guard let presentVCFromCell = UIApplication.cellDidPresentViewController() else { return }
 //        presentVCFromCell.navigationController?.show(rankedTechnieVC, sender: nil)
         
-        presentVCFromCell.present(vc, animated: true)
+        let vcWithEmbeddedNav = UINavigationController(rootViewController: vc)
+//        vcWithEmbeddedNav.modalPresentationStyle = .fullScreen
+        presentVCFromCell.present(vcWithEmbeddedNav, animated: true)
 
 //        print("IndexPath: \(indexPath.item)")
     }
