@@ -1,8 +1,8 @@
 //
-//  ClientTabController.swift
+//  TechnieTabController.swift
 //  Technie
 //
-//  Created by Valter A. Machado on 12/16/20.
+//  Created by Valter A. Machado on 1/13/21.
 //
 
 import UIKit
@@ -11,11 +11,11 @@ class TechnieTabController: UITabBarController {
     
     // MARK: - Properties
     // VCs
-    private let feedVC = ClientFeedVC()
-    private let searchVC = ClientSearchVC()
-    private let serviceVC = ClientPostVC()
-    private let chatVC = ClientChatVC()
-    private let notificationVC = ClientNotificationVC()
+    private let feedVC = TechnieFeedVC()
+    private let chatVC = TechnieChatVC()
+    private let serviceVC = TechnieServiceVC()
+    private let notificationVC = TechnieNotificationVC()
+    private let profileVC = TechnieProfileVC()
 
     // MARK: - Init
     override func viewDidLoad() {
@@ -28,10 +28,10 @@ class TechnieTabController: UITabBarController {
         // Tabs
         viewControllers = [
             createTabController(unselectedImage: "homepod", selectedImage: "homepod.fill", vc: feedVC),
-            createTabController(unselectedImage: "bell", selectedImage: "bell.fill", vc: searchVC),
-            createTabController(unselectedImage: "plus.app", selectedImage: "plus.app.fill", vc: serviceVC),
             createTabController(unselectedImage: "message", selectedImage: "message.fill", vc: chatVC),
-            createTabController(unselectedImage: "bell", selectedImage: "bell.fill", vc: notificationVC)
+            createTabController(unselectedImage: "plus.app", selectedImage: "plus.app.fill", vc: serviceVC),
+            createTabController(unselectedImage: "bell", selectedImage: "bell.fill", vc: notificationVC),
+            createTabController(unselectedImage: "person.circle", selectedImage: "person.circle.fill", vc: profileVC)
         ]
         
     }

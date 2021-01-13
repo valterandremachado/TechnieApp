@@ -1,20 +1,18 @@
 //
-//  ViewController.swift
+//  TechnieProfileVC.swift
 //  Technie
 //
-//  Created by Valter A. Machado on 12/16/20.
+//  Created by Valter A. Machado on 1/13/21.
 //
 
 import UIKit
 
-class TechnieFeedVC: UIViewController {
+class TechnieProfileVC: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        view.backgroundColor = .brown
+        view.backgroundColor = .systemPink
     }
-
-
+    
 }
-

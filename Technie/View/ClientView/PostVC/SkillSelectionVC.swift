@@ -149,6 +149,7 @@ class SkillSelectionVC: UIViewController {
                     sectionOneIndexPath = indexPath
                     //                    print(sectionOneIndexPath.row)
                     //                    let testIndex = tableView.indexPathForSelectedRow
+//                    guard let cell = tableView.dequeueReusableCell(withIdentifier: SkillsTVCell.cellID, for: sectionOneIndexPath) as? SkillsTVCell else { return }
                     guard let cell = tableView.cellForRow(at: sectionOneIndexPath) as? SkillsTVCell else { return } // accessing SkillsTVCell outside of its domain
                     let skillFromAddSection = self.sections[1].sectionDetail // list of the items in the selection section
                     let skillFromRemoveSection = self.sections[0].sectionDetail // item to be deleted from the list of the selected section
@@ -236,7 +237,7 @@ class SkillSelectionVC: UIViewController {
 //        print("saved: \(sections[0].sectionDetail)")
 //        NotificationCenter.default.post(name: Notification.Name("UpdateDefaultsArrayNotification"), object: nil, userInfo: nil)
 
-//        print("rightNavBarBtnTapped: \(sections[0].sectionDetail)")
+        print("rightNavBarBtnTapped: \(sections[0].sectionDetail)")
         skillSelectionVCDelegate?.fetchSelectedSkills(skills: sections[0].sectionDetail, didDelete: didDelete)
         dismiss(animated: true, completion: nil)
     }

@@ -37,6 +37,12 @@
 		8ADD55AA25AAF8880035BBA5 /* SkillSelectionVC2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ADD55A925AAF8880035BBA5 /* SkillSelectionVC2.swift */; };
 		8ADD55B025AAF9090035BBA5 /* TaggerKit in Frameworks */ = {isa = PBXBuildFile; productRef = 8ADD55AF25AAF9090035BBA5 /* TaggerKit */; };
 		8AE258A6258A3156004EDB26 /* ClientTabController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AE258A5258A3156004EDB26 /* ClientTabController.swift */; };
+		8AE4096A25AEFF0F00A29453 /* TechnieTabController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AE4096925AEFF0F00A29453 /* TechnieTabController.swift */; };
+		8AE4096F25AEFF4C00A29453 /* TechnieFeedVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AE4096E25AEFF4C00A29453 /* TechnieFeedVC.swift */; };
+		8AE4097C25AF004600A29453 /* TechnieChatVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AE4097B25AF004600A29453 /* TechnieChatVC.swift */; };
+		8AE4098125AF011200A29453 /* TechnieServiceVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AE4098025AF011200A29453 /* TechnieServiceVC.swift */; };
+		8AE4098625AF013800A29453 /* TechnieProfileVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AE4098525AF013800A29453 /* TechnieProfileVC.swift */; };
+		8AE4098B25AF015200A29453 /* TechnieNotificationVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AE4098A25AF015200A29453 /* TechnieNotificationVC.swift */; };
 		8AF76A4E258B0B0700ED14C2 /* UserProfileVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AF76A4D258B0B0700ED14C2 /* UserProfileVC.swift */; };
 		8AF76A53258B23BF00ED14C2 /* ProfileTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AF76A52258B23BF00ED14C2 /* ProfileTableViewCell.swift */; };
 		8AF76A77258B440D00ED14C2 /* KeyboardLayoutConstraint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AF76A6F258B440D00ED14C2 /* KeyboardLayoutConstraint.swift */; };
@@ -81,12 +87,6 @@
 		8A8F8525258A355700C4CEF9 /* ClientPostVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientPostVC.swift; sourceTree = "<group>"; };
 		8A8F852D258A357200C4CEF9 /* ClientChatVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientChatVC.swift; sourceTree = "<group>"; };
 		8A8F8532258A358400C4CEF9 /* ClientNotificationVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientNotificationVC.swift; sourceTree = "<group>"; };
-		8A8F8537258A38CC00C4CEF9 /* TechnieSearchVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnieSearchVC.swift; sourceTree = "<group>"; };
-		8A8F8538258A38CC00C4CEF9 /* TechnieTabController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnieTabController.swift; sourceTree = "<group>"; };
-		8A8F8539258A38CC00C4CEF9 /* TechnieFeedVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnieFeedVC.swift; sourceTree = "<group>"; };
-		8A8F853A258A38CC00C4CEF9 /* TechnieServiceVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnieServiceVC.swift; sourceTree = "<group>"; };
-		8A8F853B258A38CC00C4CEF9 /* TechnieNotificationVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnieNotificationVC.swift; sourceTree = "<group>"; };
-		8A8F853C258A38CC00C4CEF9 /* TechnieChatVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnieChatVC.swift; sourceTree = "<group>"; };
 		8A8F854D258A3D0500C4CEF9 /* NearbyTechniesCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NearbyTechniesCell.swift; sourceTree = "<group>"; };
 		8A9125652598C505005034A1 /* PostSectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostSectionCell.swift; sourceTree = "<group>"; };
 		8A997F2F25A823AE00B144CD /* SkillSelectionVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillSelectionVC.swift; sourceTree = "<group>"; };
@@ -109,6 +109,12 @@
 		8AC1B146258A2D8F000F2569 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8ADD55A925AAF8880035BBA5 /* SkillSelectionVC2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillSelectionVC2.swift; sourceTree = "<group>"; };
 		8AE258A5258A3156004EDB26 /* ClientTabController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientTabController.swift; sourceTree = "<group>"; };
+		8AE4096925AEFF0F00A29453 /* TechnieTabController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnieTabController.swift; sourceTree = "<group>"; };
+		8AE4096E25AEFF4C00A29453 /* TechnieFeedVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnieFeedVC.swift; sourceTree = "<group>"; };
+		8AE4097B25AF004600A29453 /* TechnieChatVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnieChatVC.swift; sourceTree = "<group>"; };
+		8AE4098025AF011200A29453 /* TechnieServiceVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnieServiceVC.swift; sourceTree = "<group>"; };
+		8AE4098525AF013800A29453 /* TechnieProfileVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnieProfileVC.swift; sourceTree = "<group>"; };
+		8AE4098A25AF015200A29453 /* TechnieNotificationVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnieNotificationVC.swift; sourceTree = "<group>"; };
 		8AF76A4D258B0B0700ED14C2 /* UserProfileVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfileVC.swift; sourceTree = "<group>"; };
 		8AF76A52258B23BF00ED14C2 /* ProfileTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileTableViewCell.swift; sourceTree = "<group>"; };
 		8AF76A6F258B440D00ED14C2 /* KeyboardLayoutConstraint.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyboardLayoutConstraint.swift; sourceTree = "<group>"; };
@@ -210,46 +216,6 @@
 			path = NotificationVC;
 			sourceTree = "<group>";
 		};
-		8A8F8548258A3C3100C4CEF9 /* FeedVC */ = {
-			isa = PBXGroup;
-			children = (
-				8A8F8539258A38CC00C4CEF9 /* TechnieFeedVC.swift */,
-			);
-			path = FeedVC;
-			sourceTree = "<group>";
-		};
-		8A8F8549258A3C3900C4CEF9 /* SearchVC */ = {
-			isa = PBXGroup;
-			children = (
-				8A8F8537258A38CC00C4CEF9 /* TechnieSearchVC.swift */,
-			);
-			path = SearchVC;
-			sourceTree = "<group>";
-		};
-		8A8F854A258A3C4400C4CEF9 /* ChatVC */ = {
-			isa = PBXGroup;
-			children = (
-				8A8F853C258A38CC00C4CEF9 /* TechnieChatVC.swift */,
-			);
-			path = ChatVC;
-			sourceTree = "<group>";
-		};
-		8A8F854B258A3C4D00C4CEF9 /* ServiceVC */ = {
-			isa = PBXGroup;
-			children = (
-				8A8F853A258A38CC00C4CEF9 /* TechnieServiceVC.swift */,
-			);
-			path = ServiceVC;
-			sourceTree = "<group>";
-		};
-		8A8F854C258A3C5600C4CEF9 /* NotificationVC */ = {
-			isa = PBXGroup;
-			children = (
-				8A8F853B258A38CC00C4CEF9 /* TechnieNotificationVC.swift */,
-			);
-			path = NotificationVC;
-			sourceTree = "<group>";
-		};
 		8A9125642598C490005034A1 /* Cells */ = {
 			isa = PBXGroup;
 			children = (
@@ -335,7 +301,7 @@
 		8AC1B15D258A2E18000F2569 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				8AE258A0258A30A2004EDB26 /* TechnieView */,
+				8AFC383125AEFECD004ECDF3 /* TechnieView */,
 				8AE2589C258A305D004EDB26 /* ClientView */,
 			);
 			path = View;
@@ -385,25 +351,51 @@
 			path = TechnieViewModel;
 			sourceTree = "<group>";
 		};
-		8AE258A0258A30A2004EDB26 /* TechnieView */ = {
-			isa = PBXGroup;
-			children = (
-				8A8F8538258A38CC00C4CEF9 /* TechnieTabController.swift */,
-				8AF76A4C258B0ADF00ED14C2 /* TechnieProfile */,
-				8A8F8548258A3C3100C4CEF9 /* FeedVC */,
-				8A8F8549258A3C3900C4CEF9 /* SearchVC */,
-				8A8F854B258A3C4D00C4CEF9 /* ServiceVC */,
-				8A8F854A258A3C4400C4CEF9 /* ChatVC */,
-				8A8F854C258A3C5600C4CEF9 /* NotificationVC */,
-			);
-			path = TechnieView;
-			sourceTree = "<group>";
-		};
 		8AE258A1258A30AD004EDB26 /* TechnieModel */ = {
 			isa = PBXGroup;
 			children = (
 			);
 			path = TechnieModel;
+			sourceTree = "<group>";
+		};
+		8AE4097325AEFF7D00A29453 /* TechnieFeedVC */ = {
+			isa = PBXGroup;
+			children = (
+				8AE4096E25AEFF4C00A29453 /* TechnieFeedVC.swift */,
+			);
+			path = TechnieFeedVC;
+			sourceTree = "<group>";
+		};
+		8AE4097425AEFFB300A29453 /* TechnieServiceVC */ = {
+			isa = PBXGroup;
+			children = (
+				8AE4098025AF011200A29453 /* TechnieServiceVC.swift */,
+			);
+			path = TechnieServiceVC;
+			sourceTree = "<group>";
+		};
+		8AE4097525AEFFBF00A29453 /* TechnieNotificationVC */ = {
+			isa = PBXGroup;
+			children = (
+				8AE4098A25AF015200A29453 /* TechnieNotificationVC.swift */,
+			);
+			path = TechnieNotificationVC;
+			sourceTree = "<group>";
+		};
+		8AE4097625AEFFD500A29453 /* TechnieChatVC */ = {
+			isa = PBXGroup;
+			children = (
+				8AE4097B25AF004600A29453 /* TechnieChatVC.swift */,
+			);
+			path = TechnieChatVC;
+			sourceTree = "<group>";
+		};
+		8AE4097725AEFFEB00A29453 /* TechnieProfileVC */ = {
+			isa = PBXGroup;
+			children = (
+				8AE4098525AF013800A29453 /* TechnieProfileVC.swift */,
+			);
+			path = TechnieProfileVC;
 			sourceTree = "<group>";
 		};
 		8AF76A4B258B0AC800ED14C2 /* ClientProfile */ = {
@@ -414,13 +406,6 @@
 				8A79718C2595CAA000648A3C /* ProfileEnum.swift */,
 			);
 			path = ClientProfile;
-			sourceTree = "<group>";
-		};
-		8AF76A4C258B0ADF00ED14C2 /* TechnieProfile */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = TechnieProfile;
 			sourceTree = "<group>";
 		};
 		8AF76A6E258B440D00ED14C2 /* utils */ = {
@@ -438,6 +423,19 @@
 				8A997F3C25A83BC300B144CD /* MultipleSectionHandler.swift */,
 			);
 			path = utils;
+			sourceTree = "<group>";
+		};
+		8AFC383125AEFECD004ECDF3 /* TechnieView */ = {
+			isa = PBXGroup;
+			children = (
+				8AE4096925AEFF0F00A29453 /* TechnieTabController.swift */,
+				8AE4097325AEFF7D00A29453 /* TechnieFeedVC */,
+				8AE4097625AEFFD500A29453 /* TechnieChatVC */,
+				8AE4097425AEFFB300A29453 /* TechnieServiceVC */,
+				8AE4097525AEFFBF00A29453 /* TechnieNotificationVC */,
+				8AE4097725AEFFEB00A29453 /* TechnieProfileVC */,
+			);
+			path = TechnieView;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -577,6 +575,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8AE4098B25AF015200A29453 /* TechnieNotificationVC.swift in Sources */,
 				8AC1B127258A2D8D000F2569 /* ClientFeedVC.swift in Sources */,
 				8AC1B123258A2D8D000F2569 /* AppDelegate.swift in Sources */,
 				8AF76A7A258B440D00ED14C2 /* MyActivityIndicator.swift in Sources */,
@@ -596,6 +595,7 @@
 				8A76FA4F258DE3EF0094C524 /* RankedTechnieVC.swift in Sources */,
 				8A76FA57258DEBB20094C524 /* FullRankingVC.swift in Sources */,
 				8AF76A8E258B671500ED14C2 /* HeaderView.swift in Sources */,
+				8AE4098125AF011200A29453 /* TechnieServiceVC.swift in Sources */,
 				8AF76A79258B440D00ED14C2 /* TrashBinCode.swift in Sources */,
 				8AAB8821259B557000BCBD33 /* PostFormVC.swift in Sources */,
 				8AF76A78258B440D00ED14C2 /* UIFeedBackGenerator.swift in Sources */,
@@ -610,9 +610,13 @@
 				8A8F8526258A355700C4CEF9 /* ClientPostVC.swift in Sources */,
 				8A9125662598C505005034A1 /* PostSectionCell.swift in Sources */,
 				8A7971922595DE8C00648A3C /* ClientPostCell.swift in Sources */,
+				8AE4096F25AEFF4C00A29453 /* TechnieFeedVC.swift in Sources */,
 				8AF76A53258B23BF00ED14C2 /* ProfileTableViewCell.swift in Sources */,
 				8A8F854E258A3D0500C4CEF9 /* NearbyTechniesCell.swift in Sources */,
+				8AE4098625AF013800A29453 /* TechnieProfileVC.swift in Sources */,
+				8AE4096A25AEFF0F00A29453 /* TechnieTabController.swift in Sources */,
 				8AF76A7E258B440D00ED14C2 /* UIScrollView+.swift in Sources */,
+				8AE4097C25AF004600A29453 /* TechnieChatVC.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

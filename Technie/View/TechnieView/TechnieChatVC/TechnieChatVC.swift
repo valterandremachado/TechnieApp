@@ -1,19 +1,17 @@
 //
-//  ClientSearchVC.swift
+//  TechnieChatVC.swift
 //  Technie
 //
-//  Created by Valter A. Machado on 12/16/20.
+//  Created by Valter A. Machado on 1/13/21.
 //
 
 import UIKit
 
-class TechnieSearchVC: UIViewController {
+class TechnieChatVC: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        view.backgroundColor = .systemPink
+        view.backgroundColor = .gray
     }
-
-
 }
