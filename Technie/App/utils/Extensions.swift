@@ -138,12 +138,59 @@ extension UIViewController {
     }
 }
 
+extension UIView {
+    func addBorder(_ edge: UIRectEdge, color: UIColor, thickness: CGFloat) {
+           let subview = UIView()
+           subview.translatesAutoresizingMaskIntoConstraints = false
+           subview.backgroundColor = color
+           self.addSubview(subview)
+           switch edge {
+           case .top, .bottom:
+               subview.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 0).isActive = true
+               subview.rightAnchor.constraint(equalTo: self.rightAnchor, constant: 0).isActive = true
+               subview.heightAnchor.constraint(equalToConstant: thickness).isActive = true
+               if edge == .top {
+                   subview.topAnchor.constraint(equalTo: self.topAnchor, constant: 0).isActive = true
+               } else {
+                   subview.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: 0).isActive = true
+               }
+           case .left, .right:
+               subview.topAnchor.constraint(equalTo: self.topAnchor, constant: 0).isActive = true
+               subview.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: 0).isActive = true
+               subview.widthAnchor.constraint(equalToConstant: thickness).isActive = true
+               if edge == .left {
+                   subview.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 0).isActive = true
+               } else {
+                   subview.rightAnchor.constraint(equalTo: self.rightAnchor, constant: 0).isActive = true
+               }
+           default:
+               break
+           }
+       }
+}
+
 extension UIImage {
     func imageResized(to size: CGSize) -> UIImage {
         let newImage = UIGraphicsImageRenderer(size: size).image { image in
             draw(in: CGRect(origin: .zero, size: size))
         }
         return newImage.withRenderingMode(.alwaysOriginal) // returns the image with its true color
+    }
+    
+    func resizeImage(image: UIImage, toTheSize size:CGSize)->UIImage{
+
+        let scale = CGFloat(max(size.width/image.size.width,
+            size.height/image.size.height))
+        let width:CGFloat  = image.size.width * scale
+        let height:CGFloat = image.size.height * scale;
+
+        let rr:CGRect = CGRect( x: 0, y: 0, width: width, height: height);
+
+        UIGraphicsBeginImageContextWithOptions(size, false, 0);
+        image.draw(in: rr)
+        let newImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext();
+        return newImage!
     }
 }
 

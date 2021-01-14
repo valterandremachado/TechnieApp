@@ -29,9 +29,9 @@ class TechnieTabController: UITabBarController {
         viewControllers = [
             createTabController(unselectedImage: "homepod", selectedImage: "homepod.fill", vc: feedVC),
             createTabController(unselectedImage: "message", selectedImage: "message.fill", vc: chatVC),
-            createTabController(unselectedImage: "plus.app", selectedImage: "plus.app.fill", vc: serviceVC),
+            createTabController(unselectedImage: "doc.text", selectedImage: "doc.text.fill", vc: serviceVC),
             createTabController(unselectedImage: "bell", selectedImage: "bell.fill", vc: notificationVC),
-            createTabController(unselectedImage: "person.circle", selectedImage: "person.circle.fill", vc: profileVC)
+            createTabController(unselectedImage: "gearshape", selectedImage: "gearshape.fill", vc: profileVC)
         ]
         
     }
