@@ -108,15 +108,18 @@ extension TechnieServiceVC: TableViewDataSourceAndDelegate {
 //        }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let headerView = UIView(frame: CGRect(x: 0, y: 0, width: tableView.frame.width, height: 40))
+        let headerView = UIView(frame: CGRect(x: 0, y: 0, width: tableView.frame.width, height: 30))
         headerView.backgroundColor = .white
         
-        let headerLabel = UILabel(frame: CGRect(x: 20, y: -15, width: tableView.frame.width - 15, height: 40))
+        let headerLabel = UILabel(frame: CGRect(x: 20, y: 0, width: tableView.frame.width - 15, height: 30))
         headerLabel.textColor = .systemGray
         headerLabel.text = sections[section].sectionTitle
         headerView.addSubview(headerLabel)
         return headerView
     }
     
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 30
+    }
 }
 

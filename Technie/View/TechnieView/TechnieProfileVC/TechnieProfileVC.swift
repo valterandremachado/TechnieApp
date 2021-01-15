@@ -45,9 +45,9 @@ class TechnieProfileVC: UIViewController {
         setupViews()
         
         sections.append(SectionHandler(title: "Active Jobs", detail: ["Active 1"]))
-        sections.append(SectionHandler(title: "Previous Jobs", detail: ["Active 1", "Active 2"]))
+        sections.append(SectionHandler(title: "Previous Jobs", detail: ["Active 1", "Active 2", "Active 2"]))
         sections.append(SectionHandler(title: "Previous Jobs2", detail: ["Active 1", "Active 2"]))
-        sections.append(SectionHandler(title: "Previous Jobs2", detail: ["Active 1", "Active 2"]))
+        sections.append(SectionHandler(title: "Previous Jobs2", detail: ["Active 1"]))
     }
    
     
@@ -107,9 +107,7 @@ extension TechnieProfileVC: TableViewDataSourceAndDelegate {
             cell.imageView?.layer.cornerRadius = 40 / 2
             cell.imageView?.contentMode = .scaleAspectFill
             cell.imageView?.image = newImage
-            
-//            indexPath.row == lastIndex ? (cell.textLabel?.textColor = .red) : (cell.textLabel?.textColor = .black)
-//            indexPath.row == lastIndex ? (cell.accessoryType = .none) : (cell.accessoryType = .disclosureIndicator)
+            cell.backgroundColor = UIColor.rgb(red: 250, green: 250, blue: 250)
             
         case 1:
             let tableViewOptions = TechnieProfileTVOptions0(rawValue: indexPath.row)
@@ -117,21 +115,25 @@ extension TechnieProfileVC: TableViewDataSourceAndDelegate {
             //        cell.detailTextLabel?.text = detailArray[indexPath.row]
             cell.imageView?.image = tableViewOptions?.image
             cell.accessoryType = .disclosureIndicator
-            
+            cell.backgroundColor = UIColor.rgb(red: 250, green: 250, blue: 250)
+
         case 2:
             let tableViewOptions = TechnieProfileTVOptions1(rawValue: indexPath.row)
             cell.textLabel?.text = tableViewOptions?.description
             //        cell.detailTextLabel?.text = detailArray[indexPath.row]
             cell.imageView?.image = tableViewOptions?.image
             cell.accessoryType = .disclosureIndicator
-            
+            cell.backgroundColor = UIColor.rgb(red: 250, green: 250, blue: 250)
+
         case 3:
             let tableViewOptions = TechnieProfileTVOptions2(rawValue: indexPath.row)
             cell.textLabel?.text = tableViewOptions?.description
             //        cell.detailTextLabel?.text = detailArray[indexPath.row]
             cell.imageView?.image = tableViewOptions?.image
-            cell.accessoryType = .disclosureIndicator
-            
+            indexPath.row == lastIndex ? (cell.accessoryType = .none) : (cell.accessoryType = .disclosureIndicator)
+            indexPath.row == lastIndex ? (cell.textLabel?.textColor = .red) : (cell.textLabel?.textColor = .black)
+            cell.backgroundColor = UIColor.rgb(red: 250, green: 250, blue: 250)
+
         default:
             break
         }
