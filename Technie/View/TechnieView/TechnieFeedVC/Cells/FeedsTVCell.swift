@@ -83,8 +83,9 @@ class FeedsTVCell: UITableViewCell {
         btn.translatesAutoresizingMaskIntoConstraints = false
 //        btn.setTitle("Like", for: .normal)
         btn.setImage(UIImage(systemName: "heart.fill"), for: .normal)
-        btn.withWidth(40)
+        btn.withWidth(30)
 //        btn.backgroundColor = .gray
+        btn.imageEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: -8)
         return btn
     }()
     
@@ -269,20 +270,21 @@ class SkillTagsCell: UICollectionViewCell {
         lbl.translatesAutoresizingMaskIntoConstraints = false
 //        lbl.text = "Skill 1 Skill 2 Skill 3 Skill 4 Skill 5"
         lbl.textAlignment = .center
+        lbl.font = .systemFont(ofSize: 13.5)
         return lbl
     }()
     
     // MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: .zero)
-        backgroundColor = .cyan
+        backgroundColor = .systemGray5
         setupViews()
     }
     
     // MARK: - Methods
     fileprivate func setupViews() {
         // Customize Cell
-        self.layer.cornerRadius = 14
+        self.layer.cornerRadius = 15
         self.clipsToBounds = true
 
         [textLabel].forEach {self.addSubview($0)}

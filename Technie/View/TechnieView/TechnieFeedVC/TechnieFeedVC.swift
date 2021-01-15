@@ -242,6 +242,11 @@ extension TechnieFeedVC: TableViewDataSourceAndDelegate {
         return cell
     }
     
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let vc = JobDetailsVC()
+        navigationController?.pushViewController(vc, animated: true)
+    }
+    
 //    // UITableViewAutomaticDimension calculates height of label contents/text
 //    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
 //        return UITableView.automaticDimension
