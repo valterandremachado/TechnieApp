@@ -187,7 +187,7 @@ class PostFormBudgetCell: UITableViewCell {
         return lbl
     }()
     
-    lazy var attachFileBtn: UIButton = {
+    lazy var budgetBtn: UIButton = {
         var btn = UIButton(type: .system)
         btn.translatesAutoresizingMaskIntoConstraints = false
 //        btn.backgroundColor = UIColor(displayP3Red: 235/255, green: 51/255, blue: 72/255, alpha: 0.2)
@@ -203,7 +203,7 @@ class PostFormBudgetCell: UITableViewCell {
     }()
     
     lazy var stackView: UIStackView = {
-        var sv = UIStackView(arrangedSubviews: [attachFileBtn, customLabel])
+        var sv = UIStackView(arrangedSubviews: [budgetBtn, customLabel])
         sv.translatesAutoresizingMaskIntoConstraints = false
         sv.axis = .horizontal
         sv.spacing = 0

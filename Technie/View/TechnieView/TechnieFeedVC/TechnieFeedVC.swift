@@ -155,8 +155,18 @@ class TechnieFeedVC: UIViewController {
         // Do any additional setup after loading the view.
         view.backgroundColor = UIColor(named: "BackgroundAppearance")
         setupViews()
-        
-        
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        // Do any additional setup after loading the view.
+        self.tabBarController?.setTabBar(hidden: true, animated: true, along: nil)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        // Do any additional setup after loading the view.
+        self.tabBarController?.setTabBar(hidden: false, animated: true, along: nil)
     }
     
     // MARK: - Methods

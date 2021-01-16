@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8A159DFD25B307D900D45C60 /* JobDetailCVCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A159DFC25B307D900D45C60 /* JobDetailCVCell.swift */; };
+		8A159E0225B316CC00D45C60 /* JobDetailTVCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A159E0125B316CC00D45C60 /* JobDetailTVCell.swift */; };
 		8A41E7A625B07AB500265D5C /* ActiveJobsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A41E7A525B07AB500265D5C /* ActiveJobsCell.swift */; };
 		8A41E7AB25B07AD900265D5C /* PreviousJobsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A41E7AA25B07AD900265D5C /* PreviousJobsCell.swift */; };
 		8A41E7B725B07D6C00265D5C /* TechineProfileTVCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A41E7B625B07D6C00265D5C /* TechineProfileTVCell.swift */; };
@@ -81,6 +83,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		8A159DFC25B307D900D45C60 /* JobDetailCVCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobDetailCVCell.swift; sourceTree = "<group>"; };
+		8A159E0125B316CC00D45C60 /* JobDetailTVCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobDetailTVCell.swift; sourceTree = "<group>"; };
 		8A41E7A525B07AB500265D5C /* ActiveJobsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveJobsCell.swift; sourceTree = "<group>"; };
 		8A41E7AA25B07AD900265D5C /* PreviousJobsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviousJobsCell.swift; sourceTree = "<group>"; };
 		8A41E7B625B07D6C00265D5C /* TechineProfileTVCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechineProfileTVCell.swift; sourceTree = "<group>"; };
@@ -349,6 +353,8 @@
 			isa = PBXGroup;
 			children = (
 				8ADECCC325B026F600F871EF /* FeedsTVCell.swift */,
+				8A159DFC25B307D900D45C60 /* JobDetailCVCell.swift */,
+				8A159E0125B316CC00D45C60 /* JobDetailTVCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -617,6 +623,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8A159E0225B316CC00D45C60 /* JobDetailTVCell.swift in Sources */,
 				8AE4098B25AF015200A29453 /* TechnieNotificationVC.swift in Sources */,
 				8AC1B127258A2D8D000F2569 /* ClientFeedVC.swift in Sources */,
 				8AC1B123258A2D8D000F2569 /* AppDelegate.swift in Sources */,
@@ -651,6 +658,7 @@
 				8A997F3025A823AE00B144CD /* SkillSelectionVC.swift in Sources */,
 				8A6A32752598C73A001FE408 /* PostSectionVC.swift in Sources */,
 				8A41E7BC25B07F1D00265D5C /* TechnieProfileTVOptions.swift in Sources */,
+				8A159DFD25B307D900D45C60 /* JobDetailCVCell.swift in Sources */,
 				8A76FA5F258DF2F40094C524 /* NearbyDetailVC.swift in Sources */,
 				8ADECCC425B026F600F871EF /* FeedsTVCell.swift in Sources */,
 				8A41E7B725B07D6C00265D5C /* TechineProfileTVCell.swift in Sources */,

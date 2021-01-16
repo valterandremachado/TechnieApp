@@ -30,7 +30,7 @@ class FeedsTVCell: UITableViewCell {
         return lbl
     }()
     
-    lazy var jobLocationLabel: UILabel = {
+    lazy var jobLocation: UILabel = {
         let lbl = UILabel()
         lbl.translatesAutoresizingMaskIntoConstraints = false
         lbl.text = "Baguio City"
@@ -38,14 +38,14 @@ class FeedsTVCell: UITableViewCell {
         return lbl
     }()
     
-    lazy var jobBudgetLabel: UILabel = {
+    lazy var jobBudget: UILabel = {
         let lbl = UILabel()
         lbl.translatesAutoresizingMaskIntoConstraints = false
         lbl.text = "$200"
         return lbl
     }()
     
-    lazy var jobLocation: UILabel = {
+    lazy var jobLocationLabel: UILabel = {
         let lbl = UILabel()
         lbl.translatesAutoresizingMaskIntoConstraints = false
         lbl.text = "Location"
@@ -54,7 +54,7 @@ class FeedsTVCell: UITableViewCell {
         return lbl
     }()
     
-    lazy var jobBudget: UILabel = {
+    lazy var jobBudgetLabel: UILabel = {
         let lbl = UILabel()
         lbl.translatesAutoresizingMaskIntoConstraints = false
         lbl.text = "Budget"
@@ -99,7 +99,7 @@ class FeedsTVCell: UITableViewCell {
     }()
     
     lazy var budgetStack: UIStackView = {
-        let stack = UIStackView(arrangedSubviews: [jobBudgetLabel, jobBudget])
+        let stack = UIStackView(arrangedSubviews: [jobBudget, jobBudgetLabel])
         stack.translatesAutoresizingMaskIntoConstraints = false
         stack.axis = .vertical
         stack.spacing = 0
@@ -108,7 +108,7 @@ class FeedsTVCell: UITableViewCell {
     }()
     
     lazy var locationStack: UIStackView = {
-        let stack = UIStackView(arrangedSubviews: [jobLocationLabel, jobLocation])
+        let stack = UIStackView(arrangedSubviews: [jobLocation, jobLocationLabel])
         stack.translatesAutoresizingMaskIntoConstraints = false
         stack.axis = .vertical
         stack.spacing = 0
