@@ -122,13 +122,13 @@ class JobDetailTVCell1: UITableViewCell {
     }
     
     func setupViews() {
-        [jobDescriptionLabel, locationStackView, jobPostTimeTrackerLabel].forEach { self.addSubview($0)}
+        [jobDescriptionLabel, locationStackView].forEach { self.addSubview($0)}
         
         jobDescriptionLabel.anchor(top: self.topAnchor, leading: self.leadingAnchor, bottom: nil, trailing: self.trailingAnchor, padding: UIEdgeInsets(top: 10, left: 20, bottom: 0, right: 20))
         
-        locationStackView.anchor(top: jobDescriptionLabel.bottomAnchor, leading: jobDescriptionLabel.leadingAnchor, bottom: nil, trailing: jobDescriptionLabel.trailingAnchor, padding: UIEdgeInsets(top: 10, left: -5, bottom: 0, right: 0))
+        locationStackView.anchor(top: jobDescriptionLabel.bottomAnchor, leading: jobDescriptionLabel.leadingAnchor, bottom: self.bottomAnchor, trailing: jobDescriptionLabel.trailingAnchor, padding: UIEdgeInsets(top: 10, left: -5, bottom: 10, right: 0))
         
-        jobPostTimeTrackerLabel.anchor(top: locationStackView.bottomAnchor, leading: jobDescriptionLabel.leadingAnchor, bottom: self.bottomAnchor, trailing: jobDescriptionLabel.trailingAnchor, padding: UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0))
+//        jobPostTimeTrackerLabel.anchor(top: locationStackView.bottomAnchor, leading: jobDescriptionLabel.leadingAnchor, bottom: self.bottomAnchor, trailing: jobDescriptionLabel.trailingAnchor, padding: UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0))
     }
     
     required init?(coder: NSCoder) {

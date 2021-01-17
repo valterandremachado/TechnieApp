@@ -157,18 +157,6 @@ class TechnieFeedVC: UIViewController {
         setupViews()
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        // Do any additional setup after loading the view.
-        self.tabBarController?.setTabBar(hidden: true, animated: true, along: nil)
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        // Do any additional setup after loading the view.
-        self.tabBarController?.setTabBar(hidden: false, animated: true, along: nil)
-    }
-    
     // MARK: - Methods
     fileprivate func setupViews(){
         [tableView, searchResultView].forEach {view.addSubview($0)}

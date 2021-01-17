@@ -99,6 +99,24 @@ class JobDetailsVC: UIViewController {
         return toolBar
     }()
     
+    lazy var navBarTitleStackView: UIStackView = {
+        let titleLbl = UILabel()
+        titleLbl.font = .boldSystemFont(ofSize: 16)
+        titleLbl.textAlignment = .center
+        titleLbl.text = "Job Details"
+        
+        let subtitleLbl = UILabel()
+        subtitleLbl.textColor = .systemGray
+        subtitleLbl.textAlignment = .center
+        subtitleLbl.text = "Posted 3 hours ago"
+        subtitleLbl.font = .systemFont(ofSize: 12)
+        let stack = UIStackView(arrangedSubviews: [titleLbl, subtitleLbl])
+        stack.axis = .vertical
+        stack.spacing = -1
+//        stack.addBackground(color: .red)
+        return stack
+    }()
+    
     // MARK: - Init
     override func loadView() {
         super.loadView()
@@ -111,16 +129,18 @@ class JobDetailsVC: UIViewController {
         // Do any additional setup after loading the view.
         view.backgroundColor = .white
     }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        // Do any additional setup after loading the view.
+        self.tabBarController?.setTabBar(hidden: false, animated: true, along: nil)
+    }
     
-//    override func viewWillDisappear(_ animated: Bool) {
-//        super.viewWillDisappear(animated)
-//        // Do any additional setup after loading the view.
-//        self.tabBarController?.setTabBar(hidden: false, animated: true, along: nil)
-//    }
-    
-//    override func viewWillAppear(_ animated: Bool) {
-//        super.viewWillAppear(animated)
-//    }
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        // Do any additional setup after loading the view.
+        self.tabBarController?.setTabBar(hidden: true, animated: true, along: nil)
+    }
     
     // MARK: - Methods
     func setupViews() {
@@ -143,10 +163,9 @@ class JobDetailsVC: UIViewController {
     
     func setupNavBar() {
         guard let navBar = navigationController?.navigationBar else { return }
-//        navBar.topItem?.title = "Job Details"
-        navigationItem.title = "Job Details"
+//        navigationItem.title = "Job Details"
         navigationItem.largeTitleDisplayMode = .never
-
+        navigationItem.titleView = navBarTitleStackView
     }
     
     // MARK: - Selectors
@@ -175,26 +194,33 @@ extension JobDetailsVC: TableViewDataSourceAndDelegate {
         case 2:
             let cell = tableView.dequeueReusableCell(withIdentifier: JobDetailTVCell2.cellID, for: indexPath) as! JobDetailTVCell2
             cell.setupViews()
+            cell.jobBudget.font = .boldSystemFont(ofSize: 16)
+            cell.jobField.font = .boldSystemFont(ofSize: 16)
             return cell
         case 3:
             let cell = tableView.dequeueReusableCell(withIdentifier: JobDetailTVCell3.cellID, for: indexPath) as! JobDetailTVCell3
             cell.setupViews()
+            cell.projectTypeLabel.font = .boldSystemFont(ofSize: 16)
             return cell
         case 4:
             let cell = tableView.dequeueReusableCell(withIdentifier: JobDetailTVCell31.cellID, for: indexPath) as! JobDetailTVCell31
             cell.setupViews()
+            cell.attachmentLabel.font = .boldSystemFont(ofSize: 16)
             return cell
         case 5:
             let cell = tableView.dequeueReusableCell(withIdentifier: JobDetailTVCell4.cellID, for: indexPath) as! JobDetailTVCell4
             cell.setupViews()
+            cell.skillsHeaderLabel.font = .boldSystemFont(ofSize: 16)
             return cell
         case 6:
             let cell = tableView.dequeueReusableCell(withIdentifier: JobDetailTVCell5.cellID, for: indexPath) as! JobDetailTVCell5
             cell.setupViews()
+            cell.activityHeaderLabel.font = .boldSystemFont(ofSize: 16)
             return cell
         case 7:
             let cell = tableView.dequeueReusableCell(withIdentifier: JobDetailTVCell6.cellID, for: indexPath) as! JobDetailTVCell6
             cell.setupViews()
+            cell.aboutTheClientHeaderLabel.font = .boldSystemFont(ofSize: 16)
             return cell
         default:
             return UITableViewCell()
