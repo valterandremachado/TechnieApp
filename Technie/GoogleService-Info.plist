@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>925416566616-e3ng5us6l9pb3e09quf82it29eg798t1.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.925416566616-e3ng5us6l9pb3e09quf82it29eg798t1</string>
+	<key>API_KEY</key>
+	<string>AIzaSyD8kStGFZhBeNc-sEsszKfCPIwb-wO0bcM</string>
+	<key>GCM_SENDER_ID</key>
+	<string>925416566616</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.valterandremachado.Technie</string>
+	<key>PROJECT_ID</key>
+	<string>technie-39e49</string>
+	<key>STORAGE_BUCKET</key>
+	<string>technie-39e49.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:925416566616:ios:3e53c56ca7d39ead8abf2d</string>
+</dict>
+</plist>
