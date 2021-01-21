@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8A00AB2925B981D000C250C4 /* LocationPickerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A00AB2825B981D000C250C4 /* LocationPickerVC.swift */; };
 		8A159DFD25B307D900D45C60 /* JobDetailCVCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A159DFC25B307D900D45C60 /* JobDetailCVCell.swift */; };
 		8A159E0225B316CC00D45C60 /* JobDetailTVCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A159E0125B316CC00D45C60 /* JobDetailTVCell.swift */; };
 		8A41E7A625B07AB500265D5C /* ActiveJobsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A41E7A525B07AB500265D5C /* ActiveJobsCell.swift */; };
@@ -15,6 +16,8 @@
 		8A41E7BC25B07F1D00265D5C /* TechnieProfileTVOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A41E7BB25B07F1D00265D5C /* TechnieProfileTVOptions.swift */; };
 		8A54FAD225B56ED100814216 /* MessageKit in Frameworks */ = {isa = PBXBuildFile; productRef = 8A54FAD125B56ED100814216 /* MessageKit */; };
 		8A60EEBB258CDB2E0061A830 /* LivePreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A60EEBA258CDB2E0061A830 /* LivePreview.swift */; };
+		8A68A56625B705BA000D988F /* StorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A68A56425B705B9000D988F /* StorageManager.swift */; };
+		8A68A56725B705BA000D988F /* DatabaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A68A56525B705BA000D988F /* DatabaseManager.swift */; };
 		8A6A32752598C73A001FE408 /* PostSectionVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A6A32742598C73A001FE408 /* PostSectionVC.swift */; };
 		8A76FA4F258DE3EF0094C524 /* RankedTechnieVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A76FA4E258DE3EF0094C524 /* RankedTechnieVC.swift */; };
 		8A76FA57258DEBB20094C524 /* FullRankingVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A76FA56258DEBB20094C524 /* FullRankingVC.swift */; };
@@ -58,7 +61,14 @@
 		8AC1B12F258A2D8F000F2569 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8AC1B12D258A2D8F000F2569 /* LaunchScreen.storyboard */; };
 		8AC1B13A258A2D8F000F2569 /* TechnieTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AC1B139258A2D8F000F2569 /* TechnieTests.swift */; };
 		8AC1B145258A2D8F000F2569 /* TechnieUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AC1B144258A2D8F000F2569 /* TechnieUITests.swift */; };
+		8AC93A8725B6ECB200663BE3 /* ChatVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AC93A8625B6ECB200663BE3 /* ChatVC.swift */; };
+		8AC93A9325B6EF3A00663BE3 /* SearchResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AC93A8F25B6EF3A00663BE3 /* SearchResult.swift */; };
+		8AC93A9425B6EF3A00663BE3 /* ConversationsModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AC93A9025B6EF3A00663BE3 /* ConversationsModels.swift */; };
+		8AC93A9525B6EF3A00663BE3 /* ChatModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AC93A9125B6EF3A00663BE3 /* ChatModels.swift */; };
+		8AC93A9625B6EF3A00663BE3 /* ProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AC93A9225B6EF3A00663BE3 /* ProfileViewModel.swift */; };
+		8AC93A9B25B6F04600663BE3 /* ConversationVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AC93A9A25B6F04600663BE3 /* ConversationVC.swift */; };
 		8AD3D07725B1D3FD00858CAD /* JobDetailsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AD3D07625B1D3FD00858CAD /* JobDetailsVC.swift */; };
+		8AD8743425B88B8400BB2F6F /* PhotoViewerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AD8743325B88B8400BB2F6F /* PhotoViewerVC.swift */; };
 		8ADECCC425B026F600F871EF /* FeedsTVCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ADECCC325B026F600F871EF /* FeedsTVCell.swift */; };
 		8AE258A6258A3156004EDB26 /* ClientTabController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AE258A5258A3156004EDB26 /* ClientTabController.swift */; };
 		8AE4096A25AEFF0F00A29453 /* TechnieTabController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AE4096925AEFF0F00A29453 /* TechnieTabController.swift */; };
@@ -106,6 +116,7 @@
 		2D46E59A249A48CCCD995D78 /* Pods-Technie-TechnieUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Technie-TechnieUITests.release.xcconfig"; path = "Target Support Files/Pods-Technie-TechnieUITests/Pods-Technie-TechnieUITests.release.xcconfig"; sourceTree = "<group>"; };
 		3608D5D19A7FDEC3B4F67809 /* Pods_Technie.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Technie.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		583B6750D252DA954CA48DB6 /* Pods_Technie_TechnieUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Technie_TechnieUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		8A00AB2825B981D000C250C4 /* LocationPickerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationPickerVC.swift; sourceTree = "<group>"; };
 		8A159DFC25B307D900D45C60 /* JobDetailCVCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobDetailCVCell.swift; sourceTree = "<group>"; };
 		8A159E0125B316CC00D45C60 /* JobDetailTVCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobDetailTVCell.swift; sourceTree = "<group>"; };
 		8A41E7A525B07AB500265D5C /* ActiveJobsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveJobsCell.swift; sourceTree = "<group>"; };
@@ -113,6 +124,8 @@
 		8A41E7B625B07D6C00265D5C /* TechineProfileTVCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechineProfileTVCell.swift; sourceTree = "<group>"; };
 		8A41E7BB25B07F1D00265D5C /* TechnieProfileTVOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnieProfileTVOptions.swift; sourceTree = "<group>"; };
 		8A60EEBA258CDB2E0061A830 /* LivePreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LivePreview.swift; sourceTree = "<group>"; };
+		8A68A56425B705B9000D988F /* StorageManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StorageManager.swift; sourceTree = "<group>"; };
+		8A68A56525B705BA000D988F /* DatabaseManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DatabaseManager.swift; sourceTree = "<group>"; };
 		8A6A32742598C73A001FE408 /* PostSectionVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostSectionVC.swift; sourceTree = "<group>"; };
 		8A76FA4E258DE3EF0094C524 /* RankedTechnieVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RankedTechnieVC.swift; sourceTree = "<group>"; };
 		8A76FA56258DEBB20094C524 /* FullRankingVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullRankingVC.swift; sourceTree = "<group>"; };
@@ -149,7 +162,14 @@
 		8AC1B140258A2D8F000F2569 /* TechnieUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TechnieUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8AC1B144258A2D8F000F2569 /* TechnieUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnieUITests.swift; sourceTree = "<group>"; };
 		8AC1B146258A2D8F000F2569 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		8AC93A8625B6ECB200663BE3 /* ChatVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatVC.swift; sourceTree = "<group>"; };
+		8AC93A8F25B6EF3A00663BE3 /* SearchResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchResult.swift; sourceTree = "<group>"; };
+		8AC93A9025B6EF3A00663BE3 /* ConversationsModels.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConversationsModels.swift; sourceTree = "<group>"; };
+		8AC93A9125B6EF3A00663BE3 /* ChatModels.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatModels.swift; sourceTree = "<group>"; };
+		8AC93A9225B6EF3A00663BE3 /* ProfileViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileViewModel.swift; sourceTree = "<group>"; };
+		8AC93A9A25B6F04600663BE3 /* ConversationVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationVC.swift; sourceTree = "<group>"; };
 		8AD3D07625B1D3FD00858CAD /* JobDetailsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobDetailsVC.swift; sourceTree = "<group>"; };
+		8AD8743325B88B8400BB2F6F /* PhotoViewerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoViewerVC.swift; sourceTree = "<group>"; };
 		8ADECCC325B026F600F871EF /* FeedsTVCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedsTVCell.swift; sourceTree = "<group>"; };
 		8AE258A5258A3156004EDB26 /* ClientTabController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientTabController.swift; sourceTree = "<group>"; };
 		8AE4096925AEFF0F00A29453 /* TechnieTabController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnieTabController.swift; sourceTree = "<group>"; };
@@ -247,6 +267,15 @@
 				8A41E7B625B07D6C00265D5C /* TechineProfileTVCell.swift */,
 			);
 			path = Cells;
+			sourceTree = "<group>";
+		};
+		8A68A56325B7058B000D988F /* DB Managers */ = {
+			isa = PBXGroup;
+			children = (
+				8A68A56525B705BA000D988F /* DatabaseManager.swift */,
+				8A68A56425B705B9000D988F /* StorageManager.swift */,
+			);
+			path = "DB Managers";
 			sourceTree = "<group>";
 		};
 		8A76FA6E258E1D300094C524 /* Cells */ = {
@@ -355,6 +384,7 @@
 				8AC1B130258A2D8F000F2569 /* Info.plist */,
 				8AADFB6325B5834000D3A5CC /* GoogleService-Info.plist */,
 				8AC1B155258A2DAB000F2569 /* App */,
+				8A68A56325B7058B000D988F /* DB Managers */,
 				8AC1B15C258A2E05000F2569 /* Model */,
 				8AC1B15D258A2E18000F2569 /* View */,
 				8AC1B15E258A2E29000F2569 /* ViewModel */,
@@ -417,6 +447,29 @@
 				8AE2589E258A307F004EDB26 /* ClientViewModel */,
 			);
 			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		8AC93A8525B6EC8100663BE3 /* ChatFeature */ = {
+			isa = PBXGroup;
+			children = (
+				8AC93A8E25B6EF3A00663BE3 /* Models */,
+				8AC93A8625B6ECB200663BE3 /* ChatVC.swift */,
+				8AC93A9A25B6F04600663BE3 /* ConversationVC.swift */,
+				8AD8743325B88B8400BB2F6F /* PhotoViewerVC.swift */,
+				8A00AB2825B981D000C250C4 /* LocationPickerVC.swift */,
+			);
+			path = ChatFeature;
+			sourceTree = "<group>";
+		};
+		8AC93A8E25B6EF3A00663BE3 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				8AC93A8F25B6EF3A00663BE3 /* SearchResult.swift */,
+				8AC93A9025B6EF3A00663BE3 /* ConversationsModels.swift */,
+				8AC93A9125B6EF3A00663BE3 /* ChatModels.swift */,
+				8AC93A9225B6EF3A00663BE3 /* ProfileViewModel.swift */,
+			);
+			path = Models;
 			sourceTree = "<group>";
 		};
 		8ADECCBF25B025EA00F871EF /* Cells */ = {
@@ -551,6 +604,7 @@
 			isa = PBXGroup;
 			children = (
 				8AE4096925AEFF0F00A29453 /* TechnieTabController.swift */,
+				8AC93A8525B6EC8100663BE3 /* ChatFeature */,
 				8AE4097325AEFF7D00A29453 /* TechnieFeedVC */,
 				8AE4097625AEFFD500A29453 /* TechnieChatVC */,
 				8AE4097425AEFFB300A29453 /* TechnieServiceVC */,
@@ -849,27 +903,33 @@
 			files = (
 				8A159E0225B316CC00D45C60 /* JobDetailTVCell.swift in Sources */,
 				8AE4098B25AF015200A29453 /* TechnieNotificationVC.swift in Sources */,
+				8AC93A9625B6EF3A00663BE3 /* ProfileViewModel.swift in Sources */,
 				8AC1B127258A2D8D000F2569 /* ClientFeedVC.swift in Sources */,
 				8AADFB8425B58E7300D3A5CC /* Message.swift in Sources */,
 				8AADFB7D25B58A2E00D3A5CC /* Chat.swift in Sources */,
 				8AC1B123258A2D8D000F2569 /* AppDelegate.swift in Sources */,
+				8AC93A9425B6EF3A00663BE3 /* ConversationsModels.swift in Sources */,
 				8AF76A7A258B440D00ED14C2 /* MyActivityIndicator.swift in Sources */,
 				8AE258A6258A3156004EDB26 /* ClientTabController.swift in Sources */,
 				8A997F3825A8380E00B144CD /* SkillSelectionTVCell.swift in Sources */,
 				8AF76A4E258B0B0700ED14C2 /* UserProfileVC.swift in Sources */,
 				8AD3D07725B1D3FD00858CAD /* JobDetailsVC.swift in Sources */,
 				8AF76A7D258B440D00ED14C2 /* SpeechService.swift in Sources */,
+				8A68A56725B705BA000D988F /* DatabaseManager.swift in Sources */,
 				8A76FA67258E1CDF0094C524 /* SearchResultCell.swift in Sources */,
 				8AAB8829259B625E00BCBD33 /* PostFormCell.swift in Sources */,
 				8A8F852E258A357200C4CEF9 /* ClientChatVC.swift in Sources */,
 				8AF76A77258B440D00ED14C2 /* KeyboardLayoutConstraint.swift in Sources */,
 				8A79718D2595CAA000648A3C /* ProfileEnum.swift in Sources */,
 				8A8F8533258A358400C4CEF9 /* ClientNotificationVC.swift in Sources */,
+				8AC93A8725B6ECB200663BE3 /* ChatVC.swift in Sources */,
 				8AF76A86258B64FC00ED14C2 /* TechnieRankingCell.swift in Sources */,
 				8A60EEBB258CDB2E0061A830 /* LivePreview.swift in Sources */,
 				8A76FA4F258DE3EF0094C524 /* RankedTechnieVC.swift in Sources */,
+				8AC93A9325B6EF3A00663BE3 /* SearchResult.swift in Sources */,
 				8A76FA57258DEBB20094C524 /* FullRankingVC.swift in Sources */,
 				8AF76A8E258B671500ED14C2 /* HeaderView.swift in Sources */,
+				8A68A56625B705BA000D988F /* StorageManager.swift in Sources */,
 				8AE4098125AF011200A29453 /* TechnieServiceVC.swift in Sources */,
 				8AF76A79258B440D00ED14C2 /* TrashBinCode.swift in Sources */,
 				8AAB8821259B557000BCBD33 /* PostFormVC.swift in Sources */,
@@ -883,8 +943,11 @@
 				8AF76A7C258B440D00ED14C2 /* Typealias.swift in Sources */,
 				8A997F3025A823AE00B144CD /* SkillSelectionVC.swift in Sources */,
 				8A6A32752598C73A001FE408 /* PostSectionVC.swift in Sources */,
+				8AC93A9525B6EF3A00663BE3 /* ChatModels.swift in Sources */,
 				8A41E7BC25B07F1D00265D5C /* TechnieProfileTVOptions.swift in Sources */,
+				8AC93A9B25B6F04600663BE3 /* ConversationVC.swift in Sources */,
 				8A159DFD25B307D900D45C60 /* JobDetailCVCell.swift in Sources */,
+				8A00AB2925B981D000C250C4 /* LocationPickerVC.swift in Sources */,
 				8AADFB9425B5A7E200D3A5CC /* MessageTVCell.swift in Sources */,
 				8A76FA5F258DF2F40094C524 /* NearbyDetailVC.swift in Sources */,
 				8ADECCC425B026F600F871EF /* FeedsTVCell.swift in Sources */,
@@ -892,6 +955,7 @@
 				8A8F8526258A355700C4CEF9 /* ClientPostVC.swift in Sources */,
 				8A9125662598C505005034A1 /* PostSectionCell.swift in Sources */,
 				8A7971922595DE8C00648A3C /* ClientPostCell.swift in Sources */,
+				8AD8743425B88B8400BB2F6F /* PhotoViewerVC.swift in Sources */,
 				8AE4096F25AEFF4C00A29453 /* TechnieFeedVC.swift in Sources */,
 				8AF76A53258B23BF00ED14C2 /* ProfileTableViewCell.swift in Sources */,
 				8A8F854E258A3D0500C4CEF9 /* NearbyTechniesCell.swift in Sources */,

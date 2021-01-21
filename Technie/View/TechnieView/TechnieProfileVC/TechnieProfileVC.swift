@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import FirebaseAuth
 
 class TechnieProfileVC: UIViewController {
         
@@ -100,7 +101,8 @@ extension TechnieProfileVC: TableViewDataSourceAndDelegate {
 //        let tableViewOptions = TechnieProfileTVOptions(rawValue: indexPath.row)
         switch indexPath.section {
         case 0:
-            cell.textLabel?.text = "Valter A. Machado"
+            let userName = UserDefaults.standard.value(forKey: "email") as? String ?? ""
+            cell.textLabel?.text = userName //"Valter A. Machado"
             cell.detailTextLabel?.text = "Baguio City"
             let newImage = UIImage().resizeImage(image: UIImage(named: "technie")!, toTheSize: CGSize(width: 40, height: 40))
             cell.imageView?.clipsToBounds = true
@@ -146,6 +148,16 @@ extension TechnieProfileVC: TableViewDataSourceAndDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+        switch indexPath.section {
+        case 3:
+            if indexPath.row == 0 {
+                try! Auth.auth().signOut()
+                print("Logged Out")
+            }
+            
+        default:
+            break
+        }
     }
     
 //    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {

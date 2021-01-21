@@ -12,7 +12,7 @@ class TechnieTabController: UITabBarController {
     // MARK: - Properties
     // VCs
     private let feedVC = TechnieFeedVC()
-    private let chatVC = TechnieChatVC()
+    private let chatVC = ConversationVC()
     private let serviceVC = TechnieServiceVC()
     private let notificationVC = TechnieNotificationVC()
     private let profileVC = TechnieProfileVC()
