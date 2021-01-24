@@ -489,6 +489,7 @@ extension DatabaseManager {
                 return Message(sender: sender,
                                messageId: messageID,
                                sentDate: date,
+                               sender_email: senderEmail,
                                kind: finalKind)
             })
 

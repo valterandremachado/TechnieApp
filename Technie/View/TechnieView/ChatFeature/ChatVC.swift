@@ -45,6 +45,25 @@ class ChatVC: MessagesViewController {
                       displayName: "Me")
     }
     
+    lazy var sendMessageBarBtn: InputBarButtonItem = {
+        let btn = InputBarButtonItem()
+        btn.isEnabled = false
+        btn.setSize(CGSize(width: 30, height: 30), animated: false)
+        btn.setImage((UIImage(named: "send")?.withTintColor(.systemBlue, renderingMode: .alwaysOriginal))?.imageResized(to: CGSize(width: 23, height: 23)), for: .normal)
+        btn.onTouchUpInside { [weak self] _ in
+            self?.messagesCollectionView.scrollToLastItem()
+            // add send func here
+            self?.messageInputBar.didSelectSendButton()
+            self?.messageInputBar.inputTextView.text = nil
+        }
+        return btn
+    }()
+   
+    var customHeight: CGFloat = 0
+    var isShowingKeyboard = false
+    
+    // MARK: - Inits
+    
     init(with email: String, id: String?) {
         self.otherUserEmail = email
         self.convoId = id
@@ -55,46 +74,38 @@ class ChatVC: MessagesViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func loadView() {
+        super.loadView()
+        setupInputBarButtons()
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-//        let mySendBtn = UIButton(type: .custom)
-//        mySendBtn.frame = CGRect(x: 329, y: 12, width: 30, height: 30)
-//        //            mySendBtn.backgroundColor = .gray
-//        mySendBtn.setImage(UIImage(systemName:"paperplane.fill"), for: .normal)
-//        mySendBtn.imageView?.contentMode = .scaleAspectFit
-//        mySendBtn.imageEdgeInsets = UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5)
-//        mySendBtn.addTarget(self, action: #selector(sendPressed(sender:)), for: .touchUpInside)
-//        messageInputBar.addSubview(mySendBtn)
        
         // Do any additional setup after loading the view.
 //        if let layout = messagesCollectionView.collectionViewLayout as? MessagesCollectionViewFlowLayout {
 //            layout.textMessageSizeCalculator.outgoingAvatarSize = .zero
 //            layout.textMessageSizeCalculator.incomingAvatarSize = .zero
-//            layout.sectionInset = UIEdgeInsets(top: 15, left: 0, bottom: 15, right: 0)
 //            layout.minimumInteritemSpacing = 0
 //            layout.minimumLineSpacing = 0
+//            layout.sectionInset = UIEdgeInsets(top: 15, left: 0, bottom: 70, right: 0)
 //        }
-        
+//        messagesCollectionView.contentInset = UIEdgeInsets(top: 10, left: 0, bottom: 70, right: 0)
+
         messagesCollectionView.messagesLayoutDelegate = self
         messagesCollectionView.messagesDataSource = self
         messagesCollectionView.messagesDisplayDelegate = self
         messagesCollectionView.messageCellDelegate = self
         messageInputBar.delegate = self
-        setupInputBarButtons()
         view.backgroundColor = .white
-        
+        addKeyboardObservers()
+
 //        messages.append(Message(sender: selfSender, messageId: "0", sentDate: Date(), kind: .text("Heyy!!")))
 //        messages.append(Message(sender: selfSender, messageId: "0", sentDate: Date(), kind: .text("Heyy Heyy Heyy!!")))
 //        NotificationCenter.default.addObserver(self, selector: #selector(handleKeyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
 
     }
-    @objc func sendPressed(sender: UIButton) {
-//        sender.backgroundColor = ColorPresets.appleSendBlue
-        messagesCollectionView.scrollToLastItem()
-
-        // add send func here
-        messageInputBar.didSelectSendButton()
-    }
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         messageInputBar.inputTextView.becomeFirstResponder()
@@ -110,12 +121,80 @@ class ChatVC: MessagesViewController {
         self.tabBarController?.setTabBar(hidden: false, animated: true, along: nil)
     }
     
+    deinit {
+        removeKeyboardObservers()
+    }
+    
+    @objc func customHandleKeyboardDidChangeState(_ notification: Notification) {
+        
+        guard let keyboardEndFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
+        
+        if (keyboardEndFrame.origin.y + keyboardEndFrame.size.height) > view.frame.size.height {
+            // Hardware keyboard is found
+            messagesCollectionView.contentInset.bottom = (view.frame.size.height - keyboardEndFrame.origin.y) + 10
+        } else {
+            //Software keyboard is found
+            let bottomInset = keyboardEndFrame.height > messageInputBar.frame.height ? keyboardEndFrame.height + 10 : messageInputBar.frame.height + 10
+            messagesCollectionView.contentInset.bottom = bottomInset
+        }
+        
+        customHeight = keyboardEndFrame.height
+        isShowingKeyboard = true
+        var aRect = self.view.frame
+        aRect.size.height -= keyboardEndFrame.height 
+        if let indexPath = getMessagesCollectionViewLastIndexPath(), let activeField = messagesCollectionView.cellForItem(at: indexPath) {
+            if (!aRect.contains(activeField.frame.origin) ) {
+                messagesCollectionView.scrollRectToVisible(activeField.frame, animated: true)
+//                messagesCollectionView.scrollToLastIndexPath(position: .bottom, animated: true)
+            }
+        }
+    }
+    
+    func getMessagesCollectionViewLastIndexPath() -> IndexPath? {
+        for sectionIndex in (0..<messagesCollectionView.numberOfSections).reversed() {
+            if messagesCollectionView.numberOfItems(inSection: sectionIndex) > 0 {
+                return IndexPath.init(item: messagesCollectionView.numberOfItems(inSection: sectionIndex)-1, section: sectionIndex)
+            }
+        }
+
+        return nil
+    }
+    
+    fileprivate func addKeyboardObservers() {
+        NotificationCenter.default.addObserver(self, selector: #selector(customHandleKeyboardWillHideState), name: UIResponder.keyboardWillHideNotification, object: nil)
+
+        NotificationCenter.default.addObserver(self, selector: #selector(customHandleKeyboardDidChangeState), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+//        NotificationCenter.default.addObserver(self, selector: #selector(customHandleKeyboardDidChangeState), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(customHandleTextViewDidBeginEditing), name: UITextField.textDidBeginEditingNotification, object: messageInputBar.inputTextView)
+    }
+    
+    var scrollsToBottomOnKeybordBeginsEditing = false
+    
+    @objc func customHandleTextViewDidBeginEditing(_ notification: Notification) {
+        messagesCollectionView.scrollToLastItem(animated: true)
+    }
+    
+    @objc func customHandleKeyboardWillHideState(_ notification: Notification) {
+        self.messagesCollectionView.contentInset.bottom =  (self.messageInputBar.frame.height) + 20
+//        self.messagesCollectionView.scrollToLastItem()
+//        isShowingKeyboard = false
+    }
+        
+    fileprivate func removeKeyboardObservers() {
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+    }
+
+    
 //    @objc func handleKeyboardWillShow(notification: Notification) {
 //
 //        messagesCollectionView.scrollToItem(at: IndexPath(row: messages.count - 1, section: messages.count), at: .top, animated: false)
 //    }
     
     private func setupInputBarButtons() {
+        messageInputBar.inputTextView.placeholder = "Type a message..."
+
+//        self.isShowingKeyboard == false || self.customHeight > 50 ? (self.messagesCollectionView.contentInset.bottom =  (self.messageInputBar.frame.height) + 10) : (self.messagesCollectionView.contentInset.bottom =  self.customHeight + 10)
+
         let photoMessageBarBtn = InputBarButtonItem()
         photoMessageBarBtn.setSize(CGSize(width: 35, height: 35), animated: false)
         photoMessageBarBtn.setImage(UIImage(systemName: "photo.fill"), for: .normal)
@@ -131,18 +210,10 @@ class ChatVC: MessagesViewController {
             self?.presentLocationPicker()
         }
         
-        let sendMessageBarBtn = InputBarButtonItem()
-        sendMessageBarBtn.setSize(CGSize(width: 30, height: 30), animated: false)
-        sendMessageBarBtn.setImage((UIImage(named: "send.fill")?.withTintColor(.systemBlue, renderingMode: .alwaysOriginal))?.imageResized(to: CGSize(width: 25, height: 25)), for: .normal)
-        sendMessageBarBtn.onTouchUpInside { [weak self] _ in
-            self?.messagesCollectionView.scrollToLastItem()
-            // add send func here
-            self?.messageInputBar.didSelectSendButton()
-        }
-        
         messageInputBar.setLeftStackViewWidthConstant(to: 70, animated: false)
         messageInputBar.setStackViewItems([photoMessageBarBtn, locationMessageBarBtn], forStack: .left, animated: false)
 //        messageInputBar.leftStackView.addBackground(color: .red)
+        
         messageInputBar.setRightStackViewWidthConstant(to: 30, animated: false)
         messageInputBar.setStackViewItems([sendMessageBarBtn], forStack: .right, animated: false)
     }
@@ -223,6 +294,7 @@ class ChatVC: MessagesViewController {
             let message = Message(sender: selfSender,
                                   messageId: messageId,
                                   sentDate: Date(),
+                                  sender_email: self?.otherUserEmail ?? "nil",
                                   kind: .location(location))
             
             DatabaseManager.shared.sendMessage(to: conversationId, otherUserEmail: strongSelf.otherUserEmail, name: name, newMessage: message, completion: { success in
@@ -242,18 +314,28 @@ class ChatVC: MessagesViewController {
         DatabaseManager.shared.getAllMessagesForConversation(with: id, completion: { [weak self] result in
             switch result {
             case .success(let messages):
-                print("success in getting messages: \(messages)")
+                
+                self?.messageInputBar.inputTextView.placeholder = "Type a message..."
+                self?.sendMessageBarBtn.isEnabled = true
+//                self?.messageInputBar.inputTextView.isUserInteractionEnabled = true
+//                self?.messageInputBar.sendButton.stopAnimating()
+//                print("success in getting messages: \(messages)")
                 guard !messages.isEmpty else {
                     print("messages are empty")
                     return
                 }
+                // Populate messages array
                 self?.messages = messages
 
                 DispatchQueue.main.async {
-//                    self?.messagesCollectionView.contentInset = UIEdgeInsets(top: 10, left: 0, bottom: 70, right: 0)
                     self?.messagesCollectionView.reloadDataAndKeepOffset()
+                    guard let wrappedHeight = self?.customHeight else { return }
+                    print("customHeight: \(wrappedHeight)")
 
                     if shouldScrollToBottom {
+                        
+                        self!.isShowingKeyboard == false ? (self?.messagesCollectionView.contentInset.bottom =  (self?.messageInputBar.frame.height)! + 10) : (self?.messagesCollectionView.contentInset.bottom =  wrappedHeight + 10)
+                        self?.scrollsToBottomOnKeybordBeginsEditing = shouldScrollToBottom
                         self?.messagesCollectionView.scrollToLastItem()
                     }
                 }
@@ -325,6 +407,7 @@ extension ChatVC: UIImagePickerControllerDelegate, UINavigationControllerDelegat
                     let message = Message(sender: selfSender,
                                           messageId: messageId,
                                           sentDate: Date(),
+                                          sender_email: self?.otherUserEmail ?? "nil",
                                           kind: .photo(media))
 
                     DatabaseManager.shared.sendMessage(to: conversationId, otherUserEmail: strongSelf.otherUserEmail, name: name, newMessage: message, completion: { success in
@@ -371,6 +454,7 @@ extension ChatVC: UIImagePickerControllerDelegate, UINavigationControllerDelegat
                     let message = Message(sender: selfSender,
                                           messageId: messageId,
                                           sentDate: Date(),
+                                          sender_email: self?.otherUserEmail ?? "nil",
                                           kind: .video(media))
 
                     DatabaseManager.shared.sendMessage(to: conversationId, otherUserEmail: strongSelf.otherUserEmail, name: name, newMessage: message, completion: { success in
@@ -396,8 +480,29 @@ extension ChatVC: UIImagePickerControllerDelegate, UINavigationControllerDelegat
 // MARK: - InputBarAccessoryViewDelegate Extension
 extension ChatVC: InputBarAccessoryViewDelegate {
     
+    func inputBar(_ inputBar: InputBarAccessoryView, textViewTextDidChangeTo text: String) {
+        if text == " " || text == "" {
+            sendMessageBarBtn.setImage((UIImage(named: "send")?.withTintColor(.systemBlue, renderingMode: .alwaysOriginal))?.imageResized(to: CGSize(width: 23, height: 23)), for: .normal)
+            sendMessageBarBtn.isEnabled = false
+        } else {
+            sendMessageBarBtn.setImage((UIImage(named: "send.fill")?.withTintColor(.systemBlue, renderingMode: .alwaysOriginal))?.imageResized(to: CGSize(width: 23, height: 23)), for: .normal)
+            sendMessageBarBtn.isEnabled = true
+        }
+    }
+    
     func inputBar(_ inputBar: InputBarAccessoryView, didPressSendButtonWith text: String) {
        
+//        if text != "" || text != " " {
+//            print("1")
+//        } else {
+//            print("2")
+//            inputBar.inputTextView.placeholder = "Sending..."
+//        }
+//        inputBar.sendButton.startAnimating()
+//        sendMessageBarBtn.isEnabled = false
+//        inputBar.inputTextView.placeholder = "Sending..."
+//        inputBar.inputTextView.isUserInteractionEnabled = false
+        
         guard !text.replacingOccurrences(of: " ", with: "").isEmpty,
               let selfSender = self.selfSender,
               let messageId = createMessageId() else {
@@ -407,6 +512,7 @@ extension ChatVC: InputBarAccessoryViewDelegate {
         let message = Message(sender: selfSender,
                                messageId: messageId,
                                sentDate: Date(),
+                               sender_email: otherUserEmail,
                                kind: .text(text))
         // Otherwise send message
         if isNewConvo {
@@ -420,6 +526,9 @@ extension ChatVC: InputBarAccessoryViewDelegate {
                     self?.convoId = newConversationId
                     self?.listenForMessages(id: newConversationId, shouldScrollToBottom: true)
                     self?.messageInputBar.inputTextView.text = nil
+//                    inputBar.inputTextView.placeholder = "Aa"
+//                    inputBar.inputTextView.isUserInteractionEnabled = true
+//                    inputBar.sendButton.stopAnimating()
                 }
                 else {
                     print("failed ot send")
@@ -447,6 +556,28 @@ extension ChatVC: InputBarAccessoryViewDelegate {
 
 // MARK: - MessagesCollectionViewDelegateAndDataSource Extension
 extension ChatVC: MessagesCollectionViewDelegateAndDataSource {
+    
+//    func footerViewSize(for section: Int, in messagesCollectionView: MessagesCollectionView) -> CGSize {
+//
+//        var lastSectionIndexPath = IndexPath.init(row: 0, section: 0)
+//
+//        for i in 0..<self.messagesCollectionView.numberOfSections {
+//            for j in 0..<self.messagesCollectionView.numberOfItems(inSection: i) {
+//                let indexPath = IndexPath(row: j, section: i)
+//                lastSectionIndexPath = indexPath
+//            }
+//        }
+//
+//        if lastSectionIndexPath.section == section {
+//            var viewHeight = CGSize.init()
+////            self.isShowingKeyboard == false ? (viewHeight = CGSize.init()) : (viewHeight = CGSize(width: view.frame.width, height: 50))
+//            print(section)
+//            print(lastSectionIndexPath.section)
+//            return viewHeight
+//        }
+//
+//        return CGSize.init()
+//    }
     
     func currentSender() -> SenderType {
         if let sender = selfSender {
@@ -601,4 +732,21 @@ extension ChatVC: MessageCellDelegate {
             break
         }
     }
+}
+
+extension UICollectionView {
+
+    func scrollToLastIndexPath(position: UICollectionView.ScrollPosition, animated: Bool) {
+        self.layoutIfNeeded()
+
+        for sectionIndex in (0..<self.numberOfSections).reversed() {
+            if self.numberOfItems(inSection: sectionIndex) > 0 {
+                self.scrollToItem(at: IndexPath.init(item: self.numberOfItems(inSection: sectionIndex)-1, section: sectionIndex),
+                                  at: position,
+                                  animated: animated)
+                break
+            }
+        }
+    }
+
 }

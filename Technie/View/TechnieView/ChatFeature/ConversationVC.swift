@@ -52,6 +52,8 @@ class ConversationVC: UIViewController {
         return label
     }()
     
+    private var messages = [Message]()
+
     // MARK: - Inits
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -72,6 +74,80 @@ class ConversationVC: UIViewController {
 //        // Do any additional setup after loading the view.
 //        self.tabBarController?.setTabBar(hidden: false, animated: true, along: nil)
 //    }
+    var messageInfo = [[String: Any]]()
+    var senderEmail = ""
+    var customDetailText = ""
+    private func listenForMessages(id: String) {
+        DatabaseManager.shared.getAllMessagesForConversation(with: id, completion: { [weak self] result in
+            switch result {
+            case .success(let messages):
+                print("success in getting messages: ")//\(messages)
+                guard !messages.isEmpty else {
+                    print("messages are empty")
+                    return
+                }
+                // Populate messages array
+                self?.messages = messages
+                self?.updateSender(message: messages)
+//                let lastMessage = messages.last
+//                guard let latestMessage = self?.conversations.first?.latestMessage.message else { return }
+//
+//                let userEmail = UserDefaults.standard.value(forKey: "email") as? String ?? ""
+//                let currentUserSafeEmail = DatabaseManager.safeEmail(emailAddress: userEmail)
+//
+//                if currentUserSafeEmail == lastMessage!.sender_email {
+//                    self?.senderEmail = lastMessage!.sender_email
+//                    guard let latestMessage = self?.conversations.first?.latestMessage.message else { return }
+//                    self?.customDetailText = "You: " + latestMessage
+//                    DispatchQueue.main.async {
+//                        self?.tableView.reloadData()
+//                    }
+//                } else {
+//                    guard let latestMessage = self?.conversations.first?.latestMessage.message else { return }
+//                    self?.customDetailText = latestMessage
+//                    self?.senderEmail = lastMessage!.sender_email
+//                    DispatchQueue.main.async {
+//                        self?.tableView.reloadData()
+//                    }
+//                    print("they're the different")
+//                }
+//                print("Latest: " + latestMessage)
+                
+//                self?.messageInfo.append(["senderEmail": lastMessage.flatMap {$0.sender_email} ?? "", "receiverName": lastMessage.flatMap {$0.name} ?? "", "contentType": lastMessage.flatMap {$0.type} ?? ""])
+//                print("Display: \(lastMessage?.sender_email)")
+            case .failure(let error):
+                print("failed to get messages: \(error)")
+            }
+        })
+    }
+    
+    func updateSender(message: [Message]) {
+        guard let lastMessage = messages.last else { return }
+        let lastUserDefaultsMessage = UserDefaults.standard.value(forKey: "lastMessage") as? String ?? ""
+        
+        let userEmail = UserDefaults.standard.value(forKey: "email") as? String ?? ""
+        let currentUserSafeEmail = DatabaseManager.safeEmail(emailAddress: userEmail)
+        
+        if currentUserSafeEmail == lastMessage.sender_email {
+//            senderEmail = lastMessage.sender_email
+            guard let latestMessage = conversations.first?.latestMessage.message else { return }
+            customDetailText = "You: " + latestMessage
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+            }
+            UserDefaults.standard.setValue(latestMessage, forKey: "lastMessage")
+        } else {
+            
+            guard let latestMessage = conversations.first?.latestMessage.message else { return }
+            latestMessage != lastUserDefaultsMessage ? (customDetailText = latestMessage): (customDetailText = "...")
+            
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+            }
+            print("they're the different")
+        }
+
+    }
     
     // MARK: - Methods
     func setupViews() {
@@ -127,19 +203,24 @@ class ConversationVC: UIViewController {
         DatabaseManager.shared.getAllConversations(for: safeEmail, completion: { [weak self] result in
             switch result {
             case .success(let conversations):
-                print("successfully got conversation models")
+                print("successfully got conversation models: \(conversations)")
                 guard !conversations.isEmpty else {
                     self?.tableView.isHidden = true
                     self?.noConversationsLabel.isHidden = false
                     return
                 }
+                
+                self?.conversations = conversations
+                guard let id =  self?.conversations.first?.id else { return }
+
                 self?.noConversationsLabel.isHidden = true
                 self?.tableView.isHidden = false
-                self?.conversations = conversations
+                self?.listenForMessages(id: id)
 
-                DispatchQueue.main.async {
-                    self?.tableView.reloadData()
-                }
+//                DispatchQueue.main.async {
+//                    self?.tableView.reloadData()
+//                }
+                
             case .failure(let error):
                 self?.tableView.isHidden = true
                 self?.noConversationsLabel.isHidden = false
@@ -264,8 +345,30 @@ extension ConversationVC: TableViewDataSourceAndDelegate {
         cell = MessageTVCell(style: .subtitle, reuseIdentifier: MessageTVCell.cellID)
         
         cell.textLabel?.text =  conversations[indexPath.row].name//users[indexPath.row]["name"]
-//        print(users[indexPath.row]["name"])
-        cell.detailTextLabel?.text = conversations[indexPath.row].latestMessage.message
+
+        let userEmail = UserDefaults.standard.value(forKey: "email") as? String ?? ""
+        let currentUserSafeEmail = DatabaseManager.safeEmail(emailAddress: userEmail)
+        print("test: \(senderEmail)")
+        cell.detailTextLabel?.textColor = .systemGray
+        cell.textLabel?.font = .boldSystemFont(ofSize: 16)
+//        senderEmail == currentUserSafeEmail ? (cell.detailTextLabel?.text = "You: " + conversations[indexPath.row].latestMessage.message) : (cell.detailTextLabel?.text = conversations[indexPath.row].latestMessage.message)
+//        let lastMessage = UserDefaults.standard.value(forKey: "lastMessage") as? String ?? ""
+//        UserDefaults.standard.removeObject(forKey: "lastMessage")
+        
+//        if senderEmail == currentUserSafeEmail {
+//            print("senderEmail1: \(senderEmail), userEmail: \(currentUserSafeEmail)")
+////            cell.detailTextLabel?.text = "You: " + conversations[indexPath.row].latestMessage.message
+//            cell.detailTextLabel?.text = customDetailText
+////            UserDefaults.standard.setValue(conversations[indexPath.row].latestMessage.message, forKey: "lastMessage")
+//        } else {
+////            cell.detailTextLabel?.text = customDetailText
+////            print("senderEmail2: \(senderEmail), userEmail: \(currentUserSafeEmail)")
+//            cell.detailTextLabel?.text = conversations[indexPath.row].latestMessage.message
+////            UserDefaults.standard.setValue(conversations[indexPath.row].latestMessage.message, forKey: "lastMessage")
+//        }
+        
+        cell.detailTextLabel?.text = customDetailText
+
         cell.accessoryType = .disclosureIndicator
         return cell
     }

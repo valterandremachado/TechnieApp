@@ -13,8 +13,16 @@ struct Message: MessageType {
     public var sender: SenderType
     public var messageId: String
     public var sentDate: Date
+    public var sender_email: String
     public var kind: MessageKind
 }
+
+//struct Messsage {
+//    public var sender_email: String
+//    public var name: String
+//    public var type: String
+//    public var content: String
+//}
 
 extension MessageKind {
     var messageKindString: String {
