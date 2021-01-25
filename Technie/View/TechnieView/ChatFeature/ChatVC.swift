@@ -492,16 +492,12 @@ extension ChatVC: InputBarAccessoryViewDelegate {
     
     func inputBar(_ inputBar: InputBarAccessoryView, didPressSendButtonWith text: String) {
        
-//        if text != "" || text != " " {
-//            print("1")
-//        } else {
-//            print("2")
-//            inputBar.inputTextView.placeholder = "Sending..."
-//        }
-//        inputBar.sendButton.startAnimating()
-//        sendMessageBarBtn.isEnabled = false
-//        inputBar.inputTextView.placeholder = "Sending..."
-//        inputBar.inputTextView.isUserInteractionEnabled = false
+        if !text.replacingOccurrences(of: " ", with: "").isEmpty {
+            messageInputBar.inputTextView.placeholder = "Sending..."
+            //        inputBar.sendButton.startAnimating()
+            //        inputBar.inputTextView.isUserInteractionEnabled = false
+        }
+
         
         guard !text.replacingOccurrences(of: " ", with: "").isEmpty,
               let selfSender = self.selfSender,
@@ -687,6 +683,7 @@ extension ChatVC: MessagesCollectionViewDelegateAndDataSource {
 
 // MARK: - MessageCellDelegate Extension
 extension ChatVC: MessageCellDelegate {
+    
     func didTapMessage(in cell: MessageCollectionViewCell) {
         guard let indexPath = messagesCollectionView.indexPath(for: cell) else {
             return
@@ -699,7 +696,7 @@ extension ChatVC: MessageCellDelegate {
             let coordinates = locationData.location.coordinate
             let vc = LocationPickerVC(coordinates: coordinates)
 
-            vc.title = "Location"
+            vc.title = "Client's Location"
             navigationController?.pushViewController(vc, animated: true)
         default:
             break
