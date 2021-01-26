@@ -128,10 +128,15 @@ class ConversationVC: UIViewController {
         let userEmail = UserDefaults.standard.value(forKey: "email") as? String ?? ""
         let currentUserSafeEmail = DatabaseManager.safeEmail(emailAddress: userEmail)
         
+        let messageType = lastMessage.kind.messageKindString
+
         if currentUserSafeEmail == lastMessage.sender_email {
 //            senderEmail = lastMessage.sender_email
+//            print("name: " + conversations.last!.name)
+
             guard let latestMessage = conversations.first?.latestMessage.message else { return }
-            customDetailText = "You: " + latestMessage
+            let modifiedLatestMessage = messageType != "text" ? ("You: Sent a " + messageType) : ("You: " + latestMessage)
+            customDetailText = modifiedLatestMessage
             DispatchQueue.main.async {
                 self.tableView.reloadData()
             }
@@ -139,7 +144,8 @@ class ConversationVC: UIViewController {
         } else {
             
             guard let latestMessage = conversations.first?.latestMessage.message else { return }
-            latestMessage != lastUserDefaultsMessage ? (customDetailText = latestMessage): (customDetailText = "...")
+            let modifiedLatestMessage = messageType != "text" ? ("Sent a " + messageType) : (latestMessage)
+            latestMessage != lastUserDefaultsMessage ? (customDetailText = modifiedLatestMessage): (customDetailText = "...")
             
             DispatchQueue.main.async {
                 self.tableView.reloadData()
