@@ -32,15 +32,22 @@ class JobDetailsVC: UIViewController {
     }()
     
     lazy var tableView: UITableView = {
-        let tv = UITableView()
+        let tv = UITableView(frame: .zero, style: .grouped)
         tv.translatesAutoresizingMaskIntoConstraints = false
         tv.backgroundColor = .white
-        tv.tableFooterView = UIView()
+//        tv.tableFooterView = UIView()
         tv.showsVerticalScrollIndicator = false
 //        tv.rowHeight = 400
         // Set automatic dimensions for row height
         tv.rowHeight = UITableView.automaticDimension
         tv.estimatedRowHeight = UITableView.automaticDimension
+        
+        /// Fix extra padding space at the top of the section of grouped tableView
+        var frame = CGRect.zero
+        frame.size.height = .leastNormalMagnitude
+        tv.tableHeaderView = UIView(frame: frame)
+        tv.tableFooterView = UIView(frame: frame)
+        tv.contentInsetAdjustmentBehavior = .never
         
         tv.delegate = self
         tv.dataSource = self
@@ -145,7 +152,7 @@ class JobDetailsVC: UIViewController {
     // MARK: - Methods
     func setupViews() {
         [tableView, toolBar].forEach { view.addSubview($0)}
-        tableView.anchor(top: view.topAnchor, leading: view.leadingAnchor, bottom: toolBar.topAnchor, trailing: view.trailingAnchor)
+        tableView.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.leadingAnchor, bottom: toolBar.topAnchor, trailing: view.trailingAnchor)
         toolBar.anchor(top: nil, leading: view.leadingAnchor, bottom: view.safeAreaLayoutGuide.bottomAnchor, trailing: view.trailingAnchor, size: CGSize(width: 0, height: 44))
         
 //        toolBar = UIToolbar.init(frame: CGRect.init(x: 0, y: 0, width: UIScreen.main.bounds.size.width, height: 35))
@@ -227,6 +234,23 @@ extension JobDetailsVC: TableViewDataSourceAndDelegate {
         }
     }
     
+    func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        // remove bottom extra 20px space.
+        return UIView(frame: CGRect(x: 0, y: 0, width: 0, height: CGFloat.leastNormalMagnitude))
+    }
+    
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        // remove bottom extra 20px space.
+        return .leastNormalMagnitude
+    }
+    
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        return UIView(frame: CGRect(x: 0, y: 0, width: 0, height: CGFloat.leastNormalMagnitude))
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return .leastNormalMagnitude
+    }
     
 }
 

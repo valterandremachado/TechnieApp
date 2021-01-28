@@ -16,13 +16,20 @@ class TechnieServiceVC: UIViewController {
         let tv = UITableView(frame: .zero, style: .grouped)
         tv.translatesAutoresizingMaskIntoConstraints = false
         tv.backgroundColor = .white
-        tv.tableFooterView = UIView()
         tv.showsVerticalScrollIndicator = false
 //        tv.rowHeight = 40
         tv.rowHeight = UITableView.automaticDimension
         tv.estimatedRowHeight = UITableView.automaticDimension
         tv.delegate = self
         tv.dataSource = self
+        
+        /// Fix extra padding space at the top of the section of grouped tableView
+        var frame = CGRect.zero
+        frame.size.height = .leastNormalMagnitude
+        tv.tableHeaderView = UIView(frame: frame)
+        tv.tableFooterView = UIView(frame: frame)
+        tv.contentInsetAdjustmentBehavior = .never
+        
         tv.register(ActiveJobsTVCell.self, forCellReuseIdentifier: ActiveJobsTVCell.cellID)
         tv.register(PreviousJobsTVCell.self, forCellReuseIdentifier: PreviousJobsTVCell.cellID)
         return tv
@@ -101,25 +108,32 @@ extension TechnieServiceVC: TableViewDataSourceAndDelegate {
         }
     }
     
-    
-    
-//        func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-//            return sections[section].sectionTitle
-//        }
-    
+   
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let headerView = UIView(frame: CGRect(x: 0, y: 0, width: tableView.frame.width, height: 30))
+        let headerView = UIView(frame: CGRect(x: 0, y: 0, width: tableView.frame.width, height: 35))
         headerView.backgroundColor = .white
         
-        let headerLabel = UILabel(frame: CGRect(x: 20, y: 0, width: tableView.frame.width - 15, height: 30))
+        let headerLabel = UILabel(frame: CGRect(x: tableView.separatorInset.left, y: 0, width: tableView.frame.width, height: 35))
         headerLabel.textColor = .systemGray
-        headerLabel.text = sections[section].sectionTitle
+        headerLabel.font = .systemFont(ofSize: 13)
+        headerLabel.text = sections[section].sectionTitle?.uppercased()
         headerView.addSubview(headerLabel)
         return headerView
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 30
+        return 35
     }
+    
+    func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        // remove bottom extra 20px space.
+        return UIView(frame: CGRect(x: 0, y: 0, width: 0, height: CGFloat.leastNormalMagnitude))
+    }
+    
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        // remove bottom extra 20px space.
+        return .leastNormalMagnitude
+    }
+    
 }
 

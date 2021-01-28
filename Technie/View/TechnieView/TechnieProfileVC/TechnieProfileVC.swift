@@ -30,6 +30,13 @@ class TechnieProfileVC: UIViewController {
 //        tv.layer.cornerRadius = 18
         tv.clipsToBounds = true
         
+        /// Fix extra padding space at the top of the section of grouped tableView
+        var frame = CGRect.zero
+        frame.size.height = .leastNormalMagnitude
+        tv.tableHeaderView = UIView(frame: frame)
+        tv.tableFooterView = UIView(frame: frame)
+//        tv.contentInsetAdjustmentBehavior = .never
+        
         tv.delegate = self
         tv.dataSource = self
         tv.register(TechineProfileTVCell.self, forCellReuseIdentifier: TechineProfileTVCell.cellID)
@@ -45,10 +52,10 @@ class TechnieProfileVC: UIViewController {
         view.backgroundColor = .white
         setupViews()
         
-        sections.append(SectionHandler(title: "Active Jobs", detail: ["Active 1"]))
-        sections.append(SectionHandler(title: "Previous Jobs", detail: ["Active 1", "Active 2", "Active 2"]))
-        sections.append(SectionHandler(title: "Previous Jobs2", detail: ["Active 1", "Active 2"]))
-        sections.append(SectionHandler(title: "Previous Jobs2", detail: ["Active 1"]))
+        sections.append(SectionHandler(title: "UserInfo", detail: [""]))
+        sections.append(SectionHandler(title: "AccountInfo", detail: ["", "A", ""]))
+        sections.append(SectionHandler(title: "Share and Help", detail: ["", ""]))
+        sections.append(SectionHandler(title: "Logout", detail: [""]))
     }
    
     
@@ -56,7 +63,7 @@ class TechnieProfileVC: UIViewController {
     fileprivate func setupViews() {
         [tableView].forEach {view.addSubview($0)}
                 
-        tableView.anchor(top: view.topAnchor, leading: view.leadingAnchor, bottom: view.safeAreaLayoutGuide.bottomAnchor, trailing: view.trailingAnchor, padding: UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0), size: CGSize(width: 0, height: 0))
+        tableView.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.safeAreaLayoutGuide.trailingAnchor, padding: UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0), size: CGSize(width: 0, height: 0))
         
         setupNavBar()
     }
@@ -168,18 +175,14 @@ extension TechnieProfileVC: TableViewDataSourceAndDelegate {
 //    }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let headerView = UIView(frame: CGRect(x: 0, y: 0, width: tableView.frame.width, height: 15))
+        let headerView = UIView(frame: CGRect(x: 0, y: 0, width: tableView.frame.width, height: 30))
         headerView.backgroundColor = .white
 
-        let headerLabel = UILabel(frame: CGRect(x: 20, y: -6, width: tableView.frame.width - 15, height: 15))
+        let headerLabel = UILabel(frame: CGRect(x: tableView.separatorInset.left, y: 0, width: tableView.frame.width, height: 30))
         headerLabel.textColor = .systemGray
        
         if section > 0 {
             headerLabel.text = ""//sections[section].sectionTitle
-//            headerView.isHidden = true
-//            headerLabel.text = ""
-//            headerView.addBorder(.top, color: .lightGray, thickness: 0.25)
-//            headerView.addBorder(.bottom, color: .lightGray, thickness: 0.25)
             headerView.addSubview(headerLabel)
             
             return headerView
@@ -191,7 +194,17 @@ extension TechnieProfileVC: TableViewDataSourceAndDelegate {
         if section == 0 {
             return 0
         }
-        return 15
+        return 30
+    }
+    
+    func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        // remove bottom extra 20px space.
+        return UIView(frame: CGRect(x: 0, y: 0, width: 0, height: CGFloat.leastNormalMagnitude))
+    }
+    
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        // remove bottom extra 20px space.
+        return .leastNormalMagnitude
     }
     
 }

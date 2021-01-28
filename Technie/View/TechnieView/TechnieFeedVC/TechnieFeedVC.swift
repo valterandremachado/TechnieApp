@@ -45,7 +45,7 @@ class TechnieFeedVC: UIViewController {
         cv.backgroundColor = .white
         cv.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         // Avoid collectionView to self adjust its size
-        //        cv.contentInsetAdjustmentBehavior = .never
+        cv.contentInsetAdjustmentBehavior = .never
         
         cv.delegate = self
         cv.dataSource = self
@@ -58,15 +58,21 @@ class TechnieFeedVC: UIViewController {
     }()
     
     lazy var tableView: UITableView = {
-        let tv = UITableView()
+        let tv = UITableView(frame: .zero, style: .grouped)
         tv.translatesAutoresizingMaskIntoConstraints = false
         tv.backgroundColor = .white
-        tv.tableFooterView = UIView()
         tv.showsVerticalScrollIndicator = false
 //        tv.rowHeight = 400
         // Set automatic dimensions for row height
         tv.rowHeight = UITableView.automaticDimension
         tv.estimatedRowHeight = UITableView.automaticDimension
+        
+        /// Fix extra padding space at the top of the section of grouped tableView
+        var frame = CGRect.zero
+        frame.size.height = .leastNormalMagnitude
+        tv.tableHeaderView = UIView(frame: frame)
+        tv.tableFooterView = UIView(frame: frame)
+//        tv.contentInsetAdjustmentBehavior = .never
         
         tv.delegate = self
         tv.dataSource = self
@@ -130,7 +136,7 @@ class TechnieFeedVC: UIViewController {
                 view.addSubview(self.searchResultCollectionView)
                 //                guard let navBarHeight = self.navigationController?.navigationBar.frame.height else { return }
                 //                self.searchResultCollectionView.withHeight(view.frame.height)
-                self.searchResultCollectionView.anchor(top: self.view.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor, padding: .init(top: 0, left: 8, bottom: 0, right: 8))
+                self.searchResultCollectionView.anchor(top: self.view.safeAreaLayoutGuide.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor, padding: .init(top: 0, left: 8, bottom: 0, right: 8))
             }
             
         }
@@ -161,11 +167,11 @@ class TechnieFeedVC: UIViewController {
     fileprivate func setupViews(){
         [tableView, searchResultView].forEach {view.addSubview($0)}
         
-        tableView.anchor(top: view.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor)
+        tableView.anchor(top: view.topAnchor, leading: view.leadingAnchor, bottom: view.safeAreaLayoutGuide.bottomAnchor, trailing: view.trailingAnchor)
         
-        guard let navBarHeight = navigationController?.navigationBar.frame.height else { return }
+//        guard let navBarHeight = navigationController?.navigationBar.frame.height else { return }
         
-        searchResultView.anchor(top: view.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor, padding: UIEdgeInsets(top: navBarHeight , left: 0, bottom: 0, right: 0))
+        searchResultView.anchor(top: view.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor, padding: UIEdgeInsets(top: 0 , left: 0, bottom: 0, right: 0))
     }
     
     func setupNavBar(){
@@ -243,6 +249,16 @@ extension TechnieFeedVC: TableViewDataSourceAndDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let vc = JobDetailsVC()
         navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        // remove bottom extra 20px space.
+        return UIView(frame: CGRect(x: 0, y: 0, width: 0, height: CGFloat.leastNormalMagnitude))
+    }
+    
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        // remove bottom extra 20px space.
+        return .leastNormalMagnitude
     }
     
 //    // UITableViewAutomaticDimension calculates height of label contents/text
