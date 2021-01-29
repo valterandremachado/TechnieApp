@@ -68,6 +68,10 @@
 		8AC93A9525B6EF3A00663BE3 /* ChatModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AC93A9125B6EF3A00663BE3 /* ChatModels.swift */; };
 		8AC93A9625B6EF3A00663BE3 /* ProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AC93A9225B6EF3A00663BE3 /* ProfileViewModel.swift */; };
 		8AC93A9B25B6F04600663BE3 /* ConversationVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AC93A9A25B6F04600663BE3 /* ConversationVC.swift */; };
+		8ACD6AEE25C4384000CC057D /* PhotoCollectionViewerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ACD6AED25C4384000CC057D /* PhotoCollectionViewerVC.swift */; };
+		8ACD6AF325C438B200CC057D /* PhotoCollectionViewerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ACD6AF225C438B200CC057D /* PhotoCollectionViewerCell.swift */; };
+		8ACD6AFE25C4534200CC057D /* LocationCollectionViewerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ACD6AFD25C4534200CC057D /* LocationCollectionViewerVC.swift */; };
+		8ACD6B0325C4547500CC057D /* LocationCollectionViewerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ACD6B0225C4547500CC057D /* LocationCollectionViewerCell.swift */; };
 		8AD3D07725B1D3FD00858CAD /* JobDetailsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AD3D07625B1D3FD00858CAD /* JobDetailsVC.swift */; };
 		8AD8743425B88B8400BB2F6F /* PhotoViewerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AD8743325B88B8400BB2F6F /* PhotoViewerVC.swift */; };
 		8ADA18AE25C0557C0040D3C6 /* ChatInfoVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ADA18AD25C0557B0040D3C6 /* ChatInfoVC.swift */; };
@@ -171,6 +175,10 @@
 		8AC93A9125B6EF3A00663BE3 /* ChatModels.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatModels.swift; sourceTree = "<group>"; };
 		8AC93A9225B6EF3A00663BE3 /* ProfileViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileViewModel.swift; sourceTree = "<group>"; };
 		8AC93A9A25B6F04600663BE3 /* ConversationVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationVC.swift; sourceTree = "<group>"; };
+		8ACD6AED25C4384000CC057D /* PhotoCollectionViewerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoCollectionViewerVC.swift; sourceTree = "<group>"; };
+		8ACD6AF225C438B200CC057D /* PhotoCollectionViewerCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoCollectionViewerCell.swift; sourceTree = "<group>"; };
+		8ACD6AFD25C4534200CC057D /* LocationCollectionViewerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationCollectionViewerVC.swift; sourceTree = "<group>"; };
+		8ACD6B0225C4547500CC057D /* LocationCollectionViewerCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationCollectionViewerCell.swift; sourceTree = "<group>"; };
 		8AD3D07625B1D3FD00858CAD /* JobDetailsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobDetailsVC.swift; sourceTree = "<group>"; };
 		8AD8743325B88B8400BB2F6F /* PhotoViewerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoViewerVC.swift; sourceTree = "<group>"; };
 		8ADA18AD25C0557B0040D3C6 /* ChatInfoVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatInfoVC.swift; sourceTree = "<group>"; };
@@ -297,6 +305,8 @@
 			isa = PBXGroup;
 			children = (
 				8A8F72A625C29E4B00F4ABFF /* ChatInfoCells.swift */,
+				8ACD6AF225C438B200CC057D /* PhotoCollectionViewerCell.swift */,
+				8ACD6B0225C4547500CC057D /* LocationCollectionViewerCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -471,6 +481,8 @@
 				8AD8743325B88B8400BB2F6F /* PhotoViewerVC.swift */,
 				8A00AB2825B981D000C250C4 /* LocationPickerVC.swift */,
 				8ADA18AD25C0557B0040D3C6 /* ChatInfoVC.swift */,
+				8ACD6AED25C4384000CC057D /* PhotoCollectionViewerVC.swift */,
+				8ACD6AFD25C4534200CC057D /* LocationCollectionViewerVC.swift */,
 			);
 			path = ChatFeature;
 			sourceTree = "<group>";
@@ -934,6 +946,7 @@
 				8ADA18AE25C0557C0040D3C6 /* ChatInfoVC.swift in Sources */,
 				8AAB8829259B625E00BCBD33 /* PostFormCell.swift in Sources */,
 				8A8F852E258A357200C4CEF9 /* ClientChatVC.swift in Sources */,
+				8ACD6B0325C4547500CC057D /* LocationCollectionViewerCell.swift in Sources */,
 				8AF76A77258B440D00ED14C2 /* KeyboardLayoutConstraint.swift in Sources */,
 				8A79718D2595CAA000648A3C /* ProfileEnum.swift in Sources */,
 				8A8F8533258A358400C4CEF9 /* ClientNotificationVC.swift in Sources */,
@@ -945,6 +958,7 @@
 				8A76FA57258DEBB20094C524 /* FullRankingVC.swift in Sources */,
 				8A8F72A725C29E4B00F4ABFF /* ChatInfoCells.swift in Sources */,
 				8AF76A8E258B671500ED14C2 /* HeaderView.swift in Sources */,
+				8ACD6AF325C438B200CC057D /* PhotoCollectionViewerCell.swift in Sources */,
 				8A68A56625B705BA000D988F /* StorageManager.swift in Sources */,
 				8AE4098125AF011200A29453 /* TechnieServiceVC.swift in Sources */,
 				8AF76A79258B440D00ED14C2 /* TrashBinCode.swift in Sources */,
@@ -956,6 +970,7 @@
 				8AF76A7B258B440D00ED14C2 /* Extensions.swift in Sources */,
 				8AADFBC025B5AE6E00D3A5CC /* ConvoVC.swift in Sources */,
 				8AC1B125258A2D8D000F2569 /* SceneDelegate.swift in Sources */,
+				8ACD6AFE25C4534200CC057D /* LocationCollectionViewerVC.swift in Sources */,
 				8AF76A7C258B440D00ED14C2 /* Typealias.swift in Sources */,
 				8A997F3025A823AE00B144CD /* SkillSelectionVC.swift in Sources */,
 				8A6A32752598C73A001FE408 /* PostSectionVC.swift in Sources */,
@@ -964,6 +979,7 @@
 				8AC93A9B25B6F04600663BE3 /* ConversationVC.swift in Sources */,
 				8A159DFD25B307D900D45C60 /* JobDetailCVCell.swift in Sources */,
 				8A00AB2925B981D000C250C4 /* LocationPickerVC.swift in Sources */,
+				8ACD6AEE25C4384000CC057D /* PhotoCollectionViewerVC.swift in Sources */,
 				8AADFB9425B5A7E200D3A5CC /* MessageTVCell.swift in Sources */,
 				8A76FA5F258DF2F40094C524 /* NearbyDetailVC.swift in Sources */,
 				8ADECCC425B026F600F871EF /* FeedsTVCell.swift in Sources */,

@@ -15,6 +15,10 @@ typealias MessagesCollectionViewDelegateAndDataSource = MessagesLayoutDelegate &
 
 class ChatVC: MessagesViewController {
     
+    // Shared variable from this vc to ChatInfo then to PhotoCollectionViewerVC
+    private var convoSharedPhotoArray = [String]()
+    private var convoSharedLocationArray = [String]()
+
     // MARK: - Properties
     private var conversations = [Conversation]()
     public var isNewConvo = false
@@ -81,17 +85,7 @@ class ChatVC: MessagesViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         // Do any additional setup after loading the view.
-        //        if let layout = messagesCollectionView.collectionViewLayout as? MessagesCollectionViewFlowLayout {
-        //            layout.textMessageSizeCalculator.outgoingAvatarSize = .zero
-        //            layout.textMessageSizeCalculator.incomingAvatarSize = .zero
-        //            layout.minimumInteritemSpacing = 0
-        //            layout.minimumLineSpacing = 0
-        //            layout.sectionInset = UIEdgeInsets(top: 15, left: 0, bottom: 70, right: 0)
-        //        }
-        //        messagesCollectionView.contentInset = UIEdgeInsets(top: 10, left: 0, bottom: 70, right: 0)
-        
         messagesCollectionView.messagesLayoutDelegate = self
         messagesCollectionView.messagesDataSource = self
         messagesCollectionView.messagesDisplayDelegate = self
@@ -103,7 +97,6 @@ class ChatVC: MessagesViewController {
         //        messages.append(Message(sender: selfSender, messageId: "0", sentDate: Date(), kind: .text("Heyy!!")))
         //        messages.append(Message(sender: selfSender, messageId: "0", sentDate: Date(), kind: .text("Heyy Heyy Heyy!!")))
         //        NotificationCenter.default.addObserver(self, selector: #selector(handleKeyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
-        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -254,7 +247,7 @@ class ChatVC: MessagesViewController {
             let longitude: Double = selectedCoorindates.longitude
             let latitude: Double = selectedCoorindates.latitude
             
-            print("long=\(longitude) | lat= \(latitude)")
+            print("long = \(longitude) | lat = \(latitude)")
             
             
             let location = Location(location: CLLocation(latitude: latitude, longitude: longitude),
@@ -263,7 +256,7 @@ class ChatVC: MessagesViewController {
             let message = Message(sender: selfSender,
                                   messageId: messageId,
                                   sentDate: Date(),
-                                  sender_email: self?.otherUserEmail ?? "nil",
+//                                  sender_email: self?.otherUserEmail ?? "nil",
                                   kind: .location(location))
             
             DatabaseManager.shared.sendMessage(to: conversationId, otherUserEmail: strongSelf.otherUserEmail, name: name, newMessage: message, completion: { success in
@@ -333,6 +326,8 @@ class ChatVC: MessagesViewController {
     // MARK: - Selectors
     @objc func rightNavBarBtnTapped() {
         let vc = ChatInfoVC()
+        vc.convoSharedPhotoArray = convoSharedPhotoArray
+        vc.convoSharedLocationArray = convoSharedLocationArray
         navigationController?.pushViewController(vc, animated: true)
     }
     
@@ -422,7 +417,7 @@ extension ChatVC: UIImagePickerControllerDelegate, UINavigationControllerDelegat
                     let message = Message(sender: selfSender,
                                           messageId: messageId,
                                           sentDate: Date(),
-                                          sender_email: self?.otherUserEmail ?? "nil",
+//                                          sender_email: self?.otherUserEmail ?? "nil",
                                           kind: .photo(media))
                     
                     DatabaseManager.shared.sendMessage(to: conversationId, otherUserEmail: strongSelf.otherUserEmail, name: name, newMessage: message, completion: { success in
@@ -469,7 +464,7 @@ extension ChatVC: UIImagePickerControllerDelegate, UINavigationControllerDelegat
                     let message = Message(sender: selfSender,
                                           messageId: messageId,
                                           sentDate: Date(),
-                                          sender_email: self?.otherUserEmail ?? "nil",
+//                                          sender_email: self?.otherUserEmail ?? "nil",
                                           kind: .video(media))
                     
                     DatabaseManager.shared.sendMessage(to: conversationId, otherUserEmail: strongSelf.otherUserEmail, name: name, newMessage: message, completion: { success in
@@ -523,7 +518,7 @@ extension ChatVC: InputBarAccessoryViewDelegate {
         let message = Message(sender: selfSender,
                               messageId: messageId,
                               sentDate: Date(),
-                              sender_email: otherUserEmail,
+//                              sender_email: otherUserEmail,
                               kind: .text(text))
         // Otherwise send message
         if isNewConvo {
@@ -599,6 +594,35 @@ extension ChatVC: MessagesCollectionViewDelegateAndDataSource {
     }
     
     func messageForItem(at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> MessageType {
+
+//        if messages[indexPath.section].kind.messageKindString == "photo" {
+//            if let safeMessageContent = messages[indexPath.section].content {
+//                convoSharedPhotoArray.append(safeMessageContent)
+//                let uniqueArrayOfPhoto = convoSharedPhotoArray.uniqueItemInTheArray{$0}
+//                convoSharedPhotoArray.removeAll()
+//                convoSharedPhotoArray.append(contentsOf: uniqueArrayOfPhoto)
+//            }
+//        }
+        
+        switch messages[indexPath.section].kind.messageKindString {
+        case "photo":
+            if let safeMessageContent = messages[indexPath.section].content {
+                convoSharedPhotoArray.append(safeMessageContent)
+                let uniqueArrayOfPhoto = convoSharedPhotoArray.uniqueItemInTheArray{$0}
+                convoSharedPhotoArray.removeAll()
+                convoSharedPhotoArray.append(contentsOf: uniqueArrayOfPhoto)
+            }
+        case "location":
+            if let safeMessageContent = messages[indexPath.section].content {
+                convoSharedLocationArray.append(safeMessageContent)
+                let uniqueArrayOfPhoto = convoSharedLocationArray.uniqueItemInTheArray{$0}
+                convoSharedLocationArray.removeAll()
+                convoSharedLocationArray.append(contentsOf: uniqueArrayOfPhoto)
+            }
+        default:
+            break
+        }
+        
         return messages[indexPath.section]
     }
     
@@ -710,7 +734,6 @@ extension ChatVC: MessageCellDelegate {
         case .location(let locationData):
             let coordinates = locationData.location.coordinate
             let vc = LocationPickerVC(coordinates: coordinates)
-            
             vc.title = "Client's Location"
             navigationController?.pushViewController(vc, animated: true)
         default:
@@ -732,14 +755,15 @@ extension ChatVC: MessageCellDelegate {
             }
             let vc = PhotoViewerVC(with: imageUrl)
             navigationController?.pushViewController(vc, animated: true)
-        //        case .video(let media):
-        //            guard let videoUrl = media.url else {
-        //                return
-        //            }
-        //
-        //            let vc = AVPlayerViewController()
-        //            vc.player = AVPlayer(url: videoUrl)
-        //            present(vc, animated: true)
+            
+//        case .video(let media):
+//            guard let videoUrl = media.url else {
+//                return
+//            }
+//
+//            let vc = AVPlayerViewController()
+//            vc.player = AVPlayer(url: videoUrl)
+//            present(vc, animated: true)
         default:
             break
         }

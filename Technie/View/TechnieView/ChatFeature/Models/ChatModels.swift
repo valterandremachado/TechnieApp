@@ -13,8 +13,9 @@ struct Message: MessageType {
     public var sender: SenderType
     public var messageId: String
     public var sentDate: Date
-    public var sender_email: String
+    public var sender_email: String?
     public var kind: MessageKind
+    public var content: String?
 }
 
 //struct Messsage {

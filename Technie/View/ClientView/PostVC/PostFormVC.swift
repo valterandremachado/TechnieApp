@@ -394,7 +394,7 @@ extension PostFormVC: SkillSelectionVCDelegate {
                 ////                    self.tableView.endUpdates()
                 //                    tableView.reloadData()
                 
-                //                    if uniqueItems.count < self.sections[3].sectionDetail.count {
+//                                    if uniqueItems.count < self.sections[3].sectionDetail.count {
                 //                        self.sections[3].sectionDetail.removeAll()
                 //                        self.sections[3].sectionDetail.append(contentsOf: uniqueItems)
                 //                        self.tableView.deleteRows(at: [IndexPath(row: 0, section: 3)], with: .fade)

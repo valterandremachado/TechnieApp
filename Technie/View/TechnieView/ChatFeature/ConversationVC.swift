@@ -89,29 +89,6 @@ class ConversationVC: UIViewController {
                 // Populate messages array
                 self?.messages = messages
                 self?.updateSender(message: messages)
-//                let lastMessage = messages.last
-//                guard let latestMessage = self?.conversations.first?.latestMessage.message else { return }
-//
-//                let userEmail = UserDefaults.standard.value(forKey: "email") as? String ?? ""
-//                let currentUserSafeEmail = DatabaseManager.safeEmail(emailAddress: userEmail)
-//
-//                if currentUserSafeEmail == lastMessage!.sender_email {
-//                    self?.senderEmail = lastMessage!.sender_email
-//                    guard let latestMessage = self?.conversations.first?.latestMessage.message else { return }
-//                    self?.customDetailText = "You: " + latestMessage
-//                    DispatchQueue.main.async {
-//                        self?.tableView.reloadData()
-//                    }
-//                } else {
-//                    guard let latestMessage = self?.conversations.first?.latestMessage.message else { return }
-//                    self?.customDetailText = latestMessage
-//                    self?.senderEmail = lastMessage!.sender_email
-//                    DispatchQueue.main.async {
-//                        self?.tableView.reloadData()
-//                    }
-//                    print("they're the different")
-//                }
-//                print("Latest: " + latestMessage)
                 
 //                self?.messageInfo.append(["senderEmail": lastMessage.flatMap {$0.sender_email} ?? "", "receiverName": lastMessage.flatMap {$0.name} ?? "", "contentType": lastMessage.flatMap {$0.type} ?? ""])
 //                print("Display: \(lastMessage?.sender_email)")
@@ -124,7 +101,7 @@ class ConversationVC: UIViewController {
     func updateSender(message: [Message]) {
         guard let lastMessage = messages.last else { return }
         let lastUserDefaultsMessage = UserDefaults.standard.value(forKey: "lastMessage") as? String ?? ""
-        
+
         let userEmail = UserDefaults.standard.value(forKey: "email") as? String ?? ""
         let currentUserSafeEmail = DatabaseManager.safeEmail(emailAddress: userEmail)
         
@@ -135,7 +112,7 @@ class ConversationVC: UIViewController {
 //            print("name: " + conversations.last!.name)
 
             guard let latestMessage = conversations.first?.latestMessage.message else { return }
-            let modifiedLatestMessage = messageType != "text" ? ("You: Sent a " + messageType) : ("You: " + latestMessage)
+            let modifiedLatestMessage = messageType != "text" ? ("You sent a " + messageType) : ("You: " + latestMessage)
             customDetailText = modifiedLatestMessage
             DispatchQueue.main.async {
                 self.tableView.reloadData()
@@ -409,27 +386,27 @@ extension ConversationVC: TableViewDataSourceAndDelegate {
         }
     }
     
-    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
-        return .delete
-    }
-
-    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            // begin delete
-            let conversationId = conversations[indexPath.row].id
-            tableView.beginUpdates()
-            self.conversations.remove(at: indexPath.row)
-            tableView.deleteRows(at: [indexPath], with: .left)
-
-            DatabaseManager.shared.deleteConversation(conversationId: conversationId, completion: { success in
-                if !success {
-                    // add model and row back and show error alert
-
-                }
-            })
-
-            tableView.endUpdates()
-        }
-    }
+//    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+//        return .delete
+//    }
+//
+//    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+//        if editingStyle == .delete {
+//            // begin delete
+//            let conversationId = conversations[indexPath.row].id
+//            tableView.beginUpdates()
+//            self.conversations.remove(at: indexPath.row)
+//            tableView.deleteRows(at: [indexPath], with: .left)
+//
+//            DatabaseManager.shared.deleteConversation(conversationId: conversationId, completion: { success in
+//                if !success {
+//                    // add model and row back and show error alert
+//
+//                }
+//            })
+//
+//            tableView.endUpdates()
+//        }
+//    }
 }
 

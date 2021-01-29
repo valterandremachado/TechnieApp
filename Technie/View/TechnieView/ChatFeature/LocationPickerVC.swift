@@ -302,8 +302,10 @@ final class LocationPickerVC: UIViewController {
             let streetNumberWithComma = !streetNumber.isEmpty ? ("\(streetNumber),") : ("")
             let streetNameWithComma = !streetName.isEmpty ? ("\(streetName),") : ("")
             
-            self.pin.subtitle = "\(streetNumberWithComma) \(streetNameWithComma) \(subLocality)"
-            print("StreetNo: \(streetNumber), StreetName:\(streetName), Brgy:\(subLocality)")
+            let location = "\(streetNumberWithComma) \(streetNameWithComma) \(subLocality)"
+            let locationWithNoLeftAndRightWhiteSpace = location.trimmingCharacters(in: .whitespaces)
+            self.pin.subtitle = locationWithNoLeftAndRightWhiteSpace
+//            print("StreetNo: \(streetNumber), StreetName:\(streetName), Brgy:\(subLocality)")
         }
     }
     
@@ -354,8 +356,10 @@ final class LocationPickerVC: UIViewController {
             let streetNameWithComma = !streetName.isEmpty ? ("\(streetName),") : ("")
             
             DispatchQueue.main.async {
-                self.addressLabel.text = "\(streetNumberWithComma) \(streetNameWithComma) \(subLocality)"
-                print("address: \(self.addressLabel.text ?? "")")// + multipleInfo)
+                let location = "\(streetNumberWithComma) \(streetNameWithComma) \(subLocality)"
+                let locationWithNoLeftAndRightWhiteSpace = location.trimmingCharacters(in: .whitespaces)
+                self.addressLabel.text = locationWithNoLeftAndRightWhiteSpace
+//                print("address: \(self.addressLabel.text ?? "")")// + multipleInfo)
             }
             
             if streetName.isEmpty && streetNumber.isEmpty && subLocality.isEmpty {

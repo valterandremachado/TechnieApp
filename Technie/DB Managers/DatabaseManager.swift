@@ -469,7 +469,7 @@ extension DatabaseManager {
                         let latitude = Double(locationComponents[1]) else {
                         return nil
                     }
-                    print("Rendering location; long=\(longitude) | lat=\(latitude)")
+                    print("Rendering location; long = \(longitude) | lat = \(latitude)")
                     let location = Location(location: CLLocation(latitude: latitude, longitude: longitude),
                                             size: CGSize(width: 300, height: 300))
                     kind = .location(location)
@@ -490,7 +490,8 @@ extension DatabaseManager {
                                messageId: messageID,
                                sentDate: date,
                                sender_email: senderEmail,
-                               kind: finalKind)
+                               kind: finalKind,
+                               content: content)
             })
 
             completion(.success(messages))

@@ -9,6 +9,9 @@ import UIKit
 
 class ChatInfoVC: UIViewController {
 
+    var convoSharedPhotoArray = [String]()
+    var convoSharedLocationArray = [String]()
+
     // MARK: - Properties
     lazy var tableView: UITableView = {
         let tv = UITableView(frame: .zero, style: .grouped)
@@ -63,6 +66,14 @@ class ChatInfoVC: UIViewController {
     func setupViews() {
         [tableView].forEach {view.addSubview($0)}
         tableView.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor)
+        
+        setupNavBar()
+    }
+    
+    func setupNavBar() {
+        guard let navBar = navigationController?.navigationBar else { return }
+        navigationItem.title = "Chat details"
+        navBar.topItem?.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
     }
     
     // MARK: - Selectors
@@ -111,6 +122,20 @@ extension ChatInfoVC: TableViewDataSourceAndDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+        switch indexPath.section {
+        case 1:
+            if indexPath.item == 1 {
+                let vc = PhotoCollectionViewerVC()
+                vc.convoSharedPhotoArray = convoSharedPhotoArray
+                navigationController?.pushViewController(vc, animated: true)
+            } else if indexPath.item == 2 {
+                let vc = LocationCollectionViewerVC()
+                vc.convoSharedLocationArray = convoSharedLocationArray
+                navigationController?.pushViewController(vc, animated: true)
+            }
+        default:
+            break
+        }
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
