@@ -1,5 +1,5 @@
 //
-//  MessageTVCell.swift
+//  ConversationsTVCell.swift
 //  Technie
 //
 //  Created by Valter A. Machado on 1/18/21.
@@ -7,9 +7,9 @@
 
 import UIKit
 
-class MessageTVCell: UITableViewCell {
+class ConversationsTVCell: UITableViewCell {
     
-    static let cellID = "MessageTVCellID"
+    static let cellID = "ConversationsTVCellID"
     
     // MARK: - Properties
     

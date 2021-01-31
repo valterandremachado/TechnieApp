@@ -20,7 +20,7 @@ class ChatVC: MessagesViewController {
     private var convoSharedLocationArray = [String]()
 
     // MARK: - Properties
-    private var conversations = [Conversation]()
+    var conversations = [Conversation]()
     public var isNewConvo = false
     private var convoId: String?
     public let otherUserEmail: String
@@ -328,6 +328,8 @@ class ChatVC: MessagesViewController {
         let vc = ChatInfoVC()
         vc.convoSharedPhotoArray = convoSharedPhotoArray
         vc.convoSharedLocationArray = convoSharedLocationArray
+        vc.conversations = conversations
+        vc.convoID = convoId
         navigationController?.pushViewController(vc, animated: true)
     }
     

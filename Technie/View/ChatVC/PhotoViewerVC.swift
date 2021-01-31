@@ -34,6 +34,7 @@ final class PhotoViewerVC: UIViewController {
         view.backgroundColor = .black
         view.addSubview(imageView)
         imageView.sd_setImage(with: url, completed: nil)
+        setupNavBar()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -44,6 +45,11 @@ final class PhotoViewerVC: UIViewController {
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         imageView.frame = view.bounds
+    }
+    
+    func setupNavBar() {
+        guard let navBar = navigationController?.navigationBar else { return }
+        navBar.topItem?.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
     }
 
 

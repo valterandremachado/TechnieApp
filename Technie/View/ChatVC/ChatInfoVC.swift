@@ -13,6 +13,9 @@ class ChatInfoVC: UIViewController {
     var convoSharedLocationArray = [String]()
 
     // MARK: - Properties
+    var conversations = [Conversation]()
+    var convoID: String?
+    
     lazy var tableView: UITableView = {
         let tv = UITableView(frame: .zero, style: .grouped)
         tv.translatesAutoresizingMaskIntoConstraints = false
@@ -76,6 +79,35 @@ class ChatInfoVC: UIViewController {
         navBar.topItem?.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
     }
     
+    func presentDeleteConvoAlertSheet() {
+        let actionController = UIAlertController(title: "Delete conversation?", message: "This conversation will be deleted from your inbox. Other people will be able to see it.", preferredStyle: .alert)
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
+        let deleteAction = UIAlertAction(title: "Delete", style: .destructive) { [weak self] _ in
+            guard let self = self, let conversationId = self.convoID else { return }
+           // TODO: Delete convo from firebase db
+            // begin delete
+//            let conversationId = conversations[indexPath.row].id
+//            self.tableView.beginUpdates()
+//            self.conversations.remove(at: indexPath.row)
+//            tableView.deleteRows(at: [indexPath], with: .left)
+
+            DatabaseManager.shared.deleteConversation(conversationId: conversationId, completion: { success in
+                if !success {
+                    // add model and row back and show error alert
+                }
+                // Removes all the view from the navigation stack expect the root view (first-most view)
+                self.navigationController?.popToRootViewController(animated: true)
+            })
+//            self.tableView.endUpdates()
+        }
+        
+        actionController.addAction(cancelAction)
+        actionController.addAction(deleteAction)
+        present(actionController, animated: true)
+    }
+    
+    
     // MARK: - Selectors
 
 }
@@ -124,14 +156,18 @@ extension ChatInfoVC: TableViewDataSourceAndDelegate {
         tableView.deselectRow(at: indexPath, animated: true)
         switch indexPath.section {
         case 1:
-            if indexPath.item == 1 {
+            if indexPath.row == 1 {
                 let vc = PhotoCollectionViewerVC()
                 vc.convoSharedPhotoArray = convoSharedPhotoArray
                 navigationController?.pushViewController(vc, animated: true)
-            } else if indexPath.item == 2 {
+            } else if indexPath.row == 2 {
                 let vc = LocationCollectionViewerVC()
                 vc.convoSharedLocationArray = convoSharedLocationArray
                 navigationController?.pushViewController(vc, animated: true)
+            }
+        case 2:
+            if indexPath.row == 1 {
+                presentDeleteConvoAlertSheet()
             }
         default:
             break

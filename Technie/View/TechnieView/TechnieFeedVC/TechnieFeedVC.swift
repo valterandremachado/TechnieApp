@@ -167,7 +167,7 @@ class TechnieFeedVC: UIViewController {
     fileprivate func setupViews(){
         [tableView, searchResultView].forEach {view.addSubview($0)}
         
-        tableView.anchor(top: view.topAnchor, leading: view.leadingAnchor, bottom: view.safeAreaLayoutGuide.bottomAnchor, trailing: view.trailingAnchor)
+        tableView.anchor(top: view.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor)
         
 //        guard let navBarHeight = navigationController?.navigationBar.frame.height else { return }
         
@@ -248,7 +248,7 @@ extension TechnieFeedVC: TableViewDataSourceAndDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let vc = JobDetailsVC()
-        navigationController?.pushViewController(vc, animated: true)
+        self.navigationController?.pushViewController(vc, animated: true)
     }
     
     func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {

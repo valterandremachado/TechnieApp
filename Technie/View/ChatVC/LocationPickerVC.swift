@@ -177,7 +177,12 @@ final class LocationPickerVC: UIViewController {
         dynamicHeightConstraint?.isActive = true
         
         addressLabel.anchor(top: handlerView.topAnchor, leading: addressView.leadingAnchor, bottom: nil, trailing: addressView.trailingAnchor, padding: UIEdgeInsets(top: 12, left: 20, bottom: 0, right: 20))
-        
+        setupNavBar()
+    }
+    
+    func setupNavBar() {
+        guard let navBar = navigationController?.navigationBar else { return }
+        navBar.topItem?.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
     }
     
     func resetMapView(withNew directions: MKDirections) {

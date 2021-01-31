@@ -45,7 +45,7 @@ enum TableViewOptions: Int, CustomStringConvertible {
             return iconImage ?? UIImage()
 
         case .Logout:
-            let iconImage = UIImage(systemName: "return")
+            let iconImage = UIImage(systemName: "power")?.withTintColor(.red, renderingMode: .alwaysOriginal)
             return iconImage ?? UIImage()
         }
     }

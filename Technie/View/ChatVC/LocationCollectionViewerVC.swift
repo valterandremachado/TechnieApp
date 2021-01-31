@@ -49,6 +49,12 @@ class LocationCollectionViewerVC: UIViewController {
         title = "Shared Locations"
         [tableView].forEach {view.addSubview($0)}
         tableView.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor)
+        setupNavBar()
+    }
+    
+    func setupNavBar() {
+        guard let navBar = navigationController?.navigationBar else { return }
+        navBar.topItem?.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
     }
     
     // MARK: - Selectors

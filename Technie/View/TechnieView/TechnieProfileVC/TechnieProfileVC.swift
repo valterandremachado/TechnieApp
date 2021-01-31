@@ -161,7 +161,9 @@ extension TechnieProfileVC: TableViewDataSourceAndDelegate {
                 try! Auth.auth().signOut()
                 print("Logged Out")
             }
-            
+        case 2:
+            let vc = ClientTabController()
+            (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootViewController(vc)
         default:
             break
         }

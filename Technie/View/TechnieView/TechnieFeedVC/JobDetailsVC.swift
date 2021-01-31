@@ -34,7 +34,7 @@ class JobDetailsVC: UIViewController {
     lazy var tableView: UITableView = {
         let tv = UITableView(frame: .zero, style: .grouped)
         tv.translatesAutoresizingMaskIntoConstraints = false
-        tv.backgroundColor = .white
+        tv.backgroundColor = .systemBackground
 //        tv.tableFooterView = UIView()
         tv.showsVerticalScrollIndicator = false
 //        tv.rowHeight = 400
@@ -72,6 +72,7 @@ class JobDetailsVC: UIViewController {
         btn.clipsToBounds = true
         btn.backgroundColor = .cyan
 //        btn.withWidth(180)
+        btn.addTarget(self, action: #selector(proposalBtnPressed), for: .touchUpInside)
         return btn
     }()
     
@@ -87,7 +88,7 @@ class JobDetailsVC: UIViewController {
     }()
     
     lazy var proposalAndStartAChatBtnStack: UIStackView = {
-        let stack = UIStackView(arrangedSubviews: [proposalBtn, startAChatBtn])
+        let stack = UIStackView(arrangedSubviews: [proposalBtn])
         stack.translatesAutoresizingMaskIntoConstraints = false
         stack.axis = .horizontal
         stack.spacing = 8
@@ -140,13 +141,15 @@ class JobDetailsVC: UIViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         // Do any additional setup after loading the view.
-        self.tabBarController?.setTabBar(hidden: false, animated: true, along: nil)
+//        self.tabBarController?.setTabBar(hidden: false, animated: true, along: nil)
+        toolBar.fadeOut()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         // Do any additional setup after loading the view.
-        self.tabBarController?.setTabBar(hidden: true, animated: true, along: nil)
+        toolBar.fadeIn()
+//        self.tabBarController?.setTabBar(hidden: true, animated: true, along: nil)
     }
     
     // MARK: - Methods
@@ -160,8 +163,9 @@ class JobDetailsVC: UIViewController {
         toolBar.addSubview(proposalAndStartAChatBtnStack)
         
         NSLayoutConstraint.activate([
-            proposalAndStartAChatBtnStack.centerYAnchor.constraint(equalTo: toolBar.centerYAnchor),
+//            proposalAndStartAChatBtnStack.centerYAnchor.constraint(equalTo: toolBar.centerYAnchor),
             proposalAndStartAChatBtnStack.centerXAnchor.constraint(equalTo: toolBar.centerXAnchor),
+            proposalAndStartAChatBtnStack.topAnchor.constraint(equalTo: toolBar.topAnchor, constant: 10)
         ])
 
 //        toolBar = UIToolbar.init(frame: CGRect.init(x: 0, y: 0, width: UIScreen.main.bounds.size.width, height: 35))
@@ -176,7 +180,11 @@ class JobDetailsVC: UIViewController {
     }
     
     // MARK: - Selectors
-
+    @objc fileprivate func proposalBtnPressed() {
+        let vc = SubmitProposalVC()
+        navigationController?.pushViewController(vc, animated: true)
+    }
+    
 }
 
 // MARK: - CollectionDataSourceAndDelegate Extension
@@ -310,6 +318,19 @@ extension JobDetailsVC: CollectionDataSourceAndDelegate {
         let finalSize = CGSize(width: size, height: size)
         
         return finalSize
+    }
+    
+}
+
+
+// MARK: - JobDetailsVCPreviews
+import SwiftUI
+
+struct JobDetailsVCPreviews: PreviewProvider {
+    
+    static var previews: some View {
+        let vc = JobDetailsVC()
+        return vc.liveViewController
     }
     
 }

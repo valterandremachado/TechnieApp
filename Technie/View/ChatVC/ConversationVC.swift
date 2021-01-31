@@ -38,7 +38,7 @@ class ConversationVC: UIViewController {
         
         tv.delegate = self
         tv.dataSource = self
-        tv.register(MessageTVCell.self, forCellReuseIdentifier: MessageTVCell.cellID)
+        tv.register(ConversationsTVCell.self, forCellReuseIdentifier: ConversationsTVCell.cellID)
         return tv
     }()
     
@@ -58,7 +58,7 @@ class ConversationVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        view.backgroundColor = .cyan
+        view.backgroundColor = .systemBackground
         setupViews()
         fetchConvo()
     }
@@ -323,9 +323,9 @@ extension ConversationVC: TableViewDataSourceAndDelegate {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        var cell = tableView.dequeueReusableCell(withIdentifier: MessageTVCell.cellID, for: indexPath) as! MessageTVCell
+        var cell = tableView.dequeueReusableCell(withIdentifier: ConversationsTVCell.cellID, for: indexPath) as! ConversationsTVCell
         // Enables detailTextLabel visibility
-        cell = MessageTVCell(style: .subtitle, reuseIdentifier: MessageTVCell.cellID)
+        cell = ConversationsTVCell(style: .subtitle, reuseIdentifier: ConversationsTVCell.cellID)
         
         cell.textLabel?.text =  conversations[indexPath.row].name//users[indexPath.row]["name"]
 
@@ -379,6 +379,7 @@ extension ConversationVC: TableViewDataSourceAndDelegate {
             let vc = ChatVC(with: targetConversation.otherUserEmail, id: targetConversation.id)
             vc.isNewConvo = false
             vc.title = targetConversation.name
+            vc.conversations = conversations
             vc.navigationItem.largeTitleDisplayMode = .never
             self.navigationController?.pushViewController(vc, animated: true)
         } else {
