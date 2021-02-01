@@ -163,14 +163,23 @@ class TechnieFeedVC: UIViewController {
         setupViews()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        UIView.animate(withDuration: 0.8, delay: 0.5, usingSpringWithDamping: 1.0, initialSpringVelocity: 0, options: .transitionCrossDissolve, animations: { [weak self] in
+            guard let self = self else { return }
+            self.tabBarController?.setTabBar(hidden: false, animated: true, along: nil)
+
+        }, completion: nil)
+        
+    }
+    
     // MARK: - Methods
     fileprivate func setupViews(){
         [tableView, searchResultView].forEach {view.addSubview($0)}
         
-        tableView.anchor(top: view.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor)
-        
+        guard let tabHeight = tabBarController?.tabBar.frame.height else { return } // SafeAreaPadding
+        tableView.anchor(top: view.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor, padding: UIEdgeInsets(top: 0, left: 0, bottom: tabHeight, right: 0))
 //        guard let navBarHeight = navigationController?.navigationBar.frame.height else { return }
-        
         searchResultView.anchor(top: view.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor, padding: UIEdgeInsets(top: 0 , left: 0, bottom: 0, right: 0))
     }
     

@@ -47,8 +47,11 @@ class JobDetailsVC: UIViewController {
         frame.size.height = .leastNormalMagnitude
         tv.tableHeaderView = UIView(frame: frame)
         tv.tableFooterView = UIView(frame: frame)
-        tv.contentInsetAdjustmentBehavior = .never
-        
+//        tv.contentInsetAdjustmentBehavior = .never
+//        if let tabHeight = tabBarController?.tabBar.frame.height {
+//            tv.contentInset = .init(top: 0, left: 0, bottom: tabHeight, right: 0)
+//        }
+
         tv.delegate = self
         tv.dataSource = self
         tv.register(JobDetailTVCell0.self, forCellReuseIdentifier: JobDetailTVCell0.cellID)
@@ -76,6 +79,7 @@ class JobDetailsVC: UIViewController {
         return btn
     }()
     
+    
     lazy var startAChatBtn: UIButton = {
         let btn = UIButton(type: .system)
         btn.translatesAutoresizingMaskIntoConstraints = false
@@ -93,9 +97,8 @@ class JobDetailsVC: UIViewController {
         stack.axis = .horizontal
         stack.spacing = 8
         stack.distribution = .fillProportionally
-        
-        stack.withWidth(view.frame.width - 100)
-        stack.withHeight(30)
+//        stack.withWidth(view.frame.width - 100)
+//        stack.withHeight(30)
         return stack
     }()
     
@@ -125,6 +128,14 @@ class JobDetailsVC: UIViewController {
         return stack
     }()
     
+   
+    let visualEffectView: UIVisualEffectView = {
+        let blurEffect = UIBlurEffect(style: .systemUltraThinMaterialLight)
+        let view = UIVisualEffectView(effect: blurEffect)
+        view.autoresizingMask = [.flexibleHeight, .flexibleWidth]
+        return view
+    }()
+    
     // MARK: - Init
     override func loadView() {
         super.loadView()
@@ -142,33 +153,42 @@ class JobDetailsVC: UIViewController {
         super.viewWillDisappear(animated)
         // Do any additional setup after loading the view.
 //        self.tabBarController?.setTabBar(hidden: false, animated: true, along: nil)
-        toolBar.fadeOut()
+        closeSelectionBar()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         // Do any additional setup after loading the view.
-        toolBar.fadeIn()
-//        self.tabBarController?.setTabBar(hidden: true, animated: true, along: nil)
+        self.tabBarController?.setTabBar(hidden: true, animated: true, along: nil)
+        presentSelectionBar()
     }
     
+    var dynamicBottomConstraint: NSLayoutConstraint?
+    private func bottomConstraint(view: UIView) -> NSLayoutConstraint {
+        guard let superview = view.superview else {
+            return NSLayoutConstraint()
+        }
+
+        for constraint in superview.constraints {
+            for bottom in [NSLayoutConstraint.Attribute.bottom, NSLayoutConstraint.Attribute.bottomMargin] {
+                if constraint.firstAttribute == bottom && constraint.isActive && view == constraint.secondItem as? UIView {
+                    return constraint
+                }
+
+                if constraint.secondAttribute == bottom && constraint.isActive && view == constraint.firstItem as? UIView {
+                    return constraint
+                }
+            }
+        }
+
+        return NSLayoutConstraint()
+    }
     // MARK: - Methods
     func setupViews() {
-        [tableView, toolBar].forEach { view.addSubview($0)}
-        tableView.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.leadingAnchor, bottom: toolBar.topAnchor, trailing: view.trailingAnchor)
-        toolBar.anchor(top: nil, leading: view.leadingAnchor, bottom: view.safeAreaLayoutGuide.bottomAnchor, trailing: view.trailingAnchor, size: CGSize(width: 0, height: 44))
-        
-//        toolBar = UIToolbar.init(frame: CGRect.init(x: 0, y: 0, width: UIScreen.main.bounds.size.width, height: 35))
+        [tableView].forEach { view.addSubview($0)}
+        guard let tabHeight = tabBarController?.tabBar.frame.height else { return } // SafeAreaPadding
+        tableView.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor, padding: UIEdgeInsets(top: 0, left: 0, bottom: tabHeight, right: 0))
 
-        toolBar.addSubview(proposalAndStartAChatBtnStack)
-        
-        NSLayoutConstraint.activate([
-//            proposalAndStartAChatBtnStack.centerYAnchor.constraint(equalTo: toolBar.centerYAnchor),
-            proposalAndStartAChatBtnStack.centerXAnchor.constraint(equalTo: toolBar.centerXAnchor),
-            proposalAndStartAChatBtnStack.topAnchor.constraint(equalTo: toolBar.topAnchor, constant: 10)
-        ])
-
-//        toolBar = UIToolbar.init(frame: CGRect.init(x: 0, y: 0, width: UIScreen.main.bounds.size.width, height: 35))
         setupNavBar()
     }
     
@@ -177,6 +197,55 @@ class JobDetailsVC: UIViewController {
 //        navigationItem.title = "Job Details"
         navigationItem.largeTitleDisplayMode = .never
         navigationItem.titleView = navBarTitleStackView
+    }
+    
+    fileprivate func presentSelectionBar() {
+        let screenSize = UIScreen.main.bounds.size
+        guard let tabHeight = tabBarController?.tabBar.frame.height else { return }
+        // window
+        guard let window = UIApplication.shared.windows.filter({$0.isKeyWindow}).first else { return }
+        // visualEffectView
+        visualEffectView.frame = CGRect(x: 0, y: screenSize.height, width: screenSize.width, height: tabHeight)
+        window.addSubview(visualEffectView)
+
+        visualEffectView.contentView.addSubview(proposalAndStartAChatBtnStack)
+        NSLayoutConstraint.activate([
+            proposalAndStartAChatBtnStack.topAnchor.constraint(equalTo: visualEffectView.contentView.topAnchor, constant: 15),
+            proposalAndStartAChatBtnStack.centerXAnchor.constraint(equalTo: visualEffectView.contentView.centerXAnchor),
+            proposalAndStartAChatBtnStack.widthAnchor.constraint(equalToConstant: view.frame.width - 100),
+            proposalAndStartAChatBtnStack.heightAnchor.constraint(equalToConstant: 30)
+        ])
+        
+        UIView.animate(withDuration: 0.5, delay: 0.15, usingSpringWithDamping: 1.0, initialSpringVelocity: 0, options: .transitionCrossDissolve, animations: { [weak self] in
+            guard let self = self else { return }
+
+//            self.proposalAndStartAChatBtnStack.frame = CGRect(x: 0, y: -(screenSize.height - tabHeight), width: screenSize.width, height: tabHeight)
+            self.visualEffectView.frame = CGRect(x: 0, y: screenSize.height - tabHeight, width: screenSize.width, height: tabHeight)
+            
+            self.visualEffectView.isHidden = false
+            self.proposalAndStartAChatBtnStack.isHidden = false
+            self.proposalAndStartAChatBtnStack.fadeIn()
+        }, completion: nil)
+    }
+    
+    fileprivate func closeSelectionBar() {
+        self.proposalAndStartAChatBtnStack.isHidden = true
+        self.visualEffectView.isHidden = true
+        
+        let screenSize = UIScreen.main.bounds.size
+        guard let tabHeight = tabBarController?.tabBar.frame.height else { return }
+
+        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0, options: .transitionCrossDissolve, animations: { [weak self] in
+            guard let self = self else { return }
+
+            self.proposalAndStartAChatBtnStack.frame = CGRect(x: 0, y: (screenSize.height - tabHeight)/0.9, width: screenSize.width , height: 0.35)
+            self.visualEffectView.frame = CGRect(x: 0, y: (screenSize.height - tabHeight)/0.9, width: screenSize.width, height: tabHeight)
+            self.proposalAndStartAChatBtnStack.fadeOut()
+            
+        }) { (_) in
+            self.proposalAndStartAChatBtnStack.removeFromSuperview()
+            self.visualEffectView.removeFromSuperview()
+        }
     }
     
     // MARK: - Selectors
@@ -241,6 +310,7 @@ extension JobDetailsVC: TableViewDataSourceAndDelegate {
             return UITableViewCell()
         }
     }
+    
     
     func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
         // remove bottom extra 20px space.

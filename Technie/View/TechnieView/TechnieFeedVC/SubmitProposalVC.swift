@@ -86,7 +86,7 @@ class SubmitProposalVC: UIViewController, UITextViewDelegate {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         // Do any additional setup after loading the view.
-//        self.tabBarController?.setTabBar(hidden: true, animated: true, along: nil)
+        self.tabBarController?.setTabBar(hidden: true, animated: true, along: nil)
     }
     
     // MARK: - Methods
@@ -101,6 +101,7 @@ class SubmitProposalVC: UIViewController, UITextViewDelegate {
         guard let navBar = navigationController?.navigationBar else { return }
         navBar.topItem?.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
 //        navBar.setBackgroundImage(UIImage(), for: .default)
+        navigationItem.title = "Submission"
     }
     
     func presentDoneSubmissionAlertSheet() {
@@ -125,15 +126,24 @@ class SubmitProposalVC: UIViewController, UITextViewDelegate {
 
 // MARK: - Extension
 extension SubmitProposalVC: TableViewDataSourceAndDelegate {
+    
     func textViewDidChange(_ textView: UITextView) {
+        
         tableView.beginUpdates()
         tableView.endUpdates()
+        
+        if !textView.text.replacingOccurrences(of: " ", with: "").isEmpty {
+            placeHolderLabel.fadeOut()
+            placeHolderLabel.isHidden = true
+        } else {
+            placeHolderLabel.isHidden = false
+            placeHolderLabel.fadeIn()
+        }
     }
     
-    func textViewDidBeginEditing(_ textView: UITextView) {
-        placeHolderLabel.fadeOut()
-        placeHolderLabel.isHidden = true
-    }
+//    func textViewDidBeginEditing(_ textView: UITextView) {
+//
+//    }
     
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
@@ -153,7 +163,7 @@ extension SubmitProposalVC: TableViewDataSourceAndDelegate {
             
             coverLetterTextField.anchor(top: txtLabel.bottomAnchor, leading: cell.contentView.leadingAnchor, bottom: cell.contentView.bottomAnchor, trailing: cell.contentView.trailingAnchor, padding: UIEdgeInsets(top: 10, left: 20, bottom: 10, right: 20), size: CGSize(width: 0, height: 0))
             
-            placeHolderLabel.anchor(top: coverLetterTextField.topAnchor, leading: cell.contentView.leadingAnchor, bottom: coverLetterTextField.bottomAnchor, trailing: cell.contentView.trailingAnchor, padding: UIEdgeInsets(top: 0, left: 30, bottom: 0, right: 0), size: CGSize(width: 0, height: 0))
+            placeHolderLabel.anchor(top: coverLetterTextField.topAnchor, leading: cell.contentView.leadingAnchor, bottom: coverLetterTextField.bottomAnchor, trailing: cell.contentView.trailingAnchor, padding: UIEdgeInsets(top: 0, left: 25, bottom: 0, right: 0), size: CGSize(width: 0, height: 0))
         case 1:
             cell.contentView.addSubview(proposalBtn)
 //            proposalBtn.centerXAnchor.constraint(equalTo: cell.contentView.centerXAnchor).isActive = true
@@ -161,7 +171,7 @@ extension SubmitProposalVC: TableViewDataSourceAndDelegate {
 ////            proposalBtn.heightAnchor.constraint(equalToConstant: view.frame.width - 100).isActive = true
 //            proposalBtn.widthAnchor.constraint(equalToConstant: view.frame.width - 100).isActive = true
             
-            proposalBtn.anchor(top: cell.contentView.topAnchor, leading: cell.contentView.leadingAnchor, bottom: cell.contentView.bottomAnchor, trailing: cell.contentView.trailingAnchor, padding: UIEdgeInsets(top: 10, left: 20, bottom: 10, right: 20), size: CGSize(width: 0, height: 0))
+            proposalBtn.anchor(top: cell.contentView.topAnchor, leading: cell.contentView.leadingAnchor, bottom: cell.contentView.bottomAnchor, trailing: cell.contentView.trailingAnchor, padding: UIEdgeInsets(top: 10, left: 20, bottom: 10, right: 20), size: CGSize(width: 0, height: 35))
         default:
             break
         }
@@ -170,13 +180,13 @@ extension SubmitProposalVC: TableViewDataSourceAndDelegate {
         return cell
     }
     
-//    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-//        if indexPath.row == 0 {
-//            return UITableView.automaticDimension
-//        }
-//
-//        return 0
-//    }
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        if indexPath.row == 1 {
+            return 55
+        }
+
+        return UITableView.automaticDimension
+    }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         return "Aditional details"
