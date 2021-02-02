@@ -22,7 +22,9 @@ class PostFormVC: UIViewController {
         tv.translatesAutoresizingMaskIntoConstraints = false
         tv.backgroundColor = .white
         tv.tableFooterView = UIView()
-        
+        // Set automatic dimensions for row height
+        tv.rowHeight = UITableView.automaticDimension
+        tv.estimatedRowHeight = UITableView.automaticDimension
         //        tv.isScrollEnabled = false
         tv.showsVerticalScrollIndicator = false
 //        tv.rowHeight = 40
@@ -274,6 +276,32 @@ class PostFormVC: UIViewController {
         actionSheet.fixActionSheetConstraintsError()
     }
     
+    func handleTitleTextFieldPlaceHolder(_ textView: UITextView) {
+        tableView.beginUpdates()
+        tableView.endUpdates()
+        
+        if !textView.text.replacingOccurrences(of: " ", with: "").isEmpty && !titleTextField.text.replacingOccurrences(of: " ", with: "").isEmpty{
+            titlePlaceHolderLabel.fadeOut()
+            titlePlaceHolderLabel.isHidden = true
+        } else {
+            titlePlaceHolderLabel.isHidden = false
+            titlePlaceHolderLabel.fadeIn()
+        }
+    }
+    
+    func handleDescriptionTextFieldPlaceHolder(_ textView: UITextView) {
+        tableView.beginUpdates()
+        tableView.endUpdates()
+        
+        if !textView.text.replacingOccurrences(of: " ", with: "").isEmpty && !descriptionTextField.text.replacingOccurrences(of: " ", with: "").isEmpty{
+            descriptionPlaceHolderLabel.fadeOut()
+            descriptionPlaceHolderLabel.isHidden = true
+        } else {
+            descriptionPlaceHolderLabel.isHidden = false
+            descriptionPlaceHolderLabel.fadeIn()
+        }
+    }
+    
     // MARK: - Selectors
     @objc fileprivate func rightNavBarBtnTapped() {
         dismiss(animated: true, completion: nil)
@@ -323,7 +351,48 @@ class PostFormVC: UIViewController {
         presentActionSheet()
     }
     
+   lazy var descriptionPlaceHolderLabel: UILabel = {
+       let lbl = UILabel()
+       lbl.translatesAutoresizingMaskIntoConstraints = false
+       lbl.text = "Description"
+       lbl.textColor = .systemGray
+       lbl.font = .systemFont(ofSize: 15)
+       return lbl
+   }()
+   
+   lazy var descriptionTextField: UITextView = {
+       let txtView = UITextView()
+       txtView.delegate = self
+//        txtView.translatesAutoresizingMaskIntoConstraints = false
+    txtView.backgroundColor = .systemBackground//UIColor(named: "textViewBackgroundColor")
+       txtView.clipsToBounds = true
+//                    txtView.layer.cornerRadius = 10
+       txtView.isEditable = true
+       txtView.isScrollEnabled = false
+       return txtView
+   }()
     
+
+    lazy var titlePlaceHolderLabel: UILabel = {
+       let lbl = UILabel()
+       lbl.translatesAutoresizingMaskIntoConstraints = false
+       lbl.text = "Title"
+       lbl.textColor = .systemGray
+       lbl.font = .systemFont(ofSize: 15)
+       return lbl
+   }()
+   
+    lazy var titleTextField: UITextView = {
+       let txtView = UITextView()
+       txtView.delegate = self
+//        txtView.translatesAutoresizingMaskIntoConstraints = false
+        txtView.backgroundColor = .systemBackground//UIColor(named: "textViewBackgroundColor")
+       txtView.clipsToBounds = true
+//                    txtView.layer.cornerRadius = 10
+       txtView.isEditable = true
+       txtView.isScrollEnabled = false
+       return txtView
+   }()
 }
 
 // MARK: - SkillSelectionVCSingleton Extension
@@ -451,7 +520,12 @@ extension PostFormVC: SkillSelectionVCDelegate {
 } // End of SkillSelectionVCSingleton Extension
 
 // MARK: - TableViewDataSourceAndDelegate Extension
-extension PostFormVC: TableViewDataSourceAndDelegate {
+extension PostFormVC: TableViewDataSourceAndDelegate, UITextViewDelegate {
+    
+    func textViewDidChange(_ textView: UITextView) {
+        handleDescriptionTextFieldPlaceHolder(textView)
+        handleTitleTextFieldPlaceHolder(textView)
+    }
     
     func numberOfSections(in tableView: UITableView) -> Int {
         return sections.count
@@ -507,22 +581,18 @@ extension PostFormVC: TableViewDataSourceAndDelegate {
 
             switch indexPath.row {
             case 0:
-                let projectTitleTextField = UITextField()
-                projectTitleTextField.placeholder = "Title"
-                projectTitleTextField.backgroundColor = .white
+                [titleTextField, titlePlaceHolderLabel].forEach{cell.contentView.addSubview($0)}
+                titleTextField.anchor(top: cell.contentView.topAnchor, leading: cell.contentView.leadingAnchor, bottom: cell.contentView.bottomAnchor, trailing: cell.contentView.trailingAnchor, padding: UIEdgeInsets(top: 0, left: cell.separatorInset.left, bottom: 0, right: cell.separatorInset.left))
                 
-                cell.addSubview(projectTitleTextField)
-                //                cell.sendSubviewToBack(viewC)
-                projectTitleTextField.anchor(top: cell.topAnchor, leading: cell.textLabel?.leadingAnchor, bottom: cell.bottomAnchor, trailing: cell.textLabel?.trailingAnchor)
-//                projectTitleTextField.backgroundColor = .red
+                titlePlaceHolderLabel.anchor(top: titleTextField.topAnchor, leading: titleTextField.leadingAnchor, bottom: titleTextField.bottomAnchor, trailing: cell.contentView.trailingAnchor, padding: UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 0))
+                
             case 1:
-                let projectDescriptionTextField = UITextField()
-                projectDescriptionTextField.placeholder = "Description"
-                projectDescriptionTextField.backgroundColor = .white
+               
+                [descriptionTextField, descriptionPlaceHolderLabel].forEach{cell.contentView.addSubview($0)}
+                descriptionTextField.anchor(top: cell.contentView.topAnchor, leading: cell.contentView.leadingAnchor, bottom: cell.contentView.bottomAnchor, trailing: cell.contentView.trailingAnchor, padding: UIEdgeInsets(top: 0, left: cell.separatorInset.left, bottom: 0, right: 0))
                 
-                cell.addSubview(projectDescriptionTextField)
-                //                cell.sendSubviewToBack(viewC)
-                projectDescriptionTextField.anchor(top: cell.topAnchor, leading: cell.textLabel?.leadingAnchor, bottom: cell.bottomAnchor, trailing: cell.textLabel?.trailingAnchor)
+                descriptionPlaceHolderLabel.anchor(top: descriptionTextField.topAnchor, leading: descriptionTextField.leadingAnchor, bottom: descriptionTextField.bottomAnchor, trailing: cell.contentView.trailingAnchor, padding: UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 0), size: CGSize(width: 0, height: 0))
+                
             case 2:
                 cell.setupViews()
                 cell.attachFileBtn.addTarget(self, action: #selector(attachFileBtnTapped), for: .touchUpInside)
@@ -612,13 +682,13 @@ extension PostFormVC: TableViewDataSourceAndDelegate {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        
+
         switch indexPath.section {
         case 0:
             if indexPath.row >= 3 {
                 return 60
             }
-            return 40
+            return UITableView.automaticDimension
         case 1:
             return 60
         case 2:

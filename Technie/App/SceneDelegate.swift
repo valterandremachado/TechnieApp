@@ -21,7 +21,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         
         //Main ViewController
-        let mainVC = TechnieTabController()
+        let mainVC = ClientTabController()
         
         // Window setup
         window = UIWindow(frame: windowScene.coordinateSpace.bounds)

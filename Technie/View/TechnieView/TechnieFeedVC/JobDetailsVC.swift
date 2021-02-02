@@ -195,6 +195,7 @@ class JobDetailsVC: UIViewController {
     func setupNavBar() {
         guard let navBar = navigationController?.navigationBar else { return }
 //        navigationItem.title = "Job Details"
+        navBar.topItem?.backBarButtonItem = UIBarButtonItem(title: "Feeds", style: .plain, target: self, action: nil)
         navigationItem.largeTitleDisplayMode = .never
         navigationItem.titleView = navBarTitleStackView
     }

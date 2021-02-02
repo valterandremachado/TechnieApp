@@ -212,6 +212,12 @@ class TechnieFeedVC: UIViewController {
         
     }
     
+    fileprivate func presentSearchResults(_ searchedString: String) {
+        let vc = SearchResultsVC()
+        vc.title = "\(searchedString) results".lowercased()
+        navigationController?.pushViewController(vc, animated: true)
+    }
+    
     // MARK: - Selectors
     @objc fileprivate func leftBarItemPressed(){
         let userProfileVC = UserProfileVC()
@@ -240,6 +246,11 @@ extension TechnieFeedVC: UISearchBarDelegate {
 //    func presentSearchController(_ searchController: UISearchController) {
 //        searchController.searchBar.becomeFirstResponder()
 //    }
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.searchTextField.autocapitalizationType = .none
+        guard let searchedString = searchBar.text else { return }
+        presentSearchResults(searchedString)
+    }
 }
 
 // MARK: - TableViewDelegateAndDataSource Extension
@@ -299,6 +310,10 @@ extension TechnieFeedVC: CollectionDataSourceAndDelegate {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         print("didSelectItemAt: \(indexPath.row)")
+        let vc = SearchResultsVC()
+        vc.title = "\(professionArray[indexPath.item]) job results".lowercased()
+        navigationController?.pushViewController(vc, animated: true)
+//        presentSearchResults()
     }
     
     // CollectionView layouts
