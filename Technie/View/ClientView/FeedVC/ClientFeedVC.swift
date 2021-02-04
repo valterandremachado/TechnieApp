@@ -302,7 +302,7 @@ extension ClientFeedVC: CollectionDataSourceAndDelegate {
         case true:
             print("resultView Showing now")
         case false:
-            let vc = NearbyDetailVC()
+            let vc = TechnicianProfileDetailsVC()
             navigationController?.pushViewController(vc, animated: true)
         }
         

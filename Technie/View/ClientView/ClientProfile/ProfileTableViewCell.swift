@@ -9,6 +9,8 @@ import UIKit
 
 class ProfileTableViewCell: UITableViewCell {
 
+    static let cellID = "ProfileTableViewCellID"
+
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
 //        backgroundColor = .white

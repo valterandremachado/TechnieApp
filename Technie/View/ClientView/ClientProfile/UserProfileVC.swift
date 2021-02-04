@@ -8,9 +8,7 @@
 import UIKit
 
 class UserProfileVC: UIViewController {
-    
-    private let tableViewID = "cellID"
-    
+        
     let stringArray = ["Lalala", "Lalala", "Lalala", "Lalala", "Lalala", "Lalala", "Lalala", "Lalala"]
     let detailArray = ["LalalaLalalaLalala", "LalalaLalalaLalala", "LalalaLalalaLalala", "LalalaLalalaLalala", "LalalaLalalaLalala", "LalalaLalalaLalala", "LalalaLalalaLalala", "LalalaLalalaLalala"]
     let imageArray = ["person.crop.circle.fill", "person.crop.circle.fill", "person.crop.circle.fill", "person.crop.circle.fill", "person.crop.circle.fill", "person.crop.circle.fill", "person.crop.circle.fill", "person.crop.circle.fill"]
@@ -38,7 +36,7 @@ class UserProfileVC: UIViewController {
         
         tv.delegate = self
         tv.dataSource = self
-        tv.register(ProfileTableViewCell.self, forCellReuseIdentifier: tableViewID)
+        tv.register(ProfileTableViewCell.self, forCellReuseIdentifier: ProfileTableViewCell.cellID)
         return tv
     }()
     
@@ -140,9 +138,9 @@ extension UserProfileVC: TableViewDataSourceAndDelegate {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        var cell = tableView.dequeueReusableCell(withIdentifier: tableViewID, for: indexPath) as! ProfileTableViewCell
+        var cell = tableView.dequeueReusableCell(withIdentifier: ProfileTableViewCell.cellID, for: indexPath) as! ProfileTableViewCell
         // Enables detailTextLabel visibility
-        cell = ProfileTableViewCell(style: .subtitle, reuseIdentifier: tableViewID)
+        cell = ProfileTableViewCell(style: .subtitle, reuseIdentifier: ProfileTableViewCell.cellID)
         cell.backgroundColor = UIColor.rgb(red: 235, green: 235, blue: 235)
 
         let lastRowIndex = tableView.numberOfRows(inSection: tableView.numberOfSections-1)
