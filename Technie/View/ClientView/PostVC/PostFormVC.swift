@@ -231,7 +231,7 @@ class PostFormVC: UIViewController {
 //        navBar.setBackgroundImage(UIImage(), for: .default)
 //        navBar.hideNavBarSeperator()
         navBar.topItem?.backBarButtonItem = backButton
-
+        title = "Completion Form"
 //        navBar.topItem?.title = "Add Skills"
 //        navBar.prefersLargeTitles = true
 //        navigationItem.largeTitleDisplayMode = .automatic

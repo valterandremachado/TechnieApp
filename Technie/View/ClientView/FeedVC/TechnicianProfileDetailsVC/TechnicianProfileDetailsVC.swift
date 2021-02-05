@@ -54,7 +54,7 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         lbl.translatesAutoresizingMaskIntoConstraints = false
         lbl.text = " 4.5 (40)"//★
         lbl.textColor = UIColor(named: "LabelPrimaryAppearance")
-
+//        lbl.textAlignment = .left
         return lbl
     }()
     
@@ -67,10 +67,11 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         iconIV.image = wiredProfileImage
         
         let sv = UIStackView(arrangedSubviews: [iconIV, ratingAndReviewsLabel])
+        sv.translatesAutoresizingMaskIntoConstraints = false
         sv.axis = .horizontal
-        sv.spacing = 2
-        sv.alignment = .leading
-        sv.distribution = .fill
+        sv.spacing = 0
+        sv.alignment = .center
+        sv.distribution = .fillProportionally
 //        sv.addBackground(color: .red)
         return sv
     }()
@@ -122,28 +123,7 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
     lazy var switchableContainerView: UIView = {
         let view = UIView()
 //        view.frame.size = contentViewSize
-        view.backgroundColor = .green
-        return view
-    }()
-    
-    lazy var switchableContainerView2: UIView = {
-        let view = UIView()
-//        view.frame.size = contentViewSize
-        view.backgroundColor = .green
-        return view
-    }()
-    
-    lazy var switchableContainerView3: UIView = {
-        let view = UIView()
-//        view.frame.size = contentViewSize
-        view.backgroundColor = .red
-        return view
-    }()
-    
-    lazy var switchableContainerView4: UIView = {
-        let view = UIView()
-//        view.frame.size = contentViewSize
-        view.backgroundColor = .red
+        view.backgroundColor = .systemBackground
         return view
     }()
     
@@ -151,7 +131,7 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
     
     var sectionSetter = [SectionHandler]()
     
-    lazy var tableView: UITableView = {
+    lazy var aboutTableView: UITableView = {
         let tv = UITableView(frame: .zero, style: .insetGrouped)
         tv.translatesAutoresizingMaskIntoConstraints = false
         tv.backgroundColor = .clear
@@ -164,6 +144,7 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         tv.estimatedRowHeight = UITableView.automaticDimension
 //        tv.layer.cornerRadius = 18
         tv.clipsToBounds = true
+        tv.contentInset = UIEdgeInsets(top: -25, left: 0, bottom: 0, right: 0)
 
         var frame = CGRect.zero
         frame.size.height = .leastNormalMagnitude
@@ -177,6 +158,76 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         return tv
     }()
     
+    lazy var reviewsTableView: UITableView = {
+        let tv = UITableView(frame: .zero, style: .insetGrouped)
+        tv.translatesAutoresizingMaskIntoConstraints = false
+        tv.backgroundColor = .clear
+        
+//        tv.isScrollEnabled = false
+        tv.showsVerticalScrollIndicator = false
+//        tv.rowHeight = 40
+        // Set automatic dimensions for row height
+        tv.rowHeight = UITableView.automaticDimension
+        tv.estimatedRowHeight = UITableView.automaticDimension
+//        tv.layer.cornerRadius = 18
+        tv.clipsToBounds = true
+        tv.contentInset = UIEdgeInsets(top: -25, left: 0, bottom: 0, right: 0)
+
+        var frame = CGRect.zero
+        frame.size.height = .leastNormalMagnitude
+        tv.tableHeaderView = UIView(frame: frame)
+        tv.tableFooterView = UIView(frame: frame)
+//        tv.contentInsetAdjustmentBehavior = .never
+        
+        tv.delegate = self
+        tv.dataSource = self
+        tv.register(ReviewsCell.self, forCellReuseIdentifier: ReviewsCell.cellID)
+        return tv
+    }()
+    
+    lazy var hireBtn: UIButton = {
+        let btn = UIButton(type: .system)
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        btn.setTitle("Hire Valter", for: .normal)
+//        btn.contentHorizontalAlignment = .left
+        btn.layer.cornerRadius = 10
+        btn.clipsToBounds = true
+        btn.backgroundColor = .cyan
+//        btn.withWidth(180)
+//        btn.addTarget(self, action: #selector(proposalBtnPressed), for: .touchUpInside)
+        return btn
+    }()
+    
+    
+    lazy var startAChatBtn: UIButton = {
+        let btn = UIButton(type: .system)
+        btn.translatesAutoresizingMaskIntoConstraints = false
+//        btn.setTitle("Chat Me", for: .normal)
+        btn.setImage(UIImage(systemName: "bubble.left.and.bubble.right.fill"), for: .normal)
+        btn.contentHorizontalAlignment = .right
+//        btn.backgroundColor = .cyan
+        btn.withWidth(45)
+        return btn
+    }()
+    
+    lazy var hireAndStartAChatBtnStack: UIStackView = {
+        let stack = UIStackView(arrangedSubviews: [hireBtn, startAChatBtn])
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        stack.axis = .horizontal
+        stack.spacing = 8
+        stack.distribution = .fillProportionally
+//        stack.withWidth(view.frame.width - 100)
+//        stack.withHeight(30)
+        return stack
+    }()
+    
+    let visualEffectView: UIVisualEffectView = {
+        let blurEffect = UIBlurEffect(style: .systemUltraThinMaterialLight)
+        let view = UIVisualEffectView(effect: blurEffect)
+        view.autoresizingMask = [.flexibleHeight, .flexibleWidth]
+        return view
+    }()
+    
     // MARK: - Inits
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -187,10 +238,24 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         populateSections()
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        // Do any additional setup after loading the view.
+        self.tabBarController?.setTabBar(hidden: false, animated: true, along: nil)
+        closeSelectionBar()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        // Do any additional setup after loading the view.
+        self.tabBarController?.setTabBar(hidden: true, animated: true, along: nil)
+        presentSelectionBar()
+    }
+    
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
         let heights = profileImageView.frame.height
-            + tableView.frame.height
+            + aboutTableView.frame.height
             + mainStackView.frame.height
             + customSegmentedControl.frame.height
             + switchableContainerView.frame.height
@@ -217,7 +282,7 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         super.didReceiveMemoryWarning()
     }
     
-    var dynamicHeight: NSLayoutConstraint?
+//    var dynamicHeight: NSLayoutConstraint?
     // MARK: - Methods
     fileprivate func setupViews() {
         view.addSubview(scrollView)
@@ -245,21 +310,8 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         customSegmentedControl.anchor(top: mainStackView.bottomAnchor, leading: mainContainerView.leadingAnchor, bottom: nil, trailing: mainContainerView.trailingAnchor, padding: UIEdgeInsets(top: 12, left: 15, bottom: 0, right: 15), size: CGSize(width: 0, height: 30))
         
         switchableContainerView.anchor(top: customSegmentedControl.bottomAnchor, leading: mainContainerView.leadingAnchor, bottom: mainContainerView.bottomAnchor, trailing: mainContainerView.trailingAnchor, padding: UIEdgeInsets(top: 10, left: 0, bottom: 0, right: 0), size: CGSize(width: 0, height: 0))
-//        switchableContainerView2.anchor(top: switchableContainerView.bottomAnchor, leading: mainContainerView.leadingAnchor, bottom: nil, trailing: mainContainerView.trailingAnchor, padding: UIEdgeInsets(top: 10, left: 0, bottom: 0, right: 0), size: CGSize(width: 0, height: 200))
-//        switchableContainerView3.anchor(top: switchableContainerView2.bottomAnchor, leading: mainContainerView.leadingAnchor, bottom: nil, trailing: mainContainerView.trailingAnchor, padding: UIEdgeInsets(top: 10, left: 0, bottom: 0, right: 0), size: CGSize(width: 0, height: 200))
-//        switchableContainerView4.anchor(top: switchableContainerView3.bottomAnchor, leading: mainContainerView.leadingAnchor, bottom: mainContainerView.bottomAnchor, trailing: mainContainerView.trailingAnchor, padding: UIEdgeInsets(top: 10, left: 0, bottom: 0, right: 0), size: CGSize(width: 0, height: 200))
-        
-//        let heights = profileImageView.frame.height
-//            + mainStackView.frame.height
-//            + customSegmentedControl.frame.height
-//            + switchableContainerView.frame.height
-//            + switchableContainerView2.frame.height
-//            + switchableContainerView3.frame.height
-//        contentViewSize.height = view.frame.height + heights
-        
-//        scrollView.withHeight(heights)
-        view.layoutIfNeeded()
 
+//        view.layoutIfNeeded()
         setupNavBar()
     }
     
@@ -271,6 +323,54 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
 //        navigationItem.title = "Submission"
     }
     
+    fileprivate func presentSelectionBar() {
+        let screenSize = UIScreen.main.bounds.size
+        guard let tabHeight = tabBarController?.tabBar.frame.height else { return }
+        // window
+        guard let window = UIApplication.shared.windows.filter({$0.isKeyWindow}).first else { return }
+        // visualEffectView
+        visualEffectView.frame = CGRect(x: 0, y: screenSize.height, width: screenSize.width, height: tabHeight)
+        window.addSubview(visualEffectView)
+
+        visualEffectView.contentView.addSubview(hireAndStartAChatBtnStack)
+        NSLayoutConstraint.activate([
+            hireAndStartAChatBtnStack.topAnchor.constraint(equalTo: visualEffectView.contentView.topAnchor, constant: 15),
+            hireAndStartAChatBtnStack.centerXAnchor.constraint(equalTo: visualEffectView.contentView.centerXAnchor),
+            hireAndStartAChatBtnStack.widthAnchor.constraint(equalToConstant: view.frame.width - 100),
+            hireAndStartAChatBtnStack.heightAnchor.constraint(equalToConstant: 30)
+        ])
+        
+        UIView.animate(withDuration: 0.5, delay: 0.15, usingSpringWithDamping: 1.0, initialSpringVelocity: 0, options: .transitionCrossDissolve, animations: { [weak self] in
+            guard let self = self else { return }
+
+//            self.proposalAndStartAChatBtnStack.frame = CGRect(x: 0, y: -(screenSize.height - tabHeight), width: screenSize.width, height: tabHeight)
+            self.visualEffectView.frame = CGRect(x: 0, y: screenSize.height - tabHeight, width: screenSize.width, height: tabHeight)
+            
+            self.visualEffectView.isHidden = false
+            self.hireAndStartAChatBtnStack.isHidden = false
+            self.hireAndStartAChatBtnStack.fadeIn()
+        }, completion: nil)
+    }
+    
+    fileprivate func closeSelectionBar() {
+        self.hireAndStartAChatBtnStack.isHidden = true
+        self.visualEffectView.isHidden = true
+        
+        let screenSize = UIScreen.main.bounds.size
+        guard let tabHeight = tabBarController?.tabBar.frame.height else { return }
+
+        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0, options: .transitionCrossDissolve, animations: { [weak self] in
+            guard let self = self else { return }
+
+            self.hireAndStartAChatBtnStack.frame = CGRect(x: 0, y: (screenSize.height - tabHeight)/0.9, width: screenSize.width , height: 0.35)
+            self.visualEffectView.frame = CGRect(x: 0, y: (screenSize.height - tabHeight)/0.9, width: screenSize.width, height: tabHeight)
+            self.hireAndStartAChatBtnStack.fadeOut()
+            
+        }) { (_) in
+            self.hireAndStartAChatBtnStack.removeFromSuperview()
+            self.visualEffectView.removeFromSuperview()
+        }
+    }
     
     fileprivate func populateSections() {
         sectionSetter.append(SectionHandler(title: "Summary", detail: ["Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus elit nisi, tempor at rhoncus id, porta tincidunt metus. Nulla dictum faucibus justo. Quisque non urna nec tortor cursus lobortis. Proin quis nunc nibh. Curabitur consequat gravida augue, vitae vestibulum sem eleifend ac. Maecenas facilisis molestie vehicula. Fusce pulvinar nisi a orci iaculis bibendum."]))
@@ -282,34 +382,58 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         // Add the VCs containterView to the switchableViews array
         switchableViews.append(AboutVC().view)
         switchableViews.append(ReviewsVC().view)
-
-//        for view in switchableViews {
-//            switchableContainerView.addSubview(view)
-//        }
         
         // removeFromSuperview the view that is not being displayed for a better memory efficiency
         switchableContainerView.addSubview(switchableViews[0])
         switchableViews[0].frame = switchableContainerView.bounds
-        switchableViews[0].addSubview(tableView)
-        tableView.contentInset = UIEdgeInsets(top: -20, left: 0, bottom: 0, right: 0)
-        tableView.anchor(top: switchableViews[0].topAnchor,
+        switchableViews[0].addSubview(aboutTableView)
+        aboutTableView.anchor(top: switchableViews[0].topAnchor,
                          leading: switchableViews[0].leadingAnchor,
                          bottom: switchableViews[0].bottomAnchor,
                          trailing: switchableViews[0].trailingAnchor)
-        switchableViews[1].removeFromSuperview()
+        
+        switchableViews[1].fadeOut()
+        // Using timer to avoid unsmooth fade animation caused by the same view that is being faded then later on removeFromSuperview
+        DispatchQueue.global().asyncAfter(deadline: .now() + .milliseconds(100)) { [self] in
+            DispatchQueue.main.async {
+                switchableViews[1].removeFromSuperview()
+            }
+        }
     }
     
     func change(to index: Int) {
         currentSegmentIndex = index
         print("segmentedControl index changed to \(index)")
-        //        UIView.animate(withDuration: 0.5, delay: 0.2, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.2, options: .transitionFlipFromLeft, animations: { [self] in
+
+        switchableViews[index].fadeOut()
         switchableContainerView.addSubview(switchableViews[index])
         switchableViews[index].frame = switchableContainerView.bounds
-//        switchableViews[index].frame.size = switchableContainerView.frame.size
-        //        switchableContainerView.bringSubviewToFront(switchableViews[index])
-        switchableViews[index == 1 ? (0) : (1)].removeFromSuperview()
-        //        }, completion: nil)
+        switchableViews[index].fadeIn()
         
+        switch currentSegmentIndex {
+        case 1:
+            [ratingAndReviewsStackView, reviewsTableView].forEach {switchableViews[currentSegmentIndex].addSubview($0)}
+            ratingAndReviewsStackView.anchor(top: switchableViews[currentSegmentIndex].topAnchor, leading: nil, bottom: nil, trailing: nil)
+            NSLayoutConstraint.activate([
+                ratingAndReviewsStackView.widthAnchor.constraint(equalToConstant: 95),
+                ratingAndReviewsStackView.heightAnchor.constraint(equalToConstant: 30),
+                ratingAndReviewsStackView.centerXAnchor.constraint(equalTo: switchableViews[currentSegmentIndex].centerXAnchor),
+            ])
+            
+            reviewsTableView.anchor(top: ratingAndReviewsStackView.bottomAnchor,
+                             leading: switchableViews[currentSegmentIndex].leadingAnchor,
+                             bottom: switchableViews[currentSegmentIndex].bottomAnchor,
+                             trailing: switchableViews[currentSegmentIndex].trailingAnchor)
+        default:
+            break
+        }
+        switchableViews[index == 1 ? (0) : (1)].fadeOut()
+        // Using timer to avoid unsmooth fade animation caused by the same view that is being faded then later on removeFromSuperview
+        DispatchQueue.global().asyncAfter(deadline: .now() + .milliseconds(100)) { [self] in
+            DispatchQueue.main.async {
+                switchableViews[index == 1 ? (0) : (1)].removeFromSuperview()
+            }
+        }
     }
     
     
@@ -320,24 +444,55 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
 extension TechnicianProfileDetailsVC: TableViewDataSourceAndDelegate {
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return sectionSetter.count
+        switch currentSegmentIndex {
+        case 0:
+            return sectionSetter.count
+        case 1:
+            return 1
+        default:
+            return sectionSetter.count
+        }
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return sectionSetter[section].sectionDetail.count
+        switch currentSegmentIndex {
+        case 0:
+            return sectionSetter[section].sectionDetail.count
+        case 1:
+            return 5
+        default:
+            return sectionSetter[section].sectionDetail.count
+        }
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: AboutCell.cellID, for: indexPath) as! AboutCell
-        let detailText = sectionSetter[indexPath.section].sectionDetail[indexPath.row]
-        
-        cell.textLabel?.numberOfLines = 0
-        cell.textLabel?.text = detailText
-        return cell
+
+        switch currentSegmentIndex {
+        case 0:
+            let cell = tableView.dequeueReusableCell(withIdentifier: AboutCell.cellID, for: indexPath) as! AboutCell
+            let detailText = sectionSetter[indexPath.section].sectionDetail[indexPath.row]
+            cell.textLabel?.numberOfLines = 0
+            cell.textLabel?.text = detailText
+            return cell
+        case 1:
+            let cell = tableView.dequeueReusableCell(withIdentifier: ReviewsCell.cellID, for: indexPath) as! ReviewsCell
+            cell.textLabel?.text = "detailText"
+            return cell
+        default:
+            return UITableViewCell()
+        }
+       
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return sectionSetter[section].sectionTitle
+        switch currentSegmentIndex {
+        case 0:
+            return sectionSetter[section].sectionTitle
+        case 1:
+            return "Reviews"
+        default:
+            return nil
+        }
     }
     
     func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {

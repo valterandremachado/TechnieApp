@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		8A00AB2925B981D000C250C4 /* LocationPickerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A00AB2825B981D000C250C4 /* LocationPickerVC.swift */; };
+		8A05765C25CD77390071FDD1 /* ReviewsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A05765B25CD77390071FDD1 /* ReviewsCell.swift */; };
+		8A05766125CD9E0A0071FDD1 /* FullRankingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A05766025CD9E0A0071FDD1 /* FullRankingCell.swift */; };
 		8A159DFD25B307D900D45C60 /* JobDetailCVCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A159DFC25B307D900D45C60 /* JobDetailCVCell.swift */; };
 		8A159E0225B316CC00D45C60 /* JobDetailTVCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A159E0125B316CC00D45C60 /* JobDetailTVCell.swift */; };
 		8A41E7A625B07AB500265D5C /* ActiveJobsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A41E7A525B07AB500265D5C /* ActiveJobsCell.swift */; };
@@ -134,6 +136,8 @@
 		3608D5D19A7FDEC3B4F67809 /* Pods_Technie.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Technie.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		583B6750D252DA954CA48DB6 /* Pods_Technie_TechnieUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Technie_TechnieUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8A00AB2825B981D000C250C4 /* LocationPickerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationPickerVC.swift; sourceTree = "<group>"; };
+		8A05765B25CD77390071FDD1 /* ReviewsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewsCell.swift; sourceTree = "<group>"; };
+		8A05766025CD9E0A0071FDD1 /* FullRankingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullRankingCell.swift; sourceTree = "<group>"; };
 		8A159DFC25B307D900D45C60 /* JobDetailCVCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobDetailCVCell.swift; sourceTree = "<group>"; };
 		8A159E0125B316CC00D45C60 /* JobDetailTVCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobDetailTVCell.swift; sourceTree = "<group>"; };
 		8A41E7A525B07AB500265D5C /* ActiveJobsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveJobsCell.swift; sourceTree = "<group>"; };
@@ -336,6 +340,8 @@
 				8AF76A85258B64FC00ED14C2 /* TechnieRankingCell.swift */,
 				8A8F854D258A3D0500C4CEF9 /* NearbyTechniesCell.swift */,
 				8A54D1A925CBFAEE00045D37 /* AboutCell.swift */,
+				8A05765B25CD77390071FDD1 /* ReviewsCell.swift */,
+				8A05766025CD9E0A0071FDD1 /* FullRankingCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -971,6 +977,7 @@
 				8AADFB7D25B58A2E00D3A5CC /* Chat.swift in Sources */,
 				8AC1B123258A2D8D000F2569 /* AppDelegate.swift in Sources */,
 				8AC93A9425B6EF3A00663BE3 /* ConversationsModels.swift in Sources */,
+				8A05766125CD9E0A0071FDD1 /* FullRankingCell.swift in Sources */,
 				8AF76A7A258B440D00ED14C2 /* MyActivityIndicator.swift in Sources */,
 				8A54D1A525CBEBA800045D37 /* ReviewsVC.swift in Sources */,
 				8AE258A6258A3156004EDB26 /* ClientTabController.swift in Sources */,
@@ -1020,6 +1027,7 @@
 				8A00AB2925B981D000C250C4 /* LocationPickerVC.swift in Sources */,
 				8ACD6AEE25C4384000CC057D /* PhotoCollectionViewerVC.swift in Sources */,
 				8AADFB9425B5A7E200D3A5CC /* ConversationsTVCell.swift in Sources */,
+				8A05765C25CD77390071FDD1 /* ReviewsCell.swift in Sources */,
 				8A76FA5F258DF2F40094C524 /* NearbyDetailVC.swift in Sources */,
 				8A6C839825CADA8B0082D51F /* TechnicianProfileDetailsVC.swift in Sources */,
 				8ADECCC425B026F600F871EF /* FeedsTVCell.swift in Sources */,

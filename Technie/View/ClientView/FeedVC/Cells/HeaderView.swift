@@ -12,7 +12,9 @@ class HeaderView: UICollectionReusableView {
     lazy var sectionTitle: UILabel = {
         let lbl = UILabel()
         lbl.translatesAutoresizingMaskIntoConstraints = false
-        lbl.font = .boldSystemFont(ofSize: 20)
+//        lbl.font = .boldSystemFont(ofSize: 20)
+        lbl.font = .systemFont(ofSize: 15)
+//        lbl.textColor = .systemGray
 //        lbl.backgroundColor = .cyan
         return lbl
     }()
@@ -49,6 +51,7 @@ class HeaderView: UICollectionReusableView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         //       self.backgroundColor = UIColor.purple
+        self.addBorder(.bottom, color: .systemGray, thickness: 0.3)
         setupView()
     }
     

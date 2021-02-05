@@ -40,7 +40,7 @@ class ReviewsVC: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         view.backgroundColor = .systemBackground
-        setupViews()
+//        setupViews()
     }
 
     fileprivate func setupViews() {

@@ -39,7 +39,8 @@ class ClientFeedVC: UIViewController {
         let collectionLayout = UICollectionViewFlowLayout()
         collectionLayout.scrollDirection = .vertical
         collectionLayout.minimumLineSpacing = 5
-        
+//        collectionLayout.sectionHeadersPinToVisibleBounds = true
+
         let cv = UICollectionView(frame: .zero, collectionViewLayout: collectionLayout)
         cv.translatesAutoresizingMaskIntoConstraints = false
         cv.backgroundColor = .clear 
@@ -289,6 +290,11 @@ extension ClientFeedVC: CollectionDataSourceAndDelegate {
         case 1:
             // Nearby Technie cell
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: feedCellOnSection1ID, for: indexPath) as! NearbyTechniesCell
+            let lastItemIndex = collectionView.numberOfItems(inSection: collectionView.numberOfSections-1)
+//            let lastIndex = lastItemIndex - 1
+//            if indexPath.item == lastIndex {
+//                cell.separatorView.isHidden = true
+//            }
             return cell
         default:
             break
@@ -345,7 +351,8 @@ extension ClientFeedVC: CollectionDataSourceAndDelegate {
             
             switch indexPath.section {
             case 0:
-                collectionViewSize = CGSize(width: viewSize.width, height: 290)
+                let screenSize = UIScreen.main.bounds
+                collectionViewSize = CGSize(width: viewSize.width, height: screenSize.width/1.72)
                 return collectionViewSize
             case 1:
                 collectionViewSize = CGSize(width: viewSize.width - 10, height: 150)
@@ -360,7 +367,7 @@ extension ClientFeedVC: CollectionDataSourceAndDelegate {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         // Section 0 EdgeInsets
-        var collectionViewEdgeInsets = UIEdgeInsets(top: 10, left: 0, bottom: 25, right: 0)
+        var collectionViewEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         
         if didShowSearchResultViewObservable.value == true {
             collectionViewEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 10, right: 0)
@@ -384,8 +391,8 @@ extension ClientFeedVC: CollectionDataSourceAndDelegate {
         let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: headerID, for: indexPath) as! HeaderView
         
         if didShowSearchResultViewObservable.value == true {
-            header.sectionTitle.text = "Search by category"
-//            header.backgroundColor = .red
+            header.sectionTitle.text = "Search by category".uppercased()
+//            header.backgroundColor = .systemBackground
 //            header.sectionTitle.backgroundColor = .brown
 //            header.stackView.addBackground(color: .cyan)
             header.headerDynamicLeadingAnchor.constant = 0
@@ -394,16 +401,17 @@ extension ClientFeedVC: CollectionDataSourceAndDelegate {
         
         switch indexPath.section {
         case 0:
-            header.sectionTitle.text = sections[indexPath.section]
+            header.sectionTitle.text = sections[indexPath.section].uppercased()
             //            header.backgroundColor = .red
             // Show seeAllBtn only for this section
             header.seeAllBtn.isHidden = false
             header.seeAllBtn.addTarget(self, action: #selector(seeAllBtnPressed), for: .touchUpInside)
-//            header.backgroundColor = .red
-//            header.sectionTitle.backgroundColor = .brown
+            header.backgroundColor = .systemBackground
+            //            header.sectionTitle.backgroundColor = .brown
             return header
         case 1:
-            header.sectionTitle.text = sections[indexPath.section]
+            header.sectionTitle.text = sections[indexPath.section].uppercased()
+            header.backgroundColor = .systemBackground
             return header
         default:
             break
@@ -414,11 +422,27 @@ extension ClientFeedVC: CollectionDataSourceAndDelegate {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         if didShowSearchResultViewObservable.value == true {
-            return CGSize(width: collectionView.frame.width, height: 50)
+            return CGSize(width: collectionView.frame.width, height: 35)
         }
-        return CGSize(width: collectionView.frame.width, height: 25)
+        
+        return CGSize(width: collectionView.frame.width, height: 30)
     }
     
+    fileprivate func configureCollectionViewLayout(_ isActive: Bool) {
+        if let layout = self.clientFeedCollectionView.collectionViewLayout as? UICollectionViewFlowLayout {
+            let padding: CGFloat = 16
+            layout.sectionInset = .init(top: padding, left: padding, bottom: padding, right: padding)
+            layout.sectionHeadersPinToVisibleBounds = isActive
+        }
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        // Handles to stick only the header on the section 1
+        guard let layout = clientFeedCollectionView.collectionViewLayout as? UICollectionViewFlowLayout else { return }
+        let offsetY = scrollView.contentOffset.y
+        print("offsetY: \(offsetY)")
+        layout.sectionHeadersPinToVisibleBounds = offsetY > 156.0
+    }
 }
 
 

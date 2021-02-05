@@ -181,7 +181,7 @@ class NearbyTechniesCell: UICollectionViewCell {
         
         let screenSize = UIScreen.main.bounds
 //        view.withSize(CGSize(width: screenSize.width - 10, height: 1))
-        view.withHeight(0.7)
+        view.withHeight(0.5)
         return view
     }()
     
@@ -197,12 +197,13 @@ class NearbyTechniesCell: UICollectionViewCell {
         [mainStackView, profileImageView, separatorView].forEach {self.addSubview($0)}
         
 //        saveBtn.anchor(top: self.topAnchor, leading: nil, bottom: nil, trailing: self.trailingAnchor, padding: UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 5))
+        separatorView.anchor(top: self.topAnchor, leading: self.leadingAnchor, bottom: nil, trailing: self.trailingAnchor, padding: UIEdgeInsets(top: -16, left: 5, bottom: 0, right: 5))
         
-        profileImageView.anchor(top: self.topAnchor, leading: self.leadingAnchor, bottom: nil, trailing: nil, padding: UIEdgeInsets(top: 10, left: 5, bottom: 0, right: 0))
+        profileImageView.anchor(top: separatorView.bottomAnchor, leading: self.leadingAnchor, bottom: nil, trailing: nil, padding: UIEdgeInsets(top: 20, left: 5, bottom: 0, right: 0))
 //        mainStackView.withHeight(160)
         mainStackView.anchor(top: profileImageView.topAnchor, leading: profileImageView.trailingAnchor, bottom: nil, trailing: self.trailingAnchor, padding: UIEdgeInsets(top: 5, left: 8, bottom: 0, right: 0))
 
-        separatorView.anchor(top: nil, leading: self.leadingAnchor, bottom: self.bottomAnchor, trailing: self.trailingAnchor, padding: UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 5))
+//        separatorView.anchor(top: nil, leading: self.leadingAnchor, bottom: self.bottomAnchor, trailing: self.trailingAnchor, padding: UIEdgeInsets(top: 0, left: 5, bottom: 10, right: 5))
         
     }
     
