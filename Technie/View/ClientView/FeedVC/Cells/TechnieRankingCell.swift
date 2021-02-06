@@ -79,13 +79,14 @@ extension TechnieRankingCell: CollectionDataSourceAndDelegate {
         self.indexPath = indexPath
         let vc = RankedTechnieVC()
 //        vc.modalTransitionStyle = .crossDissolve
-        vc.stringPrint = "\(indexPath.item)"
+//        vc.stringPrint = "\(indexPath.item)"
         
         guard let presentVCFromCell = UIApplication.cellDidPresentViewController() else { return }
 //        presentVCFromCell.navigationController?.show(rankedTechnieVC, sender: nil)
         
         let vcWithEmbeddedNav = UINavigationController(rootViewController: vc)
 //        vcWithEmbeddedNav.modalPresentationStyle = .fullScreen
+//        presentVCFromCell.navigationController?.pushViewController(vc, animated: true)
         presentVCFromCell.present(vcWithEmbeddedNav, animated: true)
 
 //        print("IndexPath: \(indexPath.item)")
@@ -248,7 +249,7 @@ class TechnieRankingInnerCell: UICollectionViewCell {
         return view
     }()
     
-    lazy var ratingAndReviewtackView: UIStackView = {
+    lazy var ratingAndReviewStackView: UIStackView = {
         var separatorView = UIView()
         separatorView.translatesAutoresizingMaskIntoConstraints = false
         separatorView.backgroundColor = .lightGray
@@ -321,7 +322,7 @@ class TechnieRankingInnerCell: UICollectionViewCell {
     
     // MARK: - Methods
     fileprivate func setupViews() {
-        [stackView2, profileImageView, ratingAndReviewtackView].forEach {self.addSubview($0)}
+        [stackView2, profileImageView, ratingAndReviewStackView].forEach {self.addSubview($0)}
         
         NSLayoutConstraint.activate([
             profileImageView.centerXAnchor.constraint(equalTo: self.centerXAnchor),
@@ -332,7 +333,7 @@ class TechnieRankingInnerCell: UICollectionViewCell {
         
         stackView2.anchor(top: profileImageView.bottomAnchor, leading: self.leadingAnchor, bottom: nil, trailing: self.trailingAnchor, padding: UIEdgeInsets(top: 5, left: 10, bottom: 0, right: 10))
         
-        ratingAndReviewtackView.anchor(top: stackView2.bottomAnchor, leading: self.leadingAnchor, bottom: nil, trailing: self.trailingAnchor, padding: UIEdgeInsets(top: 5, left: 10, bottom: 0, right: 10))
+        ratingAndReviewStackView.anchor(top: stackView2.bottomAnchor, leading: self.leadingAnchor, bottom: nil, trailing: self.trailingAnchor, padding: UIEdgeInsets(top: 5, left: 10, bottom: 0, right: 10))
         
         
     }

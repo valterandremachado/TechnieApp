@@ -440,7 +440,7 @@ extension ClientFeedVC: CollectionDataSourceAndDelegate {
         // Handles to stick only the header on the section 1
         guard let layout = clientFeedCollectionView.collectionViewLayout as? UICollectionViewFlowLayout else { return }
         let offsetY = scrollView.contentOffset.y
-        print("offsetY: \(offsetY)")
+//        print("offsetY: \(offsetY)")
         layout.sectionHeadersPinToVisibleBounds = offsetY > 156.0
     }
 }

@@ -129,8 +129,9 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
     
     var switchableViews = [UIView]()
     
-    var sectionSetter = [SectionHandler]()
-    
+    var aboutSectionSetter = [SectionHandler]()
+    var reviewsSectionSetter = [SectionHandler]()
+
     lazy var aboutTableView: UITableView = {
         let tv = UITableView(frame: .zero, style: .insetGrouped)
         tv.translatesAutoresizingMaskIntoConstraints = false
@@ -138,11 +139,9 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         
         tv.isScrollEnabled = false
         tv.showsVerticalScrollIndicator = false
-//        tv.rowHeight = 40
         // Set automatic dimensions for row height
         tv.rowHeight = UITableView.automaticDimension
         tv.estimatedRowHeight = UITableView.automaticDimension
-//        tv.layer.cornerRadius = 18
         tv.clipsToBounds = true
         tv.contentInset = UIEdgeInsets(top: -25, left: 0, bottom: 0, right: 0)
 
@@ -165,13 +164,11 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         
 //        tv.isScrollEnabled = false
         tv.showsVerticalScrollIndicator = false
-//        tv.rowHeight = 40
         // Set automatic dimensions for row height
         tv.rowHeight = UITableView.automaticDimension
         tv.estimatedRowHeight = UITableView.automaticDimension
-//        tv.layer.cornerRadius = 18
         tv.clipsToBounds = true
-        tv.contentInset = UIEdgeInsets(top: -25, left: 0, bottom: 0, right: 0)
+        tv.contentInset = UIEdgeInsets(top: 10, left: 0, bottom: 0, right: 0)
 
         var frame = CGRect.zero
         frame.size.height = .leastNormalMagnitude
@@ -181,6 +178,7 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         
         tv.delegate = self
         tv.dataSource = self
+        tv.register(ReviewsCell0.self, forCellReuseIdentifier: ReviewsCell0.cellID)
         tv.register(ReviewsCell.self, forCellReuseIdentifier: ReviewsCell.cellID)
         return tv
     }()
@@ -259,7 +257,6 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
             + mainStackView.frame.height
             + customSegmentedControl.frame.height
             + switchableContainerView.frame.height
-
 //        contentViewSize.height = view.frame.height + heights
 //        let remainHeight = heights - mainContainerView.frame.height
 //        let thisHeight = heights - scrollView.frame.height //- mainContainerView.frame.height
@@ -373,11 +370,17 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
     }
     
     fileprivate func populateSections() {
-        sectionSetter.append(SectionHandler(title: "Summary", detail: ["Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus elit nisi, tempor at rhoncus id, porta tincidunt metus. Nulla dictum faucibus justo. Quisque non urna nec tortor cursus lobortis. Proin quis nunc nibh. Curabitur consequat gravida augue, vitae vestibulum sem eleifend ac. Maecenas facilisis molestie vehicula. Fusce pulvinar nisi a orci iaculis bibendum."]))
-        sectionSetter.append(SectionHandler(title: "Skills", detail: ["skill", "skill", "skill", "skill", "skill"]))
+        aboutSectionSetter.append(SectionHandler(title: "Summary", detail: ["Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus elit nisi, tempor at rhoncus id, porta tincidunt metus. Nulla dictum faucibus justo. Quisque non urna nec tortor cursus lobortis. Proin quis nunc nibh. Curabitur consequat gravida augue, vitae vestibulum sem eleifend ac. Maecenas facilisis molestie vehicula. Fusce pulvinar nisi a orci iaculis bibendum."]))
+        aboutSectionSetter.append(SectionHandler(title: "Skills", detail: ["skill", "skill", "skill", "skill", "skill"]))
+        
+        reviewsSectionSetter.append(SectionHandler(title: "Proficience", detail: [""]))
+        reviewsSectionSetter.append(SectionHandler(title: "Reliability", detail: [""]))
+        reviewsSectionSetter.append(SectionHandler(title: "Reviews", detail: ["Reviews", "Reviews", "Reviews", "Reviews", "Reviews"]))
     }
     
-    
+    let customReviewView = UIView()
+    let customAboutView = UIView()
+
     fileprivate func setupSwitchableContainerView() {
         // Add the VCs containterView to the switchableViews array
         switchableViews.append(AboutVC().view)
@@ -412,15 +415,16 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         
         switch currentSegmentIndex {
         case 1:
-            [ratingAndReviewsStackView, reviewsTableView].forEach {switchableViews[currentSegmentIndex].addSubview($0)}
-            ratingAndReviewsStackView.anchor(top: switchableViews[currentSegmentIndex].topAnchor, leading: nil, bottom: nil, trailing: nil)
-            NSLayoutConstraint.activate([
-                ratingAndReviewsStackView.widthAnchor.constraint(equalToConstant: 95),
-                ratingAndReviewsStackView.heightAnchor.constraint(equalToConstant: 30),
-                ratingAndReviewsStackView.centerXAnchor.constraint(equalTo: switchableViews[currentSegmentIndex].centerXAnchor),
-            ])
+            switchableViews[currentSegmentIndex].addSubview(reviewsTableView)
+//            [ratingAndReviewsStackView, reviewsTableView].forEach {switchableViews[currentSegmentIndex].addSubview($0)}
+//            ratingAndReviewsStackView.anchor(top: switchableViews[currentSegmentIndex].topAnchor, leading: nil, bottom: nil, trailing: nil)
+//            NSLayoutConstraint.activate([
+//                ratingAndReviewsStackView.widthAnchor.constraint(equalToConstant: 95),
+//                ratingAndReviewsStackView.heightAnchor.constraint(equalToConstant: 30),
+//                ratingAndReviewsStackView.centerXAnchor.constraint(equalTo: switchableViews[currentSegmentIndex].centerXAnchor),
+//            ])
             
-            reviewsTableView.anchor(top: ratingAndReviewsStackView.bottomAnchor,
+            reviewsTableView.anchor(top: switchableViews[currentSegmentIndex].topAnchor,
                              leading: switchableViews[currentSegmentIndex].leadingAnchor,
                              bottom: switchableViews[currentSegmentIndex].bottomAnchor,
                              trailing: switchableViews[currentSegmentIndex].trailingAnchor)
@@ -446,22 +450,22 @@ extension TechnicianProfileDetailsVC: TableViewDataSourceAndDelegate {
     func numberOfSections(in tableView: UITableView) -> Int {
         switch currentSegmentIndex {
         case 0:
-            return sectionSetter.count
+            return aboutSectionSetter.count
         case 1:
-            return 1
+            return reviewsSectionSetter.count
         default:
-            return sectionSetter.count
+            return 0
         }
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch currentSegmentIndex {
         case 0:
-            return sectionSetter[section].sectionDetail.count
+            return aboutSectionSetter[section].sectionDetail.count
         case 1:
-            return 5
+            return reviewsSectionSetter[section].sectionDetail.count
         default:
-            return sectionSetter[section].sectionDetail.count
+            return aboutSectionSetter[section].sectionDetail.count
         }
     }
     
@@ -470,14 +474,31 @@ extension TechnicianProfileDetailsVC: TableViewDataSourceAndDelegate {
         switch currentSegmentIndex {
         case 0:
             let cell = tableView.dequeueReusableCell(withIdentifier: AboutCell.cellID, for: indexPath) as! AboutCell
-            let detailText = sectionSetter[indexPath.section].sectionDetail[indexPath.row]
+            let detailText = aboutSectionSetter[indexPath.section].sectionDetail[indexPath.row]
             cell.textLabel?.numberOfLines = 0
             cell.textLabel?.text = detailText
             return cell
         case 1:
-            let cell = tableView.dequeueReusableCell(withIdentifier: ReviewsCell.cellID, for: indexPath) as! ReviewsCell
-            cell.textLabel?.text = "detailText"
-            return cell
+            let detailText = reviewsSectionSetter[indexPath.section].sectionDetail[indexPath.row]
+
+            switch indexPath.section {
+            case 0:
+                let cell = tableView.dequeueReusableCell(withIdentifier: ReviewsCell0.cellID, for: indexPath) as! ReviewsCell0
+                cell.setupViews()
+                return cell
+            case 1:
+                let cell = tableView.dequeueReusableCell(withIdentifier: ReviewsCell0.cellID, for: indexPath) as! ReviewsCell0
+//                cell.textLabel?.text = "detailText"
+                cell.setupViews2()
+                return cell
+            case 2:
+                let cell = tableView.dequeueReusableCell(withIdentifier: ReviewsCell.cellID, for: indexPath) as! ReviewsCell
+                cell.textLabel?.text = detailText
+                return cell
+            default:
+                return UITableViewCell()
+            }
+            
         default:
             return UITableViewCell()
         }
@@ -487,9 +508,12 @@ extension TechnicianProfileDetailsVC: TableViewDataSourceAndDelegate {
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         switch currentSegmentIndex {
         case 0:
-            return sectionSetter[section].sectionTitle
+            return aboutSectionSetter[section].sectionTitle
         case 1:
-            return "Reviews"
+            if section <= 1 {
+                return nil
+            }
+            return reviewsSectionSetter[section].sectionTitle! + " (40)"
         default:
             return nil
         }
