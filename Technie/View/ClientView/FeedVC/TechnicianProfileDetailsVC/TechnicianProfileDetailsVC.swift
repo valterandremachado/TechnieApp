@@ -99,12 +99,12 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
     }()
     
     lazy var contentViewSize = CGSize(width: self.view.frame.width, height: self.view.frame.height)
-
+    var devidingNo: CGFloat = 1
     lazy var scrollView : UIScrollView = {
         let view = UIScrollView(frame : .zero)
         var frame = CGRect.init()
         let screenSize = UIScreen.main.bounds.size
-        screenSize.height <= 667 ? (frame = CGRect(x: 0, y: (navigationController?.navigationBar.frame.height)! - (navigationController?.navigationBar.frame.height)!/1.8, width: contentViewSize.width, height: contentViewSize.height - (navigationController?.navigationBar.frame.height)!/2)) : (frame = CGRect(x: 0, y: (navigationController?.navigationBar.frame.height)! - (navigationController?.navigationBar.frame.height)!/2, width: contentViewSize.width, height: contentViewSize.height - (navigationController?.navigationBar.frame.height)!))
+        screenSize.height <= 667 ? (frame = CGRect(x: 0, y: (navigationController?.navigationBar.frame.height)! - (navigationController?.navigationBar.frame.height)!/1.8, width: contentViewSize.width, height: contentViewSize.height - (navigationController?.navigationBar.frame.height)!/2)) : (frame = CGRect(x: 0, y: (navigationController?.navigationBar.frame.height)! - (navigationController?.navigationBar.frame.height)!/devidingNo, width: contentViewSize.width, height: contentViewSize.height - (navigationController?.navigationBar.frame.height)!))//2.5
     
         view.frame = frame
         view.contentInsetAdjustmentBehavior = .never
@@ -260,8 +260,9 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
 //        contentViewSize.height = view.frame.height + heights
 //        let remainHeight = heights - mainContainerView.frame.height
 //        let thisHeight = heights - scrollView.frame.height //- mainContainerView.frame.height
-        
-       
+//        print("scrollViewWidth: \(scrollView.frame.width), viewWidth: \(mainContainerView.frame.width)")
+//        print("scrollViewHeight: \(scrollView.frame.height), viewHeight: \(mainContainerView.frame.height)")
+
         
 //        print("content height: \(heights), mainContainerView height: \(mainContainerView.frame.height), scrollView height: \(scrollView.frame.height), remainHeight: \(viewHeight)")
 //        print("dynamicHeight height: \(dynamicHeight?.constant), \(thisHeight)")
@@ -286,12 +287,12 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         scrollView.addSubview(mainContainerView)
         [mainStackView, profileImageView, customSegmentedControl, switchableContainerView].forEach {mainContainerView.addSubview($0)}
         
-        guard let navBarHeight = navigationController?.navigationBar.frame.height else { return }
-        guard let tabBarHeight = tabBarController?.tabBar.frame.height else { return }
-        let viewHeight = view.frame.height - (navBarHeight - tabBarHeight)
+//        guard let navBarHeight = navigationController?.navigationBar.frame.height else { return }
+//        guard let tabBarHeight = tabBarController?.tabBar.frame.height else { return }
+//        let viewHeight = view.frame.height - (navBarHeight - tabBarHeight)
 
-//        guard let paddingToNavBarHeight = navigationController?.navigationBar.frame.height else { return }
-        mainContainerView.anchor(top: scrollView.topAnchor, leading: scrollView.leadingAnchor, bottom: scrollView.bottomAnchor, trailing: scrollView.trailingAnchor, padding: UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0), size: CGSize(width: scrollView.frame.width, height: viewHeight + 15))
+        mainContainerView.frame.size = CGSize(width: scrollView.frame.width, height: (view.frame.height) + 15)
+//        mainContainerView.anchor(top: scrollView.topAnchor, leading: scrollView.leadingAnchor, bottom: scrollView.bottomAnchor, trailing: scrollView.trailingAnchor, padding: UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0), size: CGSize(width: scrollView.frame.width, height: viewHeight + 15))
 //        dynamicHeight = mainContainerView.heightAnchor.constraint(equalToConstant: 0)
 //        dynamicHeight?.isActive = true
 
@@ -322,13 +323,14 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
     
     fileprivate func presentSelectionBar() {
         let screenSize = UIScreen.main.bounds.size
-        guard let tabHeight = tabBarController?.tabBar.frame.height else { return }
+        guard let navBarHeight = navigationController?.navigationBar.frame.height else { return }
+        let tabHeight = tabBarController?.tabBar.frame.height ?? navBarHeight*1.5
         // window
         guard let window = UIApplication.shared.windows.filter({$0.isKeyWindow}).first else { return }
         // visualEffectView
         visualEffectView.frame = CGRect(x: 0, y: screenSize.height, width: screenSize.width, height: tabHeight)
         window.addSubview(visualEffectView)
-
+//        window.bringSubviewToFront(visualEffectView)
         visualEffectView.contentView.addSubview(hireAndStartAChatBtnStack)
         NSLayoutConstraint.activate([
             hireAndStartAChatBtnStack.topAnchor.constraint(equalTo: visualEffectView.contentView.topAnchor, constant: 15),
@@ -405,6 +407,8 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
     }
     
     func change(to index: Int) {
+        // Return if currentSegmentIndex is the same with the segmentedControlIndex
+        if currentSegmentIndex == index { return }
         currentSegmentIndex = index
         print("segmentedControl index changed to \(index)")
 
@@ -416,14 +420,6 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         switch currentSegmentIndex {
         case 1:
             switchableViews[currentSegmentIndex].addSubview(reviewsTableView)
-//            [ratingAndReviewsStackView, reviewsTableView].forEach {switchableViews[currentSegmentIndex].addSubview($0)}
-//            ratingAndReviewsStackView.anchor(top: switchableViews[currentSegmentIndex].topAnchor, leading: nil, bottom: nil, trailing: nil)
-//            NSLayoutConstraint.activate([
-//                ratingAndReviewsStackView.widthAnchor.constraint(equalToConstant: 95),
-//                ratingAndReviewsStackView.heightAnchor.constraint(equalToConstant: 30),
-//                ratingAndReviewsStackView.centerXAnchor.constraint(equalTo: switchableViews[currentSegmentIndex].centerXAnchor),
-//            ])
-            
             reviewsTableView.anchor(top: switchableViews[currentSegmentIndex].topAnchor,
                              leading: switchableViews[currentSegmentIndex].leadingAnchor,
                              bottom: switchableViews[currentSegmentIndex].bottomAnchor,

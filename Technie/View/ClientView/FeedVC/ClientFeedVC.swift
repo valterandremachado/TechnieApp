@@ -309,6 +309,9 @@ extension ClientFeedVC: CollectionDataSourceAndDelegate {
             print("resultView Showing now")
         case false:
             let vc = TechnicianProfileDetailsVC()
+            vc.devidingNo = 2.5
+            let vcWithEmbeddedNav = UINavigationController(rootViewController: vc)
+//            present(vcWithEmbeddedNav, animated: true)
             navigationController?.pushViewController(vc, animated: true)
         }
         

@@ -166,10 +166,9 @@ class RankedTechnieVC: UIViewController {
     
     @objc fileprivate func checkProfileBtnPressed() {
         let vc = TechnicianProfileDetailsVC()
-//        let vcWithEmbeddedNav = UINavigationController(rootViewController: vc)
-//        present(vcWithEmbeddedNav, animated: true)
-        
-        vc.navigationController?.modalPresentationStyle = .fullScreen
+        vc.devidingNo = 1
+        vc.isModalInPresentation = true
+//        vc.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
         navigationController?.pushViewController(vc, animated: true)
     }
     
@@ -257,7 +256,7 @@ class RankedTechnieVC: UIViewController {
         navBar.setBackgroundImage(UIImage(), for: .default)
         navBar.hideNavBarSeperator()
 
-//        navBar.topItem?.title = "Add Skills"
+        navBar.topItem?.title = ""
 //        navBar.prefersLargeTitles = true
 //        navigationItem.largeTitleDisplayMode = .automatic
         let leftNavBarButton = UIBarButtonItem(image: UIImage(systemName: "xmark.circle.fill"), style: .plain, target: self, action: #selector(leftNavBarBtnTapped))

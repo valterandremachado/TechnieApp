@@ -86,6 +86,7 @@ extension TechnieRankingCell: CollectionDataSourceAndDelegate {
         
         let vcWithEmbeddedNav = UINavigationController(rootViewController: vc)
 //        vcWithEmbeddedNav.modalPresentationStyle = .fullScreen
+
 //        presentVCFromCell.navigationController?.pushViewController(vc, animated: true)
         presentVCFromCell.present(vcWithEmbeddedNav, animated: true)
 
