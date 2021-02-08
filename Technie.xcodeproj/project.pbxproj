@@ -10,6 +10,8 @@
 		8A00AB2925B981D000C250C4 /* LocationPickerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A00AB2825B981D000C250C4 /* LocationPickerVC.swift */; };
 		8A05765C25CD77390071FDD1 /* ReviewsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A05765B25CD77390071FDD1 /* ReviewsCell.swift */; };
 		8A05766125CD9E0A0071FDD1 /* FullRankingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A05766025CD9E0A0071FDD1 /* FullRankingCell.swift */; };
+		8A0C0B3D25D119C30072729D /* TechnicianSearchResultsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A0C0B3C25D119C30072729D /* TechnicianSearchResultsVC.swift */; };
+		8A0C0B4825D11ACB0072729D /* TechnicianSearchResultsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A0C0B4725D11ACB0072729D /* TechnicianSearchResultsCell.swift */; };
 		8A159DFD25B307D900D45C60 /* JobDetailCVCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A159DFC25B307D900D45C60 /* JobDetailCVCell.swift */; };
 		8A159E0225B316CC00D45C60 /* JobDetailTVCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A159E0125B316CC00D45C60 /* JobDetailTVCell.swift */; };
 		8A41E7A625B07AB500265D5C /* ActiveJobsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A41E7A525B07AB500265D5C /* ActiveJobsCell.swift */; };
@@ -51,6 +53,8 @@
 		8A997F3025A823AE00B144CD /* SkillSelectionVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A997F2F25A823AE00B144CD /* SkillSelectionVC.swift */; };
 		8A997F3825A8380E00B144CD /* SkillSelectionTVCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A997F3725A8380E00B144CD /* SkillSelectionTVCell.swift */; };
 		8A997F3D25A83BC300B144CD /* MultipleSectionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A997F3C25A83BC300B144CD /* MultipleSectionHandler.swift */; };
+		8AA43A2125D145FF00140649 /* NotificationBannerSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 8AA43A2025D145FF00140649 /* NotificationBannerSwift */; };
+		8AA43A2E25D1519C00140649 /* RecommendationVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AA43A2D25D1519C00140649 /* RecommendationVC.swift */; };
 		8AAB8821259B557000BCBD33 /* PostFormVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AAB8820259B557000BCBD33 /* PostFormVC.swift */; };
 		8AAB8829259B625E00BCBD33 /* PostFormCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AAB8828259B625E00BCBD33 /* PostFormCell.swift */; };
 		8AADFB6425B5834000D3A5CC /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8AADFB6325B5834000D3A5CC /* GoogleService-Info.plist */; };
@@ -90,7 +94,7 @@
 		8ADECCC425B026F600F871EF /* FeedsTVCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ADECCC325B026F600F871EF /* FeedsTVCell.swift */; };
 		8AE258A6258A3156004EDB26 /* ClientTabController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AE258A5258A3156004EDB26 /* ClientTabController.swift */; };
 		8AE2B0F225C97B2500479C49 /* TechnieNotificationsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AE2B0F125C97B2500479C49 /* TechnieNotificationsCell.swift */; };
-		8AE2B0FA25C9905600479C49 /* SearchResultsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AE2B0F925C9905600479C49 /* SearchResultsVC.swift */; };
+		8AE2B0FA25C9905600479C49 /* JobSearchResultsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AE2B0F925C9905600479C49 /* JobSearchResultsVC.swift */; };
 		8AE4096A25AEFF0F00A29453 /* TechnieTabController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AE4096925AEFF0F00A29453 /* TechnieTabController.swift */; };
 		8AE4096F25AEFF4C00A29453 /* TechnieFeedVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AE4096E25AEFF4C00A29453 /* TechnieFeedVC.swift */; };
 		8AE4098125AF011200A29453 /* TechnieServiceVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AE4098025AF011200A29453 /* TechnieServiceVC.swift */; };
@@ -138,6 +142,8 @@
 		8A00AB2825B981D000C250C4 /* LocationPickerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationPickerVC.swift; sourceTree = "<group>"; };
 		8A05765B25CD77390071FDD1 /* ReviewsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewsCell.swift; sourceTree = "<group>"; };
 		8A05766025CD9E0A0071FDD1 /* FullRankingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullRankingCell.swift; sourceTree = "<group>"; };
+		8A0C0B3C25D119C30072729D /* TechnicianSearchResultsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnicianSearchResultsVC.swift; sourceTree = "<group>"; };
+		8A0C0B4725D11ACB0072729D /* TechnicianSearchResultsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnicianSearchResultsCell.swift; sourceTree = "<group>"; };
 		8A159DFC25B307D900D45C60 /* JobDetailCVCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobDetailCVCell.swift; sourceTree = "<group>"; };
 		8A159E0125B316CC00D45C60 /* JobDetailTVCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobDetailTVCell.swift; sourceTree = "<group>"; };
 		8A41E7A525B07AB500265D5C /* ActiveJobsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveJobsCell.swift; sourceTree = "<group>"; };
@@ -171,6 +177,7 @@
 		8A997F2F25A823AE00B144CD /* SkillSelectionVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillSelectionVC.swift; sourceTree = "<group>"; };
 		8A997F3725A8380E00B144CD /* SkillSelectionTVCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillSelectionTVCell.swift; sourceTree = "<group>"; };
 		8A997F3C25A83BC300B144CD /* MultipleSectionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultipleSectionHandler.swift; sourceTree = "<group>"; };
+		8AA43A2D25D1519C00140649 /* RecommendationVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecommendationVC.swift; sourceTree = "<group>"; };
 		8AAB8820259B557000BCBD33 /* PostFormVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostFormVC.swift; sourceTree = "<group>"; };
 		8AAB8828259B625E00BCBD33 /* PostFormCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostFormCell.swift; sourceTree = "<group>"; };
 		8AADFB6325B5834000D3A5CC /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
@@ -206,7 +213,7 @@
 		8ADECCC325B026F600F871EF /* FeedsTVCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedsTVCell.swift; sourceTree = "<group>"; };
 		8AE258A5258A3156004EDB26 /* ClientTabController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientTabController.swift; sourceTree = "<group>"; };
 		8AE2B0F125C97B2500479C49 /* TechnieNotificationsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnieNotificationsCell.swift; sourceTree = "<group>"; };
-		8AE2B0F925C9905600479C49 /* SearchResultsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResultsVC.swift; sourceTree = "<group>"; };
+		8AE2B0F925C9905600479C49 /* JobSearchResultsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobSearchResultsVC.swift; sourceTree = "<group>"; };
 		8AE4096925AEFF0F00A29453 /* TechnieTabController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnieTabController.swift; sourceTree = "<group>"; };
 		8AE4096E25AEFF4C00A29453 /* TechnieFeedVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnieFeedVC.swift; sourceTree = "<group>"; };
 		8AE4098025AF011200A29453 /* TechnieServiceVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnieServiceVC.swift; sourceTree = "<group>"; };
@@ -237,6 +244,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8A8F8554258A408700C4CEF9 /* LBTATools in Frameworks */,
+				8AA43A2125D145FF00140649 /* NotificationBannerSwift in Frameworks */,
 				8AADFB8E25B5A59700D3A5CC /* SDWebImageMapKit in Frameworks */,
 				8A54FAD225B56ED100814216 /* MessageKit in Frameworks */,
 				8AADFB8C25B5A59700D3A5CC /* SDWebImage in Frameworks */,
@@ -342,6 +350,7 @@
 				8A54D1A925CBFAEE00045D37 /* AboutCell.swift */,
 				8A05765B25CD77390071FDD1 /* ReviewsCell.swift */,
 				8A05766025CD9E0A0071FDD1 /* FullRankingCell.swift */,
+				8A0C0B4725D11ACB0072729D /* TechnicianSearchResultsCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -361,6 +370,7 @@
 			isa = PBXGroup;
 			children = (
 				8AC1B126258A2D8D000F2569 /* ClientFeedVC.swift */,
+				8A0C0B3C25D119C30072729D /* TechnicianSearchResultsVC.swift */,
 				8A76FA4E258DE3EF0094C524 /* RankedTechnieVC.swift */,
 				8A76FA56258DEBB20094C524 /* FullRankingVC.swift */,
 				8A76FA5E258DF2F40094C524 /* NearbyDetailVC.swift */,
@@ -415,6 +425,14 @@
 				8A997F3725A8380E00B144CD /* SkillSelectionTVCell.swift */,
 			);
 			path = Cells;
+			sourceTree = "<group>";
+		};
+		8AA43A2C25D1518100140649 /* RecommendationVC */ = {
+			isa = PBXGroup;
+			children = (
+				8AA43A2D25D1519C00140649 /* RecommendationVC.swift */,
+			);
+			path = RecommendationVC;
 			sourceTree = "<group>";
 		};
 		8AC1B116258A2D8D000F2569 = {
@@ -542,6 +560,7 @@
 		8AE2589C258A305D004EDB26 /* ClientView */ = {
 			isa = PBXGroup;
 			children = (
+				8AA43A2C25D1518100140649 /* RecommendationVC */,
 				8AE258A5258A3156004EDB26 /* ClientTabController.swift */,
 				8AF76A4B258B0AC800ED14C2 /* ClientProfile */,
 				8A8F8543258A3BBA00C4CEF9 /* FeedVC */,
@@ -597,7 +616,7 @@
 				8AE4096E25AEFF4C00A29453 /* TechnieFeedVC.swift */,
 				8AD3D07625B1D3FD00858CAD /* JobDetailsVC.swift */,
 				8A4B746425C6D7E40051619C /* SubmitProposalVC.swift */,
-				8AE2B0F925C9905600479C49 /* SearchResultsVC.swift */,
+				8AE2B0F925C9905600479C49 /* JobSearchResultsVC.swift */,
 				8ADECCBF25B025EA00F871EF /* Cells */,
 			);
 			path = TechnieFeedVC;
@@ -703,6 +722,7 @@
 				8A54FAD125B56ED100814216 /* MessageKit */,
 				8AADFB8B25B5A59700D3A5CC /* SDWebImage */,
 				8AADFB8D25B5A59700D3A5CC /* SDWebImageMapKit */,
+				8AA43A2025D145FF00140649 /* NotificationBannerSwift */,
 			);
 			productName = Technie;
 			productReference = 8AC1B11F258A2D8D000F2569 /* Technie.app */;
@@ -783,6 +803,7 @@
 				8A8F8552258A408700C4CEF9 /* XCRemoteSwiftPackageReference "LBTATools" */,
 				8A54FAD025B56ED100814216 /* XCRemoteSwiftPackageReference "MessageKit" */,
 				8AADFB8A25B5A59700D3A5CC /* XCRemoteSwiftPackageReference "SDWebImage" */,
+				8AA43A1F25D145FF00140649 /* XCRemoteSwiftPackageReference "NotificationBanner" */,
 			);
 			productRefGroup = 8AC1B120258A2D8D000F2569 /* Products */;
 			projectDirPath = "";
@@ -993,9 +1014,10 @@
 				8A4B746A25C6DBAB0051619C /* SubmitProposalCell.swift in Sources */,
 				8ACD6B0325C4547500CC057D /* LocationCollectionViewerCell.swift in Sources */,
 				8AF76A77258B440D00ED14C2 /* KeyboardLayoutConstraint.swift in Sources */,
-				8AE2B0FA25C9905600479C49 /* SearchResultsVC.swift in Sources */,
+				8AE2B0FA25C9905600479C49 /* JobSearchResultsVC.swift in Sources */,
 				8A79718D2595CAA000648A3C /* ProfileEnum.swift in Sources */,
 				8A8F8533258A358400C4CEF9 /* ClientNotificationVC.swift in Sources */,
+				8A0C0B4825D11ACB0072729D /* TechnicianSearchResultsCell.swift in Sources */,
 				8AC93A8725B6ECB200663BE3 /* ChatVC.swift in Sources */,
 				8AF76A86258B64FC00ED14C2 /* TechnieRankingCell.swift in Sources */,
 				8A60EEBB258CDB2E0061A830 /* LivePreview.swift in Sources */,
@@ -1027,8 +1049,10 @@
 				8A00AB2925B981D000C250C4 /* LocationPickerVC.swift in Sources */,
 				8ACD6AEE25C4384000CC057D /* PhotoCollectionViewerVC.swift in Sources */,
 				8AADFB9425B5A7E200D3A5CC /* ConversationsTVCell.swift in Sources */,
+				8AA43A2E25D1519C00140649 /* RecommendationVC.swift in Sources */,
 				8A05765C25CD77390071FDD1 /* ReviewsCell.swift in Sources */,
 				8A76FA5F258DF2F40094C524 /* NearbyDetailVC.swift in Sources */,
+				8A0C0B3D25D119C30072729D /* TechnicianSearchResultsVC.swift in Sources */,
 				8A6C839825CADA8B0082D51F /* TechnicianProfileDetailsVC.swift in Sources */,
 				8ADECCC425B026F600F871EF /* FeedsTVCell.swift in Sources */,
 				8A41E7B725B07D6C00265D5C /* TechineProfileTVCell.swift in Sources */,
@@ -1404,6 +1428,14 @@
 				minimumVersion = 1.0.17;
 			};
 		};
+		8AA43A1F25D145FF00140649 /* XCRemoteSwiftPackageReference "NotificationBanner" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Daltron/NotificationBanner";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.0.6;
+			};
+		};
 		8AADFB8A25B5A59700D3A5CC /* XCRemoteSwiftPackageReference "SDWebImage" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SDWebImage/SDWebImage";
@@ -1424,6 +1456,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 8A8F8552258A408700C4CEF9 /* XCRemoteSwiftPackageReference "LBTATools" */;
 			productName = LBTATools;
+		};
+		8AA43A2025D145FF00140649 /* NotificationBannerSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8AA43A1F25D145FF00140649 /* XCRemoteSwiftPackageReference "NotificationBanner" */;
+			productName = NotificationBannerSwift;
 		};
 		8AADFB8B25B5A59700D3A5CC /* SDWebImage */ = {
 			isa = XCSwiftPackageProductDependency;

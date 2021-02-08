@@ -14,12 +14,13 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         var iv = UIImageView()
         iv.translatesAutoresizingMaskIntoConstraints = false
         iv.frame = CGRect(x: 0, y: 0, width: 100, height: 100)
-        iv.roundedImage()
-//        iv.image = UIImage(systemName: "person.crop.circle")?.withTintColor(.systemPink, renderingMode: .alwaysOriginal)
+//        iv.roundedImage()
+        iv.image = UIImage(named: "technieDummyPhoto")//?.withTintColor(.systemPink, renderingMode: .alwaysOriginal)
         iv.clipsToBounds = true
+        iv.layer.cornerRadius = 15
         //        iv.sizeToFit()
         iv.contentMode = .scaleAspectFill
-        iv.backgroundColor = .red
+//        iv.backgroundColor = .red
         return iv
     }()
     
@@ -39,7 +40,7 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         let lbl = UILabel()
         lbl.translatesAutoresizingMaskIntoConstraints = false
         lbl.text = "Baguio City, Philippines"
-        lbl.textAlignment = .center
+        lbl.textAlignment = .left
         lbl.textColor = .systemGray
         lbl.font = .systemFont(ofSize: 12.5)
 //        lbl.withHeight(25)
@@ -47,33 +48,6 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         lbl.numberOfLines = 0
 //        lbl.textColor = UIColor(named: "LabelPrimaryAppearance")
         return lbl
-    }()
-    
-    lazy var ratingAndReviewsLabel: UILabel = {
-        let lbl = UILabel()
-        lbl.translatesAutoresizingMaskIntoConstraints = false
-        lbl.text = " 4.5 (40)"//★
-        lbl.textColor = UIColor(named: "LabelPrimaryAppearance")
-//        lbl.textAlignment = .left
-        return lbl
-    }()
-    
-    lazy var ratingAndReviewsStackView: UIStackView = {
-        let config = UIImage.SymbolConfiguration(pointSize: CGFloat(15))
-        var wiredProfileImage = UIImage(systemName: "star.fill", withConfiguration: config)?.withTintColor(.systemPink, renderingMode: .alwaysOriginal)
-        
-        let iconIV = UIImageView()
-        iconIV.contentMode = .scaleAspectFit
-        iconIV.image = wiredProfileImage
-        
-        let sv = UIStackView(arrangedSubviews: [iconIV, ratingAndReviewsLabel])
-        sv.translatesAutoresizingMaskIntoConstraints = false
-        sv.axis = .horizontal
-        sv.spacing = 0
-        sv.alignment = .center
-        sv.distribution = .fillProportionally
-//        sv.addBackground(color: .red)
-        return sv
     }()
     
     var currentSegmentIndex = 0
@@ -88,31 +62,32 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         return segment
     }()
     
-    lazy var mainStackView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [nameLabel, locationLabel])
-        sv.axis = .vertical
-        sv.alignment = .center
-        sv.spacing = 0
-        sv.distribution = .equalSpacing
-//        sv.addBackground(color: .red)
-        return sv
-    }()
+//    lazy var mainStackView: UIStackView = {
+//        let sv = UIStackView(arrangedSubviews: [nameLabel, locationLabel])
+//        sv.axis = .vertical
+//        sv.alignment = .center
+//        sv.spacing = 0
+//        sv.distribution = .equalSpacing
+////        sv.addBackground(color: .red)
+//        return sv
+//    }()
     
     lazy var contentViewSize = CGSize(width: self.view.frame.width, height: self.view.frame.height)
     var devidingNo: CGFloat = 1
+    
     lazy var scrollView : UIScrollView = {
         let view = UIScrollView(frame : .zero)
         var frame = CGRect.init()
         let screenSize = UIScreen.main.bounds.size
-        screenSize.height <= 667 ? (frame = CGRect(x: 0, y: (navigationController?.navigationBar.frame.height)! - (navigationController?.navigationBar.frame.height)!/1.8, width: contentViewSize.width, height: contentViewSize.height - (navigationController?.navigationBar.frame.height)!/2)) : (frame = CGRect(x: 0, y: (navigationController?.navigationBar.frame.height)! - (navigationController?.navigationBar.frame.height)!/devidingNo, width: contentViewSize.width, height: contentViewSize.height - (navigationController?.navigationBar.frame.height)!))//2.5
+        screenSize.height <= 667 ? (frame = CGRect(x: 0, y: (navigationController?.navigationBar.frame.height)! - (navigationController?.navigationBar.frame.height)!/1.8, width: contentViewSize.width, height: contentViewSize.height - (navigationController?.navigationBar.frame.height)!/2)) : (frame = CGRect(x: 0, y: (navigationController?.navigationBar.frame.height)! - (navigationController?.navigationBar.frame.height)!/2, width: contentViewSize.width, height: contentViewSize.height - (navigationController?.navigationBar.frame.height)!))//2.5
     
         view.frame = frame
-        view.contentInsetAdjustmentBehavior = .never
+        view.contentInsetAdjustmentBehavior = .always
         view.contentSize = contentViewSize
         view.backgroundColor = .systemBackground
         return view
     }()
-
+    
     lazy var mainContainerView: UIView = {
         let view = UIView()
 //        view.frame.size = contentViewSize
@@ -187,12 +162,14 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         let btn = UIButton(type: .system)
         btn.translatesAutoresizingMaskIntoConstraints = false
         btn.setTitle("Hire Valter", for: .normal)
+//        btn.setTitleColor(.white, for: .normal)
+
 //        btn.contentHorizontalAlignment = .left
         btn.layer.cornerRadius = 10
         btn.clipsToBounds = true
         btn.backgroundColor = .cyan
 //        btn.withWidth(180)
-//        btn.addTarget(self, action: #selector(proposalBtnPressed), for: .touchUpInside)
+        btn.addTarget(self, action: #selector(hireBtnPressed), for: .touchUpInside)
         return btn
     }()
     
@@ -226,6 +203,101 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         return view
     }()
     
+    lazy var rankingLabel: UILabel = {
+        let lbl = UILabel()
+        lbl.translatesAutoresizingMaskIntoConstraints = false
+        lbl.text = "• Technie Rank: 1/5000"
+//        lbl.textAlignment = .center
+//        lbl.withHeight(25)
+        lbl.font = .systemFont(ofSize: 14)
+//        lbl.backgroundColor = .brown
+        lbl.numberOfLines = 0
+        lbl.textColor = .systemGray
+        return lbl
+    }()
+    
+    lazy var technicianAgeLabel: UILabel = {
+        let lbl = UILabel()
+        lbl.translatesAutoresizingMaskIntoConstraints = false
+        lbl.text = "• 30 years old"
+//        lbl.textAlignment = .center
+//        lbl.withHeight(25)
+        lbl.font = .systemFont(ofSize: 14)
+//        lbl.backgroundColor = .brown
+        lbl.numberOfLines = 0
+        lbl.textColor = .systemGray
+        return lbl
+    }()
+    
+    lazy var technicianExperienceLabel: UILabel = {
+        let lbl = UILabel()
+        lbl.translatesAutoresizingMaskIntoConstraints = false
+        lbl.text = "• 8 Year of Exp."
+//        lbl.textAlignment = .center
+//        lbl.withHeight(25)
+        lbl.font = .systemFont(ofSize: 14)
+//        lbl.backgroundColor = .brown
+        lbl.numberOfLines = 0
+        lbl.textColor = .systemGray
+        return lbl
+    }()
+    
+    lazy var memberShipDateLabel: UILabel = {
+        let lbl = UILabel()
+        lbl.translatesAutoresizingMaskIntoConstraints = false
+        lbl.text = "• Member since October'13"
+//        lbl.textAlignment = .center
+//        lbl.withHeight(25)
+        lbl.font = .systemFont(ofSize: 14)
+//        lbl.backgroundColor = .brown
+        lbl.numberOfLines = 0
+        lbl.textColor = .systemGray
+        return lbl
+    }()
+    
+    lazy var technicianInfoLabelStackView: UIStackView = {
+        let sv = UIStackView(arrangedSubviews: [nameLabel, locationWithIconStackView, technicianExperienceLabel, memberShipDateLabel])
+        sv.translatesAutoresizingMaskIntoConstraints = false
+        sv.axis = .vertical
+        sv.spacing = -15
+        sv.alignment = .leading
+        sv.distribution = .fillEqually
+//        sv.addBackground(color: .brown)
+        return sv
+    }()
+    
+    lazy var technicianInfoMainStackView: UIStackView = {
+        let sv = UIStackView(arrangedSubviews: [profileImageView, technicianInfoLabelStackView])
+        sv.translatesAutoresizingMaskIntoConstraints = false
+        sv.axis = .horizontal
+        sv.spacing = 20
+//        sv.alignment = .leading
+        sv.distribution = .fillProportionally
+//        sv.addBackground(color: .brown)
+        return sv
+    }()
+    
+    lazy var locationWithIconStackView: UIStackView = {
+        let config = UIImage.SymbolConfiguration(pointSize: 13, weight: .bold, scale: .small)
+        var wiredProfileImage = UIImage(systemName: "mappin.and.ellipse", withConfiguration: config)?.withTintColor(.systemGray, renderingMode: .alwaysOriginal)
+        
+        let iconIV = UIImageView()
+        iconIV.contentMode = .scaleAspectFit
+        iconIV.withWidth(13)
+//        iconIV.backgroundColor = .brown
+        iconIV.image = wiredProfileImage?.withAlignmentRectInsets(UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0))
+
+        let sv = UIStackView(arrangedSubviews: [iconIV, locationLabel])
+        sv.translatesAutoresizingMaskIntoConstraints = false
+        sv.axis = .horizontal
+        sv.spacing = 5
+//        sv.alignment = .leading
+        sv.distribution = .fillProportionally
+//        sv.addBackground(color: .cyan)
+        sv.withWidth(view.frame.width - 140)
+        return sv
+    }()
+    
     // MARK: - Inits
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -252,11 +324,12 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
     
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
-        let heights = profileImageView.frame.height
-            + aboutTableView.frame.height
-            + mainStackView.frame.height
-            + customSegmentedControl.frame.height
-            + switchableContainerView.frame.height
+//        let heights = profileImageView.frame.height
+//            + aboutTableView.frame.height
+//            + mainStackView.frame.height
+//            + customSegmentedControl.frame.height
+//            + switchableContainerView.frame.height
+        
 //        contentViewSize.height = view.frame.height + heights
 //        let remainHeight = heights - mainContainerView.frame.height
 //        let thisHeight = heights - scrollView.frame.height //- mainContainerView.frame.height
@@ -285,7 +358,7 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
     fileprivate func setupViews() {
         view.addSubview(scrollView)
         scrollView.addSubview(mainContainerView)
-        [mainStackView, profileImageView, customSegmentedControl, switchableContainerView].forEach {mainContainerView.addSubview($0)}
+        [technicianInfoMainStackView, customSegmentedControl, switchableContainerView].forEach {mainContainerView.addSubview($0)}
         
 //        guard let navBarHeight = navigationController?.navigationBar.frame.height else { return }
 //        guard let tabBarHeight = tabBarController?.tabBar.frame.height else { return }
@@ -296,16 +369,16 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
 //        dynamicHeight = mainContainerView.heightAnchor.constraint(equalToConstant: 0)
 //        dynamicHeight?.isActive = true
 
-        NSLayoutConstraint.activate([
-            profileImageView.widthAnchor.constraint(equalToConstant: 100),
-            profileImageView.heightAnchor.constraint(equalToConstant: 100),
-            profileImageView.centerXAnchor.constraint(equalTo: mainContainerView.centerXAnchor),
-            profileImageView.topAnchor.constraint(equalTo: mainContainerView.safeAreaLayoutGuide.topAnchor, constant: 20),
-        ])
-
-        mainStackView.anchor(top: profileImageView.bottomAnchor, leading: mainContainerView.leadingAnchor, bottom: nil, trailing: mainContainerView.trailingAnchor, padding: UIEdgeInsets(top: 10, left: 0, bottom: 0, right: 0), size: CGSize(width: 0, height: 0))
+//        NSLayoutConstraint.activate([
+        profileImageView.widthAnchor.constraint(equalToConstant: 100).isActive = true
+            profileImageView.heightAnchor.constraint(equalToConstant: 100).isActive = true
+//            profileImageView.centerXAnchor.constraint(equalTo: mainContainerView.centerXAnchor),
+//            profileImageView.topAnchor.constraint(equalTo: mainContainerView.safeAreaLayoutGuide.topAnchor, constant: 20),
+//        ])
+        technicianInfoMainStackView.anchor(top: mainContainerView.safeAreaLayoutGuide.topAnchor, leading: mainContainerView.leadingAnchor, bottom: nil, trailing: mainContainerView.trailingAnchor, padding: UIEdgeInsets(top: 20, left: 15, bottom: 0, right: 0), size: CGSize(width: 0, height: 0))
+//        mainStackView.anchor(top: profileImageView.bottomAnchor, leading: mainContainerView.leadingAnchor, bottom: nil, trailing: mainContainerView.trailingAnchor, padding: UIEdgeInsets(top: 10, left: 0, bottom: 0, right: 0), size: CGSize(width: 0, height: 0))
         
-        customSegmentedControl.anchor(top: mainStackView.bottomAnchor, leading: mainContainerView.leadingAnchor, bottom: nil, trailing: mainContainerView.trailingAnchor, padding: UIEdgeInsets(top: 12, left: 15, bottom: 0, right: 15), size: CGSize(width: 0, height: 30))
+        customSegmentedControl.anchor(top: technicianInfoMainStackView.bottomAnchor, leading: mainContainerView.leadingAnchor, bottom: nil, trailing: mainContainerView.trailingAnchor, padding: UIEdgeInsets(top: 12, left: 15, bottom: 0, right: 15), size: CGSize(width: 0, height: 30))
         
         switchableContainerView.anchor(top: customSegmentedControl.bottomAnchor, leading: mainContainerView.leadingAnchor, bottom: mainContainerView.bottomAnchor, trailing: mainContainerView.trailingAnchor, padding: UIEdgeInsets(top: 10, left: 0, bottom: 0, right: 0), size: CGSize(width: 0, height: 0))
 
@@ -313,9 +386,13 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         setupNavBar()
     }
     
+    var isSearching = false
     fileprivate func setupNavBar() {
         guard let navBar = navigationController?.navigationBar else { return }
-//        navBar.topItem?.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
+        if isSearching == true {
+            navBar.topItem?.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
+        }
+        
 //        navBar.setBackgroundImage(UIImage(), for: .default)
         navigationItem.largeTitleDisplayMode = .never
 //        navigationItem.title = "Submission"
@@ -438,7 +515,16 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
     
     
     // MARK: - Selectors
-
+    @objc fileprivate func hireBtnPressed(_ sender: UIButton) {
+        if sender.title(for: .normal) == "Hire Valter" {
+            sender.setTitle("Pending...", for: .normal)
+            sender.setTitleColor(.systemGray, for: .normal)
+        } else {
+            sender.setTitle("Hire Valter", for: .normal)
+            sender.setTitleColor(.systemBlue, for: .normal)
+        }
+    }
+    
 }
 // MARK: - TableViewDelegateAndDataSource Extension
 extension TechnicianProfileDetailsVC: TableViewDataSourceAndDelegate {

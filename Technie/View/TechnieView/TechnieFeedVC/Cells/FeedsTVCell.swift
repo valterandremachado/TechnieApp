@@ -174,14 +174,7 @@ class FeedsTVCell: UITableViewCell {
     // MARK: - Inits
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-//        backgroundColor = .white
-        /// Adding tableView right indicator
-//        self.accessoryType = .disclosureIndicator
-        /// Changing selection style
         self.selectionStyle = .none
-//        self.layer.cornerRadius = 15
-//        self.clipsToBounds = true
-//        backgroundColor = .yellow
         setupViews()
     }
     

@@ -10,26 +10,33 @@ import UIKit
 class FullRankingVC: UIViewController {
 
     // MARK: - Properties
-    lazy var collectionView: UICollectionView = {
-        let collectionLayout = UICollectionViewFlowLayout()
-        collectionLayout.scrollDirection = .vertical
-        collectionLayout.minimumLineSpacing = 4
-        collectionLayout.minimumInteritemSpacing = 6
-        collectionLayout.estimatedItemSize = .zero
-
-        let cv = UICollectionView(frame: .zero, collectionViewLayout: collectionLayout)
-        cv.translatesAutoresizingMaskIntoConstraints = false
-        cv.backgroundColor = .clear
-        cv.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        // Avoid collectionView to self adjust its size
-        //        cv.contentInsetAdjustmentBehavior = .never
+    lazy var tableView: UITableView = {
+        let tv = UITableView(frame: .zero, style: .grouped)
+        tv.translatesAutoresizingMaskIntoConstraints = false
+        tv.backgroundColor = .clear
         
-        cv.delegate = self
-        cv.dataSource = self
-        // Registration of the cell
-        cv.register(FullRankingCell.self, forCellWithReuseIdentifier: FullRankingCell.cellID)
-        return cv
+//        tv.isScrollEnabled = false
+        tv.showsVerticalScrollIndicator = false
+        // Set automatic dimensions for row height
+        tv.rowHeight = UITableView.automaticDimension
+        tv.estimatedRowHeight = UITableView.automaticDimension
+        tv.clipsToBounds = true
+//        tv.contentInset = UIEdgeInsets(top: 10, left: 0, bottom: 0, right: 0)
+
+        var frame = CGRect.zero
+        frame.size.height = .leastNormalMagnitude
+        tv.tableHeaderView = UIView(frame: frame)
+        tv.tableFooterView = UIView(frame: frame)
+//        tv.contentInsetAdjustmentBehavior = .never
+        
+        tv.delegate = self
+        tv.dataSource = self
+        tv.register(FullRankingCell.self, forCellReuseIdentifier: FullRankingCell.cellID)
+        return tv
     }()
+    
+    let rankArray = ["Valter A. Machado1", "Valter A. Machado2", "Valter A. Machado3", "Valter A. Machado4", "Valter A. Machado5", "Valter A. Machado", "Valter A. Machado", "Valter A. Machado", "Valter A. Machado"]
+    var sectionSetter = [SectionHandler]()
     
     // MARK: - Inits
     override func viewDidLoad() {
@@ -37,19 +44,29 @@ class FullRankingVC: UIViewController {
         // Do any additional setup after loading the view.
         view.backgroundColor = .systemBackground
         setupViews()
+        populateSection()
     }
     
     // MARK: - Methods
     fileprivate func setupViews() {
-        [collectionView].forEach {view.addSubview($0)}
-        collectionView.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.leadingAnchor, bottom: view.safeAreaLayoutGuide.bottomAnchor, trailing: view.trailingAnchor, padding: UIEdgeInsets(top: 0, left: 0, bottom: 0, right:  0))
+        [tableView].forEach {view.addSubview($0)}
+        tableView.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.leadingAnchor, bottom: view.safeAreaLayoutGuide.bottomAnchor, trailing: view.trailingAnchor, padding: UIEdgeInsets(top: 0, left: 0, bottom: 0, right:  0))
         setupNavBar()
     }
     
     fileprivate func setupNavBar() {
         guard let navBar = navigationController?.navigationBar else { return }
-        navigationItem.title = "Ranking"
+        navigationItem.title = "Technie Rank"
         navigationItem.largeTitleDisplayMode = .never
+    }
+    
+    fileprivate func populateSection() {
+        // Filtering the rank to have a different section for top 5 ranking from the rest
+        let topFiveRank = Array<String>(rankArray.prefix(5))
+        let remainingRank = rankArray.filter { topFiveRank.contains($0) == false }
+
+        sectionSetter.append(SectionHandler(title: "Top 5", detail: topFiveRank))
+        sectionSetter.append(SectionHandler(title: "Remaining Rank", detail: remainingRank))
     }
     
     // MARK: - Selectors
@@ -57,41 +74,61 @@ class FullRankingVC: UIViewController {
 }
 
 // MARK: - CollectionDataSourceAndDelegate Extension
-extension FullRankingVC: CollectionDataSourceAndDelegate {
+extension FullRankingVC: TableViewDataSourceAndDelegate {
     
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 21
+    func numberOfSections(in tableView: UITableView) -> Int {
+        sectionSetter.count
     }
     
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: FullRankingCell.cellID, for: indexPath) as! FullRankingCell
-        cell.layer.cornerRadius = 16
-        cell.clipsToBounds = true
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return sectionSetter[section].sectionDetail.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        var cell = tableView.dequeueReusableCell(withIdentifier: FullRankingCell.cellID, for: indexPath) as! FullRankingCell
+        cell = FullRankingCell(style: .subtitle, reuseIdentifier: FullRankingCell.cellID)
+        
+        let detailForRow = sectionSetter[indexPath.section].sectionDetail[indexPath.row]
+        
+        cell.detailTextLabel?.textColor = .systemGray
+        cell.textLabel?.text = indexPath.section == 0 ? ("#\(indexPath.row + 1) " + detailForRow) : ("#\(indexPath.row + 6) " + detailForRow)
+        cell.detailTextLabel?.text = "300 services | reviews (40)"
         return cell
     }
     
-    // CollectionView layouts
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-
-        let noOfCellsInRow = 3
-        /// changing sizeForItem when user switches through the segnment
-        let flowLayout = collectionViewLayout as! UICollectionViewFlowLayout
-        let totalSpace = flowLayout.sectionInset.left
-            + flowLayout.sectionInset.right
-            + (flowLayout.minimumInteritemSpacing * CGFloat(noOfCellsInRow))
-//            flowLayout.sectionInset.left = 5
-//            flowLayout.sectionInset.right = 5
-        
-        let size = ((collectionView.bounds.width) - totalSpace) / CGFloat(noOfCellsInRow)
-        let screenSize = UIScreen.main.bounds
-
-        let finalSize = CGSize(width: size, height: screenSize.width/1.86)
-                
-       return finalSize
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        let vc = TechnicianProfileDetailsVC()
+//        vc.devidingNo = 2.5
+        navigationController?.pushViewController(vc, animated: true)
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        let collectionViewEdgeInsets = UIEdgeInsets(top: 5, left: 3, bottom: 5, right: 3)
-        return collectionViewEdgeInsets
+    // Header layout
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return sectionSetter[section].sectionTitle
     }
+    
+    func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        // remove bottom extra 20px space.
+        return UIView(frame: CGRect(x: 0, y: 0, width: 0, height: CGFloat.leastNormalMagnitude))
+    }
+    
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        // remove bottom extra 20px space.
+        return .leastNormalMagnitude
+    }
+    
+//    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+//        return UIView(frame: CGRect(x: 0, y: 0, width: 0, height: CGFloat.leastNormalMagnitude))
+//    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        if section <= 1 {
+            return 35
+        }
+        return .leastNormalMagnitude
+    }
+
+    
+   
 }

@@ -58,13 +58,13 @@ class ClientPostVC: UIViewController {
     fileprivate func setupViews() {
         [collectionView].forEach{view.addSubview($0)}
         
-        collectionView.anchor(top: view.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor, padding: UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 8))
+        collectionView.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor, padding: UIEdgeInsets(top: 15, left: 8, bottom: 0, right: 8))
     }
     
     fileprivate func setupNavBar() {
         guard let nav = navigationController?.navigationBar else { return }
         nav.prefersLargeTitles = true
-        navigationItem.largeTitleDisplayMode = .automatic
+        navigationItem.largeTitleDisplayMode = .never
         navigationItem.title = "Post Service"
     }
     

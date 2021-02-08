@@ -7,7 +7,7 @@
 
 import UIKit
 
-class SearchResultsVC: UIViewController {
+class JobSearchResultsVC: UIViewController {
 
     // MARK: - Properties
     lazy var tableView: UITableView = {
@@ -65,7 +65,7 @@ class SearchResultsVC: UIViewController {
 }
 
 // MARK: - TableViewDelegateAndDataSource Extension
-extension SearchResultsVC: TableViewDataSourceAndDelegate {
+extension JobSearchResultsVC: TableViewDataSourceAndDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return stringArray.count
@@ -77,8 +77,11 @@ extension SearchResultsVC: TableViewDataSourceAndDelegate {
         return cell
     }
     
-//    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-//    }
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let vc = JobDetailsVC()
+        vc.isSearching = true
+        navigationController?.pushViewController(vc, animated: true)
+    }
     
     func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
         // remove bottom extra 20px space.

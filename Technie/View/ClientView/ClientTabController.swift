@@ -15,7 +15,7 @@ class ClientTabController: UITabBarController {
 //    private let searchVC = ClientSearchVC()
     private let profileVC = UserProfileVC()
     private let postVC = ClientPostVC()
-    private let chatVC = ClientChatVC()
+    private let chatVC = ConversationVC()
     private let notificationVC = ClientNotificationVC()
 
     // MARK: - Init

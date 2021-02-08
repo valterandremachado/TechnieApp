@@ -639,17 +639,22 @@ func setTitle(title:String, subtitle:String) -> UIView {
 
 extension UINavigationBar {
     
-    func hideNavBarSeperator()
-    {
-        let img = UIImage()
-        self.shadowImage = img
-        self.setBackgroundImage(img, for: UIBarMetrics.default)
+    func hideNavBarSeperator() {
+        shadowImage = UIImage()
     }
     
-    func showNavBarSeperator()
-    {
-        let img = UIImage.pixelImageWithColor(color: UIColor.systemGray5)//Use Any Color
-        self.shadowImage = img
+    func showNavBarSeperator() {
+        self.shadowImage = nil
+    }
+    
+    func clearNavBarAppearance() {
+        setBackgroundImage(UIImage(), for: .default)
+        shadowImage = UIImage()
+    }
+    
+    func defaultNavBarAppearance() {
+        setBackgroundImage(nil, for: .default)
+        shadowImage = nil
     }
 }
 extension UIImage {

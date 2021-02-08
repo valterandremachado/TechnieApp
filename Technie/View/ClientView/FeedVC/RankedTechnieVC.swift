@@ -164,14 +164,6 @@ class RankedTechnieVC: UIViewController {
         return btn
     }()
     
-    @objc fileprivate func checkProfileBtnPressed() {
-        let vc = TechnicianProfileDetailsVC()
-        vc.devidingNo = 1
-        vc.isModalInPresentation = true
-//        vc.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
-        navigationController?.pushViewController(vc, animated: true)
-    }
-    
     lazy var stackView2: UIStackView = {
         let sv = UIStackView(arrangedSubviews: [completeProfileLabel, profileDetailsLabel])
         sv.translatesAutoresizingMaskIntoConstraints = false
@@ -219,7 +211,18 @@ class RankedTechnieVC: UIViewController {
         
         setupViews()
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        setupNavBar()
+    }
 
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        // Reset navBar appearance to default
+        navigationController?.navigationBar.defaultNavBarAppearance()
+    }
+    
     // MARK: - Methods
     fileprivate func setupViews() {
         // Add subViews on the main viewRoot
@@ -248,14 +251,11 @@ class RankedTechnieVC: UIViewController {
         
         stackView2.anchor(top: checkProfileBtn.topAnchor, leading: shorterRoundedTopCornerView.leadingAnchor, bottom: nil, trailing: checkProfileBtn.leadingAnchor, padding: UIEdgeInsets(top: 0, left: 25, bottom: 0, right: 0), size: CGSize(width: 0, height: 0))
         
-        setupNavBar()
     }
     
     fileprivate func setupNavBar() {
         guard let navBar = navigationController?.navigationBar else { return }
-        navBar.setBackgroundImage(UIImage(), for: .default)
-        navBar.hideNavBarSeperator()
-
+        navBar.clearNavBarAppearance()
         navBar.topItem?.title = ""
 //        navBar.prefersLargeTitles = true
 //        navigationItem.largeTitleDisplayMode = .automatic
@@ -267,6 +267,14 @@ class RankedTechnieVC: UIViewController {
     }
     
     // MARK: - Selectors
+    @objc fileprivate func checkProfileBtnPressed() {
+        let vc = TechnicianProfileDetailsVC()
+//        vc.devidingNo = 1
+        vc.isModalInPresentation = true
+//        vc.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+        navigationController?.pushViewController(vc, animated: true)
+    }
+    
     @objc fileprivate func leftNavBarBtnTapped() {
         dismiss(animated: true, completion: nil)
     }

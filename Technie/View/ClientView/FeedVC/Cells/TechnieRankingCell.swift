@@ -151,7 +151,7 @@ class TechnieRankingInnerCell: UICollectionViewCell {
         lbl.font = .systemFont(ofSize: 12)
 //        lbl.backgroundColor = .yellow
 
-        lbl.text = "Best worker of this week"
+        lbl.text = "Expertise description"
         return lbl
     }()
     

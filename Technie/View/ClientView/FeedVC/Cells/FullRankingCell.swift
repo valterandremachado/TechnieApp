@@ -7,14 +7,17 @@
 
 import UIKit
 
-class FullRankingCell: UICollectionViewCell {
+class FullRankingCell: UITableViewCell {
     
     static let cellID = "FullRankingCellID"
-    // MARK: - Init
-    override init(frame: CGRect) {
-        super.init(frame: .zero)
-        backgroundColor = .systemGray3
-//        setupViews()
+    // MARK: - Inits
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        /// Adding tableView right indicator
+//        self.accessoryType = .disclosureIndicator
+        /// Changing selection style
+//        self.selectionStyle = .none
+//        backgroundColor = UIColor.rgb(red: 235, green: 235, blue: 235)
     }
     
     required init?(coder: NSCoder) {

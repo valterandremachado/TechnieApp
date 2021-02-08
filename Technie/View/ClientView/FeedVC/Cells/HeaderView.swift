@@ -51,7 +51,6 @@ class HeaderView: UICollectionReusableView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         //       self.backgroundColor = UIColor.purple
-        self.addBorder(.bottom, color: .systemGray, thickness: 0.3)
         setupView()
     }
     

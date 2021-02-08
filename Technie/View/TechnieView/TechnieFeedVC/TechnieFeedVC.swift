@@ -212,12 +212,6 @@ class TechnieFeedVC: UIViewController {
         
     }
     
-    fileprivate func presentSearchResults(_ searchedString: String) {
-        let vc = SearchResultsVC()
-        vc.title = "\(searchedString) results".lowercased()
-        navigationController?.pushViewController(vc, animated: true)
-    }
-    
     // MARK: - Selectors
     @objc fileprivate func leftBarItemPressed(){
         let userProfileVC = UserProfileVC()
@@ -251,6 +245,12 @@ extension TechnieFeedVC: UISearchBarDelegate {
         guard let searchedString = searchBar.text else { return }
         presentSearchResults(searchedString)
     }
+    
+    fileprivate func presentSearchResults(_ searchedString: String) {
+        let vc = JobSearchResultsVC()
+        vc.title = "\(searchedString) results".lowercased()
+        navigationController?.pushViewController(vc, animated: true)
+    }
 }
 
 // MARK: - TableViewDelegateAndDataSource Extension
@@ -261,6 +261,7 @@ extension TechnieFeedVC: TableViewDataSourceAndDelegate {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+//        tableView.deselectRow(at: indexPath, animated: true)
         let cell = tableView.dequeueReusableCell(withIdentifier: FeedsTVCell.cellID, for: indexPath) as! FeedsTVCell
 //        cell.textLabel?.text = stringArray[indexPath.row]
         return cell
@@ -310,7 +311,7 @@ extension TechnieFeedVC: CollectionDataSourceAndDelegate {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         print("didSelectItemAt: \(indexPath.row)")
-        let vc = SearchResultsVC()
+        let vc = JobSearchResultsVC()
         vc.title = "\(professionArray[indexPath.item]) job results".lowercased()
         navigationController?.pushViewController(vc, animated: true)
 //        presentSearchResults()
@@ -348,7 +349,7 @@ extension TechnieFeedVC: CollectionDataSourceAndDelegate {
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind:
                             String, at indexPath: IndexPath) -> UICollectionReusableView {
         let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: headerID, for: indexPath) as! HeaderView
-        header.sectionTitle.text = "Search by category"
+        header.sectionTitle.text = "Search by category".uppercased()
         //            header.backgroundColor = .red
         //            header.sectionTitle.backgroundColor = .brown
         //            header.stackView.addBackground(color: .cyan)

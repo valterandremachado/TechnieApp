@@ -163,18 +163,15 @@ class ClientFeedVC: UIViewController {
         // Do any additional setup after loading the view.
         view.backgroundColor = UIColor(named: "BackgroundAppearance")
         setupViews()
-        
-        
+        print("viewDidLoadFeed: \(didShowSearchResultViewObservable.value)")
     }
     
-    
     fileprivate func collectionViewFlowLayoutSetup(with Width: CGFloat){
-        
         if let flowLayout = clientFeedCollectionView.collectionViewLayout as? UICollectionViewFlowLayout {
             flowLayout.estimatedItemSize = CGSize(width: Width, height: 300)
         }
-        
     }
+    
     // MARK: - Methods
     fileprivate func setupViews(){
         [clientFeedCollectionView, searchResultView].forEach {view.addSubview($0)}
@@ -254,9 +251,20 @@ extension ClientFeedVC: UISearchBarDelegate {
         hideSearchResultView()
     }
     
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.searchTextField.autocapitalizationType = .none
+        guard let searchedString = searchBar.text else { return }
+        presentSearchResults(searchedString)
+    }
 //    func presentSearchController(_ searchController: UISearchController) {
 //        searchController.searchBar.becomeFirstResponder()
 //    }
+    
+    fileprivate func presentSearchResults(_ searchedString: String) {
+        let vc = TechnicianSearchResultsVC()
+        vc.title = "\(searchedString) results".lowercased()
+        navigationController?.pushViewController(vc, animated: true)
+    }
 }
 
 // MARK: - CollectionViewDelegateAndDataSource Extension
@@ -307,11 +315,13 @@ extension ClientFeedVC: CollectionDataSourceAndDelegate {
         switch didShowSearchResultViewObservable.value {
         case true:
             print("resultView Showing now")
+            let vc = TechnicianSearchResultsVC()
+            vc.title = "\(professionArray[indexPath.item]) technician results".lowercased()
+            navigationItem.backBarButtonItem = UIBarButtonItem(title: "Search", style: .plain, target: self, action: nil)
+            navigationController?.pushViewController(vc, animated: true)
         case false:
             let vc = TechnicianProfileDetailsVC()
-            vc.devidingNo = 2.5
-            let vcWithEmbeddedNav = UINavigationController(rootViewController: vc)
-//            present(vcWithEmbeddedNav, animated: true)
+            navigationItem.backBarButtonItem = UIBarButtonItem(title: "Feeds", style: .plain, target: self, action: nil)
             navigationController?.pushViewController(vc, animated: true)
         }
         
@@ -411,10 +421,12 @@ extension ClientFeedVC: CollectionDataSourceAndDelegate {
             header.seeAllBtn.addTarget(self, action: #selector(seeAllBtnPressed), for: .touchUpInside)
             header.backgroundColor = .systemBackground
             //            header.sectionTitle.backgroundColor = .brown
+            header.addBorder(.bottom, color: .systemGray, thickness: 0.3)
             return header
         case 1:
             header.sectionTitle.text = sections[indexPath.section].uppercased()
             header.backgroundColor = .systemBackground
+            header.addBorder(.bottom, color: .systemGray, thickness: 0.3)
             return header
         default:
             break

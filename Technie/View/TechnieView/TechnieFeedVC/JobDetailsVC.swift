@@ -192,10 +192,12 @@ class JobDetailsVC: UIViewController {
         setupNavBar()
     }
     
+    var isSearching = false
     func setupNavBar() {
         guard let navBar = navigationController?.navigationBar else { return }
 //        navigationItem.title = "Job Details"
-        navBar.topItem?.backBarButtonItem = UIBarButtonItem(title: "Feeds", style: .plain, target: self, action: nil)
+        isSearching ? (navBar.topItem?.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)) : (navBar.topItem?.backBarButtonItem = UIBarButtonItem(title: "Feeds", style: .plain, target: self, action: nil))
+       
         navigationItem.largeTitleDisplayMode = .never
         navigationItem.titleView = navBarTitleStackView
     }

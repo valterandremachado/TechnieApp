@@ -6,7 +6,7 @@
 //
 
 import UIKit
-
+import NotificationBannerSwift
 
 struct Keys {
     static let pickerStoredIndex = "pickerIndex"
@@ -235,7 +235,7 @@ class PostFormVC: UIViewController {
 //        navBar.topItem?.title = "Add Skills"
 //        navBar.prefersLargeTitles = true
 //        navigationItem.largeTitleDisplayMode = .automatic
-        let rightNavBarButton = UIBarButtonItem(title: "Post", style: .done, target: self, action: #selector(rightNavBarBtnTapped))
+        let rightNavBarButton = UIBarButtonItem(title: "Post", style: .done, target: self, action: #selector(rightNavBarItemPostBtnTapped))
             //UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(leftNavBarBtnTapped))
 
 //        self.navigationItem.leftBarButtonItem = leftNavBarButton
@@ -303,8 +303,72 @@ class PostFormVC: UIViewController {
     }
     
     // MARK: - Selectors
-    @objc fileprivate func rightNavBarBtnTapped() {
-        dismiss(animated: true, completion: nil)
+    @objc fileprivate func rightNavBarItemPostBtnTapped() {
+        navigationController?.popToRootViewController(animated: true)
+        showRecommendationBanner()
+    }
+    
+    fileprivate func showRecommendationBanner() {
+//        let banner = GrowingNotificationBanner(title: "Hello from banner",
+//                                               subtitle: "I will be your recommandation banner",
+//                                               leftView: nil,
+//                                               rightView: nil,
+//                                               style: .info,
+//                                               colors: nil,
+//                                               iconPosition: .center,
+//                                               sideViewSize: .leastNormalMagnitude)
+//
+//        let floatingBanner = FloatingNotificationBanner(title: "Hello from banner",
+//                                                        subtitle: "I will be your recommandation banner",
+//                                                        leftView: nil,
+//                                                        rightView: nil,
+//                                                        style: .info,
+//                                                        colors: nil,
+//                                                        iconPosition: .center)
+//        floatingBanner.show(queuePosition: .back,
+//                            bannerPosition: .top,
+//                            queue: .default,
+//                            on: self,
+//                            edgeInsets: UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8),
+//                            cornerRadius: nil,
+//                            shadowColor: .black,
+//                            shadowOpacity: 1,
+//                            shadowBlurRadius: 0,
+//                            shadowCornerRadius: 0,
+//                            shadowOffset: .zero,
+//                            shadowEdgeInsets: nil)
+        let config = UIImage.SymbolConfiguration(pointSize: 30, weight: .bold, scale: .large)
+        let wiredProfileImage = UIImage(systemName: "chevron.forward.circle.fill", withConfiguration: config)?.withTintColor(.systemPink, renderingMode: .alwaysOriginal)
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFill
+        imageView.image = wiredProfileImage
+        let banner = FloatingNotificationBanner(title: "Recommendation",
+                                                subtitle: "Check the best fit technicians nearby your area for the service you just posted.",
+                                                rightView: imageView,
+                                                style: .info)
+        
+//        banner.autoDismiss = false
+//        banner.autoDismiss = true
+        banner.subtitleLabel?.font = .systemFont(ofSize: 13)
+        
+        banner.show(queuePosition: .front,
+                    bannerPosition: .bottom,
+                    edgeInsets: UIEdgeInsets(top: 0, left: 10, bottom: (tabBarController?.tabBar.frame.height)! - 15, right: 10),
+                    cornerRadius: 10)
+        
+        banner.onTap = {
+            let vc = RecommendationVC()
+            let vcEmbeddedToNavController = UINavigationController(rootViewController: vc)
+            guard let topViewController = UIApplication.shared.windows.filter({$0.isKeyWindow}).first?.rootViewController else { return }
+
+            DispatchQueue.main.async {
+                
+                topViewController.present(vcEmbeddedToNavController, animated: true)
+                banner.dismiss()
+//                topViewController.navigationController?.pushViewController(vc, animated: true)
+            }
+        }
+        
     }
     
     @objc func addSkillsBtnTapped() {
@@ -692,7 +756,7 @@ extension PostFormVC: TableViewDataSourceAndDelegate, UITextViewDelegate {
         case 1:
             return 60
         case 2:
-            return 60
+            return 40
         default:
             return 40
         }
