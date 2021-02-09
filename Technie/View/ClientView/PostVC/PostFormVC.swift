@@ -25,6 +25,7 @@ class PostFormVC: UIViewController {
         // Set automatic dimensions for row height
         tv.rowHeight = UITableView.automaticDimension
         tv.estimatedRowHeight = UITableView.automaticDimension
+        tv.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         //        tv.isScrollEnabled = false
         tv.showsVerticalScrollIndicator = false
 //        tv.rowHeight = 40
@@ -349,12 +350,19 @@ class PostFormVC: UIViewController {
         
 //        banner.autoDismiss = false
 //        banner.autoDismiss = true
-        banner.subtitleLabel?.font = .systemFont(ofSize: 13)
         
-        banner.show(queuePosition: .front,
-                    bannerPosition: .bottom,
-                    edgeInsets: UIEdgeInsets(top: 0, left: 10, bottom: (tabBarController?.tabBar.frame.height)! - 15, right: 10),
-                    cornerRadius: 10)
+        banner.subtitleLabel?.font = .systemFont(ofSize: 13)
+        guard let tabHeight = tabBarController?.tabBar.frame.height else { return }
+//        DispatchQueue.global().asyncAfter(deadline: .now() + .seconds(Int(2))) { //[self] in
+//            DispatchQueue.main.async {
+                banner.show(queuePosition: .front,
+                            bannerPosition: .bottom,
+                            edgeInsets: UIEdgeInsets(top: 0, left: 10, bottom: tabHeight - 15, right: 10),
+                            cornerRadius: 10)
+//            }
+//        }
+         
+        
         
         banner.onTap = {
             let vc = RecommendationVC()
@@ -365,7 +373,6 @@ class PostFormVC: UIViewController {
                 
                 topViewController.present(vcEmbeddedToNavController, animated: true)
                 banner.dismiss()
-//                topViewController.navigationController?.pushViewController(vc, animated: true)
             }
         }
         
@@ -649,13 +656,13 @@ extension PostFormVC: TableViewDataSourceAndDelegate, UITextViewDelegate {
                 titleTextField.anchor(top: cell.contentView.topAnchor, leading: cell.contentView.leadingAnchor, bottom: cell.contentView.bottomAnchor, trailing: cell.contentView.trailingAnchor, padding: UIEdgeInsets(top: 0, left: cell.separatorInset.left, bottom: 0, right: cell.separatorInset.left))
                 
                 titlePlaceHolderLabel.anchor(top: titleTextField.topAnchor, leading: titleTextField.leadingAnchor, bottom: titleTextField.bottomAnchor, trailing: cell.contentView.trailingAnchor, padding: UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 0))
-                
+                                
             case 1:
                
                 [descriptionTextField, descriptionPlaceHolderLabel].forEach{cell.contentView.addSubview($0)}
                 descriptionTextField.anchor(top: cell.contentView.topAnchor, leading: cell.contentView.leadingAnchor, bottom: cell.contentView.bottomAnchor, trailing: cell.contentView.trailingAnchor, padding: UIEdgeInsets(top: 0, left: cell.separatorInset.left, bottom: 0, right: 0))
                 
-                descriptionPlaceHolderLabel.anchor(top: descriptionTextField.topAnchor, leading: descriptionTextField.leadingAnchor, bottom: descriptionTextField.bottomAnchor, trailing: cell.contentView.trailingAnchor, padding: UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 0), size: CGSize(width: 0, height: 0))
+                descriptionPlaceHolderLabel.anchor(top: descriptionTextField.topAnchor, leading: descriptionTextField.leadingAnchor, bottom: descriptionTextField.bottomAnchor, trailing: cell.contentView.trailingAnchor, padding: UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 0))
                 
             case 2:
                 cell.setupViews()
@@ -762,6 +769,7 @@ extension PostFormVC: TableViewDataSourceAndDelegate, UITextViewDelegate {
         }
 
     }
+    
     
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         // Gives the slide delete feature to the section 0 (but not the 2nd cell in it) and 3 (but not the last cell in it) cells

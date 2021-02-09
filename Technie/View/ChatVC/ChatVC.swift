@@ -121,6 +121,7 @@ class ChatVC: MessagesViewController {
     deinit {
         removeKeyboardObservers()
     }
+    
     var scrollsToBottomOnKeybordBeginsEditing = false
     
     // MARK: - Methods

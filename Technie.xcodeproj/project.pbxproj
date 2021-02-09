@@ -89,6 +89,7 @@
 		8ACD6AFE25C4534200CC057D /* LocationCollectionViewerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ACD6AFD25C4534200CC057D /* LocationCollectionViewerVC.swift */; };
 		8ACD6B0325C4547500CC057D /* LocationCollectionViewerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ACD6B0225C4547500CC057D /* LocationCollectionViewerCell.swift */; };
 		8AD3D07725B1D3FD00858CAD /* JobDetailsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AD3D07625B1D3FD00858CAD /* JobDetailsVC.swift */; };
+		8AD772A625D2643700955B9A /* RecommendationCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AD772A525D2643700955B9A /* RecommendationCell.swift */; };
 		8AD8743425B88B8400BB2F6F /* PhotoViewerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AD8743325B88B8400BB2F6F /* PhotoViewerVC.swift */; };
 		8ADA18AE25C0557C0040D3C6 /* ChatInfoVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ADA18AD25C0557B0040D3C6 /* ChatInfoVC.swift */; };
 		8ADECCC425B026F600F871EF /* FeedsTVCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ADECCC325B026F600F871EF /* FeedsTVCell.swift */; };
@@ -208,6 +209,7 @@
 		8ACD6AFD25C4534200CC057D /* LocationCollectionViewerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationCollectionViewerVC.swift; sourceTree = "<group>"; };
 		8ACD6B0225C4547500CC057D /* LocationCollectionViewerCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationCollectionViewerCell.swift; sourceTree = "<group>"; };
 		8AD3D07625B1D3FD00858CAD /* JobDetailsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobDetailsVC.swift; sourceTree = "<group>"; };
+		8AD772A525D2643700955B9A /* RecommendationCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecommendationCell.swift; sourceTree = "<group>"; };
 		8AD8743325B88B8400BB2F6F /* PhotoViewerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoViewerVC.swift; sourceTree = "<group>"; };
 		8ADA18AD25C0557B0040D3C6 /* ChatInfoVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatInfoVC.swift; sourceTree = "<group>"; };
 		8ADECCC325B026F600F871EF /* FeedsTVCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedsTVCell.swift; sourceTree = "<group>"; };
@@ -431,6 +433,7 @@
 			isa = PBXGroup;
 			children = (
 				8AA43A2D25D1519C00140649 /* RecommendationVC.swift */,
+				8AD772A525D2643700955B9A /* RecommendationCell.swift */,
 			);
 			path = RecommendationVC;
 			sourceTree = "<group>";
@@ -1055,6 +1058,7 @@
 				8A0C0B3D25D119C30072729D /* TechnicianSearchResultsVC.swift in Sources */,
 				8A6C839825CADA8B0082D51F /* TechnicianProfileDetailsVC.swift in Sources */,
 				8ADECCC425B026F600F871EF /* FeedsTVCell.swift in Sources */,
+				8AD772A625D2643700955B9A /* RecommendationCell.swift in Sources */,
 				8A41E7B725B07D6C00265D5C /* TechineProfileTVCell.swift in Sources */,
 				8A8F8526258A355700C4CEF9 /* ClientPostVC.swift in Sources */,
 				8A9125662598C505005034A1 /* PostSectionCell.swift in Sources */,
