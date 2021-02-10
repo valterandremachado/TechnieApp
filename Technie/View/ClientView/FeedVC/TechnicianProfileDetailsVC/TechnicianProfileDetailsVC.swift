@@ -153,8 +153,8 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         
         tv.delegate = self
         tv.dataSource = self
-        tv.register(ReviewsCell0.self, forCellReuseIdentifier: ReviewsCell0.cellID)
         tv.register(ReviewsCell.self, forCellReuseIdentifier: ReviewsCell.cellID)
+        tv.register(ProficiencyReviewCell.self, forCellReuseIdentifier: ProficiencyReviewCell.cellID)
         return tv
     }()
     
@@ -565,17 +565,18 @@ extension TechnicianProfileDetailsVC: TableViewDataSourceAndDelegate {
 
             switch indexPath.section {
             case 0:
-                let cell = tableView.dequeueReusableCell(withIdentifier: ReviewsCell0.cellID, for: indexPath) as! ReviewsCell0
+                let cell = tableView.dequeueReusableCell(withIdentifier: ProficiencyReviewCell.cellID, for: indexPath) as! ProficiencyReviewCell
                 cell.setupViews()
                 return cell
             case 1:
-                let cell = tableView.dequeueReusableCell(withIdentifier: ReviewsCell0.cellID, for: indexPath) as! ReviewsCell0
+                let cell = tableView.dequeueReusableCell(withIdentifier: ProficiencyReviewCell.cellID, for: indexPath) as! ProficiencyReviewCell
 //                cell.textLabel?.text = "detailText"
-                cell.setupViews2()
+                cell.setupReliabilityStackView()
                 return cell
             case 2:
                 let cell = tableView.dequeueReusableCell(withIdentifier: ReviewsCell.cellID, for: indexPath) as! ReviewsCell
-                cell.textLabel?.text = detailText
+//                cell.textLabel?.text = detailText
+                cell.setupViews()
                 return cell
             default:
                 return UITableViewCell()

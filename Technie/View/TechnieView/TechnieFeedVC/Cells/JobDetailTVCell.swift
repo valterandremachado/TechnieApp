@@ -64,7 +64,7 @@ class JobDetailTVCell1: UITableViewCell {
 //        iv.backgroundColor = .red
         iv.contentMode = .scaleAspectFit
         iv.clipsToBounds = true
-        iv.image = UIImage(systemName: "location.fill")?.withAlignmentRectInsets(UIEdgeInsets(top: 0, left: -5, bottom: 0, right: 0))
+        iv.image = UIImage(systemName: "mappin.and.ellipse")?.withAlignmentRectInsets(UIEdgeInsets(top: 0, left: -5, bottom: 0, right: 0))
         iv.withWidth(20)
         return iv
     }()

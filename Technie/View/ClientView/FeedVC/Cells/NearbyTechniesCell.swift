@@ -69,8 +69,8 @@ class NearbyTechniesCell: UICollectionViewCell {
     }()
     
     lazy var locationStackView: UIStackView = {
-        let config = UIImage.SymbolConfiguration(pointSize: CGFloat(15))
-        var wiredProfileImage = UIImage(systemName: "location.fill", withConfiguration: config)?.withTintColor(.systemPink, renderingMode: .alwaysOriginal)
+        let config = UIImage.SymbolConfiguration(pointSize: 15, weight: .bold, scale: .small)
+        var wiredProfileImage = UIImage(systemName: "mappin.and.ellipse", withConfiguration: config)?.withTintColor(.systemPink, renderingMode: .alwaysOriginal)
         
         let iconIV = UIImageView()
         iconIV.contentMode = .scaleAspectFit

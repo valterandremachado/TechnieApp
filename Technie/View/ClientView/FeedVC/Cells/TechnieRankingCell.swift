@@ -198,7 +198,7 @@ class TechnieRankingInnerCell: UICollectionViewCell {
     
     lazy var ratingStackView: UIStackView = {
         let config = UIImage.SymbolConfiguration(pointSize: CGFloat(15))
-        var wiredProfileImage = UIImage(systemName: "location.fill", withConfiguration: config)?.withTintColor(.systemPink, renderingMode: .alwaysOriginal)
+        var wiredProfileImage = UIImage(systemName: "star.fill", withConfiguration: config)?.withTintColor(.systemPink, renderingMode: .alwaysOriginal)
         
         let iconIV = UIImageView()
         iconIV.contentMode = .scaleAspectFit
@@ -217,18 +217,18 @@ class TechnieRankingInnerCell: UICollectionViewCell {
     }()
     
     lazy var reviewStackView: UIStackView = {
-        let config = UIImage.SymbolConfiguration(pointSize: CGFloat(15))
-        var wiredProfileImage = UIImage(systemName: "location.fill", withConfiguration: config)?.withTintColor(.systemPink, renderingMode: .alwaysOriginal)
+        let config = UIImage.SymbolConfiguration(pointSize: 13, weight: .bold, scale: .small)
+        var wiredProfileImage = UIImage(named: "commentary" ,in: nil, with: config)?.withTintColor(.systemPink, renderingMode: .alwaysOriginal)
         
         let iconIV = UIImageView()
         iconIV.contentMode = .scaleAspectFit
         iconIV.image = wiredProfileImage
 //        iconIV.backgroundColor = .brown
-        iconIV.withWidth(20)
+        iconIV.withWidth(17)
         let sv = UIStackView(arrangedSubviews: [iconIV, reviewLabel])
         sv.translatesAutoresizingMaskIntoConstraints = false
         sv.axis = .horizontal
-        sv.spacing = 1
+        sv.spacing = 2
         sv.alignment = .center
         sv.distribution = .fillProportionally
 //        sv.addBackground(color: .cyan)

@@ -196,7 +196,7 @@ class RankedTechnieVC: UIViewController {
         
         tv.delegate = self
         tv.dataSource = self
-        tv.register(ReviewsCell0.self, forCellReuseIdentifier: ReviewsCell0.cellID)
+        tv.register(ProficiencyReviewCell.self, forCellReuseIdentifier: ProficiencyReviewCell.cellID)
         return tv
     }()
     
@@ -288,7 +288,7 @@ extension RankedTechnieVC: TableViewDataSourceAndDelegate {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: ReviewsCell0.cellID, for: indexPath) as! ReviewsCell0
+        let cell = tableView.dequeueReusableCell(withIdentifier: ProficiencyReviewCell.cellID, for: indexPath) as! ProficiencyReviewCell
         cell.setupViews()
         return cell
     }

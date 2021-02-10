@@ -11,6 +11,123 @@ class ReviewsCell: UITableViewCell {
 
     static let cellID = "ReviewsCellID"
     
+    // MARK: - Properties
+    lazy var serviceNameLabel: UILabel = {
+        let lbl = UILabel()
+        lbl.translatesAutoresizingMaskIntoConstraints = false
+        lbl.text = "Fix an old TV "
+        lbl.textAlignment = .left
+//        lbl.backgroundColor = .green
+        //        lbl.withHeight(25)
+//        lbl.numberOfLines = 0
+        lbl.font = .boldSystemFont(ofSize: 16)
+        lbl.textColor = UIColor(named: "LabelPrimaryAppearance")
+        return lbl
+    }()
+    
+    lazy var serviceDateLabel: UILabel = {
+        let lbl = UILabel()
+        lbl.translatesAutoresizingMaskIntoConstraints = false
+        lbl.text = "April 2021"
+        lbl.textAlignment = .right
+        lbl.withWidth(80)
+//        lbl.backgroundColor = .brown
+        lbl.numberOfLines = 0
+        lbl.textColor = .systemGray //UIColor(named: "LabelPrimaryAppearance")
+        lbl.font = .systemFont(ofSize: 12)
+        return lbl
+    }()
+
+    lazy var reviewCommentLabel: UILabel = {
+        let lbl = UILabel()
+        lbl.translatesAutoresizingMaskIntoConstraints = false
+        lbl.text = "Great work from a great technician. Great work from a great technician. Great work from a great technician. Great work from a great technician."
+//        lbl.textAlignment = .center
+//        lbl.withHeight(25)
+//        lbl.backgroundColor = .brown
+        lbl.numberOfLines = 0
+        lbl.textColor = UIColor(named: "LabelPrimaryAppearance")
+        
+        return lbl
+    }()
+    
+    lazy var clientNameLabel: UILabel = {
+        let lbl = UILabel()
+        lbl.translatesAutoresizingMaskIntoConstraints = false
+        lbl.text = "Valter A. Machado - 2 days ago".lowercased()
+//        lbl.textAlignment = .center
+//        lbl.withHeight(25)
+//        lbl.backgroundColor = .brown
+        lbl.numberOfLines = 0
+        lbl.textColor = .systemGray//UIColor(named: "LabelPrimaryAppearance")
+        lbl.font = .systemFont(ofSize: 12)
+        return lbl
+    }()
+    
+    lazy var ratingLabel: UILabel = {
+        let lbl = UILabel()
+        lbl.translatesAutoresizingMaskIntoConstraints = false
+        lbl.text = "4.5"
+//        lbl.textAlignment = .center
+//        lbl.withHeight(25)
+//        lbl.font = .systemFont(ofSize: 13)
+//        lbl.backgroundColor = .systemPink
+//        lbl.clipsToBounds = true
+//        lbl.layer.cornerRadius = 5
+        lbl.numberOfLines = 0
+//        lbl.textColor = .systemGray
+        return lbl
+    }()
+    
+    lazy var serviceNameAndDateStackView: UIStackView = {
+        let sv = UIStackView(arrangedSubviews: [serviceNameLabel, serviceDateLabel])
+        sv.translatesAutoresizingMaskIntoConstraints = false
+        sv.axis = .horizontal
+//        sv.spacing = 5
+//        sv.alignment = .leading
+        sv.distribution = .fill
+//        sv.addBackground(color: .cyan)
+        
+        sv.withWidth(frame.width)
+//        sv.withHeight(20)
+        return sv
+    }()
+    
+    lazy var ratingWithIconStackView: UIStackView = {
+        let config = UIImage.SymbolConfiguration(pointSize: 70, weight: .bold, scale: .large)
+        var wiredProfileImage = UIImage(named: "rating4", in: nil, with: config)?.withTintColor(.systemPink, renderingMode: .alwaysOriginal)
+        
+        let iconIV = UIImageView()
+        iconIV.contentMode = .scaleAspectFill
+        iconIV.withWidth(70)
+//        iconIV.backgroundColor = .brown
+        iconIV.image = wiredProfileImage?.withAlignmentRectInsets(UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0))
+
+        let sv = UIStackView(arrangedSubviews: [iconIV, ratingLabel])
+        sv.translatesAutoresizingMaskIntoConstraints = false
+        sv.axis = .horizontal
+        sv.spacing = 5
+//        sv.alignment = .leading
+        sv.distribution = .fillProportionally
+//        sv.addBackground(color: .cyan)
+        sv.withWidth(frame.width - frame.width/3)
+        sv.withHeight(20)
+        return sv
+    }()
+    
+    lazy var technicianInfoLabelStackView: UIStackView = {
+        let sv = UIStackView(arrangedSubviews: [serviceNameAndDateStackView, ratingWithIconStackView, reviewCommentLabel, clientNameLabel])
+        sv.translatesAutoresizingMaskIntoConstraints = false
+        sv.axis = .vertical
+        sv.spacing = 8
+        sv.alignment = .leading
+//        sv.distribution = .fillProportionally
+//        sv.addBackground(color: .brown)
+//        sv.withHeight(150)
+        return sv
+    }()
+    
+    // MARK: - Inits
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         /// Adding tableView right indicator
@@ -20,23 +137,18 @@ class ReviewsCell: UITableViewCell {
         backgroundColor = UIColor.rgb(red: 235, green: 235, blue: 235)
 
     }
-    
-//    override func setSelected(_ selected: Bool, animated: Bool) {
-//        super.setSelected(selected, animated: animated)
-//
-//        // Configure the view for the selected state
-//    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
+    required init?(coder: NSCoder) {fatalError("init(coder:) has not been implemented")}
     
 
+    func setupViews() {
+        [technicianInfoLabelStackView].forEach {addSubview($0)}
+        technicianInfoLabelStackView.anchor(top: topAnchor, leading: leadingAnchor, bottom: bottomAnchor, trailing: trailingAnchor, padding: UIEdgeInsets(top: 15, left: separatorInset.left, bottom: 15, right: 0))
+    }
 }
 
-class ReviewsCell0: UITableViewCell {
+class ProficiencyReviewCell: UITableViewCell {
 
-    static let cellID = "ReviewsCell0ID"
+    static let cellID = "ProficiencyReviewCellID"
     
     // MARK: - Properties
     lazy var workSpeedLabelPlaceHolder: UILabel = {
@@ -278,7 +390,7 @@ class ReviewsCell0: UITableViewCell {
 
     }
     
-    func setupViews2() {
+    func setupReliabilityStackView() {
         [reliabilityStackView].forEach {addSubview($0)}
         reliabilityStackView.anchor(top: topAnchor, leading: leadingAnchor, bottom: bottomAnchor, trailing: nil, padding: UIEdgeInsets(top: 5, left: 0, bottom: 5, right: 0), size: CGSize(width: frame.width/1.3, height: 0))    }
     
