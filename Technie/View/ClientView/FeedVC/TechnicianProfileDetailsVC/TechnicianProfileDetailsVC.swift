@@ -7,7 +7,7 @@
 
 import UIKit
 
-class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelegate {
+class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelegate, UIScrollViewDelegate {
 
     // MARK: - Properties
     lazy var profileImageView: UIImageView = {
@@ -71,27 +71,30 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
 ////        sv.addBackground(color: .red)
 //        return sv
 //    }()
-    
+    var updateHeight: CGFloat = 0
     lazy var contentViewSize = CGSize(width: self.view.frame.width, height: self.view.frame.height)
     var devidingNo: CGFloat = 1
     
     lazy var scrollView : UIScrollView = {
         let view = UIScrollView(frame : .zero)
+        view.delegate = self
         var frame = CGRect.init()
         let screenSize = UIScreen.main.bounds.size
-        screenSize.height <= 667 ? (frame = CGRect(x: 0, y: (navigationController?.navigationBar.frame.height)! - (navigationController?.navigationBar.frame.height)!/1.8, width: contentViewSize.width, height: contentViewSize.height - (navigationController?.navigationBar.frame.height)!/2)) : (frame = CGRect(x: 0, y: (navigationController?.navigationBar.frame.height)! - (navigationController?.navigationBar.frame.height)!/2, width: contentViewSize.width, height: contentViewSize.height - (navigationController?.navigationBar.frame.height)!))//2.5
-    
-        view.frame = frame
-        view.contentInsetAdjustmentBehavior = .always
+        screenSize.height <= 667 ? (frame = CGRect(x: 0, y: (navigationController?.navigationBar.frame.height)! - (navigationController?.navigationBar.frame.height)!/1.8, width: contentViewSize.width, height: contentViewSize.height - (navigationController?.navigationBar.frame.height)!/2)) : (frame = CGRect(x: 0, y: (navigationController?.navigationBar.frame.height)! - (navigationController?.navigationBar.frame.height)!/2.5, width: contentViewSize.width, height: contentViewSize.height - (navigationController?.navigationBar.frame.height)!))//2.5
+
+        view.frame = view.bounds
+        view.contentInsetAdjustmentBehavior = .never
+//        view.contentSize = CGSize(width: self.view.frame.width, height: view.frame.size.height)
         view.contentSize = contentViewSize
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .yellow
+        view.layoutIfNeeded()
         return view
     }()
     
     lazy var mainContainerView: UIView = {
         let view = UIView()
-//        view.frame.size = contentViewSize
-        view.backgroundColor = .clear
+        view.frame.size = contentViewSize
+        view.backgroundColor = .cyan
         return view
     }()
     
@@ -137,13 +140,13 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         tv.translatesAutoresizingMaskIntoConstraints = false
         tv.backgroundColor = .clear
         
-//        tv.isScrollEnabled = false
+        tv.isScrollEnabled = false
         tv.showsVerticalScrollIndicator = false
         // Set automatic dimensions for row height
         tv.rowHeight = UITableView.automaticDimension
         tv.estimatedRowHeight = UITableView.automaticDimension
         tv.clipsToBounds = true
-        tv.contentInset = UIEdgeInsets(top: 10, left: 0, bottom: 0, right: 0)
+//        tv.contentInset = UIEdgeInsets(top: 10, left: 0, bottom: 0, right: 0)
 
         var frame = CGRect.zero
         frame.size.height = .leastNormalMagnitude
@@ -353,34 +356,46 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         super.didReceiveMemoryWarning()
     }
     
+//    override func setupContainer(_ container: UIView) {
+//        // add views here
+//        [technicianInfoMainStackView, customSegmentedControl, switchableContainerView].forEach {container.addSubview($0)}
+//        profileImageView.widthAnchor.constraint(equalToConstant: 100).isActive = true
+//            profileImageView.heightAnchor.constraint(equalToConstant: 100).isActive = true
+//
+//        technicianInfoMainStackView.anchor(top: container.safeAreaLayoutGuide.topAnchor, leading: container.leadingAnchor, bottom: nil, trailing: container.trailingAnchor, padding: UIEdgeInsets(top: 20, left: 15, bottom: 0, right: 0), size: CGSize(width: 0, height: 0))
+//
+//        customSegmentedControl.anchor(top: technicianInfoMainStackView.bottomAnchor, leading: container.leadingAnchor, bottom: nil, trailing: container.trailingAnchor, padding: UIEdgeInsets(top: 12, left: 0, bottom: 0, right: 0), size: CGSize(width: 0, height: 30))
+//
+//        switchableContainerView.anchor(top: customSegmentedControl.bottomAnchor, leading: container.leadingAnchor, bottom: nil, trailing: container.trailingAnchor, padding: UIEdgeInsets(top: 10, left: 0, bottom: 0, right: 0), size: CGSize(width: 0, height: 0))
+//
+//        setupNavBar()
+//    }
+    
 //    var dynamicHeight: NSLayoutConstraint?
+    var dynamicHeight: CGFloat = 0
+    var resizableHeight: NSLayoutConstraint!
     // MARK: - Methods
     fileprivate func setupViews() {
-        view.addSubview(scrollView)
-        scrollView.addSubview(mainContainerView)
-        [technicianInfoMainStackView, customSegmentedControl, switchableContainerView].forEach {mainContainerView.addSubview($0)}
-        
-//        guard let navBarHeight = navigationController?.navigationBar.frame.height else { return }
-//        guard let tabBarHeight = tabBarController?.tabBar.frame.height else { return }
-//        let viewHeight = view.frame.height - (navBarHeight - tabBarHeight)
-
-        mainContainerView.frame.size = CGSize(width: scrollView.frame.width, height: (view.frame.height) + 15)
-//        mainContainerView.anchor(top: scrollView.topAnchor, leading: scrollView.leadingAnchor, bottom: scrollView.bottomAnchor, trailing: scrollView.trailingAnchor, padding: UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0), size: CGSize(width: scrollView.frame.width, height: viewHeight + 15))
-//        dynamicHeight = mainContainerView.heightAnchor.constraint(equalToConstant: 0)
-//        dynamicHeight?.isActive = true
+//        view.addSubview(scrollView)
+//        scrollView.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.leadingAnchor, bottom: view.safeAreaLayoutGuide.bottomAnchor, trailing: view.trailingAnchor)
+//
+//        scrollView.addSubview(mainContainerView)
+//        [technicianInfoMainStackView, customSegmentedControl, switchableContainerView].forEach {mainContainerView.addSubview($0)}
+        view.addSubview(collectionView)
+        collectionView.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.leadingAnchor, bottom: view.safeAreaLayoutGuide.bottomAnchor, trailing: view.trailingAnchor)
 
 //        NSLayoutConstraint.activate([
-        profileImageView.widthAnchor.constraint(equalToConstant: 100).isActive = true
-            profileImageView.heightAnchor.constraint(equalToConstant: 100).isActive = true
-//            profileImageView.centerXAnchor.constraint(equalTo: mainContainerView.centerXAnchor),
-//            profileImageView.topAnchor.constraint(equalTo: mainContainerView.safeAreaLayoutGuide.topAnchor, constant: 20),
-//        ])
-        technicianInfoMainStackView.anchor(top: mainContainerView.safeAreaLayoutGuide.topAnchor, leading: mainContainerView.leadingAnchor, bottom: nil, trailing: mainContainerView.trailingAnchor, padding: UIEdgeInsets(top: 20, left: 15, bottom: 0, right: 0), size: CGSize(width: 0, height: 0))
-//        mainStackView.anchor(top: profileImageView.bottomAnchor, leading: mainContainerView.leadingAnchor, bottom: nil, trailing: mainContainerView.trailingAnchor, padding: UIEdgeInsets(top: 10, left: 0, bottom: 0, right: 0), size: CGSize(width: 0, height: 0))
-        
-        customSegmentedControl.anchor(top: technicianInfoMainStackView.bottomAnchor, leading: mainContainerView.leadingAnchor, bottom: nil, trailing: mainContainerView.trailingAnchor, padding: UIEdgeInsets(top: 12, left: 0, bottom: 0, right: 0), size: CGSize(width: 0, height: 30))
-        
-        switchableContainerView.anchor(top: customSegmentedControl.bottomAnchor, leading: mainContainerView.leadingAnchor, bottom: mainContainerView.bottomAnchor, trailing: mainContainerView.trailingAnchor, padding: UIEdgeInsets(top: 10, left: 0, bottom: 0, right: 0), size: CGSize(width: 0, height: 0))
+//        profileImageView.widthAnchor.constraint(equalToConstant: 100).isActive = true
+//            profileImageView.heightAnchor.constraint(equalToConstant: 100).isActive = true
+////            profileImageView.centerXAnchor.constraint(equalTo: mainContainerView.centerXAnchor),
+////            profileImageView.topAnchor.constraint(equalTo: mainContainerView.safeAreaLayoutGuide.topAnchor, constant: 20),
+////        ])
+//        technicianInfoMainStackView.anchor(top: mainContainerView.safeAreaLayoutGuide.topAnchor, leading: mainContainerView.leadingAnchor, bottom: nil, trailing: mainContainerView.trailingAnchor, padding: UIEdgeInsets(top: 20, left: 15, bottom: 0, right: 0), size: CGSize(width: 0, height: 0))
+////        mainStackView.anchor(top: profileImageView.bottomAnchor, leading: mainContainerView.leadingAnchor, bottom: nil, trailing: mainContainerView.trailingAnchor, padding: UIEdgeInsets(top: 10, left: 0, bottom: 0, right: 0), size: CGSize(width: 0, height: 0))
+//
+//        customSegmentedControl.anchor(top: technicianInfoMainStackView.bottomAnchor, leading: mainContainerView.leadingAnchor, bottom: nil, trailing: mainContainerView.trailingAnchor, padding: UIEdgeInsets(top: 12, left: 0, bottom: 0, right: 0), size: CGSize(width: 0, height: 30))
+//
+//        switchableContainerView.anchor(top: customSegmentedControl.bottomAnchor, leading: mainContainerView.leadingAnchor, bottom: mainContainerView.bottomAnchor, trailing: mainContainerView.trailingAnchor, padding: UIEdgeInsets(top: 10, left: 0, bottom: 0, right: 0), size: CGSize(width: 0, height: 0))
 
 //        view.layoutIfNeeded()
         setupNavBar()
@@ -454,12 +469,38 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         
         reviewsSectionSetter.append(SectionHandler(title: "Proficience", detail: [""]))
         reviewsSectionSetter.append(SectionHandler(title: "Reliability", detail: [""]))
-        reviewsSectionSetter.append(SectionHandler(title: "Reviews", detail: ["Reviews", "Reviews", "Reviews", "Reviews", "Reviews"]))
+        reviewsSectionSetter.append(SectionHandler(title: "Reviews", detail: ["Reviews", "Reviews", "Reviews", "Reviews", "Reviews", "Reviews", "Reviews", "Reviews"]))
     }
     
     let customReviewView = UIView()
     let customAboutView = UIView()
 
+    lazy var collectionView: UICollectionView = {
+        let collectionLayout = UICollectionViewFlowLayout()
+        collectionLayout.scrollDirection = .vertical
+//        collectionLayout.minimumLineSpacing = 5
+//        collectionLayout.sectionHeadersPinToVisibleBounds = true
+        collectionLayout.itemSize = UICollectionViewFlowLayout.automaticSize
+        collectionLayout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
+        let cv = UICollectionView(frame: .zero, collectionViewLayout: collectionLayout)
+        cv.translatesAutoresizingMaskIntoConstraints = false
+        cv.backgroundColor = .clear
+        cv.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        
+        cv.delegate = self
+        cv.dataSource = self
+        //        cv.collectionViewLayout.invalidateLayout()
+        
+        // Registration of the cells
+        cv.register(ReviewCollectionViewTopCell.self, forCellWithReuseIdentifier: ReviewCollectionViewTopCell.cellID)
+        cv.register(ReviewCollectionViewBottomCell.self, forCellWithReuseIdentifier: ReviewCollectionViewBottomCell.cellID)
+        // header
+        cv.register(ReviewCollectionViewCellHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: ReviewCollectionViewCellHeaderView.cellID)
+        
+       
+        return cv
+    }()
+    
     fileprivate func setupSwitchableContainerView() {
         // Add the VCs containterView to the switchableViews array
         switchableViews.append(AboutVC().view)
@@ -483,6 +524,17 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         }
     }
     
+    var heightConstraint: NSLayoutConstraint!
+    
+    var updatedHeight: CGFloat = 0.0 {
+        willSet {
+            print("Some property will be set: \(updatedHeight)")
+        }
+        didSet {
+            print("Some property has been set: \(updatedHeight)")
+        }
+    }
+    
     func change(to index: Int) {
         // Return if currentSegmentIndex is the same with the segmentedControlIndex
         if currentSegmentIndex == index { return }
@@ -495,12 +547,72 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         switchableViews[index].fadeIn()
         
         switch currentSegmentIndex {
+//        case 0:
+//            reviewsTableView.isScrollEnabled = false
+//            self.scrollView.isScrollEnabled = true
+//            reviewsTableView.contentSize = .zero
+
+//            switchableContainerView.bringSubviewToFront(switchableViews[currentSegmentIndex])
+//            switchableViews[currentSegmentIndex].addSubview(aboutTableView)
+//            aboutTableView.anchor(top: switchableViews[currentSegmentIndex].topAnchor,
+//                             leading: switchableViews[currentSegmentIndex].leadingAnchor,
+//                             bottom: switchableViews[currentSegmentIndex].bottomAnchor,
+//                             trailing: switchableViews[currentSegmentIndex].trailingAnchor)
+//////            scrollView.contentSize = contentViewSize
+//////            scrollView.layoutIfNeeded()
+//////            mainContainerView.layoutIfNeeded()
+//            print("about: \(aboutTableView.frame.height)")
+//            let tableContentSize = aboutTableView.contentSize.height
+//            updatedHeight = switchableViews[currentSegmentIndex].frame.height
+//            let suitableHeight = (view.frame.height) + updatedHeight //+ visualEffectView.frame.height
+//            mainContainerView.frame.size = CGSize(width: scrollView.frame.width, height: suitableHeight)
+//            scrollView.contentSize = CGSize(width: scrollView.frame.width, height: suitableHeight)
+//            scrollView.layoutIfNeeded()
+
+//            heightConstraint?.constant = view.frame.height
+//            mainContainerView.layoutIfNeeded()
         case 1:
+//            switchableContainerView.bringSubviewToFront(switchableViews[currentSegmentIndex])
             switchableViews[currentSegmentIndex].addSubview(reviewsTableView)
             reviewsTableView.anchor(top: switchableViews[currentSegmentIndex].topAnchor,
                              leading: switchableViews[currentSegmentIndex].leadingAnchor,
                              bottom: switchableViews[currentSegmentIndex].bottomAnchor,
-                             trailing: switchableViews[currentSegmentIndex].trailingAnchor)
+                             trailing: switchableViews[currentSegmentIndex].trailingAnchor, padding: UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0))
+//            reviewsTableView.contentInset = UIEdgeInsets(top: 10, left: 0, bottom: visualEffectView.frame.height/1.5, right: 0)
+
+//            collectionView.addSubview(reviewsTableView)
+//            reviewsTableView.anchor(top: collectionView.topAnchor,
+//                             leading: collectionView.leadingAnchor,
+//                             bottom: view.safeAreaLayoutGuide.bottomAnchor,
+//                             trailing: collectionView.trailingAnchor, padding: UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0))
+//            reviewsTableView.contentInset = UIEdgeInsets(top: 10, left: 0, bottom: visualEffectView.frame.height/1.5, right: 0)
+//            heightConstraint = reviewsTableView.heightAnchor.constraint(equalToConstant: reviewsTableView.contentSize.height)
+//            heightConstraint?.constant = reviewsTableView.contentSize.height
+//            heightConstraint.isActive = true
+
+            let tableContentSize = reviewsTableView.contentSize.height
+//            updatedHeight = tableContentSize
+//            let suitableHeight = (view.frame.height) + reviewsTableView.contentSize.height + visualEffectView.frame.height
+
+            print("tableContentSize: \(tableContentSize)")
+            print("scrollView: \(scrollView.frame.height)")
+            print("switchableContainerView: \(switchableContainerView.frame.height)")
+
+//            dynamicHeight = 0 // reset
+//            dynamicHeight = suitableHeight
+//
+//            // Avoid continuos increase of the scroll contentSize
+////            if tableContentSize != 1094.0000000000002 {
+////            switchableContainerView.frame.size = CGSize(width: scrollView.frame.width, height: tableContentSize)
+//            mainContainerView.frame.size = CGSize(width: scrollView.frame.width, height: dynamicHeight)
+//            scrollView.contentSize = CGSize(width: scrollView.frame.width, height: dynamicHeight)
+////            contentViewSize.height = suitableHeight
+////                resizableHeight.constant = suitableHeight
+//
+//                scrollView.layoutIfNeeded()
+//                mainContainerView.layoutIfNeeded()
+//            reviewsTableView.layoutIfNeeded()
+
         default:
             break
         }
@@ -511,6 +623,43 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
                 switchableViews[index == 1 ? (0) : (1)].removeFromSuperview()
             }
         }
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+//        let offsetY = scrollView.contentOffset.y
+//        let tableOffsetY = self.reviewsTableView.contentOffset.y
+        // Handles to stick only the header on the section 1
+        guard let layout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout else { return }
+        let offsetY = scrollView.contentOffset.y
+//        print("offsetY: \(offsetY)")
+        layout.sectionHeadersPinToVisibleBounds = offsetY > 101.0
+//        print("offsetY: \(offsetY)")
+//        var isScrollable = false
+        
+//        switch currentSegmentIndex {
+//        case 0:
+//            reviewsTableView.isScrollEnabled = false
+//            self.scrollView.isScrollEnabled = true
+//        case 1:
+//            if offsetY >= 125 && tableOffsetY >= -10 {
+//                isScrollable = true
+//                reviewsTableView.isScrollEnabled = isScrollable
+//                self.scrollView.isScrollEnabled = !isScrollable
+//                self.scrollView.layoutIfNeeded()
+//                print("123")
+//            } else if tableOffsetY <= -10 && offsetY <= 125 {
+//                isScrollable = true
+//                    reviewsTableView.isScrollEnabled = !isScrollable
+//                    self.scrollView.isScrollEnabled = isScrollable
+//                    print("321")
+//            }
+//        default:
+//            break
+//        }
+//
+//        offsetY == 125.0 ? (isScrollable = true) : (isScrollable = false)
+//        reviewsTableView.isScrollEnabled = isScrollable
+//        scrollView.isScrollEnabled = isScrollable//offsetY > 156.0
     }
     
     
@@ -526,9 +675,105 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
     }
     
 }
+
+extension TechnicianProfileDetailsVC: CollectionDataSourceAndDelegate {
+    
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return 2
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return section == 0 ? (1) : (1)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+      
+//        cell.addSubview(reviewsTableView)
+//        reviewsTableView.anchor(top: cell.topAnchor,
+//                         leading: cell.leadingAnchor,
+//                         bottom: cell.bottomAnchor,
+//                         trailing: cell.trailingAnchor, padding: UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0))
+//        reviewsTableView.contentInset = UIEdgeInsets(top: 10, left: 0, bottom: visualEffectView.frame.height/1.5, right: 0)
+        switch indexPath.section {
+        case 0:
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ReviewCollectionViewTopCell.cellID, for: indexPath) as! ReviewCollectionViewTopCell
+            
+            [technicianInfoMainStackView].forEach{cell.customView.addSubview($0)}
+            profileImageView.widthAnchor.constraint(equalToConstant: 100).isActive = true
+            profileImageView.heightAnchor.constraint(equalToConstant: 100).isActive = true
+            
+            technicianInfoMainStackView.anchor(top: cell.topAnchor, leading: cell.customView.leadingAnchor, bottom: cell.customView.bottomAnchor, trailing: cell.customView.trailingAnchor, padding: UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 0), size: CGSize(width: 0, height: 0))
+            
+            
+            //            print(cell.customView.frame.height)
+            //            print(collectionView.frame.height)
+            return cell
+        case 1:
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ReviewCollectionViewBottomCell.cellID, for: indexPath) as! ReviewCollectionViewBottomCell
+//            cell.backgroundColor = .cyan
+            [switchableContainerView].forEach{cell.customView.addSubview($0)}
+//            switchableContainerView.backgroundColor = .red
+            switchableContainerView.anchor(top: cell.contentView.topAnchor, leading: cell.customView.leadingAnchor, bottom: cell.customView.bottomAnchor, trailing: cell.customView.trailingAnchor, padding: UIEdgeInsets(top: 10, left: 0, bottom: 0, right: 0), size: CGSize(width: 0, height: 0))
+            return cell
+        default:
+            break
+        }
+        
+        return UICollectionViewCell()
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        
+//        let noOfCellsInRow = 1
+//        /// changing sizeForItem when user switches through the segnment
+//        let flowLayout = collectionViewLayout as! UICollectionViewFlowLayout
+//        let totalSpace = flowLayout.sectionInset.left
+//            + flowLayout.sectionInset.right
+//            + (flowLayout.minimumInteritemSpacing * CGFloat(noOfCellsInRow - 1))
+//        //        flowLayout.sectionInset.left = 5
+//        //        flowLayout.sectionInset.right = 5
+//
+//        let size = ((collectionView.bounds.width) - totalSpace) / CGFloat(noOfCellsInRow)
+//        let finalSize = CGSize(width: size, height: size)
+        if indexPath.section == 0 {
+//            collectionLayout.itemSize = UICollectionViewFlowLayout.automaticSize
+//            collectionLayout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
+            return CGSize(width: view.frame.width, height: 115)
+        }
+        return CGSize(width: view.frame.width, height: view.frame.height)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind:
+                            String, at indexPath: IndexPath) -> UICollectionReusableView {
+        
+        let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: ReviewCollectionViewCellHeaderView.cellID, for: indexPath) as! ReviewCollectionViewCellHeaderView
+        
+        header.backgroundColor = .yellow
+//        if indexPath.section == 0 {
+            [customSegmentedControl].forEach{header.contentView.addSubview($0)}
+//            profileImageView.widthAnchor.constraint(equalToConstant: 100).isActive = true
+//            profileImageView.heightAnchor.constraint(equalToConstant: 100).isActive = true
+        customSegmentedControl.anchor(top: header.contentView.topAnchor, leading: header.contentView.leadingAnchor, bottom: header.contentView.bottomAnchor, trailing: header.contentView.trailingAnchor, padding: UIEdgeInsets(top: 12, left: 0, bottom: 0, right: 0), size: CGSize(width: 0, height: 0))
+//            technicianInfoMainStackView.anchor(top: header.contentView.topAnchor, leading: header.contentView.leadingAnchor, bottom: nil, trailing: header.contentView.trailingAnchor, padding: UIEdgeInsets(top: 20, left: 15, bottom: 0, right: 0), size: CGSize(width: 0, height: 0))
+//
+//            customSegmentedControl.anchor(top: technicianInfoMainStackView.bottomAnchor, leading: header.contentView.leadingAnchor, bottom: header.contentView.bottomAnchor, trailing: header.contentView.trailingAnchor, padding: UIEdgeInsets(top: 12, left: 0, bottom: 0, right: 0), size: CGSize(width: 0, height: 30))
+//        }
+        
+        return header
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+        if section == 1 {
+            return CGSize(width: collectionView.frame.width, height: 30)
+        }
+        return .zero
+    }
+}
+
+
 // MARK: - TableViewDelegateAndDataSource Extension
 extension TechnicianProfileDetailsVC: TableViewDataSourceAndDelegate {
-    
+
     func numberOfSections(in tableView: UITableView) -> Int {
         switch currentSegmentIndex {
         case 0:
@@ -539,7 +784,7 @@ extension TechnicianProfileDetailsVC: TableViewDataSourceAndDelegate {
             return 0
         }
     }
-    
+
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch currentSegmentIndex {
         case 0:
@@ -550,17 +795,23 @@ extension TechnicianProfileDetailsVC: TableViewDataSourceAndDelegate {
             return aboutSectionSetter[section].sectionDetail.count
         }
     }
-    
+
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 
         switch currentSegmentIndex {
         case 0:
+//            let tableContentSize = aboutTableView.contentSize.height
+//            let suitableHeight = (view.frame.height) + tableContentSize + visualEffectView.frame.height
+//            mainContainerView.frame.size = CGSize(width: scrollView.frame.width, height: suitableHeight)
+//            scrollView.contentSize = CGSize(width: scrollView.frame.width, height: suitableHeight)
+
             let cell = tableView.dequeueReusableCell(withIdentifier: AboutCell.cellID, for: indexPath) as! AboutCell
             let detailText = aboutSectionSetter[indexPath.section].sectionDetail[indexPath.row]
             cell.textLabel?.numberOfLines = 0
             cell.textLabel?.text = detailText
             return cell
         case 1:
+
             let detailText = reviewsSectionSetter[indexPath.section].sectionDetail[indexPath.row]
 
             switch indexPath.section {
@@ -569,6 +820,11 @@ extension TechnicianProfileDetailsVC: TableViewDataSourceAndDelegate {
                 cell.setupViews()
                 return cell
             case 1:
+//                let tableContentSize = reviewsTableView.contentSize.height
+//                let suitableHeight = (view.frame.height) + tableContentSize + visualEffectView.frame.height
+//                mainContainerView.frame.size = CGSize(width: scrollView.frame.width, height: suitableHeight)
+//                scrollView.contentSize = CGSize(width: scrollView.frame.width, height: suitableHeight)
+
                 let cell = tableView.dequeueReusableCell(withIdentifier: ProficiencyReviewCell.cellID, for: indexPath) as! ProficiencyReviewCell
 //                cell.textLabel?.text = "detailText"
                 cell.setupReliabilityStackView()
@@ -581,13 +837,17 @@ extension TechnicianProfileDetailsVC: TableViewDataSourceAndDelegate {
             default:
                 return UITableViewCell()
             }
-            
+
         default:
             return UITableViewCell()
         }
-       
+
     }
-    
+
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        self.viewWillLayoutSubviews()
+    }
+
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         switch currentSegmentIndex {
         case 0:
@@ -601,16 +861,53 @@ extension TechnicianProfileDetailsVC: TableViewDataSourceAndDelegate {
             return nil
         }
     }
-    
+
     func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
         // remove bottom extra 20px space.
         return UIView(frame: CGRect(x: 0, y: 0, width: 0, height: CGFloat.leastNormalMagnitude))
     }
-    
+
     func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         // remove bottom extra 20px space.
         return .leastNormalMagnitude
     }
 
+
+}
+
+class BaseScrollViewController: UIViewController {
+
+lazy var contentViewSize = CGSize(width: self.view.frame.width, height: self.view.frame.height)
+lazy var scrollView: UIScrollView = {
+    let view = UIScrollView(frame: .zero)
+    view.backgroundColor = .white
+    view.frame = self.view.bounds
+    view.contentSize = contentViewSize
+    view.translatesAutoresizingMaskIntoConstraints = false
+    return view
+}()
+lazy var containerView: UIView = {
+    let v = UIView()
+    v.backgroundColor = .white
+    v.frame.size = contentViewSize
+    return v
+}()
+
+override func viewDidLoad() {
+    view.backgroundColor = .white
+    view.addSubview(scrollView)
+    scrollView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+    scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+    scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+    scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+
+    scrollView.addSubview(containerView)
+    setupContainer(containerView)
+    super.viewDidLoad()
     
+}
+
+public func setupContainer(_ container: UIView) {
+    
+}
 }
