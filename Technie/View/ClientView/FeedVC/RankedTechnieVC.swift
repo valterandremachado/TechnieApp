@@ -269,7 +269,6 @@ class RankedTechnieVC: UIViewController {
     // MARK: - Selectors
     @objc fileprivate func checkProfileBtnPressed() {
         let vc = TechnicianProfileDetailsVC()
-//        vc.devidingNo = 1
         vc.isModalInPresentation = true
 //        vc.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
         navigationController?.pushViewController(vc, animated: true)

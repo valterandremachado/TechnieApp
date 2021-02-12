@@ -99,7 +99,6 @@ extension FullRankingVC: TableViewDataSourceAndDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         let vc = TechnicianProfileDetailsVC()
-//        vc.devidingNo = 2.5
         navigationController?.pushViewController(vc, animated: true)
     }
     
