@@ -162,9 +162,22 @@ extension UserProfileVC: TableViewDataSourceAndDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        if indexPath.row == 1 {
+        switch indexPath.row {
+        case 0:
+            print("index 0")
+        case 1:
             let vc = TechnieTabController()
             (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootViewController(vc)
+        case 2:
+            let vc = ClientPostHistoryVC()
+            navigationController?.pushViewController(vc, animated: true)
+        case 3:
+            print("index 3")
+        default:
+            break
+        }
+        if indexPath.row == 1 {
+           
         }
     }
     

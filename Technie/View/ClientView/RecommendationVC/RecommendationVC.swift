@@ -78,8 +78,6 @@ extension RecommendationVC: TableViewDataSourceAndDelegate {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: RecommendationCell.cellID, for: indexPath) as! RecommendationCell
-      
-        cell.setupViews()
         return cell
     }
     

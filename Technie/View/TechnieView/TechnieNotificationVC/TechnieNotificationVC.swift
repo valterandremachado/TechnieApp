@@ -18,12 +18,13 @@ class TechnieNotificationVC: UIViewController {
         // Set automatic dimensions for row height
         tv.rowHeight = UITableView.automaticDimension
         tv.estimatedRowHeight = UITableView.automaticDimension
-        
+        tv.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+
         /// Fix extra padding space at the top of the section of grouped tableView
-//        var frame = CGRect.zero
-//        frame.size.height = .leastNormalMagnitude
-//        tv.tableHeaderView = UIView(frame: frame)
-//        tv.tableFooterView = UIView(frame: frame)
+        var frame = CGRect.zero
+        frame.size.height = .leastNormalMagnitude
+        tv.tableHeaderView = UIView(frame: frame)
+        tv.tableFooterView = UIView(frame: frame)
 //        tv.contentInsetAdjustmentBehavior = .never
         
         tv.delegate = self
@@ -57,24 +58,27 @@ class TechnieNotificationVC: UIViewController {
     
     // MARK: - Selectors
     
-
+    let notifications = ["technie", "client", "technie", "client", "technie", "client", "technie", "client", "technie"]
 }
 
 // MARK: - Extension
 extension TechnieNotificationVC: TableViewDataSourceAndDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 8
+        return notifications.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        var cell = tableView.dequeueReusableCell(withIdentifier: TechnieNotificationsCell.cellID, for: indexPath) as! TechnieNotificationsCell
-        cell = TechnieNotificationsCell(style: .subtitle, reuseIdentifier: TechnieNotificationsCell.cellID)
-        cell.textLabel?.text = "title"
-        cell.detailTextLabel?.textColor = .systemGray
-        cell.detailTextLabel?.text = "details"
+        let cell = tableView.dequeueReusableCell(withIdentifier: TechnieNotificationsCell.cellID, for: indexPath) as! TechnieNotificationsCell
+
+        if notifications[indexPath.row] == "technie" {
+            cell.setupViews2()
+        } else {
+            cell.setupViews()
+        }
         return cell
     }
+    
     
     
 }

@@ -192,6 +192,7 @@ class RecommendationCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         self.accessoryType = .disclosureIndicator
+        setupViews()
     }
     
     override public func layoutSubviews() {

@@ -28,6 +28,7 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         let lbl = UILabel()
         lbl.translatesAutoresizingMaskIntoConstraints = false
         lbl.text = "Valter A. Machado"
+        lbl.font = .boldSystemFont(ofSize: 16)
         lbl.textAlignment = .center
 //        lbl.withHeight(25)
 //        lbl.backgroundColor = .brown
@@ -129,22 +130,21 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         btn.translatesAutoresizingMaskIntoConstraints = false
         btn.setTitle("Hire Valter", for: .normal)
 //        btn.setTitleColor(.white, for: .normal)
-
+        btn.setTitleColor(.white, for: .normal)
+        btn.backgroundColor = .systemPink
 //        btn.contentHorizontalAlignment = .left
         btn.layer.cornerRadius = 10
         btn.clipsToBounds = true
-        btn.backgroundColor = .cyan
 //        btn.withWidth(180)
         btn.addTarget(self, action: #selector(hireBtnPressed), for: .touchUpInside)
         return btn
     }()
     
-    
     lazy var startAChatBtn: UIButton = {
         let btn = UIButton(type: .system)
         btn.translatesAutoresizingMaskIntoConstraints = false
 //        btn.setTitle("Chat Me", for: .normal)
-        btn.setImage(UIImage(systemName: "bubble.left.and.bubble.right.fill"), for: .normal)
+        btn.setImage(UIImage(systemName: "bubble.left.and.bubble.right.fill")?.withTintColor(.systemPink, renderingMode: .alwaysOriginal), for: .normal)
         btn.contentHorizontalAlignment = .right
 //        btn.backgroundColor = .cyan
         btn.withWidth(45)
@@ -313,12 +313,7 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
 
                     reviewsTableView.heightConstraint?.constant = 0
                     reviewsTableView.heightConstraint?.constant = newsize.height
-                    //                switchableContainerView.heightConstraint?.constant = newsize.height
-//                    switchableContainerView.layoutIfNeeded()
-//                    reviewsTableView.layoutIfNeeded()
                     collectionView.layoutIfNeeded()
-//                    collectionView.reloadData()
-//                    view.layoutIfNeeded()
                 }
             }
             
@@ -328,11 +323,7 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
                     let newsize  = newvalue as! CGSize
                     aboutTableView.heightConstraint?.constant = 0
                     aboutTableView.heightConstraint?.constant = newsize.height
-//                    switchableContainerView.layoutIfNeeded()
-//                    aboutTableView.layoutIfNeeded()
                     collectionView.layoutIfNeeded()
-//                    collectionView.reloadData()
-//                    view.layoutIfNeeded()
                 }
             }
         }
@@ -371,10 +362,7 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
             navBar.topItem?.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
         }
         
-//        navBar.setBackgroundImage(UIImage(), for: .default)
         navigationItem.largeTitleDisplayMode = .never
-//        navigationItem.title = "Submission"
-
         navigationItem.titleView = titleView
     }
     
@@ -387,7 +375,6 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         // visualEffectView
         visualEffectView.frame = CGRect(x: 0, y: screenSize.height, width: screenSize.width, height: tabHeight)
         window.addSubview(visualEffectView)
-//        window.bringSubviewToFront(visualEffectView)
         visualEffectView.contentView.addSubview(hireAndStartAChatBtnStack)
         NSLayoutConstraint.activate([
             hireAndStartAChatBtnStack.topAnchor.constraint(equalTo: visualEffectView.contentView.topAnchor, constant: 15),
@@ -399,7 +386,6 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         UIView.animate(withDuration: 0.5, delay: 0.15, usingSpringWithDamping: 1.0, initialSpringVelocity: 0, options: .transitionCrossDissolve, animations: { [weak self] in
             guard let self = self else { return }
 
-//            self.proposalAndStartAChatBtnStack.frame = CGRect(x: 0, y: -(screenSize.height - tabHeight), width: screenSize.width, height: tabHeight)
             self.visualEffectView.frame = CGRect(x: 0, y: screenSize.height - tabHeight, width: screenSize.width, height: tabHeight)
             
             self.visualEffectView.isHidden = false
@@ -478,11 +464,6 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
                          bottom: nil,
                          trailing: switchableViews[0].trailingAnchor)
         aboutTableView.heightAnchor.constraint(equalToConstant: view.frame.height + visualEffectView.frame.height).isActive = true
-
-//        guard let layout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout else { return }
-//        layout.itemSize = CGSize(width:  collectionView.frame.size.width , height: aboutTableView.contentSize.height + visualEffectView.frame.height)
-//        print("itemSize: \(layout.itemSize), \(aboutTableView.contentSize.height)")
-//        collectionView.layoutIfNeeded()
         
         switchableViews[1].fadeOut()
         // Using timer to avoid unsmooth fade animation caused by the same view that is being faded then later on removeFromSuperview
@@ -506,23 +487,10 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         
         switch currentSegmentIndex {
         case 0:
-
-////            switchableContainerView.bringSubviewToFront(switchableViews[currentSegmentIndex])
-////            switchableViews[currentSegmentIndex].addSubview(aboutTableView)
-////            aboutTableView.anchor(top: switchableViews[currentSegmentIndex].topAnchor,
-////                             leading: switchableViews[currentSegmentIndex].leadingAnchor,
-////                             bottom: switchableViews[currentSegmentIndex].bottomAnchor,
-////                             trailing: switchableViews[currentSegmentIndex].trailingAnchor)
-        
-//            guard let layout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout else { return }
-//            layout.itemSize = CGSize(width:  collectionView.frame.size.width , height: aboutTableView.contentSize.height + visualEffectView.frame.height)
-//            collectionView.layoutIfNeeded()
-            
-//            let indexPath = IndexPath (row: 0, section: 1)
-//            collectionView.scrollToItem(at: indexPath, at: .bottom, animated: true)
             
             guard let layout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout else { return }
             if layout.sectionHeadersPinToVisibleBounds == true {
+                // Scrolls the content to the 125 offsetY
                 collectionView.setContentOffset(CGPoint(x: 0.0, y: 125), animated: true)
             }
            
@@ -535,7 +503,6 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
                              trailing: switchableViews[currentSegmentIndex].trailingAnchor,
                              padding: UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0))
             reviewsTableView.heightAnchor.constraint(equalToConstant: reviewDynamicHeight == 0.0 ? (collectionView.frame.height) : (reviewDynamicHeight)).isActive = true
-//            collectionView.layoutIfNeeded()
 
         default:
             break
@@ -550,19 +517,18 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        //        let offsetY = scrollView.contentOffset.y
-        //        let tableOffsetY = self.reviewsTableView.contentOffset.y
-        // Handles to stick only the header on the section 1
         guard let layout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout else { return }
         let offsetY = scrollView.contentOffset.y
-//        print("offsetY: \(offsetY)")
+        // Handles to stick only the header on the section 1
         layout.sectionHeadersPinToVisibleBounds = offsetY > 125.0
         
+        // Fades in and out the titleView based on the offsetY
         if offsetY >= 25.0 {
             titleView.isHidden = !(titleView.alpha > 0.001)
         }
         let alpha: CGFloat = (offsetY-25)/100
         titleView.alpha = alpha
+//        print("offsetY: \(offsetY)")
 //        print("alpha: \(alpha)")
     }
     
@@ -570,11 +536,18 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
     // MARK: - Selectors
     @objc fileprivate func hireBtnPressed(_ sender: UIButton) {
         if sender.title(for: .normal) == "Hire Valter" {
-            sender.setTitle("Pending...", for: .normal)
-            sender.setTitleColor(.systemGray, for: .normal)
+            UIView.animate(withDuration: 0.5) {
+                sender.setTitle("Pending...", for: .normal)
+                sender.setTitleColor(.systemGray4, for: .normal)
+                sender.backgroundColor = UIColor.systemPink.withAlphaComponent(0.8)
+            }
+          
         } else {
-            sender.setTitle("Hire Valter", for: .normal)
-            sender.setTitleColor(.systemBlue, for: .normal)
+            UIView.animate(withDuration: 0.5) {
+                sender.setTitle("Hire Valter", for: .normal)
+                sender.setTitleColor(.white, for: .normal)
+                sender.backgroundColor = .systemPink
+            }
         }
     }
     
@@ -591,13 +564,7 @@ extension TechnicianProfileDetailsVC: CollectionDataSourceAndDelegate {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-      
-//        cell.addSubview(reviewsTableView)
-//        reviewsTableView.anchor(top: cell.topAnchor,
-//                         leading: cell.leadingAnchor,
-//                         bottom: cell.bottomAnchor,
-//                         trailing: cell.trailingAnchor, padding: UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0))
-//        reviewsTableView.contentInset = UIEdgeInsets(top: 10, left: 0, bottom: visualEffectView.frame.height/1.5, right: 0)
+
         switch indexPath.section {
         case 0:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ReviewCollectionViewTopCell.cellID, for: indexPath) as! ReviewCollectionViewTopCell
@@ -608,15 +575,10 @@ extension TechnicianProfileDetailsVC: CollectionDataSourceAndDelegate {
             
             technicianInfoMainStackView.anchor(top: cell.customView.topAnchor, leading: cell.customView.leadingAnchor, bottom: cell.customView.bottomAnchor, trailing: cell.customView.trailingAnchor, padding: UIEdgeInsets(top: 0, left: 15, bottom: 10, right: 0), size: CGSize(width: 0, height: 0))
             
-            
-            //            print(cell.customView.frame.height)
-            //            print(collectionView.frame.height)
             return cell
         case 1:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ReviewCollectionViewBottomCell.cellID, for: indexPath) as! ReviewCollectionViewBottomCell
-//            cell.backgroundColor = .cyan
             [switchableContainerView].forEach{cell.addSubview($0)}
-//            switchableContainerView.backgroundColor = .red
             switchableContainerView.anchor(top: cell.topAnchor, leading: cell.leadingAnchor, bottom: cell.contentView.bottomAnchor, trailing: cell.trailingAnchor, padding: UIEdgeInsets(top: 10, left: 0, bottom: 0, right: 0), size: CGSize(width: 0, height: 0))
 //            switchableContainerView.heightAnchor.constraint(equalToConstant: view.frame.height).isActive = true
             return cell
@@ -628,36 +590,20 @@ extension TechnicianProfileDetailsVC: CollectionDataSourceAndDelegate {
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        
-//        let noOfCellsInRow = 1
-//        /// changing sizeForItem when user switches through the segnment
-//        let flowLayout = collectionViewLayout as! UICollectionViewFlowLayout
-//        let totalSpace = flowLayout.sectionInset.left
-//            + flowLayout.sectionInset.right
-//            + (flowLayout.minimumInteritemSpacing * CGFloat(noOfCellsInRow - 1))
-//        //        flowLayout.sectionInset.left = 5
-//        //        flowLayout.sectionInset.right = 5
-//
-//        let size = ((collectionView.bounds.width) - totalSpace) / CGFloat(noOfCellsInRow)
-//        let finalSize = CGSize(width: size, height: size)
+
         if indexPath.section == 0 {
-//            collectionLayout.itemSize = UICollectionViewFlowLayout.automaticSize
-//            collectionLayout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
             return CGSize(width: view.frame.width, height: 115)
         }
         
         let adjustedHeight: CGFloat = (view.frame.height) + reviewsTableView.contentSize.height + visualEffectView.frame.height
         switch currentSegmentIndex {
         case 0:
-            return CGSize(width:  collectionView.frame.size.width , height: view.frame.height - visualEffectView.frame.height*1.5)
+            return CGSize(width:  collectionView.frame.size.width , height: view.frame.height - visualEffectView.frame.height*1.2)
         case 1:
             return CGSize(width:  collectionView.frame.size.width , height: reviewsTableView.contentSize.height + visualEffectView.frame.height)
         default:
             return .zero
         }
-//        return CGSize(width:  collectionView.frame.size.width , height: view.frame.height)
-//        }
-//        return .zero
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind:
@@ -719,11 +665,6 @@ extension TechnicianProfileDetailsVC: TableViewDataSourceAndDelegate {
 
         switch currentSegmentIndex {
         case 0:
-//            let tableContentSize = aboutTableView.contentSize.height
-//            let suitableHeight = (view.frame.height) + tableContentSize + visualEffectView.frame.height
-//            mainContainerView.frame.size = CGSize(width: scrollView.frame.width, height: suitableHeight)
-//            scrollView.contentSize = CGSize(width: scrollView.frame.width, height: suitableHeight)
-
             let cell = tableView.dequeueReusableCell(withIdentifier: AboutCell.cellID, for: indexPath) as! AboutCell
             let detailText = aboutSectionSetter[indexPath.section].sectionDetail[indexPath.row]
             cell.textLabel?.numberOfLines = 0
@@ -731,7 +672,7 @@ extension TechnicianProfileDetailsVC: TableViewDataSourceAndDelegate {
             return cell
         case 1:
 
-            let detailText = reviewsSectionSetter[indexPath.section].sectionDetail[indexPath.row]
+//            let detailText = reviewsSectionSetter[indexPath.section].sectionDetail[indexPath.row]
 
             switch indexPath.section {
             case 0:
@@ -739,18 +680,11 @@ extension TechnicianProfileDetailsVC: TableViewDataSourceAndDelegate {
                 cell.setupViews()
                 return cell
             case 1:
-//                let tableContentSize = reviewsTableView.contentSize.height
-//                let suitableHeight = (view.frame.height) + tableContentSize + visualEffectView.frame.height
-//                mainContainerView.frame.size = CGSize(width: scrollView.frame.width, height: suitableHeight)
-//                scrollView.contentSize = CGSize(width: scrollView.frame.width, height: suitableHeight)
-
                 let cell = tableView.dequeueReusableCell(withIdentifier: ProficiencyReviewCell.cellID, for: indexPath) as! ProficiencyReviewCell
-//                cell.textLabel?.text = "detailText"
                 cell.setupReliabilityStackView()
                 return cell
             case 2:
                 let cell = tableView.dequeueReusableCell(withIdentifier: ReviewsCell.cellID, for: indexPath) as! ReviewsCell
-//                cell.textLabel?.text = detailText
                 cell.setupViews()
                 return cell
             default:
@@ -791,27 +725,5 @@ extension TechnicianProfileDetailsVC: TableViewDataSourceAndDelegate {
         return .leastNormalMagnitude
     }
 
-
-}
-
-extension UIView {
-
-var heightConstraint: NSLayoutConstraint? {
-    get {
-        return constraints.first(where: {
-            $0.firstAttribute == .height && $0.relation == .equal
-        })
-    }
-    set { setNeedsLayout() }
-}
-
-var widthConstraint: NSLayoutConstraint? {
-    get {
-        return constraints.first(where: {
-            $0.firstAttribute == .width && $0.relation == .equal
-        })
-    }
-    set { setNeedsLayout() }
-}
 
 }
