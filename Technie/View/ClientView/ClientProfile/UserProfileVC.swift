@@ -164,7 +164,8 @@ extension UserProfileVC: TableViewDataSourceAndDelegate {
         tableView.deselectRow(at: indexPath, animated: true)
         switch indexPath.row {
         case 0:
-            print("index 0")
+            let vc = EditProfileVC()
+            navigationController?.pushViewController(vc, animated: true)
         case 1:
             let vc = TechnieTabController()
             (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootViewController(vc)
@@ -172,13 +173,12 @@ extension UserProfileVC: TableViewDataSourceAndDelegate {
             let vc = ClientPostHistoryVC()
             navigationController?.pushViewController(vc, animated: true)
         case 3:
-            print("index 3")
+            let vc = ClientSettingsVC()
+            navigationController?.pushViewController(vc, animated: true)
         default:
             break
         }
-        if indexPath.row == 1 {
-           
-        }
+      
     }
     
     

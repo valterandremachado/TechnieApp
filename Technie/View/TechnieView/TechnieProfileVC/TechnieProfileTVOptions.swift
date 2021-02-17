@@ -64,13 +64,11 @@ enum TechnieProfileTVOptions: Int, CustomStringConvertible {
 
 enum TechnieProfileTVOptions0: Int, CustomStringConvertible {
     case Account
-    case ServiceHistory
     case SavedJobs
     
     var description: String {
         switch self {
         case .Account: return "Account"
-        case .ServiceHistory: return "Service History"
         case .SavedJobs: return "Saved Jobs"
         }
     }
@@ -79,11 +77,6 @@ enum TechnieProfileTVOptions0: Int, CustomStringConvertible {
         switch self {
         case .Account:
             let iconImage = UIImage(systemName: "person.circle.fill")?.withTintColor(.systemBlue, renderingMode: .alwaysOriginal) ?? UIImage()
-            let resizedImage = UIImage().resizeImage(image: iconImage, toTheSize: CGSize(width: 24, height: 24))
-            return resizedImage
-            
-        case .ServiceHistory:
-            let iconImage = UIImage(named: "history")?.withTintColor(.systemBlue, renderingMode: .alwaysOriginal) ?? UIImage()//clock.arrow.circlepath
             let resizedImage = UIImage().resizeImage(image: iconImage, toTheSize: CGSize(width: 24, height: 24))
             return resizedImage
             
@@ -97,6 +90,7 @@ enum TechnieProfileTVOptions0: Int, CustomStringConvertible {
 }
 
 enum TechnieProfileTVOptions1: Int, CustomStringConvertible {
+    case General
     case HelpCenter
     case TellAFriend
     
@@ -104,6 +98,7 @@ enum TechnieProfileTVOptions1: Int, CustomStringConvertible {
         switch self {
         case .HelpCenter: return "Help"
         case .TellAFriend: return "Tell a Friend"
+        case .General: return "General"
         }
     }
     
@@ -115,6 +110,11 @@ enum TechnieProfileTVOptions1: Int, CustomStringConvertible {
             return resizedImage
             
         case .TellAFriend:
+            let iconImage = UIImage(systemName: "heart.circle.fill")?.withTintColor(.systemBlue, renderingMode: .alwaysOriginal) ?? UIImage()
+            let resizedImage = UIImage().resizeImage(image: iconImage, toTheSize: CGSize(width: 24, height: 24))
+            return resizedImage
+            
+        case .General:
             let iconImage = UIImage(systemName: "heart.circle.fill")?.withTintColor(.systemBlue, renderingMode: .alwaysOriginal) ?? UIImage()
             let resizedImage = UIImage().resizeImage(image: iconImage, toTheSize: CGSize(width: 24, height: 24))
             return resizedImage

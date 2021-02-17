@@ -53,8 +53,8 @@ class TechnieProfileVC: UIViewController {
         setupViews()
         
         sections.append(SectionHandler(title: "UserInfo", detail: [""]))
-        sections.append(SectionHandler(title: "AccountInfo", detail: ["", "A", ""]))
-        sections.append(SectionHandler(title: "Share and Help", detail: ["", ""]))
+        sections.append(SectionHandler(title: "AccountInfo", detail: ["", ""]))
+        sections.append(SectionHandler(title: "Share and Help", detail: ["", "", ""]))
         sections.append(SectionHandler(title: "Logout", detail: [""]))
     }
    
@@ -162,8 +162,14 @@ extension TechnieProfileVC: TableViewDataSourceAndDelegate {
                 print("Logged Out")
             }
         case 2:
-            let vc = ClientTabController()
-            (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootViewController(vc)
+            if indexPath.row == 0 {
+                let vc = ClientSettingsVC()
+                navigationController?.pushViewController(vc, animated: true)
+            } else {
+                let vc = ClientTabController()
+                (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootViewController(vc)
+            }
+         
         default:
             break
         }
