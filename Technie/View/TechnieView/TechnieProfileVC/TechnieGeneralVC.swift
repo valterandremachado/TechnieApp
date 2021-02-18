@@ -1,17 +1,15 @@
 //
-//  ClientSettingsVC.swift
+//  GeneralVC.swift
 //  Technie
 //
-//  Created by Valter A. Machado on 2/16/21.
+//  Created by Valter A. Machado on 2/18/21.
 //
 
 import UIKit
 
-class ClientSettingsVC: UIViewController {
+class TechnieGeneralVC: UIViewController {
 
     // MARK: - Properties
-    var sections = [SectionHandler]()
-    
     lazy var tableView: UITableView = {
         let tv = UITableView(frame: .zero, style: .grouped)
         tv.translatesAutoresizingMaskIntoConstraints = false
@@ -65,7 +63,7 @@ class ClientSettingsVC: UIViewController {
         guard let navBar = navigationController?.navigationBar else { return }
 //        navBar.prefersLargeTitles = true
         navigationItem.largeTitleDisplayMode = .never
-        navigationItem.title = "Settings"
+        navigationItem.title = "General"
     }
     
     // MARK: - Selectors
@@ -74,10 +72,10 @@ class ClientSettingsVC: UIViewController {
 }
 
 // MARK: - TableViewDataSourceAndDelegate Extension
-extension ClientSettingsVC: TableViewDataSourceAndDelegate {
+extension TechnieGeneralVC: TableViewDataSourceAndDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 3
+        return 2
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -88,9 +86,6 @@ extension ClientSettingsVC: TableViewDataSourceAndDelegate {
             cell.setupSwitcherStackView()
             cell.titleLabel.text = "In-App Notification"
         case 1:
-            cell.setupSwitcherStackView()
-            cell.titleLabel.text = "Recommendation Engine"
-        case 2:
             cell.setupVersionStackView()
         default:
             break

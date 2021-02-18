@@ -1,20 +1,18 @@
 //
-//  EditProfileVC.swift
+//  TechnieEditProfile.swift
 //  Technie
 //
-//  Created by Valter A. Machado on 2/16/21.
+//  Created by Valter A. Machado on 2/18/21.
 //
 
 import UIKit
 
-class EditProfileVC: UIViewController {
+class TechnieEditProfileVC: UIViewController {
 
     // MARK: - Properties
     var newProfileImage = Data()
     var newUserName = ""
     var newLocation = ""
-    
-    var sections = [SectionHandler]()
     
     lazy var tableView: UITableView = {
         let tv = UITableView(frame: .zero, style: .grouped)
@@ -34,7 +32,7 @@ class EditProfileVC: UIViewController {
         tv.tableFooterView = UIView(frame: frame)
 //        tv.contentInsetAdjustmentBehavior = .automatic
         
-        tv.register(EditProfileCell.self, forCellReuseIdentifier: EditProfileCell.cellID)
+        tv.register(TechnieEditProfileCell.self, forCellReuseIdentifier: TechnieEditProfileCell.cellID)
         return tv
     }()
     
@@ -68,34 +66,34 @@ class EditProfileVC: UIViewController {
     fileprivate func setupNavBar() {
         guard let navBar = navigationController?.navigationBar else { return }
 //        navBar.prefersLargeTitles = true
-//        navigationItem.largeTitleDisplayMode = .never
+        navigationItem.largeTitleDisplayMode = .never
         navigationItem.title = "Edit Profile"
     }
     
     // MARK: - Selectors
-    
-    
+
 }
 
 // MARK: - TableViewDataSourceAndDelegate Extension
-extension EditProfileVC: TableViewDataSourceAndDelegate {
+extension TechnieEditProfileVC: TableViewDataSourceAndDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 4
+        return 3
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: EditProfileCell.cellID, for: indexPath) as! EditProfileCell
+        let cell = tableView.dequeueReusableCell(withIdentifier: TechnieEditProfileCell.cellID, for: indexPath) as! TechnieEditProfileCell
         
         switch indexPath.row {
         case 0:
             var userProfileImage = UIImage(named: "technieDummyPhoto")
             let uploadedUserProfileImage = UIImage(data: newProfileImage)
             uploadedUserProfileImage == nil ? (userProfileImage = userProfileImage) : (userProfileImage = uploadedUserProfileImage)
-            
+
             cell.setupViewsOne()
             cell.titleLabel.text = "Profile Photo"
             cell.profileImageView.image = userProfileImage
+            
         case 1:
             var userDisplayName = ""
             newUserName == "" ? (userDisplayName = "username") : (userDisplayName = newUserName)
@@ -104,16 +102,10 @@ extension EditProfileVC: TableViewDataSourceAndDelegate {
             
         case 2:
             var userLocation = ""
-            newLocation == "" ? (userLocation = "Baguio City") : (userLocation = newLocation)
+            newLocation == "" ? (userLocation = "Baguio city") : (userLocation = newLocation)
             cell.titleLabel.text = "Location"
             cell.descriptionLabel.text = userLocation
-            
-        case 3:
-            cell.titleLabel.text = "Account"
-            cell.descriptionLabel.text = "username@gmail.com"
-            cell.accessoryType = .none
-            cell.selectionStyle = .none
-            
+
         default:
             break
         }
@@ -139,11 +131,11 @@ extension EditProfileVC: TableViewDataSourceAndDelegate {
         let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
         let camera = UIAlertAction(title: "Camera", style: .default) { (_) in
-            //            let imagePicker = UIImagePickerController()
-            //            imagePicker.sourceType = .photoLibrary
-            //            imagePicker.delegate = self
-            //            imagePicker.allowsEditing = true
-            //            self.present(imagePicker, animated: true)
+//            let imagePicker = UIImagePickerController()
+//            imagePicker.sourceType = .photoLibrary
+//            imagePicker.delegate = self
+//            imagePicker.allowsEditing = true
+//            self.present(imagePicker, animated: true)
             print("camera")
         }
         
@@ -190,7 +182,7 @@ extension EditProfileVC: TableViewDataSourceAndDelegate {
         firstNameField.placeholder = "First Name"
         var lastNameField = UITextField()
         lastNameField.placeholder = "Last Name"
-        
+
         let alertController = UIAlertController(title: "Change Name", message: nil, preferredStyle: .alert)
         
         let save = UIAlertAction(title: "Save", style: .default) { [self] (action) in
@@ -224,7 +216,7 @@ extension EditProfileVC: TableViewDataSourceAndDelegate {
     fileprivate func presentEnterLocationAlertController() {
         var locationField = UITextField()
         locationField.placeholder = "New Location"
-        
+
         let alertController = UIAlertController(title: "Enter Location", message: nil, preferredStyle: .alert)
         
         let save = UIAlertAction(title: "Save", style: .default) { [self] (action) in
@@ -270,7 +262,7 @@ extension EditProfileVC: TableViewDataSourceAndDelegate {
 }
 
 // MARK: - UIImagePickerControllerDelegate Extension
-extension EditProfileVC: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+extension TechnieEditProfileVC: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         picker.dismiss(animated: true, completion: nil)

@@ -115,7 +115,7 @@ enum TechnieProfileTVOptions1: Int, CustomStringConvertible {
             return resizedImage
             
         case .General:
-            let iconImage = UIImage(systemName: "heart.circle.fill")?.withTintColor(.systemBlue, renderingMode: .alwaysOriginal) ?? UIImage()
+            let iconImage = UIImage(systemName: "gearshape.fill")?.withTintColor(.systemBlue, renderingMode: .alwaysOriginal) ?? UIImage()
             let resizedImage = UIImage().resizeImage(image: iconImage, toTheSize: CGSize(width: 24, height: 24))
             return resizedImage
         }

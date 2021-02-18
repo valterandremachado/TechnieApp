@@ -156,20 +156,32 @@ extension TechnieProfileVC: TableViewDataSourceAndDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         switch indexPath.section {
-        case 3:
+        case 0:
+            let vc = TechnieEditProfileVC()
+            navigationController?.pushViewController(vc, animated: true)
+        case 1:
             if indexPath.row == 0 {
-                try! Auth.auth().signOut()
-                print("Logged Out")
+                let vc = TechnieAccountVC()
+                navigationController?.pushViewController(vc, animated: true)
+            } else if indexPath.row == 1 {
+                let vc = TechnieSavedJobsVC()
+                navigationController?.pushViewController(vc, animated: true)
             }
         case 2:
             if indexPath.row == 0 {
-                let vc = ClientSettingsVC()
+                let vc = TechnieGeneralVC()
                 navigationController?.pushViewController(vc, animated: true)
             } else {
                 let vc = ClientTabController()
                 (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootViewController(vc)
             }
          
+        case 3:
+            if indexPath.row == 0 {
+                try! Auth.auth().signOut()
+                print("Logged Out")
+            }
+        
         default:
             break
         }

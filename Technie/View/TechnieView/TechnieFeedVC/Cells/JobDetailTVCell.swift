@@ -392,10 +392,10 @@ class JobDetailTVCell5: UITableViewCell {
         return lbl
     }()
     
-    lazy var negotiationsLabel: UILabel = {
+    lazy var jobStatusLabel: UILabel = {
         let lbl = UILabel()
         lbl.translatesAutoresizingMaskIntoConstraints = false
-        lbl.text = "Negotiating:"
+        lbl.text = "Status:"
         return lbl
     }()
     
@@ -422,10 +422,10 @@ class JobDetailTVCell5: UITableViewCell {
         return lbl
     }()
     
-    lazy var negotiations: UILabel = {
+    lazy var jobStatus: UILabel = {
         let lbl = UILabel()
         lbl.translatesAutoresizingMaskIntoConstraints = false
-        lbl.text = "2"
+        lbl.text = "Active"
         lbl.textAlignment = .right
         lbl.textColor = .systemGray
         return lbl
@@ -459,8 +459,8 @@ class JobDetailTVCell5: UITableViewCell {
 //        stack.withHeight(40)
         return stack
     }()
-    lazy var negotiationsStack: UIStackView = {
-        let stack = UIStackView(arrangedSubviews: [negotiationsLabel, negotiations])
+    lazy var jobStatusStack: UIStackView = {
+        let stack = UIStackView(arrangedSubviews: [jobStatusLabel, jobStatus])
         stack.translatesAutoresizingMaskIntoConstraints = false
         stack.axis = .horizontal
 //        stack.spacing = 2
@@ -490,7 +490,7 @@ class JobDetailTVCell5: UITableViewCell {
         return stack
     }()
     lazy var mainStack: UIStackView = {
-        let stack = UIStackView(arrangedSubviews: [proposalsStack, negotiationsStack, invitesSentStack, unansweredInvitesStack])
+        let stack = UIStackView(arrangedSubviews: [proposalsStack, invitesSentStack, unansweredInvitesStack, jobStatusStack])
         stack.translatesAutoresizingMaskIntoConstraints = false
         stack.axis = .vertical
         stack.spacing = 5

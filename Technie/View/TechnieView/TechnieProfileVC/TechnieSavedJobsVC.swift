@@ -1,17 +1,15 @@
 //
-//  ClientSettingsVC.swift
+//  TechnieSavedJobsVC.swift
 //  Technie
 //
-//  Created by Valter A. Machado on 2/16/21.
+//  Created by Valter A. Machado on 2/18/21.
 //
 
 import UIKit
 
-class ClientSettingsVC: UIViewController {
+class TechnieSavedJobsVC: UIViewController {
 
     // MARK: - Properties
-    var sections = [SectionHandler]()
-    
     lazy var tableView: UITableView = {
         let tv = UITableView(frame: .zero, style: .grouped)
         tv.translatesAutoresizingMaskIntoConstraints = false
@@ -30,7 +28,7 @@ class ClientSettingsVC: UIViewController {
         tv.tableFooterView = UIView(frame: frame)
         tv.contentInsetAdjustmentBehavior = .automatic
         
-        tv.register(SettingsCell.self, forCellReuseIdentifier: SettingsCell.cellID)
+        tv.register(TechnieSavedJobsCell.self, forCellReuseIdentifier: TechnieSavedJobsCell.cellID)
         return tv
     }()
     
@@ -65,7 +63,7 @@ class ClientSettingsVC: UIViewController {
         guard let navBar = navigationController?.navigationBar else { return }
 //        navBar.prefersLargeTitles = true
         navigationItem.largeTitleDisplayMode = .never
-        navigationItem.title = "Settings"
+        navigationItem.title = "Saved Jobs"
     }
     
     // MARK: - Selectors
@@ -74,34 +72,26 @@ class ClientSettingsVC: UIViewController {
 }
 
 // MARK: - TableViewDataSourceAndDelegate Extension
-extension ClientSettingsVC: TableViewDataSourceAndDelegate {
+extension TechnieSavedJobsVC: TableViewDataSourceAndDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 3
+        return 2
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: SettingsCell.cellID, for: indexPath) as! SettingsCell
+        var cell = tableView.dequeueReusableCell(withIdentifier: TechnieSavedJobsCell.cellID, for: indexPath) as! TechnieSavedJobsCell
+        cell = TechnieSavedJobsCell(style: .subtitle, reuseIdentifier: TechnieSavedJobsCell.cellID)
         
-        switch indexPath.row {
-        case 0:
-            cell.setupSwitcherStackView()
-            cell.titleLabel.text = "In-App Notification"
-        case 1:
-            cell.setupSwitcherStackView()
-            cell.titleLabel.text = "Recommendation Engine"
-        case 2:
-            cell.setupVersionStackView()
-        default:
-            break
-        }
-        
+        cell.detailTextLabel?.textColor = .systemGray
+        cell.detailTextLabel?.text = "detailTextLabel"
+        cell.textLabel?.text = "textLabel"
+
         return cell
     }
     
-//    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-//        tableView.deselectRow(at: indexPath, animated: true)
-//    }
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
     
     func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
         // remove bottom extra 20px space.

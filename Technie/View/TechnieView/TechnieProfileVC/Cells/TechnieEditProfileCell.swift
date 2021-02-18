@@ -1,15 +1,14 @@
 //
-//  EditProfileCell.swift
+//  TechnieEditProfileCell.swift
 //  Technie
 //
-//  Created by Valter A. Machado on 2/17/21.
+//  Created by Valter A. Machado on 2/18/21.
 //
 
 import UIKit
 
-class EditProfileCell: UITableViewCell {
-    
-    static let cellID = "EditProfileCellID"
+class TechnieEditProfileCell: UITableViewCell {
+    static let cellID = "TechnieEditProfileCellID"
     
     // MARK: - Properties
     lazy var titleLabel: UILabel = {
@@ -37,11 +36,13 @@ class EditProfileCell: UITableViewCell {
     lazy var profileImageView: UIImageView = {
         let iv = UIImageView()
         iv.translatesAutoresizingMaskIntoConstraints = false
+        iv.contentMode = .scaleAspectFill
         iv.backgroundColor = .red
         iv.clipsToBounds = true
         iv.layer.cornerRadius = 10
         return iv
     }()
+   
     
     lazy var mainStackView: UIStackView = {
         let sv = UIStackView(arrangedSubviews: [titleLabel, descriptionLabel])
@@ -55,17 +56,19 @@ class EditProfileCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         accessoryType = .disclosureIndicator
-        
+        selectionStyle = .default
         setupViewsTwo()
     }
     
     // MARK: - Methods
+//    var dynamicTrailing: NSLayoutConstraint?
     func setupViewsOne() {
         addSubview(profilePhotoLabel)
         
         profilePhotoLabel.anchor(top: topAnchor, leading: leadingAnchor, bottom: bottomAnchor, trailing: trailingAnchor, padding: UIEdgeInsets(top: 20, left: 20, bottom: 20, right: 40))
         
         profilePhotoLabel.addSubview(profileImageView)
+
         NSLayoutConstraint.activate([
             profileImageView.centerYAnchor.constraint(equalTo: profilePhotoLabel.centerYAnchor, constant: 0),
             profileImageView.trailingAnchor.constraint(equalTo: profilePhotoLabel.trailingAnchor, constant: 0)
@@ -78,6 +81,8 @@ class EditProfileCell: UITableViewCell {
         addSubview(mainStackView)
         mainStackView.anchor(top: topAnchor, leading: leadingAnchor, bottom: bottomAnchor, trailing: trailingAnchor, padding: UIEdgeInsets(top: 15, left: 20, bottom: 15, right: 40))
     }
+    
+   
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")

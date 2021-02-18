@@ -14,7 +14,6 @@ class SettingsCell: UITableViewCell {
     lazy var titleLabel: UILabel = {
         let lbl = UILabel()
         lbl.translatesAutoresizingMaskIntoConstraints = false
-        lbl.text = "In-App Notification"
         return lbl
     }()
     
