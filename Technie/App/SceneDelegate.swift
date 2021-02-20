@@ -21,12 +21,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         
         //Main ViewController
-        let mainVC = TechnieTabController()
+        let mainVC = ChooseAccountTypeVC()
         
         // Window setup
         window = UIWindow(frame: windowScene.coordinateSpace.bounds)
         window?.windowScene = windowScene
-        window?.rootViewController = mainVC
+        window?.rootViewController = UINavigationController(rootViewController: mainVC)
         
         // Window visibility
         window?.makeKeyAndVisible()

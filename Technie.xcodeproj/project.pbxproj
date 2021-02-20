@@ -34,6 +34,10 @@
 		8A54D1AA25CBFAEE00045D37 /* AboutCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A54D1A925CBFAEE00045D37 /* AboutCell.swift */; };
 		8A54FAD225B56ED100814216 /* MessageKit in Frameworks */ = {isa = PBXBuildFile; productRef = 8A54FAD125B56ED100814216 /* MessageKit */; };
 		8A60EEBB258CDB2E0061A830 /* LivePreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A60EEBA258CDB2E0061A830 /* LivePreview.swift */; };
+		8A64899525E117B70019A6DC /* ChooseAccountTypeVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A64899425E117B70019A6DC /* ChooseAccountTypeVC.swift */; };
+		8A64899B25E11BA30019A6DC /* SignupVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A64899925E11BA20019A6DC /* SignupVC.swift */; };
+		8A64899C25E11BA30019A6DC /* LoginVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A64899A25E11BA30019A6DC /* LoginVC.swift */; };
+		8A6489A125E11C7D0019A6DC /* LoginOrSignupVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A6489A025E11C7D0019A6DC /* LoginOrSignupVC.swift */; };
 		8A68A56625B705BA000D988F /* StorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A68A56425B705B9000D988F /* StorageManager.swift */; };
 		8A68A56725B705BA000D988F /* DatabaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A68A56525B705BA000D988F /* DatabaseManager.swift */; };
 		8A6A32752598C73A001FE408 /* PostSectionVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A6A32742598C73A001FE408 /* PostSectionVC.swift */; };
@@ -181,6 +185,10 @@
 		8A54D1A425CBEBA800045D37 /* ReviewsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewsVC.swift; sourceTree = "<group>"; };
 		8A54D1A925CBFAEE00045D37 /* AboutCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutCell.swift; sourceTree = "<group>"; };
 		8A60EEBA258CDB2E0061A830 /* LivePreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LivePreview.swift; sourceTree = "<group>"; };
+		8A64899425E117B70019A6DC /* ChooseAccountTypeVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseAccountTypeVC.swift; sourceTree = "<group>"; };
+		8A64899925E11BA20019A6DC /* SignupVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignupVC.swift; sourceTree = "<group>"; };
+		8A64899A25E11BA30019A6DC /* LoginVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginVC.swift; sourceTree = "<group>"; };
+		8A6489A025E11C7D0019A6DC /* LoginOrSignupVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginOrSignupVC.swift; sourceTree = "<group>"; };
 		8A68A56425B705B9000D988F /* StorageManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StorageManager.swift; sourceTree = "<group>"; };
 		8A68A56525B705BA000D988F /* DatabaseManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DatabaseManager.swift; sourceTree = "<group>"; };
 		8A6A32742598C73A001FE408 /* PostSectionVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostSectionVC.swift; sourceTree = "<group>"; };
@@ -354,6 +362,17 @@
 				8A54D1A425CBEBA800045D37 /* ReviewsVC.swift */,
 			);
 			path = TechnicianProfileDetailsVC;
+			sourceTree = "<group>";
+		};
+		8A64899325E1178D0019A6DC /* Test */ = {
+			isa = PBXGroup;
+			children = (
+				8A64899A25E11BA30019A6DC /* LoginVC.swift */,
+				8A64899925E11BA20019A6DC /* SignupVC.swift */,
+				8A64899425E117B70019A6DC /* ChooseAccountTypeVC.swift */,
+				8A6489A025E11C7D0019A6DC /* LoginOrSignupVC.swift */,
+			);
+			path = Test;
 			sourceTree = "<group>";
 		};
 		8A68A56325B7058B000D988F /* DB Managers */ = {
@@ -563,6 +582,7 @@
 		8AC1B15D258A2E18000F2569 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				8A64899325E1178D0019A6DC /* Test */,
 				8AC93A8525B6EC8100663BE3 /* ChatVC */,
 				8AFC383125AEFECD004ECDF3 /* TechnieView */,
 				8AE2589C258A305D004EDB26 /* ClientView */,
@@ -1055,6 +1075,7 @@
 				8AADFB7D25B58A2E00D3A5CC /* Chat.swift in Sources */,
 				8AC1B123258A2D8D000F2569 /* AppDelegate.swift in Sources */,
 				8AC93A9425B6EF3A00663BE3 /* ConversationsModels.swift in Sources */,
+				8A6489A125E11C7D0019A6DC /* LoginOrSignupVC.swift in Sources */,
 				8A05766125CD9E0A0071FDD1 /* FullRankingCell.swift in Sources */,
 				8AF76A7A258B440D00ED14C2 /* MyActivityIndicator.swift in Sources */,
 				8A54D1A525CBEBA800045D37 /* ReviewsVC.swift in Sources */,
@@ -1077,6 +1098,7 @@
 				8A0C0B4825D11ACB0072729D /* TechnicianSearchResultsCell.swift in Sources */,
 				8AC93A8725B6ECB200663BE3 /* ChatVC.swift in Sources */,
 				8AF76A86258B64FC00ED14C2 /* TechnieRankingCell.swift in Sources */,
+				8A64899C25E11BA30019A6DC /* LoginVC.swift in Sources */,
 				8A60EEBB258CDB2E0061A830 /* LivePreview.swift in Sources */,
 				8A8D1BC925DD33CD0076C56E /* SettingsCell.swift in Sources */,
 				8A13FDE625DE3DB30034945D /* TechnieAccountVC.swift in Sources */,
@@ -1118,10 +1140,12 @@
 				8AA43A2E25D1519C00140649 /* RecommendationVC.swift in Sources */,
 				8AAE555425DC093D003AB202 /* ClientPostHistoryCell.swift in Sources */,
 				8A05765C25CD77390071FDD1 /* ReviewsCell.swift in Sources */,
+				8A64899B25E11BA30019A6DC /* SignupVC.swift in Sources */,
 				8A76FA5F258DF2F40094C524 /* NearbyDetailVC.swift in Sources */,
 				8A0C0B3D25D119C30072729D /* TechnicianSearchResultsVC.swift in Sources */,
 				8A6C839825CADA8B0082D51F /* TechnicianProfileDetailsVC.swift in Sources */,
 				8ADECCC425B026F600F871EF /* FeedsTVCell.swift in Sources */,
+				8A64899525E117B70019A6DC /* ChooseAccountTypeVC.swift in Sources */,
 				8A13FDF425DE3E050034945D /* TechnieEditProfileVC.swift in Sources */,
 				8A13FDFE25DE3E9D0034945D /* TechnieAccountCell.swift in Sources */,
 				8AD772A625D2643700955B9A /* RecommendationCell.swift in Sources */,

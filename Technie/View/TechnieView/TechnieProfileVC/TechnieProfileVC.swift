@@ -53,7 +53,7 @@ class TechnieProfileVC: UIViewController {
         setupViews()
         
         sections.append(SectionHandler(title: "UserInfo", detail: [""]))
-        sections.append(SectionHandler(title: "AccountInfo", detail: ["", ""]))
+        sections.append(SectionHandler(title: "AccountInfo", detail: ["", "", ""]))
         sections.append(SectionHandler(title: "Share and Help", detail: ["", "", ""]))
         sections.append(SectionHandler(title: "Logout", detail: [""]))
     }

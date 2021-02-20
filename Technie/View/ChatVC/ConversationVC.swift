@@ -296,9 +296,8 @@ class ConversationVC: UIViewController {
                 if success {
                     // upload image
 //                    guard let image = strongSelf.imageView.image,
-//                        let data = image.pngData() else {
-//                            return
-//                    }
+//                          let data = image.pngData()
+//                    else { return }
 //                    let filename = chatUser.profilePictureFileName
 //                    StorageManager.shared.uploadProfilePicture(with: data, fileName: filename, completion: { result in
 //                        switch result {

@@ -119,7 +119,248 @@ extension DatabaseManager {
             })
         })
     }
+    
+    
+    public func insertTechnicianUser(with user: TechnicianUserModel, completion: @escaping (Bool) -> Void) {
+        database.child(user.safeEmail).setValue([
+            "first_name": user.firstName,
+            "last_name": user.lastName
+        ], withCompletionBlock: { [weak self] error, _ in
 
+            guard let strongSelf = self else {
+                return
+            }
+
+            guard error == nil else {
+                print("failed ot write to database")
+                completion(false)
+                return
+            }
+
+            strongSelf.database.child("users").observeSingleEvent(of: .value, with: { snapshot in
+                if var usersCollection = snapshot.value as? [[String: Any]] {
+                    // append to user dictionary
+                    let newElement = [
+                        "name": user.firstName + " " + user.lastName,
+                        "email": user.safeEmail,
+                        "location": user.location,
+                        "profileSummary": user.profileSummary,
+                        "experience": user.experience,
+                        "skills": user.skills,
+                        "accountType": user.accountType,
+                        "hourlyRate": user.hourlyRate,
+
+                    ] as [String : Any]
+                    usersCollection.append(newElement)
+
+                    strongSelf.database.child("users").setValue(usersCollection, withCompletionBlock: { error, _ in
+                        guard error == nil else {
+                            completion(false)
+                            return
+                        }
+
+                        completion(true)
+                    })
+                }
+                else {
+                    // create that array
+                    let newCollection: [[String: Any]] = [
+                        [
+                            "name": user.firstName + " " + user.lastName,
+                            "email": user.safeEmail,
+                            "location": user.location,
+                            "profileSummary": user.profileSummary,
+                            "experience": user.experience,
+                            "skills": user.skills,
+                            "accountType": user.accountType,
+                            "hourlyRate": user.hourlyRate,
+                        ]
+                    ]
+
+                    strongSelf.database.child("users").setValue(newCollection, withCompletionBlock: { error, _ in
+                        guard error == nil else {
+                            completion(false)
+                            return
+                        }
+
+                        completion(true)
+                    })
+                }
+            })
+        })
+    }
+
+    public func insertClientUser(with user: ClientUserModel, completion: @escaping (Bool) -> Void) {
+        database.child(user.safeEmail).setValue([
+            "first_name": user.firstName,
+            "last_name": user.lastName
+        ], withCompletionBlock: { [weak self] error, _ in
+
+            guard let strongSelf = self else {
+                return
+            }
+
+            guard error == nil else {
+                print("failed ot write to database")
+                completion(false)
+                return
+            }
+
+            strongSelf.database.child("users").observeSingleEvent(of: .value, with: { snapshot in
+                if var usersCollection = snapshot.value as? [[String: Any]] {
+                    // append to user dictionary
+                    let newElement = [
+                        "profileInfo": [
+                            "name": user.firstName + " " + user.lastName,
+                            "email": user.safeEmail,
+                            "location": user.location
+                        ]
+                       
+                    ]
+                    
+                    usersCollection.append(newElement)
+                    strongSelf.database.child("users").setValue(usersCollection, withCompletionBlock: { error, _ in
+                        guard error == nil else {
+                            completion(false)
+                            return
+                        }
+
+                        completion(true)
+                    })
+                }
+                else {
+                    // create that array
+                    let newCollection: [[String: Any]] = [
+                        [
+                            "profileInfo": [
+                                "name": user.firstName + " " + user.lastName,
+                                "email": user.safeEmail,
+                                "location": user.location
+                            ]
+                        ]
+                    ]
+
+                    strongSelf.database.child("users").setValue(newCollection, withCompletionBlock: { error, _ in
+                        guard error == nil else {
+                            completion(false)
+                            return
+                        }
+
+                        completion(true)
+                    })
+                }
+            })
+        })
+    }
+    
+    public func insertClientUser2(with user: ClientUserModel, uid: String, completion: @escaping (Bool) -> Void) {
+
+        database.child("users").observeSingleEvent(of: .value, with: { [self] snapshot in
+                if var usersCollection = snapshot.value as? [String: Any] {
+                    let newElement = [
+                        "profileInfo": [
+                            "name": user.firstName + " " + user.lastName,
+                            "email": user.safeEmail,
+                            "location": user.location
+                        ]
+                       
+                    ]
+                    // append to user dictionary
+                    usersCollection = newElement
+                    
+                    let useRRef = database.child("users")
+                    let newUserRef = useRRef.child(uid)
+                    newUserRef.updateChildValues(usersCollection, withCompletionBlock: { error, _ in
+                        guard error == nil else {
+                            completion(false)
+                            return
+                        }
+
+                        completion(true)
+                    })
+                   
+                } else {
+                    // create that array
+                    let newCollection: [String: Any] = [
+                            "profileInfo": [
+                                "name": user.firstName + " " + user.lastName,
+                                "email": user.safeEmail,
+                                "location": user.location
+                            ]
+                        ]
+
+                    let useRRef = database.child("users")
+                    let newUserRef = useRRef.child(uid)
+                    newUserRef.setValue(newCollection, withCompletionBlock: { error, _ in
+                        guard error == nil else {
+                            completion(false)
+                            return
+                        }
+
+                        completion(true)
+                    })
+                    
+                }
+            })
+    }
+    
+    public func postService(userUID: String, completion: @escaping (Bool) -> Void) {
+      
+            database.child("users/\(userUID)").observeSingleEvent(of: .value, with: { [weak self] snapshot in
+                print("VALUE: \(snapshot.value)")
+                guard let strongSelf = self else {
+                    return
+                }
+
+                if var usersCollection = snapshot.value as? [String: Any] {
+                    // append to user dictionary
+                    let newElement = [
+                        "servicePosts": [
+                            "title": "user.firstName + user.lastName",
+                            "description": "user.safeEmail",
+                            "attachments": "user.location",
+                            "projectType": "user.location",
+                            "budget": "user.location",
+                            "requiredSkills": "user.location"
+                        ]
+
+                    ]
+                    usersCollection = newElement
+
+                    strongSelf.database.child("users/\(userUID)").updateChildValues(usersCollection, withCompletionBlock: { error, _ in
+                        print("That error: \(error?.localizedDescription)")
+                        guard error == nil else {
+                            completion(false)
+                            return
+                        }
+
+                        completion(true)
+                    })
+                }
+//                else {
+//                    // create that array
+//                    let newCollection: [[String: Any]] = [
+//                        [
+//                            "profileInfo": [
+//                                "name": user.firstName + " " + user.lastName,
+//                                "email": user.safeEmail,
+//                                "location": user.location
+//                            ]
+//                        ]
+//                    ]
+//
+//                    strongSelf.database.child("users").setValue(newCollection, withCompletionBlock: { error, _ in
+//                        guard error == nil else {
+//                            completion(false)
+//                            return
+//                        }
+//
+//                        completion(true)
+//                    })
+                })
+//            })
+    }
+    
     /// Gets all users from database
     public func getAllUsers(completion: @escaping (Result<[[String: String]], Error>) -> Void) {
         database.child("users").observeSingleEvent(of: .value, with: { snapshot in
@@ -781,6 +1022,7 @@ extension DatabaseManager {
 
 }
 
+// MARK: - User Insertion
 struct ChatAppUser {
     let firstName: String
     let lastName: String
@@ -794,6 +1036,50 @@ struct ChatAppUser {
 
     var profilePictureFileName: String {
         //afraz9-gmail-com_profile_picture.png
+        return "\(safeEmail)_profile_picture.png"
+    }
+}
+
+struct TechnicianUserModel {
+//    let id: String
+    let firstName: String
+    let middleName: String
+    let lastName: String
+    let emailAddress: String
+    let location: String
+    let profileSummary: String
+    let experience: String //Int
+    let skills: [String]
+    let accountType: String
+    let hourlyRate: Float
+
+    var safeEmail: String {
+        var safeEmail = emailAddress.replacingOccurrences(of: ".", with: "-")
+        safeEmail = safeEmail.replacingOccurrences(of: "@", with: "-")
+        return safeEmail
+    }
+
+    var profilePictureFileName: String {
+        //afraz9-gmail-com_profile_picture.png
+        return "\(safeEmail)_profile_picture.png"
+    }
+}
+
+struct ClientUserModel {
+//    let id: String
+    let firstName: String
+    let middleName: String
+    let lastName: String
+    let emailAddress: String
+    let location: String
+
+    var safeEmail: String {
+        var safeEmail = emailAddress.replacingOccurrences(of: ".", with: "-")
+        safeEmail = safeEmail.replacingOccurrences(of: "@", with: "-")
+        return safeEmail
+    }
+
+    var profilePictureFileName: String {
         return "\(safeEmail)_profile_picture.png"
     }
 }

@@ -65,11 +65,12 @@ enum TechnieProfileTVOptions: Int, CustomStringConvertible {
 enum TechnieProfileTVOptions0: Int, CustomStringConvertible {
     case Account
     case SavedJobs
-    
+    case Stats
     var description: String {
         switch self {
         case .Account: return "Account"
         case .SavedJobs: return "Saved Jobs"
+        case .Stats: return "Stats"
         }
     }
     
@@ -82,6 +83,11 @@ enum TechnieProfileTVOptions0: Int, CustomStringConvertible {
             
         case .SavedJobs:
             let iconImage = UIImage(systemName: "bookmark.circle.fill")?.withTintColor(.systemBlue, renderingMode: .alwaysOriginal) ?? UIImage()
+            let resizedImage = UIImage().resizeImage(image: iconImage, toTheSize: CGSize(width: 24, height: 24))
+            return resizedImage
+            
+        case .Stats:
+            let iconImage = UIImage(systemName: "chart.bar.xaxis")?.withTintColor(.systemBlue, renderingMode: .alwaysOriginal) ?? UIImage()
             let resizedImage = UIImage().resizeImage(image: iconImage, toTheSize: CGSize(width: 24, height: 24))
             return resizedImage
         }
