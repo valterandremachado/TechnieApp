@@ -535,7 +535,7 @@ extension SignupVC: UIImagePickerControllerDelegate, UINavigationControllerDeleg
                     
                     guard let uid = result?.user.uid else { return }
 
-                    DatabaseManager.shared.insertClientUser2(with: user, uid: uid, completion: { success in
+                    DatabaseManager.shared.insertClientUser(with: user, completion: { success in
                         if success {
 //                            let data = selectedImage
 //                            let filename = user.profilePictureFileName

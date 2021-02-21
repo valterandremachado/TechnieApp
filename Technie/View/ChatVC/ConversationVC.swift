@@ -247,7 +247,7 @@ class ConversationVC: UIViewController {
             switch result {
             case .success(let usersCollection):
 //                self?.hasFetched = true
-                self?.users = usersCollection
+//                self?.users = usersCollection
 //                guard let currentUserUID = Auth.auth().currentUser?.uid else { return }
 //                self?.users.forEach { userDic in
 //                    guard let user = userDic["name"] else { return }

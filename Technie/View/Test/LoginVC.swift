@@ -338,15 +338,34 @@ class LoginVC: UIViewController {
 //        else { return }
         
         // SignIn user
-        Auth.auth().signIn(withEmail: emailTxtFld.text!, password: passwordTxtFld.text!) { (result, error) in
-            if error != nil {
-                print("ERROR: " + error!.localizedDescription)
-                return
-            }
-            
-            guard let uid = result?.user.uid else { return }
+//        Auth.auth().signIn(withEmail: emailTxtFld.text!, password: passwordTxtFld.text!) { (result, error) in
+//            if error != nil {
+//                print("ERROR: " + error!.localizedDescription)
+//                return
+//            }
+//
+//            guard let uid = result?.user.uid else { return }
 
-            DatabaseManager.shared.postService(userUID: uid, completion: { success in
+//            DatabaseManager.shared.getAllUsers(completion: { [weak self] result in
+//                switch result {
+//                case .success(let usersCollection):
+//                    print("success: \(usersCollection)")
+//                    for user in usersCollection {
+//                        print("User: \(user)")
+//                            for (key, value) in user {
+//                                print("key: \(key)")
+//                                print("value: \(value)")
+//                                let values = value as! [String: Any]
+//                                print("email: \(String(describing: values["email"]))")
+//
+//                            }
+//                    }
+//                case .failure(let error):
+//                    print("Failed to get usertest1234567s: \(error.localizedDescription)")
+//                }
+//            })
+            
+            DatabaseManager.shared.postService(userUID: "uid", completion: { success in
                 if success {
                     print("success")
                 } else {
@@ -360,7 +379,7 @@ class LoginVC: UIViewController {
 //                let vc = ClientTabController()
 //                (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootViewController(vc)
 //            }
-        }
+//        }
         
         
     }

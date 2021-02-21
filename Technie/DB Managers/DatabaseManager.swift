@@ -227,8 +227,7 @@ extension DatabaseManager {
 
                         completion(true)
                     })
-                }
-                else {
+                } else {
                     // create that array
                     let newCollection: [[String: Any]] = [
                         [
@@ -305,70 +304,120 @@ extension DatabaseManager {
     }
     
     public func postService(userUID: String, completion: @escaping (Bool) -> Void) {
-      
-            database.child("users/\(userUID)").observeSingleEvent(of: .value, with: { [weak self] snapshot in
-                print("VALUE: \(snapshot.value)")
-                guard let strongSelf = self else {
-                    return
-                }
-
-                if var usersCollection = snapshot.value as? [String: Any] {
-                    // append to user dictionary
-                    let newElement = [
-                        "servicePosts": [
-                            "title": "user.firstName + user.lastName",
-                            "description": "user.safeEmail",
-                            "attachments": "user.location",
-                            "projectType": "user.location",
-                            "budget": "user.location",
-                            "requiredSkills": "user.location"
-                        ]
-
+        
+        database.child("users").observeSingleEvent(of: .value, with: { [weak self] snapshot in
+            //                print("VALUE: \(snapshot.value)")
+            guard let strongSelf = self else {
+                return
+            }
+            
+            if var usersCollection = snapshot.value as? [[String: Any]] {
+                // append to user dictionary
+                let newElement = [
+//                    "servicePosts": [
+                    [
+                        "title": "user.firstName + user.lastName",
+                        "description": "user.safeEmail",
+                        "attachments": "user.location",
+                        "projectType": "user.location",
+                        "budget": "user.location",
+                        "requiredSkills": "user.location3"
                     ]
-                    usersCollection = newElement
-
-                    strongSelf.database.child("users/\(userUID)").updateChildValues(usersCollection, withCompletionBlock: { error, _ in
-                        print("That error: \(error?.localizedDescription)")
-                        guard error == nil else {
-                            completion(false)
-                            return
-                        }
-
-                        completion(true)
-                    })
-                }
-//                else {
-//                    // create that array
-//                    let newCollection: [[String: Any]] = [
-//                        [
-//                            "profileInfo": [
-//                                "name": user.firstName + " " + user.lastName,
-//                                "email": user.safeEmail,
-//                                "location": user.location
-//                            ]
 //                        ]
+                ]
+                
+                for index in 0..<usersCollection.count {
+                    let user = usersCollection[index]
+                    print("USERS: \(user)")
+                    for (key , values) in user {
+//                        print("value: \(values), \(key)")
+                        guard let value = values as? [String: Any] else { return }
+                        
+                        let email = value["email"] as? String
+                        if email  == "test3-hotmail-com" && key != "servicePosts" {
+                            print("email: \(String(describing: email)), indexOf: \(index)")
+                            
+//                            var post = usersCollection[index]
+//                            post["servicePosts"] = [
+//                                "title": "user.firstName + user.lastName",
+//                                "description": "user.safeEmail",
+//                                "attachments": "user.location",
+//                                "projectType": "user.location",
+//                                "budget": "user.location",
+//                                "requiredSkills": "user.location"
+//                            ]
+//                            usersCollection.append(newElement)
+//                            var increasedIndexUID = 0
+//                            strongSelf.database.child("users").child("\(index)").child("servicePosts").observeSingleEvent(of: .value, with: { [weak self] snapshot in
+//                                //                print("VALUE: \(snapshot.value)")
+//                                guard let strongSelf = self else {
+//                                    return
+//                                }
+//
+//                                if var usersCollection = snapshot.value as? [[String: Any]] {
+//                                    print("count: \(usersCollection.count)")
+//                                    if usersCollection.count == 0 {
+//                                        increasedIndexUID = 0
+//                                    } else if usersCollection.count >= 1 {
+//                                        increasedIndexUID = (usersCollection.count - 1)
+//                                        increasedIndexUID += 1
+//                                    }
+//
+//                                }
+//                            })
+                            
+                            strongSelf.database.child("users/\(index)").child("servicePosts").setValue(newElement, withCompletionBlock: { error, _ in
+                                print("That error: \(error?.localizedDescription ?? "nil")")
+
+                                guard error == nil else {
+                                    completion(false)
+                                    return
+                                }
+                                completion(true)
+                            })
+//                            return // Get out of the loop once the right much is found
+                        }
+                    }
+                    
+                }
+                
+            }
+//            else {
+//                // create that array
+//                let newCollection = [
+//                    "servicePosts": [
+//                        "title": "user.firstName + user.lastName",
+//                        "description": "user.safeEmail",
+//                        "attachments": "user.location",
+//                        "projectType": "user.location",
+//                        "budget": "user.location",
+//                        "requiredSkills": "user.location"
 //                    ]
 //
-//                    strongSelf.database.child("users").setValue(newCollection, withCompletionBlock: { error, _ in
-//                        guard error == nil else {
-//                            completion(false)
-//                            return
-//                        }
+//                ]
 //
-//                        completion(true)
-//                    })
-                })
-//            })
+//                strongSelf.database.child("users").setValue(newCollection, withCompletionBlock: { error, _ in
+//                    guard error == nil else {
+//                        completion(false)
+//                        return
+//                    }
+//
+//                    completion(true)
+//                })
+//            }
+            
+        })
     }
+            
     
     /// Gets all users from database
-    public func getAllUsers(completion: @escaping (Result<[[String: String]], Error>) -> Void) {
+    public func getAllUsers(completion: @escaping (Result<[[String: Any]], Error>) -> Void) {
         database.child("users").observeSingleEvent(of: .value, with: { snapshot in
-            guard let value = snapshot.value as? [[String: String]] else {
+//            print(snapshot.value)
+            guard let value = snapshot.value as? [[String: Any]] else {
                 completion(.failure(DatabaseError.failedToFetch))
                 return
             }
-
             completion(.success(value))
         })
     }
