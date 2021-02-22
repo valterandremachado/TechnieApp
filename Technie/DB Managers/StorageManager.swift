@@ -75,32 +75,58 @@ final class StorageManager {
         })
     }
 
-    public func uploadPostImages(with data: Data, fileName: String, completion: @escaping UploadPictureCompletion) {
-        storage.child("post_images/\(fileName)").putData(data, metadata: nil, completion: { [weak self] metadata, error in
-            guard let strongSelf = self else {
-                return
+    public func uploadPostImages(with imageArray: [Data], with fileNameArray: [String], completion: @escaping UploadPictureCompletion) {
+        for data in imageArray {
+            for fileName in fileNameArray {
+                let storagePath = storage.child("post_images").child("technician2@hotmail.com/\(fileName)")
+                storagePath.putData(data, metadata: nil, completion: { metadata, error in
+//                    guard let strongSelf = self else { return }
+                    
+                    guard error == nil else {
+                        // failed
+                        print("failed to upload data to firebase for picture")
+                        completion(.failure(StorageErrors.failedToUpload))
+                        return
+                    }
+                    
+                    storagePath.downloadURL(completion: { url, error in
+                        guard let url = url else {
+                            print("Failed to get download url")
+                            completion(.failure(StorageErrors.failedToGetDownloadUrl))
+                            return
+                        }
+
+                        let urlString = url.absoluteString
+                         print("download url: \(urlString)")
+                        completion(.success(urlString))
+                    })
+                })
             }
-
-            guard error == nil else {
-                // failed
-                print("failed to upload data to firebase for picture")
-                completion(.failure(StorageErrors.failedToUpload))
-                return
-            }
-
-            strongSelf.storage.child("post_images/\(fileName)").downloadURL(completion: { url, error in
-                guard let url = url else {
-                    print("Failed to get download url")
-                    completion(.failure(StorageErrors.failedToGetDownloadUrl))
-                    return
-                }
-
-                let urlString = url.absoluteString
-                print("download url returned: \(urlString)")
-                completion(.success(urlString))
-            })
-        })
+        }
     }
+    
+//    public func getPostImages(with data: [Data], fileName: [String], completion: @escaping UploadPictureCompletion) {
+//
+////        guard error == nil else {
+////            // failed
+////            print("failed to upload data to firebase for picture")
+////            completion(.failure(StorageErrors.failedToUpload))
+////            return
+////        }
+//
+//        storage.child("post_images").child("technician2@hotmail.com/\(name)").downloadURL(completion: { url, error in
+//            guard let url = url else {
+//                print("Failed to get download url")
+//                completion(.failure(StorageErrors.failedToGetDownloadUrl))
+//                return
+//            }
+//
+//            let urlString = url.absoluteString
+//            print("download url returned: \(urlString)")
+//            completion(.success(urlString))
+//        })
+//
+//    }
     
     /// Upload video that will be sent in a conversation message
     public func uploadMessageVideo(with fileUrl: URL, fileName: String, completion: @escaping UploadPictureCompletion) {

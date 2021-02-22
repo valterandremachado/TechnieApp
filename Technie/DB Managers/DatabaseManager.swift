@@ -137,23 +137,30 @@ extension DatabaseManager {
                 return
             }
 
-            strongSelf.database.child("users").observeSingleEvent(of: .value, with: { snapshot in
+            strongSelf.database.child("users/technicians").observeSingleEvent(of: .value, with: { snapshot in
                 if var usersCollection = snapshot.value as? [[String: Any]] {
                     // append to user dictionary
                     let newElement = [
-                        "name": user.firstName + " " + user.lastName,
-                        "email": user.safeEmail,
-                        "location": user.location,
-                        "profileSummary": user.profileSummary,
-                        "experience": user.experience,
-                        "skills": user.skills,
-                        "accountType": user.accountType,
-                        "hourlyRate": user.hourlyRate,
-
+                        "profileInfo": [
+                            "name": user.firstName + " " + user.lastName,
+                            "email": user.safeEmail,
+                            "location": user.location,
+                            "profileSummary": user.profileSummary,
+                            "experience": user.experience,
+                            "skills": user.skills,
+                            "accountType": user.accountType,
+                            "hourlyRate": user.hourlyRate,
+                        ],
+                        
+                        "numberOfCompletedServices": user.numberOfCompletedServices,
+                        "numberOfActiveServices": user.numberOfActiveServices,
+                        "numberOfPreviousServices": user.numberOfPreviousServices,
+                        "technieRank": user.technieRank
                     ] as [String : Any]
+                    
                     usersCollection.append(newElement)
 
-                    strongSelf.database.child("users").setValue(usersCollection, withCompletionBlock: { error, _ in
+                    strongSelf.database.child("users/technicians").setValue(usersCollection, withCompletionBlock: { error, _ in
                         guard error == nil else {
                             completion(false)
                             return
@@ -166,18 +173,25 @@ extension DatabaseManager {
                     // create that array
                     let newCollection: [[String: Any]] = [
                         [
-                            "name": user.firstName + " " + user.lastName,
-                            "email": user.safeEmail,
-                            "location": user.location,
-                            "profileSummary": user.profileSummary,
-                            "experience": user.experience,
-                            "skills": user.skills,
-                            "accountType": user.accountType,
-                            "hourlyRate": user.hourlyRate,
+                            "profileInfo": [
+                                "name": user.firstName + " " + user.lastName,
+                                "email": user.safeEmail,
+                                "location": user.location,
+                                "profileSummary": user.profileSummary,
+                                "experience": user.experience,
+                                "skills": user.skills, // array
+                                "accountType": user.accountType,
+                                "hourlyRate": user.hourlyRate,
+                            ],
+                            
+                            "numberOfCompletedServices": user.numberOfCompletedServices,
+                            "numberOfActiveServices": user.numberOfActiveServices,
+                            "numberOfPreviousServices": user.numberOfPreviousServices,
+                            "technieRank": user.technieRank
                         ]
                     ]
 
-                    strongSelf.database.child("users").setValue(newCollection, withCompletionBlock: { error, _ in
+                    strongSelf.database.child("users/technicians").setValue(newCollection, withCompletionBlock: { error, _ in
                         guard error == nil else {
                             completion(false)
                             return
@@ -206,7 +220,7 @@ extension DatabaseManager {
                 return
             }
 
-            strongSelf.database.child("users").observeSingleEvent(of: .value, with: { snapshot in
+            strongSelf.database.child("users/clients").observeSingleEvent(of: .value, with: { snapshot in
                 if var usersCollection = snapshot.value as? [[String: Any]] {
                     // append to user dictionary
                     let newElement = [
@@ -214,12 +228,15 @@ extension DatabaseManager {
                             "name": user.firstName + " " + user.lastName,
                             "email": user.safeEmail,
                             "location": user.location
-                        ]
-                       
-                    ]
+                        ],
+                        
+                        "numberOfPosts": user.numberOfPosts,
+                        "numberOfActivePosts": user.numberOfActivePosts,
+                        "numberOfInactivePosts": user.numberOfInactivePosts
+                    ] as [String : Any]
                     
                     usersCollection.append(newElement)
-                    strongSelf.database.child("users").setValue(usersCollection, withCompletionBlock: { error, _ in
+                    strongSelf.database.child("users/clients").setValue(usersCollection, withCompletionBlock: { error, _ in
                         guard error == nil else {
                             completion(false)
                             return
@@ -235,11 +252,15 @@ extension DatabaseManager {
                                 "name": user.firstName + " " + user.lastName,
                                 "email": user.safeEmail,
                                 "location": user.location
-                            ]
+                            ],
+                            
+                            "numberOfPosts": user.numberOfPosts,
+                            "numberOfActivePosts": user.numberOfActivePosts,
+                            "numberOfInactivePosts": user.numberOfInactivePosts
                         ]
                     ]
 
-                    strongSelf.database.child("users").setValue(newCollection, withCompletionBlock: { error, _ in
+                    strongSelf.database.child("users/clients").setValue(newCollection, withCompletionBlock: { error, _ in
                         guard error == nil else {
                             completion(false)
                             return
@@ -252,163 +273,271 @@ extension DatabaseManager {
         })
     }
     
-    public func insertClientUser2(with user: ClientUserModel, uid: String, completion: @escaping (Bool) -> Void) {
-
-        database.child("users").observeSingleEvent(of: .value, with: { [self] snapshot in
-                if var usersCollection = snapshot.value as? [String: Any] {
-                    let newElement = [
-                        "profileInfo": [
-                            "name": user.firstName + " " + user.lastName,
-                            "email": user.safeEmail,
-                            "location": user.location
-                        ]
-                       
-                    ]
-                    // append to user dictionary
-                    usersCollection = newElement
-                    
-                    let useRRef = database.child("users")
-                    let newUserRef = useRRef.child(uid)
-                    newUserRef.updateChildValues(usersCollection, withCompletionBlock: { error, _ in
-                        guard error == nil else {
-                            completion(false)
-                            return
-                        }
-
-                        completion(true)
-                    })
-                   
-                } else {
-                    // create that array
-                    let newCollection: [String: Any] = [
-                            "profileInfo": [
-                                "name": user.firstName + " " + user.lastName,
-                                "email": user.safeEmail,
-                                "location": user.location
-                            ]
-                        ]
-
-                    let useRRef = database.child("users")
-                    let newUserRef = useRRef.child(uid)
-                    newUserRef.setValue(newCollection, withCompletionBlock: { error, _ in
-                        guard error == nil else {
-                            completion(false)
-                            return
-                        }
-
-                        completion(true)
-                    })
-                    
-                }
-            })
-    }
-    
-    public func postService(userUID: String, completion: @escaping (Bool) -> Void) {
-        
-        database.child("users").observeSingleEvent(of: .value, with: { [weak self] snapshot in
-            //                print("VALUE: \(snapshot.value)")
-            guard let strongSelf = self else {
-                return
-            }
-            
-            if var usersCollection = snapshot.value as? [[String: Any]] {
-                // append to user dictionary
-                let newElement = [
-//                    "servicePosts": [
-                    [
-                        "title": "user.firstName + user.lastName",
-                        "description": "user.safeEmail",
-                        "attachments": "user.location",
-                        "projectType": "user.location",
-                        "budget": "user.location",
-                        "requiredSkills": "user.location3"
-                    ]
-//                        ]
-                ]
-                
-                for index in 0..<usersCollection.count {
-                    let user = usersCollection[index]
-                    print("USERS: \(user)")
-                    for (key , values) in user {
-//                        print("value: \(values), \(key)")
-                        guard let value = values as? [String: Any] else { return }
-                        
-                        let email = value["email"] as? String
-                        if email  == "test3-hotmail-com" && key != "servicePosts" {
-                            print("email: \(String(describing: email)), indexOf: \(index)")
-                            
-//                            var post = usersCollection[index]
-//                            post["servicePosts"] = [
-//                                "title": "user.firstName + user.lastName",
-//                                "description": "user.safeEmail",
-//                                "attachments": "user.location",
-//                                "projectType": "user.location",
-//                                "budget": "user.location",
-//                                "requiredSkills": "user.location"
-//                            ]
-//                            usersCollection.append(newElement)
-//                            var increasedIndexUID = 0
-//                            strongSelf.database.child("users").child("\(index)").child("servicePosts").observeSingleEvent(of: .value, with: { [weak self] snapshot in
-//                                //                print("VALUE: \(snapshot.value)")
-//                                guard let strongSelf = self else {
-//                                    return
-//                                }
+//    public func postService(userUID: String, completion: @escaping (Bool) -> Void) {
 //
-//                                if var usersCollection = snapshot.value as? [[String: Any]] {
-//                                    print("count: \(usersCollection.count)")
-//                                    if usersCollection.count == 0 {
-//                                        increasedIndexUID = 0
-//                                    } else if usersCollection.count >= 1 {
-//                                        increasedIndexUID = (usersCollection.count - 1)
-//                                        increasedIndexUID += 1
-//                                    }
+//        database.child("users").observeSingleEvent(of: .value, with: { [weak self] snapshot in
+//            //                print("VALUE: \(snapshot.value)")
+//            guard let strongSelf = self else {
+//                return
+//            }
 //
-//                                }
-//                            })
-                            
-                            strongSelf.database.child("users/\(index)").child("servicePosts").setValue(newElement, withCompletionBlock: { error, _ in
-                                print("That error: \(error?.localizedDescription ?? "nil")")
-
-                                guard error == nil else {
-                                    completion(false)
-                                    return
-                                }
-                                completion(true)
-                            })
-//                            return // Get out of the loop once the right much is found
-                        }
-                    }
-                    
-                }
-                
-            }
-//            else {
-//                // create that array
-//                let newCollection = [
-//                    "servicePosts": [
+//            if var usersCollection = snapshot.value as? [[String: Any]] {
+//                // append to user dictionary
+//                let newElement = [
+////                    "servicePosts": [
+////                    [
 //                        "title": "user.firstName + user.lastName",
 //                        "description": "user.safeEmail",
 //                        "attachments": "user.location",
 //                        "projectType": "user.location",
 //                        "budget": "user.location",
-//                        "requiredSkills": "user.location"
-//                    ]
-//
+//                        "requiredSkills": "user.location3"
+////                    ]
+////                        ]
 //                ]
 //
-//                strongSelf.database.child("users").setValue(newCollection, withCompletionBlock: { error, _ in
-//                    guard error == nil else {
-//                        completion(false)
-//                        return
+//                for index in 0..<usersCollection.count {
+//                    let user = usersCollection[index]
+////                    print("USERS: \(user)")
+//                    for (key , values) in user {
+////                        print("value: \(values), key: \(key)")
+//                        guard let value = values as? [String: Any] else { return }
+//                        if key == "servicePosts" {
+//                            guard let value = values as? [String: Any] else { return }
+//                            print("servicePostsValue: \(value.values)")
+//                        }
+//                        let email = value["email"] as? String
+//                        if email  == "test3-hotmail-com" && key != "servicePosts" {
+//                            print("email: \(String(describing: email)), indexOf: \(index)")
+//
+//                            strongSelf.database.child("users/\(index)").child("servicePosts").childByAutoId().setValue(newElement, withCompletionBlock: { error, _ in
+//                                print("That error: \(error?.localizedDescription ?? "nil")")
+//
+//                                guard error == nil else {
+//                                    completion(false)
+//                                    return
+//                                }
+//                                completion(true)
+//                            })
+//                            return // Get out of the loop once the right much is found
+//                        }
 //                    }
 //
-//                    completion(true)
-//                })
+//                }
+//
 //            }
+//        })
+//    }
+    
+    public func insertPostToUserDB(with postID: String, completion: @escaping (Bool) -> Void) {
+        database.child("users/clients").observeSingleEvent(of: .value, with: { [weak self] snapshot in
+            guard let strongSelf = self else {
+                return
+            }
             
+            guard let usersCollection = snapshot.value as? [[String: Any]] else { return }
+            print("counting: \(usersCollection.count)")
+            var index = -1 //indexOfUsers in the db
+            
+            for users in usersCollection {
+                index += 1
+                // print("USER: \(users), count: \(count)")
+                for user in users {
+                    if user.key == "profileInfo" {
+                        guard let value = user.value as? [String: Any] else { return }
+                        let email = value["email"] as? String
+                        print("USER: \(email ?? "nil"), count: \(index)")
+                        let randomString = ["client1-hotmail-com", "client2-hotmail-com", "client3-hotmail-com"]
+                        let randomEmail = (randomString.randomElement() ?? "nil")
+                        print("randomEmail: " + randomEmail)
+                        if email  ==  randomEmail {
+                            print("email: \(String(describing: email)), indexOf: \(index)")
+                            
+                            strongSelf.database.child("users/clients/\(index)/servicePosts").observeSingleEvent(of: .value, with: { snapshot in
+                                
+                                if var usersCollection = snapshot.value as? [[String: Any]] {
+                                    // append to user dictionary
+                                    let newElement = [
+                                        "postID": postID,
+                                    ]
+                                    
+                                    usersCollection.append(newElement)
+                                    strongSelf.database.child("users/clients/\(index)/servicePosts").setValue(usersCollection, withCompletionBlock: { error, _ in
+                                        guard error == nil else {
+                                            completion(false)
+                                            return
+                                        }
+                                        
+                                        completion(true)
+                                    })
+                                } else {
+                                    // create that array
+                                    let newCollection: [[String: Any]] = [
+                                        [
+                                            "postID": postID,
+                                        ]
+                                    ]
+                                    
+                                    strongSelf.database.child("users/clients/\(index)/servicePosts").setValue(newCollection, withCompletionBlock: { error, _ in
+                                        guard error == nil else {
+                                            completion(false)
+                                            return
+                                        }
+                                        
+                                        completion(true)
+                                    })
+                                }
+                            })
+                           return // Get out of the loop once the right much is found
+                        }
+                    }
+                }
+            }
         })
     }
+    
+    public func insertPost(with post: PostModel, completion: @escaping (Bool) -> Void) {
+
+            database.child("posts").observeSingleEvent(of: .value, with: { [weak self] snapshot in
+                
+                guard let strongSelf = self else {
+                    return
+                }
+                
+                let postDate = post.dateTime
+                let dateString = PostFormVC.dateFormatter.string(from: postDate)
+                
+                if var usersCollection = snapshot.value as? [[String: Any]] {
+                   
+                    // append to user dictionary
+                    let newElement = [
+                        "title": post.title,
+                        "description": post.description,
+                        "attachments": post.attachments,
+                        "projectType": post.projectType,
+                        "budget": post.budget,
+                        "requiredSkills": post.requiredSkills,
+                        
+                        "availabilityStatus": post.availabilityStatus,
+                        "numberOfProposals": post.numberOfProposals,
+                        "numberOfInvitesSent": post.numberOfInvitesSent,
+                        "numberOfUnansweredInvites": post.numberOfUnansweredInvites,
+                        "dateTime": dateString,
+                        "hiringStatus": post.hiringStatus,
+                        "hiredTechnicianEmail": post.hiredTechnicianEmail
+                    ] as [String : Any]
+                    
+                    usersCollection.append(newElement)
+                    let db = strongSelf.database.child("posts")
+                    let dbPostID = db.childByAutoId()
+                    dbPostID.setValue(newElement, withCompletionBlock: { error, _ in
+                        guard error == nil else {
+                            completion(false)
+                            return
+                        }
+                        let postID = "\(dbPostID)"
+                        let delimiter = "posts/"
+                        let slicedString = postID.components(separatedBy: delimiter)[1]
+                        DatabaseManager.shared.insertPostToUserDB(with: slicedString, completion: { success in
+                            if success {
+                                print("success")
+                            } else {
+                                print("failed")
+                            }
+                        })
+                        completion(true)
+                    })
+                } else {
+                    // create that array
+                    let newCollection: [String: Any] = [
+                        "title": post.title,
+                        "description": post.description,
+                        "attachments": post.attachments,
+                        "projectType": post.projectType,
+                        "budget": post.budget,
+                        "requiredSkills": post.requiredSkills,
+                        
+                        "availabilityStatus": post.availabilityStatus,
+                        "numberOfProposals": post.numberOfProposals,
+                        "numberOfInvitesSent": post.numberOfInvitesSent,
+                        "numberOfUnansweredInvites": post.numberOfUnansweredInvites,
+                        "dateTime": dateString,
+                        "hiringStatus": post.hiringStatus,
+                        "hiredTechnicianEmail": post.hiredTechnicianEmail
+                    ]
+
+                    let db = strongSelf.database.child("posts")
+                    let dbPostID = db.childByAutoId()
+                    dbPostID.setValue(newCollection, withCompletionBlock: { error, _ in
+                        guard error == nil else {
+                            completion(false)
+                            return
+                        }
+                        let postID = "\(dbPostID)"
+                        let delimiter = "posts/"
+                        let slicedString = postID.components(separatedBy: delimiter)[1]
+                        DatabaseManager.shared.insertPostToUserDB(with: slicedString, completion: { success in
+                            if success {
+                                print("success")
+                            } else {
+                                print("failed")
+                            }
+                        })
+                        
+                        completion(true)
+                    })
+                }
+        })
+    }
+          
+    /// Gets all posts from database
+    public func getAllPosts(completion: @escaping (Result<[String: Any], Error>) -> Void) {
+        database.child("posts").observeSingleEvent(of: .value, with: { snapshot in
+            guard let value = snapshot.value as? [String: Any] else {
+                completion(.failure(DatabaseError.failedToFetch))
+                return
+            }
+            completion(.success(value))
+        })
+    }
+    
+    public func getUserPosts(completion: @escaping (Result<[[String: Any]], Error>) -> Void) {
+        database.child("users/clients").observeSingleEvent(of: .value, with: { [weak self] snapshot in
+            guard let strongSelf = self else {
+                return
+            }
             
+            guard let usersCollection = snapshot.value as? [[String: Any]] else { return }
+            var index = -1 //indexOfUsers in the db
+            
+            for users in usersCollection {
+                index += 1
+                // print("USER: \(users), count: \(count)")
+                for user in users {
+                    if user.key == "profileInfo" {
+                        guard let value = user.value as? [String: Any] else { return }
+                        let email = value["email"] as? String
+                        
+                        if email  == "test1-hotmail-com" {
+                            print("email: \(String(describing: email)), indexOf: \(index)")
+                            
+                            strongSelf.database.child("users/clients\(index)/servicePosts").observeSingleEvent(of: .value, with: { snapshot in
+
+                                guard let value = snapshot.value as? [[String: Any]] else {
+                                    completion(.failure(DatabaseError.failedToFetch))
+                                    return
+                                }
+                                completion(.success(value))
+                                
+                            })
+                           return // Get out of the loop once the right much is found
+                        }
+                    }
+                }
+            }
+        })
+    }
+    
     
     /// Gets all users from database
     public func getAllUsers(completion: @escaping (Result<[[String: Any]], Error>) -> Void) {
@@ -1102,6 +1231,15 @@ struct TechnicianUserModel {
     let accountType: String
     let hourlyRate: Float
 
+    let numberOfCompletedServices: Int
+    let numberOfActiveServices: Int
+    let numberOfPreviousServices: Int
+    let technieRank: Int
+    
+//    clientsSatisfaction[],
+//    notifications[],
+//    chats[]
+    
     var safeEmail: String {
         var safeEmail = emailAddress.replacingOccurrences(of: ".", with: "-")
         safeEmail = safeEmail.replacingOccurrences(of: "@", with: "-")
@@ -1121,7 +1259,14 @@ struct ClientUserModel {
     let lastName: String
     let emailAddress: String
     let location: String
-
+    let numberOfPosts: Int
+    let numberOfActivePosts: Int
+    let numberOfInactivePosts: Int
+    
+//    posts[],
+//    notifications[],
+//    chats[]
+    
     var safeEmail: String {
         var safeEmail = emailAddress.replacingOccurrences(of: ".", with: "-")
         safeEmail = safeEmail.replacingOccurrences(of: "@", with: "-")
@@ -1131,4 +1276,22 @@ struct ClientUserModel {
     var profilePictureFileName: String {
         return "\(safeEmail)_profile_picture.png"
     }
+}
+
+struct PostModel {
+    
+    let title: String
+    let description: String
+    let attachments: [String]
+    let projectType: String
+    let budget: String
+    let requiredSkills: [String]
+
+    let availabilityStatus: Bool
+    let numberOfProposals: Int
+    let numberOfInvitesSent: Int
+    let numberOfUnansweredInvites: Int
+    let dateTime: Date
+    let hiringStatus: Bool
+    let hiredTechnicianEmail: String
 }

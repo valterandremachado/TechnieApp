@@ -303,10 +303,100 @@ class PostFormVC: UIViewController {
         }
     }
     
+    public static let dateFormatter: DateFormatter = {
+        let formattre = DateFormatter()
+        formattre.dateStyle = .medium
+        formattre.timeStyle = .long
+        formattre.locale = .current
+        return formattre
+    }()
+    
+    var postTitle: String = ""
+    var postDescription: String = ""
+    var postProjectType: String = ""
+    var postBudget: String = ""
+    var postRequiredSkills = [String]()
+    var postAttachments = [String]()
+    // Auto Initializers
+    var postAvailabilityStatus: Bool = true
+    var postNumberOfProposals: Int = 0
+    var postNumberOfInvitesSent: Int = 0
+    var postNumberOfUnansweredInvites: Int = 0
+    var postDateTime = Date()
+    var postHiringStatus: Bool = false
+    
+    var items = [String]()
+    var chosenItem: String!
     // MARK: - Selectors
     @objc fileprivate func rightNavBarItemPostBtnTapped() {
-        navigationController?.popToRootViewController(animated: true)
-        showRecommendationBanner()
+
+        postTitle = titleTextField.text
+        postDescription = descriptionTextField.text
+        postProjectType = chosenItem
+        postBudget = finalPick
+        
+        let removeWhiteSpace = initialSelectedSkill.firstIndex(of: "") ?? 400
+        if removeWhiteSpace != 400 {
+            initialSelectedSkill.remove(at: removeWhiteSpace)
+        }
+        postRequiredSkills = initialSelectedSkill
+
+        print(postTitle)
+        print(postDescription)
+        print(postProjectType)
+        print(postBudget)
+        print(postRequiredSkills)
+//        print(postAttachments)
+
+        guard !postTitle.replacingOccurrences(of: " ", with: "").isEmpty,
+              !postDescription.replacingOccurrences(of: " ", with: "").isEmpty,
+              !postProjectType.replacingOccurrences(of: " ", with: "").isEmpty,
+              !postBudget.replacingOccurrences(of: " ", with: "").isEmpty,
+              !postRequiredSkills.isEmpty,
+              !imageDataArray.isEmpty
+        else { return }
+        
+        var postsImageUrl = [String]()
+        StorageManager.shared.uploadPostImages(with: imageDataArray, with: imageNameArray, completion: { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let downloadUrl):
+                postsImageUrl.append(downloadUrl)
+                
+                if postsImageUrl.count == self.imageDataArray.count {
+                    self.postAttachments = postsImageUrl
+                    print("download url returned: \(postsImageUrl), count: \(postsImageUrl.count)")
+                    let post = PostModel(title: self.postTitle,
+                                         description: self.postDescription,
+                                         attachments: self.postAttachments,
+                                         projectType: self.postProjectType,
+                                         budget: self.postBudget,
+                                         requiredSkills: self.postRequiredSkills,
+                                         availabilityStatus: self.postAvailabilityStatus,
+                                         numberOfProposals: self.postNumberOfProposals,
+                                         numberOfInvitesSent: self.postNumberOfInvitesSent,
+                                         numberOfUnansweredInvites: self.postNumberOfUnansweredInvites,
+                                         dateTime: self.postDateTime,
+                                         hiringStatus: self.postHiringStatus,
+                                         hiredTechnicianEmail: "nil")
+                    
+                    DatabaseManager.shared.insertPost(with: post, completion: { success in
+                        if success {
+                            self.navigationController?.popToRootViewController(animated: true)
+                            self.showRecommendationBanner()
+                            print("success")
+                        } else {
+                            print("failed")
+                        }
+                    })
+                    
+                    return // Get out of this function
+                }
+            case .failure(let error):
+                print("Storage maanger error: \(error)")
+            }
+        })
+       
     }
     
     fileprivate func showRecommendationBanner() {
@@ -676,6 +766,8 @@ extension PostFormVC: TableViewDataSourceAndDelegate, UITextViewDelegate {
             // PostFormProjectTypeCell
             let cell = tableView.dequeueReusableCell(withIdentifier: PostFormProjectTypeCell.cellID, for: indexPath) as! PostFormProjectTypeCell
             cell.setupViews()
+            cell.projectTypeSwitcher.addTarget(self, action: #selector(projectTypeSegmentPressed), for: .valueChanged)
+            items = cell.items
             return cell
         case 2:
             // PostFormBudgetCell
@@ -706,6 +798,12 @@ extension PostFormVC: TableViewDataSourceAndDelegate, UITextViewDelegate {
         default:
             return UITableViewCell()
         }
+    }
+    
+    @objc func projectTypeSegmentPressed(_ sender: UISegmentedControl) {
+        let item = items[sender.selectedSegmentIndex]
+        chosenItem = item
+        print("Index: \(sender.selectedSegmentIndex), item: \(item)")
     }
     
     @objc func UpdateDefaultsArrayObserver() {

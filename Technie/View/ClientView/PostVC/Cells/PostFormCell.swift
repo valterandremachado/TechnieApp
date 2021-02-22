@@ -110,9 +110,9 @@ class PostFormCell: UITableViewCell {
 class PostFormProjectTypeCell: UITableViewCell {
     static var cellID = "PostFormProjectTypeCell"
     
+    let items = ["Long Term", "Short Term"]
     // MARK: - Properties
     lazy var projectTypeSwitcher: UISegmentedControl = {
-        let items = ["Long Term", "Short Term"]
         let seg = UISegmentedControl(items: items)
         seg.translatesAutoresizingMaskIntoConstraints = false
         seg.selectedSegmentIndex = 0

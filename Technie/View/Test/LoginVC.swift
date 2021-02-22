@@ -327,59 +327,74 @@ class LoginVC: UIViewController {
     }
     
     @objc func loginBtnPressed(){
-//        indicator?.isHidden = false
-//        view.endEditing(true)
-//        view.isUserInteractionEnabled = false
+        //        indicator?.isHidden = false
+        //        view.endEditing(true)
+        //        view.isUserInteractionEnabled = false
         // validate text fields
         
         // creates clean version of textfield
-//        guard let email = emailTxtFld.text?.trimmingCharacters(in: .whitespacesAndNewlines),
-//              let password = passwordTxtFld.text?.trimmingCharacters(in: .whitespacesAndNewlines)
-//        else { return }
+        //        guard let email = emailTxtFld.text?.trimmingCharacters(in: .whitespacesAndNewlines),
+        //              let password = passwordTxtFld.text?.trimmingCharacters(in: .whitespacesAndNewlines)
+        //        else { return }
         
         // SignIn user
-//        Auth.auth().signIn(withEmail: emailTxtFld.text!, password: passwordTxtFld.text!) { (result, error) in
-//            if error != nil {
-//                print("ERROR: " + error!.localizedDescription)
-//                return
-//            }
-//
-//            guard let uid = result?.user.uid else { return }
-
-//            DatabaseManager.shared.getAllUsers(completion: { [weak self] result in
+        //        Auth.auth().signIn(withEmail: emailTxtFld.text!, password: passwordTxtFld.text!) { (result, error) in
+        //            if error != nil {
+        //                print("ERROR: " + error!.localizedDescription)
+        //                return
+        //            }
+        //
+        //            guard let uid = result?.user.uid else { return }
+        
+        
+        if pickAccountType == 0 {
+//            let vc = TechnieTabController()
+//            (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootViewController(vc)
+            
+        } else {
+//            var posts = [String: Any]()
+//            var userPosts = [[String: Any]]()
+            
+//            DatabaseManager.shared.getAllPosts(completion: { result in
 //                switch result {
-//                case .success(let usersCollection):
-//                    print("success: \(usersCollection)")
-//                    for user in usersCollection {
-//                        print("User: \(user)")
-//                            for (key, value) in user {
-//                                print("key: \(key)")
-//                                print("value: \(value)")
-//                                let values = value as! [String: Any]
-//                                print("email: \(String(describing: values["email"]))")
+//                case .success(let postsCollection):
+//                    //                print("success: \(postsCollection)")
+//                    posts = postsCollection
 //
+//                    DatabaseManager.shared.getUserPosts(completion: { result in
+//                        switch result {
+//                        case .success(let userPostsCollection):
+//                            //                        print("success: \(userPostsCollection)")
+//                            for post in userPostsCollection {
+//                                for (_ , value) in post {
+//                                    let userPost = posts["\(value)"] as! [String: Any]
+//                                    print("THIS: \(userPost), \(value)")
+//                                    userPosts.append(userPost)
+//                                }
 //                            }
-//                    }
+//                            print("userPosts: \(userPosts)")
+//                        case .failure(let error):
+//                            print("Failed to get posts: \(error.localizedDescription)")
+//                        }
+//                    })
+//
 //                case .failure(let error):
 //                    print("Failed to get usertest1234567s: \(error.localizedDescription)")
 //                }
 //            })
             
-            DatabaseManager.shared.postService(userUID: "uid", completion: { success in
-                if success {
-                    print("success")
-                } else {
-                    print("failed")
-                }
-            })
-//            if pickAccountType == 0 {
-//                let vc = TechnieTabController()
-//                (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootViewController(vc)
-//            } else {
-//                let vc = ClientTabController()
-//                (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootViewController(vc)
-//            }
-//        }
+//            DatabaseManager.shared.insertPost(with: <#PostModel#>, completion: { success in
+//                if success {
+//                    print("success")
+//                } else {
+//                    print("failed")
+//                }
+//            })
+            
+//            let vc = ClientTabController()
+//            (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootViewController(vc)
+        }
+        //        }
         
         
     }

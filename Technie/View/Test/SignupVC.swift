@@ -527,36 +527,72 @@ extension SignupVC: UIImagePickerControllerDelegate, UINavigationControllerDeleg
                         print("ERROR: " + error!.localizedDescription)
                         return
                     }
-                    let user = ClientUserModel(firstName: firstName,
-                                               middleName: middleName,
-                                               lastName: lastName,
-                                               emailAddress: email,
-                                               location: location)
+                    
+                    let randomNumberForPosts = Int.random(in: 0...500)
+                    let randomNumberForActivePosts = Int.random(in: 0...500)
+                    let randomNumberForInactivePosts = Int.random(in: 0...500)
+                    let randomNumberForCompletedServices = Int.random(in: 0...500)
+                    let randomNumberForActiveServices = Int.random(in: 0...500)
+                    let randomNumberExp = Int.random(in: 0...20)
+                    let randomNumberForPreviousServices = Int.random(in: 0...500)
+                    let randomNumberForTechnieRank = Int.random(in: 0...500)
+
+                    
+                    let clientUser = ClientUserModel(firstName: firstName,
+                                                     middleName: middleName,
+                                                     lastName: lastName,
+                                                     emailAddress: email,
+                                                     location: location,
+                                                     numberOfPosts: randomNumberForPosts,
+                                                     numberOfActivePosts: randomNumberForActivePosts,
+                                                     numberOfInactivePosts: randomNumberForInactivePosts)
+                    
+                    let technicianUser = TechnicianUserModel(firstName: firstName,
+                                                             middleName: middleName,
+                                                             lastName: lastName,
+                                                             emailAddress: email,
+                                                             location: location,
+                                                             profileSummary: "I am this and that",
+                                                             experience: "\(randomNumberExp)",
+                                                             skills: ["Plumber", "Handyman"],
+                                                             accountType: "personal",
+                                                             hourlyRate: 150,
+                                                             numberOfCompletedServices: randomNumberForCompletedServices,
+                                                             numberOfActiveServices: randomNumberForActiveServices,
+                                                             numberOfPreviousServices: randomNumberForPreviousServices,
+                                                             technieRank: randomNumberForTechnieRank)
                     
                     guard let uid = result?.user.uid else { return }
 
-                    DatabaseManager.shared.insertClientUser(with: user, completion: { success in
-                        if success {
-//                            let data = selectedImage
-//                            let filename = user.profilePictureFileName
-//                            StorageManager.shared.uploadProfilePicture(with: data, fileName: filename, completion: { result in
-//                                switch result {
-//                                case .success(let downloadUrl):
-////                                    UserDefaults.standard.set(downloadUrl, forKey: "profile_picture_url")
-//                                    print(downloadUrl)
-//                                case .failure(let error):
-//                                    print("Storage maanger error: \(error)")
-//                                }
-//                            })
-                        }
-                    })
-//                    if pickAccountType == 0 {
+                   
+                    if pickAccountType == 0 {
+                        DatabaseManager.shared.insertTechnicianUser(with: technicianUser, completion: { success in
+                            if success {
+                            }
+                        })
+                        
 //                        let vc = TechnieTabController()
 //                        (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootViewController(vc)
-//                    } else {
+                    } else {
+                        DatabaseManager.shared.insertClientUser(with: clientUser, completion: { success in
+                            if success {
+    //                            let data = selectedImage
+    //                            let filename = user.profilePictureFileName
+    //                            StorageManager.shared.uploadProfilePicture(with: data, fileName: filename, completion: { result in
+    //                                switch result {
+    //                                case .success(let downloadUrl):
+    ////                                    UserDefaults.standard.set(downloadUrl, forKey: "profile_picture_url")
+    //                                    print(downloadUrl)
+    //                                case .failure(let error):
+    //                                    print("Storage maanger error: \(error)")
+    //                                }
+    //                            })
+                            }
+                        })
+                        
 //                        let vc = ClientTabController()
 //                        (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootViewController(vc)
-//                    }
+                    }
                 }
             }
             
