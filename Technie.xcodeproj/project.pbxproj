@@ -34,6 +34,8 @@
 		8A54D1AA25CBFAEE00045D37 /* AboutCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A54D1A925CBFAEE00045D37 /* AboutCell.swift */; };
 		8A54FAD225B56ED100814216 /* MessageKit in Frameworks */ = {isa = PBXBuildFile; productRef = 8A54FAD125B56ED100814216 /* MessageKit */; };
 		8A60EEBB258CDB2E0061A830 /* LivePreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A60EEBA258CDB2E0061A830 /* LivePreview.swift */; };
+		8A630B1825E52B5200733475 /* TechnieStatsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A630B1725E52B5200733475 /* TechnieStatsVC.swift */; };
+		8A630B2025E52FCA00733475 /* TechnieStatsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A630B1F25E52FCA00733475 /* TechnieStatsCell.swift */; };
 		8A64899525E117B70019A6DC /* ChooseAccountTypeVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A64899425E117B70019A6DC /* ChooseAccountTypeVC.swift */; };
 		8A64899B25E11BA30019A6DC /* SignupVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A64899925E11BA20019A6DC /* SignupVC.swift */; };
 		8A64899C25E11BA30019A6DC /* LoginVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A64899A25E11BA30019A6DC /* LoginVC.swift */; };
@@ -185,6 +187,8 @@
 		8A54D1A425CBEBA800045D37 /* ReviewsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewsVC.swift; sourceTree = "<group>"; };
 		8A54D1A925CBFAEE00045D37 /* AboutCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutCell.swift; sourceTree = "<group>"; };
 		8A60EEBA258CDB2E0061A830 /* LivePreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LivePreview.swift; sourceTree = "<group>"; };
+		8A630B1725E52B5200733475 /* TechnieStatsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnieStatsVC.swift; sourceTree = "<group>"; };
+		8A630B1F25E52FCA00733475 /* TechnieStatsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnieStatsCell.swift; sourceTree = "<group>"; };
 		8A64899425E117B70019A6DC /* ChooseAccountTypeVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseAccountTypeVC.swift; sourceTree = "<group>"; };
 		8A64899925E11BA20019A6DC /* SignupVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignupVC.swift; sourceTree = "<group>"; };
 		8A64899A25E11BA30019A6DC /* LoginVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginVC.swift; sourceTree = "<group>"; };
@@ -350,6 +354,7 @@
 				8A13FDFD25DE3E9D0034945D /* TechnieAccountCell.swift */,
 				8A13FE0525DE4F130034945D /* TechnieSavedJobsCell.swift */,
 				8A13FE0A25DE51410034945D /* TechnieEditProfileCell.swift */,
+				8A630B1F25E52FCA00733475 /* TechnieStatsCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -723,6 +728,7 @@
 				8A13FDF325DE3E050034945D /* TechnieEditProfileVC.swift */,
 				8A13FDE525DE3DB30034945D /* TechnieAccountVC.swift */,
 				8A13FDF825DE3E560034945D /* TechnieSavedJobsVC.swift */,
+				8A630B1725E52B5200733475 /* TechnieStatsVC.swift */,
 				8A13FDDD25DE3AD20034945D /* TechnieGeneralVC.swift */,
 				8A41E7B525B07D5600265D5C /* Cells */,
 			);
@@ -1069,6 +1075,7 @@
 				8AE4098B25AF015200A29453 /* TechnieNotificationVC.swift in Sources */,
 				8A4B746525C6D7E40051619C /* SubmitProposalVC.swift in Sources */,
 				8AC93A9625B6EF3A00663BE3 /* ProfileViewModel.swift in Sources */,
+				8A630B2025E52FCA00733475 /* TechnieStatsCell.swift in Sources */,
 				8AC1B127258A2D8D000F2569 /* ClientFeedVC.swift in Sources */,
 				8AADFB8425B58E7300D3A5CC /* Message.swift in Sources */,
 				8AE2B0F225C97B2500479C49 /* TechnieNotificationsCell.swift in Sources */,
@@ -1138,6 +1145,7 @@
 				8ACD6AEE25C4384000CC057D /* PhotoCollectionViewerVC.swift in Sources */,
 				8AADFB9425B5A7E200D3A5CC /* ConversationsTVCell.swift in Sources */,
 				8AA43A2E25D1519C00140649 /* RecommendationVC.swift in Sources */,
+				8A630B1825E52B5200733475 /* TechnieStatsVC.swift in Sources */,
 				8AAE555425DC093D003AB202 /* ClientPostHistoryCell.swift in Sources */,
 				8A05765C25CD77390071FDD1 /* ReviewsCell.swift in Sources */,
 				8A64899B25E11BA30019A6DC /* SignupVC.swift in Sources */,

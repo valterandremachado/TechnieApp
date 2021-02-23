@@ -206,7 +206,7 @@ class ProficiencyReviewCell: UITableViewCell {
     lazy var responseTimeLabelPlaceHolder: UILabel = {
         let lbl = UILabel()
         lbl.translatesAutoresizingMaskIntoConstraints = false
-        lbl.text = "Response time".uppercased()
+        lbl.text = "response time".uppercased()
         lbl.textAlignment = .center
 //        lbl.withHeight(25)
         lbl.font = .systemFont(ofSize: 12)
@@ -222,7 +222,7 @@ class ProficiencyReviewCell: UITableViewCell {
         lbl.text = "Great"
         lbl.textAlignment = .center
 //        lbl.withHeight(25)
-        lbl.font = .systemFont(ofSize: 14)
+        lbl.font = .systemFont(ofSize: 12)
 //        lbl.backgroundColor = .brown
         lbl.numberOfLines = 0
         lbl.textColor = UIColor(named: "LabelPrimaryAppearance")
@@ -364,6 +364,26 @@ class ProficiencyReviewCell: UITableViewCell {
         return sv
     }()
     
+    lazy var responseTimeStackView: UIStackView = {
+        responseTimeLabelPlaceHolder.textAlignment = .left
+//        responseTimeLabelPlaceHolder.backgroundColor = .red
+//        responseTimeLabelPlaceHolder.withWidth(150)
+//        responseTimeLabel.withWidth(50)
+        responseTimeLabel.textAlignment = .left
+        responseTimeLabelPlaceHolder.text = "response time:".uppercased()
+        responseTimeLabel.text = "Great".uppercased()
+        let sv = UIStackView(arrangedSubviews: [responseTimeLabelPlaceHolder, responseTimeLabel])
+        sv.translatesAutoresizingMaskIntoConstraints = false
+        sv.axis = .horizontal
+        sv.spacing = 0
+        sv.alignment = .leading
+        sv.distribution = .fillProportionally
+//        sv.addBackground(color: .brown)
+//        sv.withWidth(200)
+        sv.withWidth(frame.width/1.4 - 25)
+        return sv
+    }()
+    
    
     
     // MARK: - Inits
@@ -392,7 +412,15 @@ class ProficiencyReviewCell: UITableViewCell {
     
     func setupReliabilityStackView() {
         [reliabilityStackView].forEach {addSubview($0)}
-        reliabilityStackView.anchor(top: topAnchor, leading: leadingAnchor, bottom: bottomAnchor, trailing: nil, padding: UIEdgeInsets(top: 5, left: 0, bottom: 5, right: 0), size: CGSize(width: frame.width/1.3, height: 0))    }
+        reliabilityStackView.anchor(top: topAnchor, leading: leadingAnchor, bottom: bottomAnchor, trailing: nil, padding: UIEdgeInsets(top: 10, left: 0, bottom: 5, right: 0))
+        //frame.width/1.3
+    }
+    
+    func setupResponseTimeStackView() {
+        [responseTimeStackView].forEach {addSubview($0)}
+        responseTimeStackView.anchor(top: topAnchor, leading: leadingAnchor, bottom: bottomAnchor, trailing: nil, padding: UIEdgeInsets(top: 10, left: 15, bottom: 5, right: 0))
+        //frame.width/1.3
+    }
     
     // MARK: - Selectors
 

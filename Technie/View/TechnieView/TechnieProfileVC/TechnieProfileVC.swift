@@ -166,6 +166,9 @@ extension TechnieProfileVC: TableViewDataSourceAndDelegate {
             } else if indexPath.row == 1 {
                 let vc = TechnieSavedJobsVC()
                 navigationController?.pushViewController(vc, animated: true)
+            } else {
+                let vc = TechnieStatsVC()
+                navigationController?.pushViewController(vc, animated: true)
             }
         case 2:
             if indexPath.row == 0 {
