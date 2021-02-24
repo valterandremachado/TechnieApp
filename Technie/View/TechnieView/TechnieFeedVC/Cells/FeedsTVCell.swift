@@ -170,7 +170,19 @@ class FeedsTVCell: UITableViewCell {
         return cv
     }()
     
-    let dataArray = ["repairer", "handyman", "electrician", "plumber"]
+    var dataArray = [String]()
+    
+    var postModel: PostModel! {
+        didSet {
+            jobTitleLabel.text = postModel.title
+            jobDescriptionLabel.text = postModel.description
+            jobBudget.text = postModel.budget
+            jobLocation.text = postModel.location
+            dataArray = postModel.requiredSkills
+            jobPostTimeTrackerLabel.text = postModel.dateTime
+        }
+    }
+    
     // MARK: - Inits
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)

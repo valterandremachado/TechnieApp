@@ -9,6 +9,7 @@ import Foundation
 import FirebaseDatabase
 import MessageKit
 import CoreLocation
+import CodableFirebase
 
 /// Manager object to read and write data to real time firebase database
 final class DatabaseManager {
@@ -397,107 +398,120 @@ extension DatabaseManager {
     }
     
     public func insertPost(with post: PostModel, completion: @escaping (Bool) -> Void) {
-
-            database.child("posts").observeSingleEvent(of: .value, with: { [weak self] snapshot in
+        let data = try! FirebaseEncoder().encode(post)
+        
+        database.child("posts").observeSingleEvent(of: .value, with: { [weak self] snapshot in
+            
+            guard let strongSelf = self else {
+                return
+            }
+            
+//            if var _ = snapshot.value as? [[String: Any]] {
+//
+//                let db = strongSelf.database.child("posts")
+//                let dbPostID = db.childByAutoId()
+//
+//                dbPostID.setValue(data, withCompletionBlock: { error, _ in
+//                    guard error == nil else {
+//                        completion(false)
+//                        return
+//                    }
+//                    let postID = "\(dbPostID)"
+//                    let delimiter = "posts/"
+//                    let slicedString = postID.components(separatedBy: delimiter)[1]
+//                    DatabaseManager.shared.insertPostToUserDB(with: slicedString, completion: { success in
+//                        if success {
+//                            print("success")
+//                        } else {
+//                            print("failed")
+//                        }
+//                    })
+//
+////                    strongSelf.database.child("posts/\(slicedString)").observeSingleEvent(of: .value, with: { snapshot in
+//                        let newElement = [
+//                            "id": slicedString,
+//                        ]
+//                        let childPath = "posts/\(slicedString)"
+//                        strongSelf.database.child(childPath).updateChildValues(newElement, withCompletionBlock: { error, _ in
+//                        })
+////                    })
+//                    completion(true)
+//                })
+//            } else {
+                // create that array
                 
-                guard let strongSelf = self else {
-                    return
-                }
-                
-                let postDate = post.dateTime
-                let dateString = PostFormVC.dateFormatter.string(from: postDate)
-                
-                if var usersCollection = snapshot.value as? [[String: Any]] {
-                   
-                    // append to user dictionary
-                    let newElement = [
-                        "title": post.title,
-                        "description": post.description,
-                        "attachments": post.attachments,
-                        "projectType": post.projectType,
-                        "budget": post.budget,
-                        "requiredSkills": post.requiredSkills,
-                        
-                        "availabilityStatus": post.availabilityStatus,
-                        "numberOfProposals": post.numberOfProposals,
-                        "numberOfInvitesSent": post.numberOfInvitesSent,
-                        "numberOfUnansweredInvites": post.numberOfUnansweredInvites,
-                        "dateTime": dateString,
-                        "hiringStatus": post.hiringStatus,
-                        "hiredTechnicianEmail": post.hiredTechnicianEmail
-                    ] as [String : Any]
+                let db = strongSelf.database.child("posts")
+                let dbPostID = db.childByAutoId()
+                dbPostID.setValue(data, withCompletionBlock: { error, _ in
+                    guard error == nil else {
+                        completion(false)
+                        return
+                    }
+                    let postID = "\(dbPostID)"
+                    let delimiter = "posts/"
+                    let slicedString = postID.components(separatedBy: delimiter)[1]
+                    DatabaseManager.shared.insertPostToUserDB(with: slicedString, completion: { success in
+                        if success {
+                            print("success")
+                        } else {
+                            print("failed")
+                        }
+                    })
                     
-                    usersCollection.append(newElement)
-                    let db = strongSelf.database.child("posts")
-                    let dbPostID = db.childByAutoId()
-                    dbPostID.setValue(newElement, withCompletionBlock: { error, _ in
-                        guard error == nil else {
-                            completion(false)
-                            return
-                        }
-                        let postID = "\(dbPostID)"
-                        let delimiter = "posts/"
-                        let slicedString = postID.components(separatedBy: delimiter)[1]
-                        DatabaseManager.shared.insertPostToUserDB(with: slicedString, completion: { success in
-                            if success {
-                                print("success")
-                            } else {
-                                print("failed")
-                            }
-                        })
-                        completion(true)
-                    })
-                } else {
-                    // create that array
-                    let newCollection: [String: Any] = [
-                        "title": post.title,
-                        "description": post.description,
-                        "attachments": post.attachments,
-                        "projectType": post.projectType,
-                        "budget": post.budget,
-                        "requiredSkills": post.requiredSkills,
-                        
-                        "availabilityStatus": post.availabilityStatus,
-                        "numberOfProposals": post.numberOfProposals,
-                        "numberOfInvitesSent": post.numberOfInvitesSent,
-                        "numberOfUnansweredInvites": post.numberOfUnansweredInvites,
-                        "dateTime": dateString,
-                        "hiringStatus": post.hiringStatus,
-                        "hiredTechnicianEmail": post.hiredTechnicianEmail
+                    let updateElement = [
+                        "id": slicedString,
+//                        "location":
                     ]
-
-                    let db = strongSelf.database.child("posts")
-                    let dbPostID = db.childByAutoId()
-                    dbPostID.setValue(newCollection, withCompletionBlock: { error, _ in
-                        guard error == nil else {
-                            completion(false)
-                            return
-                        }
-                        let postID = "\(dbPostID)"
-                        let delimiter = "posts/"
-                        let slicedString = postID.components(separatedBy: delimiter)[1]
-                        DatabaseManager.shared.insertPostToUserDB(with: slicedString, completion: { success in
-                            if success {
-                                print("success")
-                            } else {
-                                print("failed")
-                            }
-                        })
-                        
-                        completion(true)
+                    
+                    let childPath = "posts/\(slicedString)"
+                    strongSelf.database.child(childPath).updateChildValues(updateElement, withCompletionBlock: { error, _ in
                     })
-                }
+                    
+                    completion(true)
+                })
+//            }
         })
     }
-          
+    
     /// Gets all posts from database
-    public func getAllPosts(completion: @escaping (Result<[String: Any], Error>) -> Void) {
+    public func getAllPosts(completion: @escaping (Result<PostModel, Error>) -> Void) {
         database.child("posts").observeSingleEvent(of: .value, with: { snapshot in
-            guard let value = snapshot.value as? [String: Any] else {
+            guard let postsCollection = snapshot.value as? [String: Any] else {
                 completion(.failure(DatabaseError.failedToFetch))
                 return
             }
-            completion(.success(value))
+            
+            for (keys, _) in postsCollection {
+                Database.database().reference().child("posts/\(keys)").observeSingleEvent(of: .value, with: { snapshot in
+                    guard let value = snapshot.value else { return }
+                    do {
+                        let model = try FirebaseDecoder().decode(PostModel.self, from: value)
+                        completion(.success(model))
+                    } catch let error {
+                        print(error)
+                    }
+                })
+            }
+        })
+    }
+    
+    /// Gets all posts from database
+    public func getAllClients(completion: @escaping (Result<ClientModel, Error>) -> Void) {
+        database.child("users/clients").observeSingleEvent(of: .value, with: { snapshot in
+            guard let postsCollection = snapshot.value as? [[String: Any]] else {
+                completion(.failure(DatabaseError.failedToFetch))
+                return
+            }
+            
+            for post in postsCollection {
+                do {
+                    let model = try FirebaseDecoder().decode(ClientModel.self, from: post)
+                    print("email: \(model.profileInfo.email)")
+                    completion(.success(model))
+                } catch let error {
+                    print(error)
+                }
+            }
         })
     }
     
@@ -1252,7 +1266,7 @@ struct TechnicianUserModel {
     }
 }
 
-struct ClientUserModel {
+struct ClientUserModel: Codable {
 //    let id: String
     let firstName: String
     let middleName: String
@@ -1278,20 +1292,53 @@ struct ClientUserModel {
     }
 }
 
-struct PostModel {
-    
+struct ClientModel: Codable {
+   
+    let numberOfActivePosts: Int
+    let numberOfInactivePosts: Int
+    let numberOfPosts: Int
+    let profileInfo: ProfileInfo
+    let servicePosts: [ServicePosts]?
+}
+
+struct ProfileInfo: Codable {
+    let email: String
+    let location: String
+    let name: String
+}
+
+struct ServicePosts: Codable {
+    let postID: String
+}
+
+
+struct PostModel: Codable {
+    let id: String?
     let title: String
     let description: String
     let attachments: [String]
     let projectType: String
     let budget: String
+    let location: String?
     let requiredSkills: [String]
 
     let availabilityStatus: Bool
     let numberOfProposals: Int
     let numberOfInvitesSent: Int
     let numberOfUnansweredInvites: Int
-    let dateTime: Date
-    let hiringStatus: Bool
-    let hiredTechnicianEmail: String
+    let dateTime: String
+    let field: String?
+    let hiringStatus: HiringStatus?
+    let proposals: [Proposals]?
+
+}
+
+struct HiringStatus: Codable {
+    var isHired: Bool
+    var hiredTechnicianEmail: String
+}
+
+struct Proposals: Codable {
+    var technicianEmail: String
+    var coverLetter: String
 }

@@ -142,6 +142,10 @@ class PostFormVC: UIViewController {
     var initialSelectedSkill = [""]
     
     let singleton = SkillSelectionVC()//.shared
+    
+    var serviceField = ""
+    var selectedArea = ""
+    
     // MARK: - Inits
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -149,11 +153,7 @@ class PostFormVC: UIViewController {
         view.backgroundColor = .cyan
 //        singleton.delegate = self
         setupViews()
-
-        sections.append(SectionHandler(title: "Project Title & Description", detail: ["0", "1", ""]))
-        sections.append(SectionHandler(title: "Project Type", detail: ["0"]))
-        sections.append(SectionHandler(title: "Project Budget", detail: ["0"]))
-        sections.append(SectionHandler(title: "Skills Required", detail: initialSelectedSkill))
+        populateSection()
         print("viewDidLoad")
     }
     
@@ -161,31 +161,6 @@ class PostFormVC: UIViewController {
         super.loadView()
         print("loadView")
     }
-    
-//    override func viewWillLayoutSubviews() {
-//        super.viewWillLayoutSubviews()
-//        print("viewWillLayoutSubviews
-//    }
-    
-//    override func viewWillAppear(_ animated: Bool) {
-//        super.viewWillAppear(animated)
-//        print("viewWillAppear")
-//        
-//        let selectedSkill2 = userDefaults.stringArray(forKey: Keys.selectedSkills) ?? [String]()
-//        print(selectedSkill2)
-//        if selectedSkill2.first != "" && !selectedSkill2.isEmpty {
-//            print("12")
-//            let selectedSkill = userDefaults.stringArray(forKey: Keys.selectedSkills) ?? [String]() // retrieve
-//            sections.append(SectionHandler(title: "Skills Required", detail: selectedSkill))
-////            tableView.reloadData()
-//        } else {
-//            print("34")
-//
-//            userDefaults.set(selectedSkillEmpty, forKey: Keys.selectedSkills) // save
-//            let selectedSkill = userDefaults.stringArray(forKey: Keys.selectedSkills) ?? [String]() // retrieve
-//            sections.append(SectionHandler(title: "Skills Required", detail: selectedSkill))
-//        }
-//    }
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
@@ -242,6 +217,30 @@ class PostFormVC: UIViewController {
 //        self.navigationItem.leftBarButtonItem = leftNavBarButton
         self.navigationItem.rightBarButtonItem = rightNavBarButton
         navigationItem.largeTitleDisplayMode = .never
+    }
+    
+    fileprivate func populateSection() {
+
+        switch serviceField {
+        case "Handyman":
+            initialSelectedSkill.removeAll()
+            initialSelectedSkill.append("")
+            initialSelectedSkill.insert(selectedArea, at: 0)
+  
+        case "Repairer":
+            initialSelectedSkill.removeAll()
+            initialSelectedSkill.append("")
+            initialSelectedSkill.insert(selectedArea, at: 0)
+
+        default:
+            break
+        }
+        
+        sections.append(SectionHandler(title: "Project Title & Description", detail: ["0", "1", ""]))
+        sections.append(SectionHandler(title: "Project Type", detail: ["0"]))
+        sections.append(SectionHandler(title: "Project Budget", detail: ["0"]))
+        sections.append(SectionHandler(title: "Skills Required", detail: initialSelectedSkill))
+        tableView.reloadData()
     }
     
     fileprivate func addSkillData(_ skillTitle: String?) {
@@ -324,16 +323,19 @@ class PostFormVC: UIViewController {
     var postNumberOfUnansweredInvites: Int = 0
     var postDateTime = Date()
     var postHiringStatus: Bool = false
+    var fieldOfService = ""
     
     var items = [String]()
-    var chosenItem: String!
+    var chosenItem: String = "Long Term"
     // MARK: - Selectors
     @objc fileprivate func rightNavBarItemPostBtnTapped() {
-
+        let dateString = PostFormVC.dateFormatter.string(from: postDateTime)
+        
         postTitle = titleTextField.text
         postDescription = descriptionTextField.text
         postProjectType = chosenItem
         postBudget = finalPick
+        serviceField != "Others" ? (fieldOfService = serviceField) : (fieldOfService = "Not Specified")
         
         let removeWhiteSpace = initialSelectedSkill.firstIndex(of: "") ?? 400
         if removeWhiteSpace != 400 {
@@ -366,24 +368,27 @@ class PostFormVC: UIViewController {
                 if postsImageUrl.count == self.imageDataArray.count {
                     self.postAttachments = postsImageUrl
                     print("download url returned: \(postsImageUrl), count: \(postsImageUrl.count)")
-                    let post = PostModel(title: self.postTitle,
+                    let post = PostModel(id: nil,
+                                         title: self.postTitle,
                                          description: self.postDescription,
                                          attachments: self.postAttachments,
                                          projectType: self.postProjectType,
                                          budget: self.postBudget,
+                                         location: nil,
                                          requiredSkills: self.postRequiredSkills,
                                          availabilityStatus: self.postAvailabilityStatus,
                                          numberOfProposals: self.postNumberOfProposals,
                                          numberOfInvitesSent: self.postNumberOfInvitesSent,
                                          numberOfUnansweredInvites: self.postNumberOfUnansweredInvites,
-                                         dateTime: self.postDateTime,
-                                         hiringStatus: self.postHiringStatus,
-                                         hiredTechnicianEmail: "nil")
+                                         dateTime: dateString,
+                                         field: self.fieldOfService,
+                                         hiringStatus: nil,
+                                         proposals: nil)
                     
                     DatabaseManager.shared.insertPost(with: post, completion: { success in
                         if success {
-                            self.navigationController?.popToRootViewController(animated: true)
-                            self.showRecommendationBanner()
+//                            self.navigationController?.popToRootViewController(animated: true)
+//                            self.showRecommendationBanner()
                             print("success")
                         } else {
                             print("failed")
@@ -471,6 +476,7 @@ class PostFormVC: UIViewController {
     @objc func addSkillsBtnTapped() {
         let vc = SkillSelectionVC()
         vc.skillSelectionVCDelegate = self // set delegate in order to have access of the data used in the SkillSelectionVC
+        vc.serviceField = serviceField
         
         if initialSelectedSkill.last == "" && initialSelectedSkill.count == 1 {
             print("array is empty")

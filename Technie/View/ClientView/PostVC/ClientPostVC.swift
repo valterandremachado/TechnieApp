@@ -128,10 +128,12 @@ extension ClientPostVC: CollectionDataSourceAndDelegate {
         case 1:
             print("index 0")
             let vc = PostFormVC()
+            vc.serviceField = "Electrician"
             navigationController?.pushViewController(vc, animated: true)
         case 3:
             print("index 3")
             let vc = PostFormVC()
+            vc.serviceField = "Others"
             navigationController?.pushViewController(vc, animated: true)
         default:
             // present postSubSections

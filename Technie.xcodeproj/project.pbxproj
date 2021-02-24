@@ -99,6 +99,7 @@
 		8AC1B12F258A2D8F000F2569 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8AC1B12D258A2D8F000F2569 /* LaunchScreen.storyboard */; };
 		8AC1B13A258A2D8F000F2569 /* TechnieTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AC1B139258A2D8F000F2569 /* TechnieTests.swift */; };
 		8AC1B145258A2D8F000F2569 /* TechnieUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AC1B144258A2D8F000F2569 /* TechnieUITests.swift */; };
+		8AC5604025E66E18000FD89F /* CodableFirebase in Frameworks */ = {isa = PBXBuildFile; productRef = 8AC5603F25E66E18000FD89F /* CodableFirebase */; };
 		8AC93A8725B6ECB200663BE3 /* ChatVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AC93A8625B6ECB200663BE3 /* ChatVC.swift */; };
 		8AC93A9325B6EF3A00663BE3 /* SearchResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AC93A8F25B6EF3A00663BE3 /* SearchResult.swift */; };
 		8AC93A9425B6EF3A00663BE3 /* ConversationsModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AC93A9025B6EF3A00663BE3 /* ConversationsModels.swift */; };
@@ -287,6 +288,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8AC5604025E66E18000FD89F /* CodableFirebase in Frameworks */,
 				8A8F8554258A408700C4CEF9 /* LBTATools in Frameworks */,
 				8AA43A2125D145FF00140649 /* NotificationBannerSwift in Frameworks */,
 				8AADFB8E25B5A59700D3A5CC /* SDWebImageMapKit in Frameworks */,
@@ -805,6 +807,7 @@
 				8AADFB8B25B5A59700D3A5CC /* SDWebImage */,
 				8AADFB8D25B5A59700D3A5CC /* SDWebImageMapKit */,
 				8AA43A2025D145FF00140649 /* NotificationBannerSwift */,
+				8AC5603F25E66E18000FD89F /* CodableFirebase */,
 			);
 			productName = Technie;
 			productReference = 8AC1B11F258A2D8D000F2569 /* Technie.app */;
@@ -886,6 +889,7 @@
 				8A54FAD025B56ED100814216 /* XCRemoteSwiftPackageReference "MessageKit" */,
 				8AADFB8A25B5A59700D3A5CC /* XCRemoteSwiftPackageReference "SDWebImage" */,
 				8AA43A1F25D145FF00140649 /* XCRemoteSwiftPackageReference "NotificationBanner" */,
+				8AC5603E25E66E18000FD89F /* XCRemoteSwiftPackageReference "CodableFirebase" */,
 			);
 			productRefGroup = 8AC1B120258A2D8D000F2569 /* Products */;
 			projectDirPath = "";
@@ -1548,6 +1552,14 @@
 				minimumVersion = 5.10.2;
 			};
 		};
+		8AC5603E25E66E18000FD89F /* XCRemoteSwiftPackageReference "CodableFirebase" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/alickbass/CodableFirebase";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.2.2;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1575,6 +1587,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 8AADFB8A25B5A59700D3A5CC /* XCRemoteSwiftPackageReference "SDWebImage" */;
 			productName = SDWebImageMapKit;
+		};
+		8AC5603F25E66E18000FD89F /* CodableFirebase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8AC5603E25E66E18000FD89F /* XCRemoteSwiftPackageReference "CodableFirebase" */;
+			productName = CodableFirebase;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

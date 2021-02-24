@@ -18,7 +18,7 @@ class TechnieFeedVC: UIViewController {
     private let searchResultHeaderID = "searchViewHeaderID"
     
     let sections = ["Technician's Ranking", "Nearby Technicians"]
-    
+    var postModel = [PostModel]()
     // MARK: - Properties
     var customindexPath = IndexPath(item: 0, section: 0)
     
@@ -160,6 +160,7 @@ class TechnieFeedVC: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         view.backgroundColor = UIColor(named: "BackgroundAppearance")
+        fetchData()
         setupViews()
     }
     
@@ -212,6 +213,19 @@ class TechnieFeedVC: UIViewController {
         
     }
     
+    fileprivate func fetchData()  {
+        DatabaseManager.shared.getAllPosts(completion: {[weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let posts):
+                self.postModel.append(posts)
+                self.tableView.reloadData()
+            case .failure(let error):
+                print("Failed to get post: \(error.localizedDescription)")
+            }
+        })
+    }
+    
     // MARK: - Selectors
     @objc fileprivate func leftBarItemPressed(){
         let userProfileVC = UserProfileVC()
@@ -257,18 +271,20 @@ extension TechnieFeedVC: UISearchBarDelegate {
 extension TechnieFeedVC: TableViewDataSourceAndDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return stringArray.count
+        return postModel.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 //        tableView.deselectRow(at: indexPath, animated: true)
         let cell = tableView.dequeueReusableCell(withIdentifier: FeedsTVCell.cellID, for: indexPath) as! FeedsTVCell
-//        cell.textLabel?.text = stringArray[indexPath.row]
+        let post = postModel[indexPath.row]
+        cell.postModel = post
         return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let vc = JobDetailsVC()
+        vc.postModel = postModel[indexPath.row]
         self.navigationController?.pushViewController(vc, animated: true)
     }
     

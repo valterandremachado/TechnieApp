@@ -19,7 +19,8 @@ class SkillSelectionVC: UIViewController {
     
     // MARK: - Properties
     var sections = [SectionHandler]()
-
+    var serviceField = ""
+    
     lazy var searchBar: UISearchBar = {
         let sb = UISearchBar(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: 0))
         sb.placeholder = "Search for skills"
@@ -50,6 +51,8 @@ class SkillSelectionVC: UIViewController {
     var selectedSkill = [String]()
     var didDelete = false
     var didAdd = false
+    
+    var suggestedSkills = [String]()
     // MARK: - Inits
     override func loadView() {
         super.loadView()
@@ -62,8 +65,7 @@ class SkillSelectionVC: UIViewController {
         
 //        let defaultArray = userDefaults.set(selectedSkill, forKey: Keys.selectedSkills) // save
 //        let selectedSkill = userDefaults.stringArray(forKey: Keys.selectedSkills) ?? [String]() // retrieve
-        sections.append(SectionHandler(title: "Selected skills", detail: selectedSkill.first == "" ? ([String]()) : (selectedSkill)))
-        sections.append(SectionHandler(title: "Suggested skills", detail: ["skill 1", "skill 2", "skill 3", "skill 4", "skill 5", "skill 6", "skill 7", "skill 8", "skill 9", "skill 10", "skill 11", "skill 12"]))
+        populateSections()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -75,10 +77,10 @@ class SkillSelectionVC: UIViewController {
     // MARK: - Methods
     fileprivate func setupViews() {
         setupNavBar()
-        [searchBar, tableView].forEach { view.addSubview($0)}
-        searchBar.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.leadingAnchor, bottom: nil, trailing: view.trailingAnchor, padding: UIEdgeInsets(top: 5, left: 5, bottom: 0, right: 5), size: CGSize(width: 0, height: 44))
+        [tableView].forEach { view.addSubview($0)}
+//        searchBar.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.leadingAnchor, bottom: nil, trailing: view.trailingAnchor, padding: UIEdgeInsets(top: 5, left: 5, bottom: 0, right: 5), size: CGSize(width: 0, height: 44))
         
-        tableView.anchor(top: searchBar.bottomAnchor, leading: view.leadingAnchor, bottom: view.safeAreaLayoutGuide.bottomAnchor, trailing: view.trailingAnchor, padding: UIEdgeInsets(top: 5, left: 0, bottom: 0, right: 0))
+        tableView.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.leadingAnchor, bottom: view.safeAreaLayoutGuide.bottomAnchor, trailing: view.trailingAnchor, padding: UIEdgeInsets(top: 5, left: 0, bottom: 0, right: 0))
     }
     
     fileprivate func setupNavBar() {
@@ -92,6 +94,79 @@ class SkillSelectionVC: UIViewController {
         self.navigationItem.leftBarButtonItem = leftNavBarButton
         self.navigationItem.rightBarButtonItem = rightNavBarButton
 //        navigationItem.searchController = searchController
+    }
+    
+    fileprivate func populateSections() {
+        
+        let handymanSkills = ["Drywall repair",
+                              "Snow removal",
+                              "Door frames",
+                              "Sheetrock",
+                              "Light fixtures",
+                              "Multitasking",
+                              "Problem solving",
+                              "Innovative and teachable",
+                              "Safety sonscious",
+                              "Active learning",
+                              "Time management",
+                              "Communication",
+                              "Social perceptiveness",
+                              "Writing"]
+        
+        let electricianSkills = ["Mechanical aptitude",
+                                 "Problem solving",
+                                 "Reading comprehension",
+                                 "Physical skills",
+                                 "Flexibility",
+                                 "Communication",
+                                 "Basic maths skills",
+                                 "Ability to install conduits",
+                                 "Ability to install tubing",
+                                 "Ability to install cables",
+                                 "knowledge to read and understand blueprints",
+                                 "Understand all procedures and electrical safety rules",
+                                 "repair or replace equipment",
+                                 "repair or replace fixtures",
+                                 "repair or replace wiring"]
+        
+      
+        let repairerSkills = ["Preventive Maintenance",
+                              "Communication",
+                              "Safety Conscious",
+                              "Repairing",
+                              "Equipment Maintenance",
+                              "Troubleshooting",
+                              "Operation Monitoring",
+                              "Operation and Control",
+                              "Critical Thinking",
+                              "Active Learning",
+                              "Problem Solving",
+                              "Time Management",
+                              "Speaking",
+                              "Social Perceptiveness",
+                              "Writing"]
+        
+        var othersSkills = [String]()
+
+        switch serviceField {
+        case "Handyman":
+            suggestedSkills = handymanSkills
+        case "Electrician":
+            suggestedSkills = electricianSkills
+        case "Repairer":
+            suggestedSkills = repairerSkills
+        case "Others":
+            othersSkills.append(contentsOf: electricianSkills)
+            othersSkills.append(contentsOf: repairerSkills)
+            othersSkills.append(contentsOf: handymanSkills)
+            let uniqueItems = othersSkills.uniqueItemInTheArray(map: {$0})
+            suggestedSkills = uniqueItems
+        default:
+            break
+        }
+        
+        sections.append(SectionHandler(title: "Selected skills", detail: selectedSkill.first == "" ? ([String]()) : (selectedSkill)))
+        sections.append(SectionHandler(title: "Suggested skills", detail: suggestedSkills))
     }
         
     fileprivate func removeSkill(_ index: Int) {

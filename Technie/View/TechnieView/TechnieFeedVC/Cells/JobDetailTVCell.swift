@@ -327,7 +327,7 @@ class JobDetailTVCell4: UITableViewCell {
         return cv
     }()
     
-    let dataArray = ["repairer", "handyman", "electrician", "plumber"]
+    var dataArray = [String]()
 
     // MARK: - Inits
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {

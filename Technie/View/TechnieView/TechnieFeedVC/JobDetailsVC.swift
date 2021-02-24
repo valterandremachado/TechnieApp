@@ -9,28 +9,9 @@ import UIKit
 
 class JobDetailsVC: UIViewController {
 
-    // MARK: - Properties
-    lazy var collectionView: UICollectionView = {
-        let collectionLayout = UICollectionViewFlowLayout()
-        collectionLayout.scrollDirection = .vertical
-//        collectionLayout.minimumLineSpacing = 8
-//        collectionLayout.minimumInteritemSpacing = 8
-//        collectionLayout.estimatedItemSize = .zero
-        
-        let cv = UICollectionView(frame: .zero, collectionViewLayout: collectionLayout)
-        cv.translatesAutoresizingMaskIntoConstraints = false
-        cv.backgroundColor = .white
-        cv.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        // Avoid collectionView to self adjust its size
-        //        cv.contentInsetAdjustmentBehavior = .never
-        
-        cv.delegate = self
-        cv.dataSource = self
-        // Registration of the cell
-        cv.register(JobDetailCVCell.self, forCellWithReuseIdentifier: JobDetailCVCell.cellID)
-        return cv
-    }()
+    var postModel: PostModel!
     
+    // MARK: - Properties
     lazy var tableView: UITableView = {
         let tv = UITableView(frame: .zero, style: .grouped)
         tv.translatesAutoresizingMaskIntoConstraints = false
@@ -254,6 +235,8 @@ class JobDetailsVC: UIViewController {
     // MARK: - Selectors
     @objc fileprivate func proposalBtnPressed() {
         let vc = SubmitProposalVC()
+        vc.postID = postModel.id ?? ""
+        vc.numberOfProposals = postModel.numberOfProposals
         navigationController?.pushViewController(vc, animated: true)
     }
     
@@ -272,41 +255,57 @@ extension JobDetailsVC: TableViewDataSourceAndDelegate {
             let cell = tableView.dequeueReusableCell(withIdentifier: JobDetailTVCell0.cellID, for: indexPath) as! JobDetailTVCell0
 //            cell.setupViews()
             cell.textLabel?.font = .boldSystemFont(ofSize: 20)
-            cell.textLabel?.text = "Job Title"
+            cell.textLabel?.text = postModel.title
             return cell
         case 1:
             let cell = tableView.dequeueReusableCell(withIdentifier: JobDetailTVCell1.cellID, for: indexPath) as! JobDetailTVCell1
+            cell.jobDescriptionLabel.text = postModel.description
             cell.setupViews()
             return cell
         case 2:
             let cell = tableView.dequeueReusableCell(withIdentifier: JobDetailTVCell2.cellID, for: indexPath) as! JobDetailTVCell2
             cell.setupViews()
+            cell.jobBudget.text = postModel.budget
+//            cell.jobField.text = postModel.title
             cell.jobBudget.font = .boldSystemFont(ofSize: 16)
             cell.jobField.font = .boldSystemFont(ofSize: 16)
             return cell
         case 3:
             let cell = tableView.dequeueReusableCell(withIdentifier: JobDetailTVCell3.cellID, for: indexPath) as! JobDetailTVCell3
             cell.setupViews()
+            cell.projectType.text = postModel.projectType
             cell.projectTypeLabel.font = .boldSystemFont(ofSize: 16)
             return cell
         case 4:
             let cell = tableView.dequeueReusableCell(withIdentifier: JobDetailTVCell31.cellID, for: indexPath) as! JobDetailTVCell31
             cell.setupViews()
+//            cell.attachmentLabel = postModel.attachments
             cell.attachmentLabel.font = .boldSystemFont(ofSize: 16)
             return cell
         case 5:
             let cell = tableView.dequeueReusableCell(withIdentifier: JobDetailTVCell4.cellID, for: indexPath) as! JobDetailTVCell4
             cell.setupViews()
+            cell.dataArray = postModel.requiredSkills
             cell.skillsHeaderLabel.font = .boldSystemFont(ofSize: 16)
             return cell
         case 6:
             let cell = tableView.dequeueReusableCell(withIdentifier: JobDetailTVCell5.cellID, for: indexPath) as! JobDetailTVCell5
             cell.setupViews()
+            cell.proposals.text = "\(postModel.numberOfProposals)"
+            cell.invitesSent.text = "\(postModel.numberOfInvitesSent)"
+            cell.unansweredInvites.text = "\(postModel.numberOfUnansweredInvites)"
+            cell.jobStatus.text = postModel.availabilityStatus == false ? ("Closed") : ("Active")
+
             cell.activityHeaderLabel.font = .boldSystemFont(ofSize: 16)
             return cell
         case 7:
             let cell = tableView.dequeueReusableCell(withIdentifier: JobDetailTVCell6.cellID, for: indexPath) as! JobDetailTVCell6
             cell.setupViews()
+            cell.loactionLabel.text = postModel.location
+//            cell.numberOfPostedJobsLabel.text = postModel.title
+//            cell.statusLabel.text = postModel.title
+//            cell.numberOfOpenJobsLabel.text = postModel.title
+
             cell.aboutTheClientHeaderLabel.font = .boldSystemFont(ofSize: 16)
             return cell
         default:
@@ -335,65 +334,6 @@ extension JobDetailsVC: TableViewDataSourceAndDelegate {
     
 }
 
-
-// MARK: - CollectionDataSourceAndDelegate Extension
-extension JobDetailsVC: CollectionDataSourceAndDelegate {
-    
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 7
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: JobDetailCVCell.cellID, for: indexPath) as! JobDetailCVCell
-        switch indexPath.row {
-        case 0:
-            cell.setupViewsOnItem0()
-            return cell
-        case 1:
-            print("1")
-            cell.setupViewsOnItem1()
-            return cell
-        case 2:
-            print("2")
-            return cell
-        case 3:
-            print("3")
-            return cell
-        case 4:
-            print("4")
-            return cell
-        case 5:
-            print("5")
-            return cell
-        case 6:
-            print("6")
-            return cell
-        default:
-            return UICollectionViewCell()
-        }
-//        if indexPath.row == 0 {
-//            cell.setupViewsOnItem0()
-//        }
-//        return cell
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        
-        let noOfCellsInRow = 1
-        let flowLayout = collectionViewLayout as! UICollectionViewFlowLayout
-        let totalSpace = flowLayout.sectionInset.left
-            + flowLayout.sectionInset.right
-            + (flowLayout.minimumInteritemSpacing * CGFloat(noOfCellsInRow - 1))
-//            flowLayout.sectionInset.left = 2
-//            flowLayout.sectionInset.right = 2
-        
-        let size = ((collectionView.bounds.width) - totalSpace) / CGFloat(noOfCellsInRow)
-        let finalSize = CGSize(width: size, height: size)
-        
-        return finalSize
-    }
-    
-}
 
 
 // MARK: - JobDetailsVCPreviews

@@ -6,9 +6,14 @@
 //
 
 import UIKit
+import FirebaseDatabase
+import CodableFirebase
 
 class SubmitProposalVC: UIViewController, UITextViewDelegate {
 
+    var postID = ""
+    var numberOfProposals: Int = 0
+    
     // MARK: - Properties
     lazy var tableView: UITableView = {
         let tv = UITableView(frame: .zero, style: .grouped)
@@ -117,7 +122,24 @@ class SubmitProposalVC: UIViewController, UITextViewDelegate {
     }
     
     // MARK: - Selectors
+    private let database = Database.database().reference()
+
     @objc fileprivate func proposalBtnPressed() {
+        guard let coverLetter = coverLetterTextField.text else { return }
+        numberOfProposals += 1
+
+        let updateElement = [
+                "numberOfProposals": numberOfProposals,
+                "proposals": [[
+                    "technicianEmail": "email",
+                    "coverLetter": coverLetter
+                ]]
+        ] as [String : Any] //as? [AnyHashable: Any]
+       
+
+        let childPath = "posts/\(postID)"
+        database.child(childPath).updateChildValues(updateElement, withCompletionBlock: { error, _ in
+        })
         presentDoneSubmissionAlertSheet()
     }
     

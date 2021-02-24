@@ -9,6 +9,7 @@
 import UIKit
 import LBTATools
 import Firebase
+import CodableFirebase
 
 class LoginVC: UIViewController {
     
@@ -352,15 +353,29 @@ class LoginVC: UIViewController {
 //            (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootViewController(vc)
             
         } else {
-//            var posts = [String: Any]()
-//            var userPosts = [[String: Any]]()
-            
-//            DatabaseManager.shared.getAllPosts(completion: { result in
-//                switch result {
-//                case .success(let postsCollection):
-//                    //                print("success: \(postsCollection)")
+
+            DatabaseManager.shared.getAllClients(completion: { result in
+                switch result {
+                case .success(let users):
 //                    posts = postsCollection
+                    print("success: \(users)")
+//                    print("budget: \(posts.budget)")
+
+//                        if keys == "-MU8vTecV1Bid3Lt_WWR" {
+//                            print("INSIDE KEY: \(keys)")
 //
+//                        database.child("posts/\(keys)").observeSingleEvent(of: .value, with: { [weak self] snapshot in
+//                            let newElement = [
+//                                "title": "post.title",
+//                            ] //as [String : Any]
+//                            let childPath = "posts/\(keys)"
+//                            database.child(childPath).updateChildValues(newElement, withCompletionBlock: { error, _ in
+//
+//                            })
+//                        })
+//                    }
+
+
 //                    DatabaseManager.shared.getUserPosts(completion: { result in
 //                        switch result {
 //                        case .success(let userPostsCollection):
@@ -377,11 +392,11 @@ class LoginVC: UIViewController {
 //                            print("Failed to get posts: \(error.localizedDescription)")
 //                        }
 //                    })
-//
-//                case .failure(let error):
-//                    print("Failed to get usertest1234567s: \(error.localizedDescription)")
-//                }
-//            })
+
+                case .failure(let error):
+                    print("Failed to get usertest1234567s: \(error.localizedDescription)")
+                }
+            })
             
 //            DatabaseManager.shared.insertPost(with: <#PostModel#>, completion: { success in
 //                if success {

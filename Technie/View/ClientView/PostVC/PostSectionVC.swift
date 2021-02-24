@@ -32,7 +32,7 @@ class PostSectionVC: UIViewController {
         return tv
     }()
     
-    let repairerSectionArray = ["Refrigerator", "Washing Machine", "Freezer", "Ice Cream Machine", "TV", "Microwave", "Heat Pump", "Commercial Oven", "Dryer Machine", "Others"]
+    let repairerSectionArray = ["Refrigerator Repair", "Washing Machine Repair", "Freezer Repair", "Ice Cream Machine Repair", "TV Repair", "Microwave Repair", "Heat Pump Repair", "Commercial Oven Repair", "Dryer Machine Repair", "Others"]
     
     let handymanSectionArray = ["Plumbing Installation/Leaking Plumbing", "Drywall Installation", "Fixture Replacement", "Painting for the Interior and Exterior", "Power Washing", "Tile Installation", "Deck/Door/Window Repair", "Carpenter", "Cabinetmaker", "Others"]
     
@@ -121,10 +121,16 @@ extension PostSectionVC: TableViewDataSourceAndDelegate {
         tableView.deselectRow(at: indexPath, animated: true)
         switch postSectionVCIndexPath.item {
         case 0:
+            let selectedArea = handymanSectionArray[indexPath.row]
             let vc = PostFormVC()
+            vc.serviceField = "Handyman"
+            vc.selectedArea = selectedArea
             navigationController?.pushViewController(vc, animated: true)
         case 2:
+            let selectedArea = repairerSectionArray[indexPath.row]
             let vc = PostFormVC()
+            vc.serviceField = "Repairer"
+            vc.selectedArea = selectedArea
             navigationController?.pushViewController(vc, animated: true)
         default:
            break
