@@ -159,6 +159,7 @@ extension ChatInfoVC: TableViewDataSourceAndDelegate {
             if indexPath.row == 1 {
                 let vc = PhotoCollectionViewerVC()
                 vc.convoSharedPhotoArray = convoSharedPhotoArray
+                vc.navigationItem.title = "Shared Photos"
                 navigationController?.pushViewController(vc, animated: true)
             } else if indexPath.row == 2 {
                 let vc = LocationCollectionViewerVC()

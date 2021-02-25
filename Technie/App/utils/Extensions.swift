@@ -14,6 +14,19 @@ import UIKit
 //    }
 //}
 
+// Calculates distance between dateTime
+extension UIView {
+    func calculateTimeFrame(initialTime: String) -> String {
+        let start = PostFormVC.dateFormatter.date(from: initialTime)
+        let end = PostFormVC.dateFormatter.date(from: PostFormVC.dateFormatter.string(from: Date()))
+
+        let relativeDateTime = RelativeDateTimeFormatter()
+        relativeDateTime.unitsStyle = .full
+        let timeFrame = relativeDateTime.localizedString(for: start!, relativeTo: end!)
+        return timeFrame == "in 0 seconds" ? ("just now") : (timeFrame)
+    }
+}
+
 extension UIView {
     
     var heightConstraint: NSLayoutConstraint? {
@@ -131,11 +144,22 @@ extension UserDefaults {
         guard let data = self.value(forKey: key) as? Data else { return nil }
         return try? decoder.decode(type.self, from: data)
     }
-
+    
     func setCodableUserDefaults<T: Codable>(object: T, forKey key: String, usingEncoder encoder: JSONEncoder = JSONEncoder()) {
         let data = try? encoder.encode(object)
         self.set(data, forKey: key)
     }
+    
+    func object<T: Codable>(_ type: T.Type, with key: String, usingDecoder decoder: JSONDecoder = JSONDecoder()) -> T? {
+        guard let data = self.value(forKey: key) as? Data else { return nil }
+        return try? decoder.decode(type.self, from: data)
+    }
+    
+    func set<T: Codable>(object: T, forKey key: String, usingEncoder encoder: JSONEncoder = JSONEncoder()) {
+        let data = try? encoder.encode(object)
+        self.set(data, forKey: key)
+    }
+    
 }
 
 // -> Helps Create an dynamic observable variable

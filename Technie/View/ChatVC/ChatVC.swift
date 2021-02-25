@@ -39,11 +39,19 @@ class ChatVC: MessagesViewController {
     private var messages = [Message]()
     
     private var selfSender: Sender? {
-        guard let email = UserDefaults.standard.value(forKey: "email") as? String else {
-            return nil
-        }
+        let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo")
         
-        let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
+        var userPersistedEmail = ""
+//        var userPersistedName = ""
+        if let info = getUsersPersistedInfo {
+            userPersistedEmail = info.first!.email
+//            userPersistedName = info.first!.name
+        }
+//        guard let email = UserDefaults.standard.value(forKey: "email") as? String else {
+//            return nil
+//        }
+        
+        let safeEmail = DatabaseManager.safeEmail(emailAddress: userPersistedEmail)
         
         return Sender(photoURL: "",
                       senderId: safeEmail,
@@ -173,8 +181,14 @@ class ChatVC: MessagesViewController {
             self?.presentLocationPicker()
         }
         
+        let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo")
+        
+        var userPersistedEmail = ""
+        if let info = getUsersPersistedInfo {
+            userPersistedEmail = info.first!.email
+        }
         messageInputBar.setLeftStackViewWidthConstant(to: 70, animated: false)
-        messageInputBar.setStackViewItems([photoMessageBarBtn, locationMessageBarBtn], forStack: .left, animated: false)
+        messageInputBar.setStackViewItems(userPersistedEmail == "client@hotmail.com" ? ([photoMessageBarBtn, locationMessageBarBtn]) : ([photoMessageBarBtn]), forStack: .left, animated: false)
         //        messageInputBar.leftStackView.addBackground(color: .red)
         
         messageInputBar.setRightStackViewWidthConstant(to: 30, animated: false)
@@ -310,11 +324,18 @@ class ChatVC: MessagesViewController {
     
     private func createMessageId() -> String? {
         // date, otherUesrEmail, senderEmail, randomInt
-        guard let currentUserEmail = UserDefaults.standard.value(forKey: "email") as? String else {
-            return nil
+//        guard let currentUserEmail = UserDefaults.standard.value(forKey: "email") as? String else {
+//            return nil
+//        }
+        
+        let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo")
+        
+        var userPersistedEmail = ""
+        if let info = getUsersPersistedInfo {
+            userPersistedEmail = info.first!.email
         }
         
-        let safeCurrentEmail = DatabaseManager.safeEmail(emailAddress: currentUserEmail)
+        let safeCurrentEmail = DatabaseManager.safeEmail(emailAddress: userPersistedEmail)
         
         let dateString = Self.dateFormatter.string(from: Date())
         let newIdentifier = "\(otherUserEmail)_\(safeCurrentEmail)_\(dateString)"

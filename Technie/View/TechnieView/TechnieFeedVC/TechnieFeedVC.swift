@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import FirebaseDatabase
 
 class TechnieFeedVC: UIViewController {
     
@@ -160,12 +161,15 @@ class TechnieFeedVC: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         view.backgroundColor = UIColor(named: "BackgroundAppearance")
-        fetchData()
         setupViews()
+        fetchData()
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        listenToPostsChange()
+        
         UIView.animate(withDuration: 0.8, delay: 0.5, usingSpringWithDamping: 1.0, initialSpringVelocity: 0, options: .transitionCrossDissolve, animations: { [weak self] in
             guard let self = self else { return }
             self.tabBarController?.setTabBar(hidden: false, animated: true, along: nil)
@@ -213,17 +217,41 @@ class TechnieFeedVC: UIViewController {
         
     }
     
+
     fileprivate func fetchData()  {
-        DatabaseManager.shared.getAllPosts(completion: {[weak self] result in
-            guard let self = self else { return }
-            switch result {
-            case .success(let posts):
-                self.postModel.append(posts)
-                self.tableView.reloadData()
-            case .failure(let error):
-                print("Failed to get post: \(error.localizedDescription)")
-            }
-        })
+        DispatchQueue.main.async {
+            DatabaseManager.shared.getAllPosts(completion: {[weak self] result in
+                guard let self = self else { return }
+                switch result {
+                case .success(let posts):
+                    self.postModel.append(posts)
+                    self.tableView.reloadData()
+
+                    return
+                case .failure(let error):
+                    print("Failed to get posts: \(error.localizedDescription)")
+                }
+            })
+        }
+        
+    }
+    
+    fileprivate func listenToPostsChange() {
+        DispatchQueue.main.async {
+            DatabaseManager.shared.listenToPostChanges(completion: { result in
+                switch result {
+                case .success(let posts):
+                    // Remove existing items to avoid duplicated items
+                    self.postModel.removeAll()
+                    print("childChanged")
+                    self.postModel.append(contentsOf: posts)
+                    self.tableView.reloadData()
+                    return
+                case .failure(let error):
+                    print("Failed to get posts: \(error.localizedDescription)")
+                }
+            })
+        }
     }
     
     // MARK: - Selectors
@@ -285,6 +313,7 @@ extension TechnieFeedVC: TableViewDataSourceAndDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let vc = JobDetailsVC()
         vc.postModel = postModel[indexPath.row]
+        vc.navBarViewSubtitleLbl.text = "posted \(view.calculateTimeFrame(initialTime: postModel[indexPath.row].dateTime))"
         self.navigationController?.pushViewController(vc, animated: true)
     }
     
@@ -392,3 +421,4 @@ struct TechnieFeedVCPreviews: PreviewProvider {
     }
     
 }
+

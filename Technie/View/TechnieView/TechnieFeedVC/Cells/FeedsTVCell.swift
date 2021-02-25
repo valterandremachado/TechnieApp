@@ -171,7 +171,8 @@ class FeedsTVCell: UITableViewCell {
     }()
     
     var dataArray = [String]()
-    
+    var currentTime = Date()
+
     var postModel: PostModel! {
         didSet {
             jobTitleLabel.text = postModel.title
@@ -179,9 +180,21 @@ class FeedsTVCell: UITableViewCell {
             jobBudget.text = postModel.budget
             jobLocation.text = postModel.location
             dataArray = postModel.requiredSkills
-            jobPostTimeTrackerLabel.text = postModel.dateTime
+            
+     
+            jobPostTimeTrackerLabel.text = calculateTimeFrame(initialTime: postModel.dateTime)
         }
     }
+    
+//    func calculateTimeFrame(initialTime: String) -> String {
+//        guard let start = PostFormVC.dateFormatter.date(from: initialTime) else { return }
+//        guard let end = PostFormVC.dateFormatter.date(from: PostFormVC.dateFormatter.string(from: Date())) else { return }
+//
+//        let relativeDateTime = RelativeDateTimeFormatter()
+//        relativeDateTime.unitsStyle = .full
+//        let timeFrame = relativeDateTime.localizedString(for: start, relativeTo: end)
+//        return timeFrame
+//    }
     
     // MARK: - Inits
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {

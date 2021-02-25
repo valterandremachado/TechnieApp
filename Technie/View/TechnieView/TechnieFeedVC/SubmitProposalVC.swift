@@ -126,20 +126,49 @@ class SubmitProposalVC: UIViewController, UITextViewDelegate {
 
     @objc fileprivate func proposalBtnPressed() {
         guard let coverLetter = coverLetterTextField.text else { return }
+        guard !coverLetter.replacingOccurrences(of: " ", with: "").isEmpty else { return}
         numberOfProposals += 1
 
         let updateElement = [
                 "numberOfProposals": numberOfProposals,
-                "proposals": [[
-                    "technicianEmail": "email",
-                    "coverLetter": coverLetter
-                ]]
         ] as [String : Any] //as? [AnyHashable: Any]
        
 
         let childPath = "posts/\(postID)"
         database.child(childPath).updateChildValues(updateElement, withCompletionBlock: { error, _ in
+            self.database.child("\(childPath)/proposals").observeSingleEvent(of: .value, with: { snapshot in
+                
+                if var usersCollection = snapshot.value as? [[String: Any]] {
+                    // append to user dictionary
+                    let newElement = [
+                            [
+                                "technicianEmail": "email",
+                                "coverLetter": coverLetter
+                            ]
+                    ]
+                    
+                    usersCollection.append(contentsOf: newElement)
+                    self.database.child("\(childPath)/proposals").setValue(usersCollection, withCompletionBlock: { error, _ in
+                        guard error == nil else {
+                            return
+                        }
+                        
+                    })
+                } else {
+                    // create that array
+                    let newElement = [
+                            [
+                                "technicianEmail": "email",
+                                "coverLetter": coverLetter
+                            ]
+                    ]
+                    
+                    self.database.child("\(childPath)/proposals").setValue(newElement, withCompletionBlock: { error, _ in
+                    })
+                }
+            })
         })
+        
         presentDoneSubmissionAlertSheet()
     }
     

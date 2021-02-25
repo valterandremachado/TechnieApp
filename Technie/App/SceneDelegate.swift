@@ -20,13 +20,26 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // windowScene
         guard let windowScene = (scene as? UIWindowScene) else { return }
         
-        //Main ViewController
-        let mainVC = ClientTabController()
+        let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo")
+        
+        var userPersistedEmail = ""
+        if let info = getUsersPersistedInfo {
+            userPersistedEmail = info.first!.email
+        }
         
         // Window setup
         window = UIWindow(frame: windowScene.coordinateSpace.bounds)
         window?.windowScene = windowScene
-        window?.rootViewController = mainVC//UINavigationController(rootViewController: mainVC)
+        //Main ViewController
+        if userPersistedEmail == "client@hotmail.com" {
+            let mainVC = ClientTabController()
+            window?.rootViewController = mainVC//UINavigationController(rootViewController: mainVC)
+
+        } else if userPersistedEmail == "technician2@gmail.com" {
+            let mainVC = TechnieTabController()
+            window?.rootViewController = mainVC//UINavigationController(rootViewController: mainVC)
+        }
+//        window?.rootViewController = mainVC//UINavigationController(rootViewController: mainVC)
         
         // Window visibility
         window?.makeKeyAndVisible()

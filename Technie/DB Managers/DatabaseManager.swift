@@ -330,7 +330,7 @@ extension DatabaseManager {
 //        })
 //    }
     
-    public func insertPostToUserDB(with postID: String, completion: @escaping (Bool) -> Void) {
+    public func insertPostToUserDB2(with postID: String, completion: @escaping (Bool) -> Void) {
         database.child("users/clients").observeSingleEvent(of: .value, with: { [weak self] snapshot in
             guard let strongSelf = self else {
                 return
@@ -392,6 +392,73 @@ extension DatabaseManager {
                            return // Get out of the loop once the right much is found
                         }
                     }
+                }
+            }
+        })
+    }
+    
+    public func insertPostToUserDB(with postID: String, completion: @escaping (Bool) -> Void) {
+        database.child("users/clients").observeSingleEvent(of: .value, with: { [weak self] snapshot in
+            guard let strongSelf = self else { return }
+            
+            guard let postsCollection = snapshot.value as? [String: Any] else {
+                completion(false)
+                return
+            }
+            
+            let uidKeys = ["PNayVUR9AyTwQqqHn0T9oanJwd72", "RNVQZwqbXIcakB1LJjUwNEO1BG22", "SEQ0IMTLF4YZMXtjwR7AkiuypSg1", "nSOieQCUcWQZQlTMRk6LKYGYyO02"]
+            let randoUIDkey = uidKeys.randomElement() ?? "nil"
+            
+            for (key, _) in postsCollection {
+                print("randomKey: \(randoUIDkey), key: \(key)")
+                if key == randoUIDkey {
+                    print("InsideRandomKey: \(randoUIDkey), insideKey: \(key)")
+                    
+                    strongSelf.database.child("users/clients/\(key)/servicePosts").observeSingleEvent(of: .value, with: { snapshot in
+                        
+                        if var usersCollection = snapshot.value as? [[String: Any]] {
+                            // append to user dictionary
+                            let newElement = [
+                                "postID": postID,
+                            ]
+                            
+                            usersCollection.append(newElement)
+                            strongSelf.database.child("users/clients/\(key)/servicePosts").setValue(usersCollection, withCompletionBlock: { error, _ in
+                                guard error == nil else {
+                                    completion(false)
+                                    return
+                                }
+                                
+                                completion(true)
+                            })
+                        } else {
+                            // create that array
+                            let newCollection: [[String: Any]] = [
+                                [
+                                    "postID": postID,
+                                ]
+                            ]
+                            
+                            strongSelf.database.child("users/clients/\(key)/servicePosts").setValue(newCollection, withCompletionBlock: { error, _ in
+                                guard error == nil else {
+                                    completion(false)
+                                    return
+                                }
+                                
+                                completion(true)
+                            })
+                        }
+                    })
+//                    Database.database().reference().child("users/clients/\(key)").observeSingleEvent(of: .value, with: { snapshot in
+//                        guard let value = snapshot.value else { return }
+////                        do {
+////                            let model = try FirebaseDecoder().decode(ClientModel.self, from: value)
+////                            print("email: \(model.profileInfo.email)")
+////                            completion(true)
+////                        } catch let error {
+////                            print(error)
+////                        }
+//                    })
                 }
             }
         })
@@ -473,6 +540,66 @@ extension DatabaseManager {
         })
     }
     
+    public func insertClient(with clientUser: ClientModel, with UID: String, firstName: String, lastName: String, completion: @escaping (Bool) -> Void) {
+        let data = try! FirebaseEncoder().encode(clientUser)
+        
+        var safeEmail: String {
+            var safeEmail = clientUser.profileInfo.email.replacingOccurrences(of: ".", with: "-")
+            safeEmail = safeEmail.replacingOccurrences(of: "@", with: "-")
+            return safeEmail
+        }
+        
+        database.child(safeEmail).setValue([
+            "first_name": firstName,
+            "last_name": lastName
+        ], withCompletionBlock: { [weak self] error, _ in
+            guard let strongSelf = self else {
+                return
+            }
+            
+            let db = strongSelf.database.child("users/clients")
+            let dbPostID = db.child(UID)
+            dbPostID.setValue(data, withCompletionBlock: { error, _ in
+                guard error == nil else {
+                    completion(false)
+                    return
+                }
+                
+                completion(true)
+            })
+        })
+    }
+   
+    public func insertTechnician(with technicainUser: TechnicianModel, with UID: String, firstName: String, lastName: String, completion: @escaping (Bool) -> Void) {
+        let data = try! FirebaseEncoder().encode(technicainUser)
+        
+        var safeEmail: String {
+            var safeEmail = technicainUser.profileInfo.email.replacingOccurrences(of: ".", with: "-")
+            safeEmail = safeEmail.replacingOccurrences(of: "@", with: "-")
+            return safeEmail
+        }
+        
+        database.child(safeEmail).setValue([
+            "first_name": firstName,
+            "last_name": lastName
+        ], withCompletionBlock: { [weak self] error, _ in
+            guard let strongSelf = self else {
+                return
+            }
+            
+            let db = strongSelf.database.child("users/technicians")
+            let dbPostID = db.child(UID)
+            dbPostID.setValue(data, withCompletionBlock: { error, _ in
+                guard error == nil else {
+                    completion(false)
+                    return
+                }
+                
+                completion(true)
+            })
+        })
+    }
+    
     /// Gets all posts from database
     public func getAllPosts(completion: @escaping (Result<PostModel, Error>) -> Void) {
         database.child("posts").observeSingleEvent(of: .value, with: { snapshot in
@@ -481,11 +608,14 @@ extension DatabaseManager {
                 return
             }
             
-            for (keys, _) in postsCollection {
-                Database.database().reference().child("posts/\(keys)").observeSingleEvent(of: .value, with: { snapshot in
+            var posts = [PostModel]()
+
+            for (key, _) in postsCollection {
+                Database.database().reference().child("posts/\(key)").observeSingleEvent(of: .value, with: { snapshot in
                     guard let value = snapshot.value else { return }
                     do {
                         let model = try FirebaseDecoder().decode(PostModel.self, from: value)
+//                        posts.append(model)
                         completion(.success(model))
                     } catch let error {
                         print(error)
@@ -495,22 +625,80 @@ extension DatabaseManager {
         })
     }
     
-    /// Gets all posts from database
+    public func listenToPostChanges(completion: @escaping (Result<[PostModel], Error>) -> Void) {
+        Database.database().reference().child("posts").observeSingleEvent(of: .childChanged, with: { [self] snapshot in
+            guard let postsCollection = snapshot.value as? [String: Any] else {
+                completion(.failure(DatabaseError.failedToFetch))
+                return
+            }
+//            print("postsCollection: \(postsCollection)")
+            var updatedPosts = [PostModel]()
+            
+            database.child("posts").observeSingleEvent(of: .value, with: { snapshot in
+                guard let postsCollection = snapshot.value as? [String: Any] else {
+                    completion(.failure(DatabaseError.failedToFetch))
+                    return
+                }
+                
+                for (key, _) in postsCollection {
+                    Database.database().reference().child("posts/\(key)").observeSingleEvent(of: .value, with: { snapshot in
+                        guard let value = snapshot.value else { return }
+                        do {
+                            let model = try FirebaseDecoder().decode(PostModel.self, from: value)
+//                            print("model: \(model)")
+                            updatedPosts.append(model)
+                            completion(.success(updatedPosts))
+                        } catch let error {
+                            print(error)
+                        }
+                    })
+                }
+            })
+        })
+    }
+    
+    /// Gets all clients from database
     public func getAllClients(completion: @escaping (Result<ClientModel, Error>) -> Void) {
         database.child("users/clients").observeSingleEvent(of: .value, with: { snapshot in
-            guard let postsCollection = snapshot.value as? [[String: Any]] else {
+            guard let postsCollection = snapshot.value as? [String: Any] else {
+                completion(.failure(DatabaseError.failedToFetch))
+                return
+            }
+
+            for (key, _) in postsCollection {
+                Database.database().reference().child("users/clients/\(key)").observeSingleEvent(of: .value, with: { snapshot in
+                    guard let value = snapshot.value else { return }
+                    do {
+                        let model = try FirebaseDecoder().decode(ClientModel.self, from: value)
+                        print("email: \(model.profileInfo.email)")
+                        completion(.success(model))
+                    } catch let error {
+                        print(error)
+                    }
+                })
+            }
+        })
+    }
+    
+    /// Gets all technician from database
+    public func getAllTechnicians(completion: @escaping (Result<TechnicianModel, Error>) -> Void) {
+        database.child("users/technicians").observeSingleEvent(of: .value, with: { snapshot in
+            guard let postsCollection = snapshot.value as? [String: Any] else {
                 completion(.failure(DatabaseError.failedToFetch))
                 return
             }
             
-            for post in postsCollection {
-                do {
-                    let model = try FirebaseDecoder().decode(ClientModel.self, from: post)
-                    print("email: \(model.profileInfo.email)")
-                    completion(.success(model))
-                } catch let error {
-                    print(error)
-                }
+            for (key, _) in postsCollection {
+                Database.database().reference().child("users/technicians/\(key)").observeSingleEvent(of: .value, with: { snapshot in
+                    guard let value = snapshot.value else { return }
+                    do {
+                        let model = try FirebaseDecoder().decode(TechnicianModel.self, from: value)
+//                        print("email: \(model.profileInfo.email)")
+                        completion(.success(model))
+                    } catch let error {
+                        print(error)
+                    }
+                })
             }
         })
     }
@@ -624,15 +812,24 @@ extension DatabaseManager {
     /// Creates a new conversation with target user emamil and first message sent
     public func createNewConversation(with otherUserEmail: String, name: String, firstMessage: Message, completion: @escaping (Bool) -> Void) {
         
-        guard let currentEmail = UserDefaults.standard.value(forKey: "email") as? String,
-        let currentNamme = UserDefaults.standard.value(forKey: "name") as? String else {
-            return
+        let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo")
+        
+        var userPersistedEmail = ""
+        var userPersistedName = ""
+        if let info = getUsersPersistedInfo {
+            userPersistedEmail = info.first!.email
+            userPersistedName = info.first!.name
         }
+        
+//        guard let currentEmail = UserDefaults.standard.value(forKey: "email") as? String,
+//        let currentNamme = UserDefaults.standard.value(forKey: "name") as? String else {
+//            return
+//        }
 //        let currentNamme = "pjW9o46h98axzoNsQyyohi2J2XN2"
 //        print("currentNamme: "+currentNamme)
 //        print("currentEmail: "+currentEmail)
 
-        let safeEmail = DatabaseManager.safeEmail(emailAddress: currentEmail)
+        let safeEmail = DatabaseManager.safeEmail(emailAddress: userPersistedEmail)
 
         let ref = database.child("\(safeEmail)")
 
@@ -687,7 +884,7 @@ extension DatabaseManager {
             let recipient_newConversationData: [String: Any] = [
                 "id": conversationId,
                 "other_user_email": safeEmail,
-                "name": currentNamme, //recipientName
+                "name": userPersistedName, //recipientName
                 "latest_message": [
                     "date": dateString,
                     "message": message,
@@ -784,13 +981,20 @@ extension DatabaseManager {
         case .linkPreview(_):
             break
         }
-
-        guard let myEmmail = UserDefaults.standard.value(forKey: "email") as? String else {
-            completion(false)
-            return
+        
+        let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo")
+        
+        var userPersistedEmail = ""
+        if let info = getUsersPersistedInfo {
+            userPersistedEmail = info.first!.email
         }
 
-        let currentUserEmail = DatabaseManager.safeEmail(emailAddress: myEmmail)
+//        guard let myEmmail = UserDefaults.standard.value(forKey: "email") as? String else {
+//            completion(false)
+//            return
+//        }
+
+        let currentUserEmail = DatabaseManager.safeEmail(emailAddress: userPersistedEmail)
 
         let collectionMessage: [String: Any] = [
             "id": firstMessage.messageId,
@@ -937,10 +1141,19 @@ extension DatabaseManager {
         // update sender latest message
         // update recipient latest message
 
-        guard let myEmail = UserDefaults.standard.value(forKey: "email") as? String else {
-            completion(false)
-            return
+        let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo")
+        
+        var myEmail = ""
+//        var userPersistedName = ""
+        if let info = getUsersPersistedInfo {
+            myEmail = info.first!.email
+//            userPersistedName = info.first!.name
         }
+        
+//        guard let myEmail = UserDefaults.standard.value(forKey: "email") as? String else {
+//            completion(false)
+//            return
+//        }
 
         let currentEmail = DatabaseManager.safeEmail(emailAddress: myEmail)
 
@@ -989,12 +1202,19 @@ extension DatabaseManager {
                 break
             }
 
-            guard let myEmmail = UserDefaults.standard.value(forKey: "email") as? String else {
-                completion(false)
-                return
+            let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo")
+            
+            var userPersistedEmail = ""
+            if let info = getUsersPersistedInfo {
+                userPersistedEmail = info.first!.email
             }
+            
+//            guard let myEmmail = UserDefaults.standard.value(forKey: "email") as? String else {
+//                completion(false)
+//                return
+//            }
 
-            let currentUserEmail = DatabaseManager.safeEmail(emailAddress: myEmmail)
+            let currentUserEmail = DatabaseManager.safeEmail(emailAddress: userPersistedEmail)
 
             let newMessageEntry: [String: Any] = [
                 "id": newMessage.messageId,
@@ -1141,10 +1361,17 @@ extension DatabaseManager {
     }
 
     public func deleteConversation(conversationId: String, completion: @escaping (Bool) -> Void) {
-        guard let email = UserDefaults.standard.value(forKey: "email") as? String else {
-            return
+//        guard let email = UserDefaults.standard.value(forKey: "email") as? String else {
+//            return
+//        }
+        let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo")
+        
+        var userPersistedEmail = ""
+        if let info = getUsersPersistedInfo {
+            userPersistedEmail = info.first!.email
         }
-        let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
+        
+        let safeEmail = DatabaseManager.safeEmail(emailAddress: userPersistedEmail)
 
         print("Deleting conversation with id: \(conversationId)")
 
@@ -1180,10 +1407,19 @@ extension DatabaseManager {
 
     public func conversationExists(with targetRecipientEmail: String, completion: @escaping (Result<String, Error>) -> Void) {
         let safeRecipientEmail = DatabaseManager.safeEmail(emailAddress: targetRecipientEmail)
-        guard let senderEmail = UserDefaults.standard.value(forKey: "email") as? String else {
-            return
+        let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo")
+        
+        var userPersistedEmail = ""
+//        var userPersistedName = ""
+        if let info = getUsersPersistedInfo {
+            userPersistedEmail = info.first!.email
+//            userPersistedName = info.first!.name
         }
-        let safeSenderEmail = DatabaseManager.safeEmail(emailAddress: senderEmail)
+//        print("email: \(userPersistedEmail)")
+//        guard let senderEmail = UserDefaults.standard.value(forKey: "email") as? String else {
+//            return
+//        }
+        let safeSenderEmail = DatabaseManager.safeEmail(emailAddress: userPersistedEmail)
 
         database.child("\(safeRecipientEmail)/conversations").observeSingleEvent(of: .value, with: { snapshot in
             guard let collection = snapshot.value as? [[String: Any]] else {
@@ -1233,7 +1469,7 @@ struct ChatAppUser {
 }
 
 struct TechnicianUserModel {
-//    let id: String
+    let id: String
     let firstName: String
     let middleName: String
     let lastName: String
@@ -1244,6 +1480,7 @@ struct TechnicianUserModel {
     let skills: [String]
     let accountType: String
     let hourlyRate: Float
+    let membershipDate: String
 
     let numberOfCompletedServices: Int
     let numberOfActiveServices: Int
@@ -1267,7 +1504,7 @@ struct TechnicianUserModel {
 }
 
 struct ClientUserModel: Codable {
-//    let id: String
+    let id: String
     let firstName: String
     let middleName: String
     let lastName: String
@@ -1276,7 +1513,7 @@ struct ClientUserModel: Codable {
     let numberOfPosts: Int
     let numberOfActivePosts: Int
     let numberOfInactivePosts: Int
-    
+    let membershipDate: String
 //    posts[],
 //    notifications[],
 //    chats[]
@@ -1297,22 +1534,60 @@ struct ClientModel: Codable {
     let numberOfActivePosts: Int
     let numberOfInactivePosts: Int
     let numberOfPosts: Int
-    let profileInfo: ProfileInfo
+    let profileInfo: ClientProfileInfo
     let servicePosts: [ServicePosts]?
+//    posts[],
+//    notifications[],
+//    chats[]
 }
 
-struct ProfileInfo: Codable {
+struct ClientProfileInfo: Codable {
+    let id: String
     let email: String
+//    let profileImage: String
+//    let coverImage: String
     let location: String
     let name: String
+    let membershipDate: String
 }
 
 struct ServicePosts: Codable {
     let postID: String
 }
 
+struct TechnicianModel: Codable {
+    
+    let numberOfCompletedServices: Int
+    let numberOfActiveServices: Int
+    let numberOfPreviousServices: Int
+    let technieRank: Int
+    let profileInfo: TechnicianProfileInfo
+
+//    clientsSatisfaction[],
+//    notifications[],
+//    chats[]
+}
+
+struct TechnicianProfileInfo: Codable {
+    let id: String
+    let name: String
+    let email: String
+//    let profileImage: String
+//    let coverImage: String
+    let location: String
+    let profileSummary: String
+    let experience: String //Int?
+    let accountType: String
+    let hourlyRate: Int
+    let skills: [String]
+    let membershipDate: String
+}
 
 struct PostModel: Codable {
+//    static func == (lhs: PostModel, rhs: PostModel) -> Bool {
+//        return true
+//    }
+    
     let id: String?
     let title: String
     let description: String
@@ -1330,7 +1605,10 @@ struct PostModel: Codable {
     let field: String?
     let hiringStatus: HiringStatus?
     let proposals: [Proposals]?
-
+    
+//    func hash(into hasher: inout Hasher) {
+//        hasher.combine(id)
+//    }
 }
 
 struct HiringStatus: Codable {

@@ -26,6 +26,7 @@
 		8A41E7AB25B07AD900265D5C /* PreviousJobsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A41E7AA25B07AD900265D5C /* PreviousJobsCell.swift */; };
 		8A41E7B725B07D6C00265D5C /* TechineProfileTVCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A41E7B625B07D6C00265D5C /* TechineProfileTVCell.swift */; };
 		8A41E7BC25B07F1D00265D5C /* TechnieProfileTVOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A41E7BB25B07F1D00265D5C /* TechnieProfileTVOptions.swift */; };
+		8A4288C825E7F25700091020 /* UserPersistedInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A4288C725E7F25600091020 /* UserPersistedInfo.swift */; };
 		8A4B746525C6D7E40051619C /* SubmitProposalVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A4B746425C6D7E40051619C /* SubmitProposalVC.swift */; };
 		8A4B746A25C6DBAB0051619C /* SubmitProposalCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A4B746925C6DBAB0051619C /* SubmitProposalCell.swift */; };
 		8A54D19425CBE19100045D37 /* CustomSegmentedControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A54D19325CBE19100045D37 /* CustomSegmentedControl.swift */; };
@@ -181,6 +182,7 @@
 		8A41E7AA25B07AD900265D5C /* PreviousJobsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviousJobsCell.swift; sourceTree = "<group>"; };
 		8A41E7B625B07D6C00265D5C /* TechineProfileTVCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechineProfileTVCell.swift; sourceTree = "<group>"; };
 		8A41E7BB25B07F1D00265D5C /* TechnieProfileTVOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnieProfileTVOptions.swift; sourceTree = "<group>"; };
+		8A4288C725E7F25600091020 /* UserPersistedInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPersistedInfo.swift; sourceTree = "<group>"; };
 		8A4B746425C6D7E40051619C /* SubmitProposalVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubmitProposalVC.swift; sourceTree = "<group>"; };
 		8A4B746925C6DBAB0051619C /* SubmitProposalCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubmitProposalCell.swift; sourceTree = "<group>"; };
 		8A54D19325CBE19100045D37 /* CustomSegmentedControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomSegmentedControl.swift; sourceTree = "<group>"; };
@@ -359,6 +361,14 @@
 				8A630B1F25E52FCA00733475 /* TechnieStatsCell.swift */,
 			);
 			path = Cells;
+			sourceTree = "<group>";
+		};
+		8A4288C625E7F1FF00091020 /* UsersDefaults */ = {
+			isa = PBXGroup;
+			children = (
+				8A4288C725E7F25600091020 /* UserPersistedInfo.swift */,
+			);
+			path = UsersDefaults;
 			sourceTree = "<group>";
 		};
 		8A54D19B25CBEB5900045D37 /* TechnicianProfileDetailsVC */ = {
@@ -582,6 +592,7 @@
 				8A73943A25C6CE7600060075 /* ChatModel */,
 				8AE258A1258A30AD004EDB26 /* TechnieModel */,
 				8AE2589D258A3074004EDB26 /* ClientModel */,
+				8A4288C625E7F1FF00091020 /* UsersDefaults */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -1121,6 +1132,7 @@
 				8AF76A8E258B671500ED14C2 /* HeaderView.swift in Sources */,
 				8AAE554F25DC08FE003AB202 /* ClientPostHistoryVC.swift in Sources */,
 				8ACD6AF325C438B200CC057D /* PhotoCollectionViewerCell.swift in Sources */,
+				8A4288C825E7F25700091020 /* UserPersistedInfo.swift in Sources */,
 				8A13FDDE25DE3AD20034945D /* TechnieGeneralVC.swift in Sources */,
 				8A68A56625B705BA000D988F /* StorageManager.swift in Sources */,
 				8AE4098125AF011200A29453 /* TechnieServiceVC.swift in Sources */,

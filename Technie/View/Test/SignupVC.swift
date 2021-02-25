@@ -12,6 +12,9 @@ import Firebase
 
 class SignupVC: UIViewController {
     
+    fileprivate var defaults = UserDefaults.standard
+    var persistUsersInfo = [UserPersistedInfo]()
+    
     // MARK: - UserAuthViewModel
     let imageBackground = UIImage(named: "balance.jpg")
     
@@ -536,37 +539,43 @@ extension SignupVC: UIImagePickerControllerDelegate, UINavigationControllerDeleg
                     let randomNumberExp = Int.random(in: 0...20)
                     let randomNumberForPreviousServices = Int.random(in: 0...500)
                     let randomNumberForTechnieRank = Int.random(in: 0...500)
+                    let randomHourlyRate = Int.random(in: 200...800)
+                    
 
-                    
-                    let clientUser = ClientUserModel(firstName: firstName,
-                                                     middleName: middleName,
-                                                     lastName: lastName,
-                                                     emailAddress: email,
-                                                     location: location,
-                                                     numberOfPosts: randomNumberForPosts,
-                                                     numberOfActivePosts: randomNumberForActivePosts,
-                                                     numberOfInactivePosts: randomNumberForInactivePosts)
-                    
-                    let technicianUser = TechnicianUserModel(firstName: firstName,
-                                                             middleName: middleName,
-                                                             lastName: lastName,
-                                                             emailAddress: email,
-                                                             location: location,
-                                                             profileSummary: "I am this and that",
-                                                             experience: "\(randomNumberExp)",
-                                                             skills: ["Plumber", "Handyman"],
-                                                             accountType: "personal",
-                                                             hourlyRate: 150,
-                                                             numberOfCompletedServices: randomNumberForCompletedServices,
-                                                             numberOfActiveServices: randomNumberForActiveServices,
-                                                             numberOfPreviousServices: randomNumberForPreviousServices,
-                                                             technieRank: randomNumberForTechnieRank)
-                    
                     guard let uid = result?.user.uid else { return }
 
-                   
+                    let dateString = PostFormVC.dateFormatter.string(from: Date())
+//                    let autoUID = "\(email)_\(uid)"
+                    let clientProfileInfo = ClientProfileInfo(id: uid,
+                                                              email: email,
+                                                              location: location,
+                                                              name: "\(firstName) "+lastName,
+                                                              membershipDate: dateString)
+                    
+                    let client = ClientModel(numberOfActivePosts: randomNumberForActivePosts,
+                                             numberOfInactivePosts: randomNumberForInactivePosts,
+                                             numberOfPosts: randomNumberForPosts,
+                                             profileInfo: clientProfileInfo,
+                                             servicePosts: nil)
+                    
+                    let technicianProfileInfo = TechnicianProfileInfo(id: uid,
+                                                                      name: "\(firstName) "+lastName,
+                                                                      email: email,
+                                                                      location: location,
+                                                                      profileSummary: "I am this and that",
+                                                                      experience: "\(randomNumberExp)",
+                                                                      accountType: "Personal",
+                                                                      hourlyRate: randomHourlyRate,
+                                                                      skills: ["Plumber", "Handyman"],
+                                                                      membershipDate: dateString)
+                    
+                    let technician = TechnicianModel(numberOfCompletedServices: randomNumberForCompletedServices,
+                                                     numberOfActiveServices: randomNumberForActiveServices,
+                                                     numberOfPreviousServices: randomNumberForPreviousServices,
+                                                     technieRank: randomNumberForTechnieRank,
+                                                     profileInfo: technicianProfileInfo)
                     if pickAccountType == 0 {
-                        DatabaseManager.shared.insertTechnicianUser(with: technicianUser, completion: { success in
+                        DatabaseManager.shared.insertTechnician(with: technician, with: uid, firstName: firstName, lastName: lastName, completion: { success in
                             if success {
                             }
                         })
@@ -574,21 +583,28 @@ extension SignupVC: UIImagePickerControllerDelegate, UINavigationControllerDeleg
 //                        let vc = TechnieTabController()
 //                        (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootViewController(vc)
                     } else {
-                        DatabaseManager.shared.insertClientUser(with: clientUser, completion: { success in
+                        DatabaseManager.shared.insertClient(with: client, with: uid, firstName: firstName, lastName: lastName, completion: { success in
                             if success {
-    //                            let data = selectedImage
-    //                            let filename = user.profilePictureFileName
-    //                            StorageManager.shared.uploadProfilePicture(with: data, fileName: filename, completion: { result in
-    //                                switch result {
-    //                                case .success(let downloadUrl):
-    ////                                    UserDefaults.standard.set(downloadUrl, forKey: "profile_picture_url")
-    //                                    print(downloadUrl)
-    //                                case .failure(let error):
-    //                                    print("Storage maanger error: \(error)")
-    //                                }
-    //                            })
+                                print("success")
+                            } else {
+                                print("failed")
                             }
                         })
+//                        DatabaseManager.shared.insertClientUser(with: clientUser, completion: { success in
+//                            if success {
+//    //                            let data = selectedImage
+//    //                            let filename = user.profilePictureFileName
+//    //                            StorageManager.shared.uploadProfilePicture(with: data, fileName: filename, completion: { result in
+//    //                                switch result {
+//    //                                case .success(let downloadUrl):
+//    ////                                    UserDefaults.standard.set(downloadUrl, forKey: "profile_picture_url")
+//    //                                    print(downloadUrl)
+//    //                                case .failure(let error):
+//    //                                    print("Storage maanger error: \(error)")
+//    //                                }
+//    //                            })
+//                            }
+//                        })
                         
 //                        let vc = ClientTabController()
 //                        (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootViewController(vc)

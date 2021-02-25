@@ -18,6 +18,7 @@ class LoginVC: UIViewController {
     // UserAuthViewModel
     
     fileprivate var defaults = UserDefaults.standard
+    var persistUsersInfo = [UserPersistedInfo]()
     
     let imageBackground = UIImage(named: "balance.jpg")
     let logo = UIImage(named: "guidetech-06.png")
@@ -339,79 +340,120 @@ class LoginVC: UIViewController {
         //        else { return }
         
         // SignIn user
-        //        Auth.auth().signIn(withEmail: emailTxtFld.text!, password: passwordTxtFld.text!) { (result, error) in
-        //            if error != nil {
-        //                print("ERROR: " + error!.localizedDescription)
-        //                return
-        //            }
-        //
-        //            guard let uid = result?.user.uid else { return }
-        
-        
-        if pickAccountType == 0 {
-//            let vc = TechnieTabController()
-//            (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootViewController(vc)
+        Auth.auth().signIn(withEmail: emailTxtFld.text!, password: passwordTxtFld.text!) { [self] (result, error) in
+            if error != nil {
+                print("ERROR: " + error!.localizedDescription)
+                return
+            }
             
-        } else {
-
-            DatabaseManager.shared.getAllClients(completion: { result in
-                switch result {
-                case .success(let users):
-//                    posts = postsCollection
-                    print("success: \(users)")
-//                    print("budget: \(posts.budget)")
-
-//                        if keys == "-MU8vTecV1Bid3Lt_WWR" {
-//                            print("INSIDE KEY: \(keys)")
-//
-//                        database.child("posts/\(keys)").observeSingleEvent(of: .value, with: { [weak self] snapshot in
-//                            let newElement = [
-//                                "title": "post.title",
-//                            ] //as [String : Any]
-//                            let childPath = "posts/\(keys)"
-//                            database.child(childPath).updateChildValues(newElement, withCompletionBlock: { error, _ in
-//
-//                            })
-//                        })
-//                    }
-
-
-//                    DatabaseManager.shared.getUserPosts(completion: { result in
-//                        switch result {
-//                        case .success(let userPostsCollection):
-//                            //                        print("success: \(userPostsCollection)")
-//                            for post in userPostsCollection {
-//                                for (_ , value) in post {
-//                                    let userPost = posts["\(value)"] as! [String: Any]
-//                                    print("THIS: \(userPost), \(value)")
-//                                    userPosts.append(userPost)
-//                                }
-//                            }
-//                            print("userPosts: \(userPosts)")
-//                        case .failure(let error):
-//                            print("Failed to get posts: \(error.localizedDescription)")
-//                        }
-//                    })
-
-                case .failure(let error):
-                    print("Failed to get usertest1234567s: \(error.localizedDescription)")
-                }
-            })
+            guard let uid = result?.user.uid else { return }
+            guard let user = result?.user else { return }
             
-//            DatabaseManager.shared.insertPost(with: <#PostModel#>, completion: { success in
-//                if success {
-//                    print("success")
-//                } else {
-//                    print("failed")
-//                }
-//            })
-            
-//            let vc = ClientTabController()
-//            (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootViewController(vc)
+            if pickAccountType == 0 {
+                DatabaseManager.shared.getAllTechnicians(completion: { result in
+                    switch result {
+                    case .success(let users):
+                        if uid == users.profileInfo.id {
+                            self.persistData(withEmail: user.email, withName: users.profileInfo.name, withLocation: users.profileInfo.location)
+                            
+                            let vc = TechnieTabController()
+                            (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootViewController(vc)
+                        }
+                    case .failure(let error):
+                        print("Failed to get all technicians: \(error.localizedDescription)")
+                    }
+                })
+                
+                
+            } else {
+                
+                DatabaseManager.shared.getAllClients(completion: { result in
+                    switch result {
+                    case .success(let users):
+                        //                    posts = postsCollection
+                        //                    print("success: \(users)")
+                        //                    print("budget: \(posts.budget)")
+                        
+                        if uid == users.profileInfo.id {
+                            self.persistData(withEmail: user.email, withName: users.profileInfo.name, withLocation: users.profileInfo.location)
+                            
+                            let vc = ClientTabController()
+                            (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootViewController(vc)
+                        }
+                    //                        if keys == "-MU8vTecV1Bid3Lt_WWR" {
+                    //                            print("INSIDE KEY: \(keys)")
+                    //
+                    //                        database.child("posts/\(keys)").observeSingleEvent(of: .value, with: { [weak self] snapshot in
+                    //                            let newElement = [
+                    //                                "title": "post.title",
+                    //                            ] //as [String : Any]
+                    //                            let childPath = "posts/\(keys)"
+                    //                            database.child(childPath).updateChildValues(newElement, withCompletionBlock: { error, _ in
+                    //
+                    //                            })
+                    //                        })
+                    //                    }
+                    
+                    
+                    //                    DatabaseManager.shared.getUserPosts(completion: { result in
+                    //                        switch result {
+                    //                        case .success(let userPostsCollection):
+                    //                            //                        print("success: \(userPostsCollection)")
+                    //                            for post in userPostsCollection {
+                    //                                for (_ , value) in post {
+                    //                                    let userPost = posts["\(value)"] as! [String: Any]
+                    //                                    print("THIS: \(userPost), \(value)")
+                    //                                    userPosts.append(userPost)
+                    //                                }
+                    //                            }
+                    //                            print("userPosts: \(userPosts)")
+                    //                        case .failure(let error):
+                    //                            print("Failed to get posts: \(error.localizedDescription)")
+                    //                        }
+                    //                    })
+                    
+                    case .failure(let error):
+                        print("Failed to get all technicians: \(error.localizedDescription)")
+                    }
+                })
+                
+                //            DatabaseManager.shared.insertPost(with: <#PostModel#>, completion: { success in
+                //                if success {
+                //                    print("success")
+                //                } else {
+                //                    print("failed")
+                //                }
+                //            })
+                
+                //            let vc = ClientTabController()
+                //            (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootViewController(vc)
+            }
         }
-        //        }
         
         
+    }
+    
+    private func persistData(withEmail email: String?, withName name: String?, withLocation location: String?) {
+        guard let name = name,
+              let email = email ,
+              let location = location
+        else { return }
+        
+        let newItem = UserPersistedInfo(name: name,
+                                        email: email,
+                                        location: location,
+                                        accountType: nil,
+                                        locationInLongLat: nil,
+                                        profileImage: nil)
+        
+        if email != self.persistUsersInfo.first?.email {
+            self.persistUsersInfo.append(newItem)
+            print("data persisted: \(self.persistUsersInfo)")
+        } else {
+            print("existing Name")
+        }
+        
+        self.defaults.set(object: self.persistUsersInfo, forKey: "persistUsersInfo")
     }
     
 
@@ -423,3 +465,4 @@ class LoginVC: UIViewController {
         
     }
 }
+

@@ -91,18 +91,25 @@ class JobDetailsVC: UIViewController {
         return toolBar
     }()
     
-    lazy var navBarTitleStackView: UIStackView = {
-        let titleLbl = UILabel()
-        titleLbl.font = .boldSystemFont(ofSize: 16)
-        titleLbl.textAlignment = .center
-        titleLbl.text = "Job Details"
-        
+    var navBarViewSubtitleLbl: UILabel = {
         let subtitleLbl = UILabel()
         subtitleLbl.textColor = .systemGray
         subtitleLbl.textAlignment = .center
         subtitleLbl.text = "Posted 3 hours ago"
         subtitleLbl.font = .systemFont(ofSize: 12)
-        let stack = UIStackView(arrangedSubviews: [titleLbl, subtitleLbl])
+        return subtitleLbl
+    }()
+    
+    var navBarViewTitleLbl: UILabel = {
+        let titleLbl = UILabel()
+        titleLbl.font = .boldSystemFont(ofSize: 16)
+        titleLbl.textAlignment = .center
+        titleLbl.text = "Job Details"
+        return titleLbl
+    }()
+    
+    lazy var navBarTitleStackView: UIStackView = {
+        let stack = UIStackView(arrangedSubviews: [navBarViewTitleLbl, navBarViewSubtitleLbl])
         stack.axis = .vertical
         stack.spacing = -1
 //        stack.addBackground(color: .red)
@@ -266,7 +273,7 @@ extension JobDetailsVC: TableViewDataSourceAndDelegate {
             let cell = tableView.dequeueReusableCell(withIdentifier: JobDetailTVCell2.cellID, for: indexPath) as! JobDetailTVCell2
             cell.setupViews()
             cell.jobBudget.text = postModel.budget
-//            cell.jobField.text = postModel.title
+            cell.jobField.text = postModel.field
             cell.jobBudget.font = .boldSystemFont(ofSize: 16)
             cell.jobField.font = .boldSystemFont(ofSize: 16)
             return cell
@@ -278,9 +285,12 @@ extension JobDetailsVC: TableViewDataSourceAndDelegate {
             return cell
         case 4:
             let cell = tableView.dequeueReusableCell(withIdentifier: JobDetailTVCell31.cellID, for: indexPath) as! JobDetailTVCell31
-            cell.setupViews()
+//            cell.setupViews()
+            cell.textLabel?.text = "Attachments"
+            cell.textLabel?.font = .boldSystemFont(ofSize: 16)
+
 //            cell.attachmentLabel = postModel.attachments
-            cell.attachmentLabel.font = .boldSystemFont(ofSize: 16)
+//            cell.attachmentLabel.font = .boldSystemFont(ofSize: 16)
             return cell
         case 5:
             let cell = tableView.dequeueReusableCell(withIdentifier: JobDetailTVCell4.cellID, for: indexPath) as! JobDetailTVCell4
@@ -313,6 +323,15 @@ extension JobDetailsVC: TableViewDataSourceAndDelegate {
         }
     }
     
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        if indexPath.row == 4 {
+            let vc = PhotoCollectionViewerVC()
+            vc.convoSharedPhotoArray = postModel.attachments
+            vc.navigationItem.title = "Attachments"
+            navigationController?.pushViewController(vc, animated: true)
+        }
+    }
     
     func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
         // remove bottom extra 20px space.

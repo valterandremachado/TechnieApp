@@ -9,6 +9,7 @@ import UIKit
 
 class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelegate, UIScrollViewDelegate {
 
+    var technicianModel: TechnicianModel!
     // MARK: - Properties
     lazy var profileImageView: UIImageView = {
         var iv = UIImageView()
@@ -140,7 +141,7 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         return btn
     }()
     
-    lazy var startAChatBtn: UIButton = {
+    lazy var startChatBtn: UIButton = {
         let btn = UIButton(type: .system)
         btn.translatesAutoresizingMaskIntoConstraints = false
 //        btn.setTitle("Chat Me", for: .normal)
@@ -148,11 +149,12 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         btn.contentHorizontalAlignment = .right
 //        btn.backgroundColor = .cyan
         btn.withWidth(45)
+        btn.addTarget(self, action: #selector(startChatBtnPressed), for: .touchUpInside)
         return btn
     }()
     
     lazy var hireAndStartAChatBtnStack: UIStackView = {
-        let stack = UIStackView(arrangedSubviews: [hireBtn, startAChatBtn])
+        let stack = UIStackView(arrangedSubviews: [hireBtn, startChatBtn])
         stack.translatesAutoresizingMaskIntoConstraints = false
         stack.axis = .horizontal
         stack.spacing = 8
@@ -415,8 +417,9 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
     }
     
     fileprivate func populateSections() {
-        aboutSectionSetter.append(SectionHandler(title: "Summary", detail: ["Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus elit nisi, tempor at rhoncus id, porta tincidunt metus. Nulla dictum faucibus justo. Quisque non urna nec tortor cursus lobortis. Proin quis nunc nibh. Curabitur consequat gravida augue, vitae vestibulum sem eleifend ac. Maecenas facilisis molestie vehicula. Fusce pulvinar nisi a orci iaculis bibendum."]))
-        aboutSectionSetter.append(SectionHandler(title: "Skills", detail: ["skill", "skill", "skill", "skill", "skill"]))
+        
+        aboutSectionSetter.append(SectionHandler(title: "Summary", detail: [technicianModel.profileInfo.profileSummary]))
+        aboutSectionSetter.append(SectionHandler(title: "Skills", detail: technicianModel.profileInfo.skills))
         
         reviewsSectionSetter.append(SectionHandler(title: "Proficience", detail: [""]))
         reviewsSectionSetter.append(SectionHandler(title: "Reliability", detail: [""]))
@@ -493,17 +496,34 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
                 // Scrolls the content to the 125 offsetY
                 collectionView.setContentOffset(CGPoint(x: 0.0, y: 125), animated: true)
             }
-           
+            
         case 1:
-
-            switchableViews[currentSegmentIndex].addSubview(reviewsTableView)
-            reviewsTableView.anchor(top: switchableViews[currentSegmentIndex].topAnchor,
-                             leading: switchableViews[currentSegmentIndex].leadingAnchor,
-                             bottom: nil,
-                             trailing: switchableViews[currentSegmentIndex].trailingAnchor,
-                             padding: UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0))
-            reviewsTableView.heightAnchor.constraint(equalToConstant: reviewDynamicHeight == 0.0 ? (collectionView.frame.height) : (reviewDynamicHeight)).isActive = true
-
+            if reviewsSectionSetter[2].sectionDetail.count == 0 {
+                let noReviewsView = UIView()
+                noReviewsView.backgroundColor = .systemBackground
+                switchableViews[currentSegmentIndex].addSubview(noReviewsView)
+                noReviewsView.frame = switchableViews[currentSegmentIndex].bounds
+                switchableViews[currentSegmentIndex].layoutIfNeeded()
+                
+                let noReviewLabel = UILabel()
+                noReviewLabel.translatesAutoresizingMaskIntoConstraints = false
+                noReviewLabel.numberOfLines = 0
+                noReviewLabel.text = "This technican has no reviews yet"
+                noReviewLabel.textAlignment = .center
+                noReviewsView.addSubview(noReviewLabel)
+                NSLayoutConstraint.activate([
+                    noReviewLabel.topAnchor.constraint(equalTo: noReviewsView.topAnchor, constant: 50),
+                    noReviewLabel.centerXAnchor.constraint(equalTo: collectionView.centerXAnchor),
+                ])
+            } else {
+                switchableViews[currentSegmentIndex].addSubview(reviewsTableView)
+                reviewsTableView.anchor(top: switchableViews[currentSegmentIndex].topAnchor,
+                                        leading: switchableViews[currentSegmentIndex].leadingAnchor,
+                                        bottom: nil,
+                                        trailing: switchableViews[currentSegmentIndex].trailingAnchor,
+                                        padding: UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0))
+                reviewsTableView.heightAnchor.constraint(equalToConstant: reviewDynamicHeight == 0.0 ? (collectionView.frame.height) : (reviewDynamicHeight)).isActive = true
+            }
         default:
             break
         }
@@ -549,6 +569,42 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
                 sender.backgroundColor = .systemPink
             }
         }
+        
+    }
+    
+    @objc fileprivate func startChatBtnPressed(_ sender: UIButton) {
+        self.createNewConversation(resultEmail: technicianModel.profileInfo.email, resultName: technicianModel.profileInfo.name)
+    }
+    
+    private func createNewConversation(resultEmail: String, resultName: String) {
+        let name = resultName
+        let email = DatabaseManager.safeEmail(emailAddress: resultEmail)
+
+        // check in database if conversation with these two users exists
+        // if it does, reuse conversation id
+        // otherwise use existing code
+
+        DatabaseManager.shared.conversationExists(with: email, completion: { [weak self] result in
+            guard let strongSelf = self else {
+                return
+            }
+            switch result {
+            case .success(let convoId):
+                print("success")
+                let vc = ChatVC(with: email, id: convoId)
+                vc.isNewConvo = false
+                vc.title = name
+                vc.navigationItem.largeTitleDisplayMode = .never
+                strongSelf.navigationController?.pushViewController(vc, animated: true)
+            case .failure(let failure):
+                print("failure: \(failure)")
+                let vc = ChatVC(with: email, id: nil)
+                vc.isNewConvo = true
+                vc.title = name
+                vc.navigationItem.largeTitleDisplayMode = .never
+                strongSelf.navigationController?.pushViewController(vc, animated: true)
+            }
+        })
     }
     
 }

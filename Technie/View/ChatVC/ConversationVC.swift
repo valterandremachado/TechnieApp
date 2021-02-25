@@ -61,6 +61,8 @@ class ConversationVC: UIViewController {
         view.backgroundColor = .systemBackground
         setupViews()
         fetchConvo()
+//        UserDefaults.standard.removeObject(forKey: "email")
+//        UserDefaults.standard.removeObject(forKey: "name")
     }
     
 //    override func viewWillDisappear(_ animated: Bool) {
@@ -102,8 +104,15 @@ class ConversationVC: UIViewController {
         guard let lastMessage = messages.last else { return }
         let lastUserDefaultsMessage = UserDefaults.standard.value(forKey: "lastMessage") as? String ?? ""
 
-        let userEmail = UserDefaults.standard.value(forKey: "email") as? String ?? ""
-        let currentUserSafeEmail = DatabaseManager.safeEmail(emailAddress: userEmail)
+        let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo")
+//        print("messages: \(messages.last)")
+        var userPersistedEmail = ""
+        if let info = getUsersPersistedInfo {
+            userPersistedEmail = info.first!.email
+        }
+        
+//        let userEmail = UserDefaults.standard.value(forKey: "email") as? String ?? ""
+        let currentUserSafeEmail = DatabaseManager.safeEmail(emailAddress: userPersistedEmail)
         
         let messageType = lastMessage.kind.messageKindString
 
@@ -119,15 +128,16 @@ class ConversationVC: UIViewController {
             }
             UserDefaults.standard.setValue(latestMessage, forKey: "lastMessage")
         } else {
-            
-            guard let latestMessage = conversations.first?.latestMessage.message else { return }
+//            guard let latestMessage = conversations.first?.latestMessage.message else { return }
+
+            guard let latestMessage = messages.last?.content else { return }
             let modifiedLatestMessage = messageType != "text" ? ("Sent a " + messageType) : (latestMessage)
             latestMessage != lastUserDefaultsMessage ? (customDetailText = modifiedLatestMessage): (customDetailText = "...")
-            
+//            print("latestMessage: \(latestMessage), lastUserDefaultsMessage: \(lastUserDefaultsMessage)")
             DispatchQueue.main.async {
                 self.tableView.reloadData()
             }
-            print("they're the different")
+            print("they're different")
         }
 
     }
@@ -156,9 +166,9 @@ class ConversationVC: UIViewController {
             startListeningForConversations()
         } else {
             //user is not logged in
-            print("user is signed in")
-            insertUser()
-            getAllUsers()
+            print("user is not signed in")
+//            insertUser()
+//            getAllUsers()
         }
     }
     
@@ -171,9 +181,20 @@ class ConversationVC: UIViewController {
     
     /// Fetches currentUser's convos (get's currentUser email from userDefaullts in order to differ between sender and receiver)
     private func startListeningForConversations() {
-        guard let email = UserDefaults.standard.value(forKey: "email") as? String else {
-            return
+        let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo")
+        
+        var userPersistedEmail = ""
+//        var userPersistedName = ""
+        if let info = getUsersPersistedInfo {
+            userPersistedEmail = info.first!.email
+//            userPersistedName = info.first!.name
         }
+        
+      print("userPersistedEmail: "+userPersistedEmail)
+
+//        guard let email = UserDefaults.standard.value(forKey: "email") as? String else {
+//            return
+//        }
 
 //        if let observer = loginObserver {
 //            NotificationCenter.default.removeObserver(observer)
@@ -181,7 +202,7 @@ class ConversationVC: UIViewController {
 
         print("starting conversation fetch...")
 
-        let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
+        let safeEmail = DatabaseManager.safeEmail(emailAddress: userPersistedEmail)
 
         DatabaseManager.shared.getAllConversations(for: safeEmail, completion: { [weak self] result in
             switch result {
@@ -328,9 +349,7 @@ extension ConversationVC: TableViewDataSourceAndDelegate {
         
         cell.textLabel?.text =  conversations[indexPath.row].name//users[indexPath.row]["name"]
 
-        let userEmail = UserDefaults.standard.value(forKey: "email") as? String ?? ""
-        let currentUserSafeEmail = DatabaseManager.safeEmail(emailAddress: userEmail)
-        print("test: \(senderEmail)")
+      
         cell.detailTextLabel?.textColor = .systemGray
         cell.textLabel?.font = .boldSystemFont(ofSize: 16)
 //        senderEmail == currentUserSafeEmail ? (cell.detailTextLabel?.text = "You: " + conversations[indexPath.row].latestMessage.message) : (cell.detailTextLabel?.text = conversations[indexPath.row].latestMessage.message)

@@ -45,7 +45,7 @@ class PhotoCollectionViewerVC: UIViewController {
 
     // MARK: - Methods
     func setupViews() {
-        title = "Shared Photos"
+//        title = "Shared Photos"
         [collectionView].forEach {view.addSubview($0)}
         collectionView.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor)
         setupNavBar()

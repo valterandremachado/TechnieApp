@@ -108,8 +108,15 @@ extension TechnieProfileVC: TableViewDataSourceAndDelegate {
 //        let tableViewOptions = TechnieProfileTVOptions(rawValue: indexPath.row)
         switch indexPath.section {
         case 0:
-            let userName = UserDefaults.standard.value(forKey: "email") as? String ?? ""
-            cell.textLabel?.text = userName //"Valter A. Machado"
+//            let userName = UserDefaults.standard.value(forKey: "email") as? String ?? ""
+            let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo")
+            
+            var userPersistedEmail = ""
+            if let info = getUsersPersistedInfo {
+                userPersistedEmail = info.first!.email
+            }
+            
+            cell.textLabel?.text = userPersistedEmail //"Valter A. Machado"
             cell.detailTextLabel?.text = "Baguio City"
             let newImage = UIImage().resizeImage(image: UIImage(named: "technie")!, toTheSize: CGSize(width: 40, height: 40))
             cell.imageView?.clipsToBounds = true

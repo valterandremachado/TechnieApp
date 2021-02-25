@@ -64,7 +64,7 @@ class JobDetailTVCell1: UITableViewCell {
 //        iv.backgroundColor = .red
         iv.contentMode = .scaleAspectFit
         iv.clipsToBounds = true
-        iv.image = UIImage(systemName: "mappin.and.ellipse")?.withAlignmentRectInsets(UIEdgeInsets(top: 0, left: -5, bottom: 0, right: 0))
+        iv.image = UIImage(systemName: "mappin.and.ellipse")?.withTintColor(.systemGray, renderingMode: .alwaysOriginal).withAlignmentRectInsets(UIEdgeInsets(top: 0, left: -5, bottom: 0, right: 0))
         iv.withWidth(20)
         return iv
     }()
@@ -666,9 +666,9 @@ class JobDetailTVCell31: UITableViewCell {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
 //        backgroundColor = .white
         /// Adding tableView right indicator
-//        self.accessoryType = .disclosureIndicator
+        self.accessoryType = .disclosureIndicator
         /// Changing selection style
-        self.selectionStyle = .none
+//        self.selectionStyle = .none
 //        self.layer.cornerRadius = 15
 //        self.clipsToBounds = true
 //        backgroundColor = .yellow

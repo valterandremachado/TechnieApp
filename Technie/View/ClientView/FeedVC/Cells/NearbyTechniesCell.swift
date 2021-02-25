@@ -75,13 +75,14 @@ class NearbyTechniesCell: UICollectionViewCell {
         let iconIV = UIImageView()
         iconIV.contentMode = .scaleAspectFit
         iconIV.image = wiredProfileImage
-        
+        iconIV.withWidth(20)
+
         let sv = UIStackView(arrangedSubviews: [iconIV, locationLabel])
         sv.axis = .horizontal
-        sv.spacing = 2
+        sv.spacing = 5
 //        sv.alignment = .fill
-        sv.distribution = .fillProportionally
-//        sv.addBackground(color: .red)
+        sv.distribution = .fill
+//        sv.addBackground(color: .cyan)
         return sv
     }()
     
@@ -92,15 +93,24 @@ class NearbyTechniesCell: UICollectionViewCell {
         let iconIV = UIImageView()
         iconIV.contentMode = .scaleAspectFit
         iconIV.image = wiredProfileImage
-        
+        iconIV.withWidth(20)
+
         let sv = UIStackView(arrangedSubviews: [iconIV, ratingLabel])
         sv.axis = .horizontal
         sv.spacing = 2
-        sv.alignment = .leading
+        sv.alignment = .trailing
         sv.distribution = .fill
-//        sv.addBackground(color: .red)
+//        sv.addBackground(color: .brown)
         return sv
     }()
+    
+//    lazy var skillsStackView: UIStackView = {
+//        let sv = UIStackView(arrangedSubviews: [jobTitleLabel])
+//        sv.axis = .horizontal
+//        sv.alignment = .leading
+//        sv.distribution = .fill
+//        return sv
+//    }()
     
     lazy var skillsTagStackView: UIStackView = {
         let config = UIImage.SymbolConfiguration(pointSize: CGFloat(15))
@@ -109,15 +119,23 @@ class NearbyTechniesCell: UICollectionViewCell {
         let iconIV = UIImageView()
         iconIV.contentMode = .scaleAspectFit
         iconIV.image = wiredProfileImage
-        
+        iconIV.withWidth(20)
         let sv = UIStackView(arrangedSubviews: [iconIV, jobTitleLabel])
         sv.axis = .horizontal
-        sv.spacing = 2
-//        sv.alignment = .fill
-        sv.distribution = .fillProportionally
-//        sv.addBackground(color: .red)
+        sv.spacing = 5
+        sv.alignment = .leading
+        sv.distribution = .fill
+//        sv.addBackground(color: .systemPurple)
         return sv
     }()
+    
+//    lazy var pricePerHourStackView: UIStackView = {
+//        let sv = UIStackView(arrangedSubviews: [pricePerHourLabel])
+//        sv.axis = .horizontal
+//        sv.alignment = .leading
+//        sv.distribution = .fill
+//        return sv
+//    }()
     
     lazy var priceStackView: UIStackView = {
         let config = UIImage.SymbolConfiguration(pointSize: CGFloat(15))
@@ -126,14 +144,14 @@ class NearbyTechniesCell: UICollectionViewCell {
         let iconIV = UIImageView()
         iconIV.contentMode = .scaleAspectFit
         iconIV.image = wiredProfileImage
-//        iconIV.withWidth(15)
+        iconIV.withWidth(20)
         
         let sv = UIStackView(arrangedSubviews: [iconIV, pricePerHourLabel])
         sv.axis = .horizontal
-        sv.spacing = 2
+        sv.spacing = 5
 //        sv.alignment = .leading
-        sv.distribution = .fillProportionally
-//        sv.addBackground(color: .red)
+        sv.distribution = .fill
+//        sv.addBackground(color: .lightGray)
         return sv
     }()
     
@@ -142,7 +160,7 @@ class NearbyTechniesCell: UICollectionViewCell {
         sv.axis = .horizontal
         sv.spacing = 10
 //        sv.alignment = .leading
-        sv.distribution = .fillEqually
+        sv.distribution = .fill
 //        sv.addBackground(color: .cyan)
         return sv
     }()
@@ -185,6 +203,17 @@ class NearbyTechniesCell: UICollectionViewCell {
         return view
     }()
     
+    var technicianModel: TechnicianModel! {
+        didSet {
+            nameLabel.text = technicianModel.profileInfo.name
+            jobTitleLabel.text = technicianModel.profileInfo.name
+            locationLabel.text = technicianModel.profileInfo.location
+            pricePerHourLabel.text = "\(technicianModel.profileInfo.hourlyRate)"
+            ratingLabel.text = "4.5 (\(technicianModel.numberOfCompletedServices))"
+//            jobTitleLabel = technicianModel.profileInfo.requiredSkills
+        }
+    }
+    
     // MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: .zero)
@@ -199,11 +228,16 @@ class NearbyTechniesCell: UICollectionViewCell {
 //        saveBtn.anchor(top: self.topAnchor, leading: nil, bottom: nil, trailing: self.trailingAnchor, padding: UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 5))
         separatorView.anchor(top: self.topAnchor, leading: self.leadingAnchor, bottom: nil, trailing: self.trailingAnchor, padding: UIEdgeInsets(top: -16, left: 5, bottom: 0, right: 5))
         
-        profileImageView.anchor(top: separatorView.bottomAnchor, leading: self.leadingAnchor, bottom: nil, trailing: nil, padding: UIEdgeInsets(top: 20, left: 5, bottom: 0, right: 0))
+        profileImageView.anchor(top: separatorView.bottomAnchor, leading: self.leadingAnchor, bottom: nil, trailing: nil, padding: UIEdgeInsets(top: 20, left: 10, bottom: 0, right: 0))
 //        mainStackView.withHeight(160)
-        mainStackView.anchor(top: profileImageView.topAnchor, leading: profileImageView.trailingAnchor, bottom: nil, trailing: self.trailingAnchor, padding: UIEdgeInsets(top: 5, left: 8, bottom: 0, right: 0))
+        mainStackView.anchor(top: profileImageView.topAnchor, leading: profileImageView.trailingAnchor, bottom: nil, trailing: self.trailingAnchor, padding: UIEdgeInsets(top: 5, left: 8, bottom: 0, right: 15))
 
 //        separatorView.anchor(top: nil, leading: self.leadingAnchor, bottom: self.bottomAnchor, trailing: self.trailingAnchor, padding: UIEdgeInsets(top: 0, left: 5, bottom: 10, right: 5))
+//        nameLabel.text = "technician1 technician1"
+//        jobTitleLabel.text = "technician1 technician1"
+//        locationLabel.text = "technican1"
+//        pricePerHourLabel.text = "150.0"
+//        ratingLabel.text = "4.5(267) 4.5(267)"
         
     }
     

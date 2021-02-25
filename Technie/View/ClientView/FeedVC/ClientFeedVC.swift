@@ -21,6 +21,7 @@ class ClientFeedVC: UIViewController {
     
     let sections = ["Technician's Ranking", "Nearby Technicians"]
     
+    var technicianModel = [TechnicianModel]()
     // MARK: - Properties
     var customindexPath = IndexPath(item: 0, section: 0)
     
@@ -162,8 +163,10 @@ class ClientFeedVC: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         view.backgroundColor = UIColor(named: "BackgroundAppearance")
+        fetchData()
         setupViews()
         print("viewDidLoadFeed: \(didShowSearchResultViewObservable.value)")
+//        UserDefaults.standard.removeObject(forKey: "persistUsersInfo")
     }
     
     fileprivate func collectionViewFlowLayoutSetup(with Width: CGFloat){
@@ -197,6 +200,19 @@ class ClientFeedVC: UIViewController {
         navigationItem.searchController = searchController
 //        searchController.isActive = true
 //        searchController.searchBar.becomeFirstResponder()
+    }
+    
+    fileprivate func fetchData()  {
+        DatabaseManager.shared.getAllTechnicians(completion: {[weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let technicians):
+                self.technicianModel.append(technicians)
+                self.clientFeedCollectionView.reloadData()
+            case .failure(let error):
+                print("Failed to get technicians: \(error.localizedDescription)")
+            }
+        })
     }
     
     fileprivate func showSearchResultView() {
@@ -275,7 +291,7 @@ extension ClientFeedVC: CollectionDataSourceAndDelegate {
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return didShowSearchResultViewObservable.value == true ? (professionArray.count) : (section == 0 ? (1) : (5)) //section == 0 ? (1) : (5)
+        return didShowSearchResultViewObservable.value == true ? (professionArray.count) : (section == 0 ? (1) : (technicianModel.count)) //section == 0 ? (1) : (5)
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -298,6 +314,8 @@ extension ClientFeedVC: CollectionDataSourceAndDelegate {
         case 1:
             // Nearby Technie cell
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: feedCellOnSection1ID, for: indexPath) as! NearbyTechniesCell
+            let model = technicianModel[indexPath.item]
+            cell.technicianModel = model
             let lastItemIndex = collectionView.numberOfItems(inSection: collectionView.numberOfSections-1)
 //            let lastIndex = lastItemIndex - 1
 //            if indexPath.item == lastIndex {
@@ -321,6 +339,7 @@ extension ClientFeedVC: CollectionDataSourceAndDelegate {
             navigationController?.pushViewController(vc, animated: true)
         case false:
             let vc = TechnicianProfileDetailsVC()
+            vc.technicianModel = technicianModel[indexPath.item]
             navigationItem.backBarButtonItem = UIBarButtonItem(title: "Feeds", style: .plain, target: self, action: nil)
             navigationController?.pushViewController(vc, animated: true)
         }
@@ -427,6 +446,7 @@ extension ClientFeedVC: CollectionDataSourceAndDelegate {
             header.sectionTitle.text = sections[indexPath.section].uppercased()
             header.backgroundColor = .systemBackground
             header.addBorder(.bottom, color: .systemGray, thickness: 0.3)
+            header.seeAllBtn.isHidden = true
             return header
         default:
             break
