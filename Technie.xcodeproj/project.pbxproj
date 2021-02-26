@@ -93,6 +93,8 @@
 		8AAE556025DC0CAE003AB202 /* ClientSettingsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AAE555F25DC0CAE003AB202 /* ClientSettingsVC.swift */; };
 		8AAE556B25DC0CC9003AB202 /* EditProfileVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AAE556A25DC0CC9003AB202 /* EditProfileVC.swift */; };
 		8AAE557325DC0CF2003AB202 /* ClientHelpCenterVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AAE557225DC0CF2003AB202 /* ClientHelpCenterVC.swift */; };
+		8AB5316F25E92AD9001D7CCD /* MyJobsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB5316E25E92AD9001D7CCD /* MyJobsVC.swift */; };
+		8AB5317425E92D05001D7CCD /* MyJobsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB5317325E92D05001D7CCD /* MyJobsCell.swift */; };
 		8AC1B123258A2D8D000F2569 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AC1B122258A2D8D000F2569 /* AppDelegate.swift */; };
 		8AC1B125258A2D8D000F2569 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AC1B124258A2D8D000F2569 /* SceneDelegate.swift */; };
 		8AC1B127258A2D8D000F2569 /* ClientFeedVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AC1B126258A2D8D000F2569 /* ClientFeedVC.swift */; };
@@ -230,6 +232,8 @@
 		8AAE555F25DC0CAE003AB202 /* ClientSettingsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientSettingsVC.swift; sourceTree = "<group>"; };
 		8AAE556A25DC0CC9003AB202 /* EditProfileVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileVC.swift; sourceTree = "<group>"; };
 		8AAE557225DC0CF2003AB202 /* ClientHelpCenterVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientHelpCenterVC.swift; sourceTree = "<group>"; };
+		8AB5316E25E92AD9001D7CCD /* MyJobsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyJobsVC.swift; sourceTree = "<group>"; };
+		8AB5317325E92D05001D7CCD /* MyJobsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyJobsCell.swift; sourceTree = "<group>"; };
 		8AC1B11F258A2D8D000F2569 /* Technie.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Technie.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8AC1B122258A2D8D000F2569 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		8AC1B124258A2D8D000F2569 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -377,6 +381,7 @@
 				8A6C839725CADA8B0082D51F /* TechnicianProfileDetailsVC.swift */,
 				8A54D19C25CBEB7400045D37 /* AboutVC.swift */,
 				8A54D1A425CBEBA800045D37 /* ReviewsVC.swift */,
+				8AB5316E25E92AD9001D7CCD /* MyJobsVC.swift */,
 			);
 			path = TechnicianProfileDetailsVC;
 			sourceTree = "<group>";
@@ -423,6 +428,7 @@
 				8A05766025CD9E0A0071FDD1 /* FullRankingCell.swift */,
 				8A0C0B4725D11ACB0072729D /* TechnicianSearchResultsCell.swift */,
 				8A21738825D5A025006FC895 /* ReviewCollectionViewCell.swift */,
+				8AB5317325E92D05001D7CCD /* MyJobsCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -1139,6 +1145,8 @@
 				8AF76A79258B440D00ED14C2 /* TrashBinCode.swift in Sources */,
 				8A13FE0B25DE51410034945D /* TechnieEditProfileCell.swift in Sources */,
 				8AAB8821259B557000BCBD33 /* PostFormVC.swift in Sources */,
+				8AB5317425E92D05001D7CCD /* MyJobsCell.swift in Sources */,
+				8AB5316F25E92AD9001D7CCD /* MyJobsVC.swift in Sources */,
 				8AF76A78258B440D00ED14C2 /* UIFeedBackGenerator.swift in Sources */,
 				8A8F8521258A353500C4CEF9 /* ClientSearchVC.swift in Sources */,
 				8A41E7A625B07AB500265D5C /* ActiveJobsCell.swift in Sources */,

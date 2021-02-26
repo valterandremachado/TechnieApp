@@ -141,26 +141,32 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         return btn
     }()
     
-    lazy var startChatBtn: UIButton = {
+    lazy var moreBtn: UIButton = {
         let btn = UIButton(type: .system)
         btn.translatesAutoresizingMaskIntoConstraints = false
 //        btn.setTitle("Chat Me", for: .normal)
-        btn.setImage(UIImage(systemName: "bubble.left.and.bubble.right.fill")?.withTintColor(.systemPink, renderingMode: .alwaysOriginal), for: .normal)
+        let config = UIImage.SymbolConfiguration(pointSize: 30, weight: .bold, scale: .small)
+
+        btn.setImage(UIImage(systemName: "ellipsis.circle.fill", withConfiguration: config)?.withTintColor(.systemPink, renderingMode: .alwaysOriginal), for: .normal)
         btn.contentHorizontalAlignment = .right
 //        btn.backgroundColor = .cyan
-        btn.withWidth(45)
-        btn.addTarget(self, action: #selector(startChatBtnPressed), for: .touchUpInside)
+        // rotates btn 90 degrees for a vertical look of the icon
+        btn.transform = CGAffineTransform(rotationAngle: CGFloat(Double.pi/2))
+        btn.withWidth(30)
+        btn.withHeight(30)
+        btn.addTarget(self, action: #selector(moreBtnPressed), for: .touchUpInside)
         return btn
     }()
     
     lazy var hireAndStartAChatBtnStack: UIStackView = {
-        let stack = UIStackView(arrangedSubviews: [hireBtn, startChatBtn])
+        let stack = UIStackView(arrangedSubviews: [hireBtn, moreBtn])
         stack.translatesAutoresizingMaskIntoConstraints = false
         stack.axis = .horizontal
-        stack.spacing = 8
+        stack.spacing = 20
         stack.distribution = .fillProportionally
 //        stack.withWidth(view.frame.width - 100)
 //        stack.withHeight(30)
+//        stack.backgroundColor = .blue
         return stack
     }()
     
@@ -168,6 +174,7 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         let blurEffect = UIBlurEffect(style: .systemUltraThinMaterialLight)
         let view = UIVisualEffectView(effect: blurEffect)
         view.autoresizingMask = [.flexibleHeight, .flexibleWidth]
+        view.contentView.addBorder(.top, color: .systemGray2, thickness: 0.2)
         return view
     }()
     
@@ -284,23 +291,21 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         // Do any additional setup after loading the view.
+        
         self.tabBarController?.setTabBar(hidden: false, animated: true, along: nil)
         closeSelectionBar()
         self.reviewsTableView.removeObserver(self, forKeyPath: "contentSize")
         self.aboutTableView.removeObserver(self, forKeyPath: "contentSize2")
-//        self.collectionView.removeObserver(self, forKeyPath: "contentSize3")
-
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         // Do any additional setup after loading the view.
-        self.tabBarController?.setTabBar(hidden: true, animated: true, along: nil)
-        presentSelectionBar()
-        self.reviewsTableView.addObserver(self, forKeyPath: "contentSize", options: .new, context: nil)
-        self.aboutTableView.addObserver(self, forKeyPath: "contentSize2", options: .new, context: nil)
-//        self.collectionView.addObserver(self, forKeyPath: "contentSize3", options: .new, context: nil)
-
+        
+            self.tabBarController?.setTabBar(hidden: true, animated: true, along: nil)
+            presentSelectionBar()
+            self.reviewsTableView.addObserver(self, forKeyPath: "contentSize", options: .new, context: nil)
+            self.aboutTableView.addObserver(self, forKeyPath: "contentSize2", options: .new, context: nil)
     }
     
     var reviewDynamicHeight: CGFloat = 0.0
@@ -381,7 +386,7 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         NSLayoutConstraint.activate([
             hireAndStartAChatBtnStack.topAnchor.constraint(equalTo: visualEffectView.contentView.topAnchor, constant: 15),
             hireAndStartAChatBtnStack.centerXAnchor.constraint(equalTo: visualEffectView.contentView.centerXAnchor),
-            hireAndStartAChatBtnStack.widthAnchor.constraint(equalToConstant: view.frame.width - 100),
+            hireAndStartAChatBtnStack.widthAnchor.constraint(equalToConstant: view.frame.width - 80),
             hireAndStartAChatBtnStack.heightAnchor.constraint(equalToConstant: 30)
         ])
         
@@ -556,24 +561,55 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
     // MARK: - Selectors
     @objc fileprivate func hireBtnPressed(_ sender: UIButton) {
         if sender.title(for: .normal) == "Hire Valter" {
-            UIView.animate(withDuration: 0.5) {
-                sender.setTitle("Pending...", for: .normal)
-                sender.setTitleColor(.systemGray4, for: .normal)
-                sender.backgroundColor = UIColor.systemPink.withAlphaComponent(0.8)
-            }
+            let vc = MyJobsVC()
+            vc.myJobsVCDismissalDelegate = self
+            present(UINavigationController(rootViewController: vc), animated: true)
           
         } else {
-            UIView.animate(withDuration: 0.5) {
-                sender.setTitle("Hire Valter", for: .normal)
-                sender.setTitleColor(.white, for: .normal)
-                sender.backgroundColor = .systemPink
-            }
+            presentAlertSheetForHireBtn()
         }
         
     }
     
-    @objc fileprivate func startChatBtnPressed(_ sender: UIButton) {
-        self.createNewConversation(resultEmail: technicianModel.profileInfo.email, resultName: technicianModel.profileInfo.name)
+    fileprivate func presentAlertSheetForHireBtn() {
+        let alertController = UIAlertController(title: "Hiring", message: "Are you sure you want to pullback from this hire?", preferredStyle: .alert)
+        
+        let yesAction = UIAlertAction(title: "Yes", style: .default) { (_) in
+            UIView.animate(withDuration: 0.5) { [self] in
+                hireBtn.setTitle("Hire Valter", for: .normal)
+                hireBtn.setTitleColor(.white, for: .normal)
+                hireBtn.backgroundColor = .systemPink
+            }
+        }
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
+        alertController.addAction(yesAction)
+        alertController.addAction(cancelAction)
+        present(alertController, animated: true)
+    }
+    
+    fileprivate func presentActionSheetForMoreBtn() {
+        let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        let inviteAction = UIAlertAction(title: "Send Invitation", style: .default) { (_) in
+           
+        }
+        
+        let dmAction = UIAlertAction(title: "Direct Message", style: .default) { [self] (_) in
+            self.createNewConversation(resultEmail: technicianModel.profileInfo.email,
+                                       resultName: technicianModel.profileInfo.name)
+        }
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
+        alertController.addAction(inviteAction)
+        alertController.addAction(dmAction)
+        alertController.addAction(cancelAction)
+        alertController.fixActionSheetConstraintsError()
+        present(alertController, animated: true)
+    }
+    
+    @objc fileprivate func moreBtnPressed(_ sender: UIButton) {
+        presentActionSheetForMoreBtn()
     }
     
     private func createNewConversation(resultEmail: String, resultName: String) {
@@ -595,17 +631,32 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
                 vc.isNewConvo = false
                 vc.title = name
                 vc.navigationItem.largeTitleDisplayMode = .never
-                strongSelf.navigationController?.pushViewController(vc, animated: true)
+                strongSelf.present(UINavigationController(rootViewController: vc), animated: true)
             case .failure(let failure):
                 print("failure: \(failure)")
                 let vc = ChatVC(with: email, id: nil)
                 vc.isNewConvo = true
                 vc.title = name
                 vc.navigationItem.largeTitleDisplayMode = .never
-                strongSelf.navigationController?.pushViewController(vc, animated: true)
+                strongSelf.present(UINavigationController(rootViewController: vc), animated: true)
             }
         })
     }
+    
+}
+
+extension TechnicianProfileDetailsVC: MyJobsVCDismissalDelegate {
+    // Handles the hire button label changes when the hiring was sent successfully
+    func jobsVCDismissalSingleton(isDismissed withIsDone: Bool) {
+        if withIsDone == true {
+            UIView.animate(withDuration: 0.5) { [self] in
+                hireBtn.setTitle("Pending...", for: .normal)
+                hireBtn.setTitleColor(.systemGray4, for: .normal)
+                hireBtn.backgroundColor = UIColor.systemPink.withAlphaComponent(0.8)
+            }
+        }
+    }
+    
     
 }
 
@@ -651,7 +702,9 @@ extension TechnicianProfileDetailsVC: CollectionDataSourceAndDelegate {
             return CGSize(width: view.frame.width, height: 115)
         }
         
-        let adjustedHeight: CGFloat = (view.frame.height) + reviewsTableView.contentSize.height + visualEffectView.frame.height
+//        let navBarHeight = navigationController?.navigationBar.frame.height
+//        let height = navBarHeight!*1.5
+//        let adjustedHeight: CGFloat = (view.frame.height) + reviewsTableView.contentSize.height + visualEffectView.frame.height
         switch currentSegmentIndex {
         case 0:
             return CGSize(width:  collectionView.frame.size.width , height: view.frame.height - visualEffectView.frame.height*1.2)

@@ -167,6 +167,14 @@ class ClientFeedVC: UIViewController {
         setupViews()
         print("viewDidLoadFeed: \(didShowSearchResultViewObservable.value)")
 //        UserDefaults.standard.removeObject(forKey: "persistUsersInfo")
+//        DatabaseManager.shared.getAllClientPosts(completion: { result in
+//            switch result {
+//            case .success(let userPosts):
+//                print("userPost: \(userPosts), count: \(userPosts.count)")
+//            case .failure(let error):
+//                print(error)
+//            }
+//        })
     }
     
     fileprivate func collectionViewFlowLayoutSetup(with Width: CGFloat){

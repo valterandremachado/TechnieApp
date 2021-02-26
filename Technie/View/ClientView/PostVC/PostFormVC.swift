@@ -382,6 +382,7 @@ class PostFormVC: UIViewController {
                                          numberOfUnansweredInvites: self.postNumberOfUnansweredInvites,
                                          dateTime: dateString,
                                          field: self.fieldOfService,
+                                         postOwnerInfo: nil,
                                          hiringStatus: nil,
                                          proposals: nil)
                     

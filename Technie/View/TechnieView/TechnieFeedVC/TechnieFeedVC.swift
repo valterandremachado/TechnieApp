@@ -244,7 +244,7 @@ class TechnieFeedVC: UIViewController {
                     // Remove existing items to avoid duplicated items
                     self.postModel.removeAll()
                     print("childChanged")
-                    self.postModel.append(contentsOf: posts)
+                    self.postModel = posts
                     self.tableView.reloadData()
                     return
                 case .failure(let error):

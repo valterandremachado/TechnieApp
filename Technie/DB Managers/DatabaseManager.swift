@@ -608,7 +608,7 @@ extension DatabaseManager {
                 return
             }
             
-            var posts = [PostModel]()
+//            var posts = [PostModel]()
 
             for (key, _) in postsCollection {
                 Database.database().reference().child("posts/\(key)").observeSingleEvent(of: .value, with: { snapshot in
@@ -736,6 +736,88 @@ extension DatabaseManager {
                         }
                     }
                 }
+            }
+        })
+    }
+    
+    public func getAllClientPosts(completion: @escaping (Result<[PostModel], Error>) -> Void) {
+        
+        let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo")
+        
+        var userPersistedEmail = ""
+        if let info = getUsersPersistedInfo {
+            userPersistedEmail = info.first!.email
+        }
+        
+        database.child("posts").observeSingleEvent(of: .value, with: { [weak self] snapshot in
+            guard let self = self else { return }
+            
+            guard let postsCollection = snapshot.value as? [String: Any] else {
+                completion(.failure(DatabaseError.failedToFetch))
+                return
+            }
+            
+            var posts = [PostModel]()
+            var userPostIDs = [String]()
+            
+            for (key, _) in postsCollection {
+                self.database.child("posts/\(key)").observeSingleEvent(of: .value, with: { snapshot in
+                    guard let value = snapshot.value else { return }
+                    do {
+                        let postModel = try FirebaseDecoder().decode(PostModel.self, from: value)
+                        
+                        self.database.child("users/clients").observeSingleEvent(of: .value, with: { snapshot in
+                            guard let postsCollection = snapshot.value as? [String: Any] else {
+                                completion(.failure(DatabaseError.failedToFetch))
+                                return
+                            }
+                            
+                            
+                            for (key, _) in postsCollection {
+                                self.database.child("users/clients/\(key)").observeSingleEvent(of: .value, with: { snapshot in
+                                    guard let value = snapshot.value else { return }
+                                    do {
+                                        let userModel = try FirebaseDecoder().decode(ClientModel.self, from: value)
+                                        let email = userModel.profileInfo.email
+                                        
+//                                        print("email: \(email)")
+                                        if userPersistedEmail == email {
+//                                            print("Equal email: \(email)")
+                                            userModel.servicePosts?.forEach({ (post) in
+                                                if userPostIDs.count != userModel.servicePosts?.count {
+                                                    userPostIDs.append(post.postID)
+//                                                    print("userPostIDs: \(userPostIDs)")
+                                                }
+                                                
+                                            })
+                                            
+                                            if  userPostIDs.count == userModel.servicePosts?.count {
+                                                for ids in userPostIDs {
+                                                    if postModel.id == ids {
+                                                        posts.append(postModel)
+//                                                        print("posts: \(posts), count: \(posts.count)")
+                                                        completion(.success(posts))
+                                                    }
+                                                }
+                                            }
+//                                            guard let postID = userModel.servicePosts?.first?.postID else { return }
+                                            
+                                            
+                                        }
+                                        
+                                    } catch let error {
+                                        print(error)
+                                    }
+                                })
+                            }
+                        })
+                        
+                        
+                        
+                    } catch let error {
+                        print(error)
+                    }
+                })
             }
         })
     }
@@ -1535,8 +1617,8 @@ struct ClientModel: Codable {
     let numberOfInactivePosts: Int
     let numberOfPosts: Int
     let profileInfo: ClientProfileInfo
-    let servicePosts: [ServicePosts]?
-//    posts[],
+    let servicePosts: [ServicePosts]? // array of user's post
+
 //    notifications[],
 //    chats[]
 }
@@ -1562,7 +1644,8 @@ struct TechnicianModel: Codable {
     let numberOfPreviousServices: Int
     let technieRank: Int
     let profileInfo: TechnicianProfileInfo
-
+//    let hired: [Hired]?
+    
 //    clientsSatisfaction[],
 //    notifications[],
 //    chats[]
@@ -1583,10 +1666,12 @@ struct TechnicianProfileInfo: Codable {
     let membershipDate: String
 }
 
+struct Hired: Codable { //Added to the db only when technician accept the hiring offer
+    var servicePostID: String
+    var isCompleted: Bool
+}
+
 struct PostModel: Codable {
-//    static func == (lhs: PostModel, rhs: PostModel) -> Bool {
-//        return true
-//    }
     
     let id: String?
     let title: String
@@ -1594,7 +1679,7 @@ struct PostModel: Codable {
     let attachments: [String]
     let projectType: String
     let budget: String
-    let location: String?
+    let location: String? //jobLocation?
     let requiredSkills: [String]
 
     let availabilityStatus: Bool
@@ -1603,12 +1688,18 @@ struct PostModel: Codable {
     let numberOfUnansweredInvites: Int
     let dateTime: String
     let field: String?
+    let postOwnerInfo: PostOwnerInfo?
     let hiringStatus: HiringStatus?
     let proposals: [Proposals]?
-    
-//    func hash(into hasher: inout Hasher) {
-//        hasher.combine(id)
-//    }
+ 
+}
+
+struct PostOwnerInfo: Codable {
+    var id: String
+    var name: String
+    var email: String
+    var location: String
+    var profileImage: String
 }
 
 struct HiringStatus: Codable {
