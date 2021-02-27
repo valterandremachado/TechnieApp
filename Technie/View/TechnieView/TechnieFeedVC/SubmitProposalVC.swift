@@ -138,7 +138,7 @@ class SubmitProposalVC: UIViewController, UITextViewDelegate {
         database.child(childPath).updateChildValues(updateElement, withCompletionBlock: { error, _ in
             self.database.child("\(childPath)/proposals").observeSingleEvent(of: .value, with: { snapshot in
                 
-                if var usersCollection = snapshot.value as? [[String: Any]] {
+                if var postsCollection = snapshot.value as? [[String: Any]] {
                     // append to user dictionary
                     let newElement = [
                             [
@@ -147,8 +147,8 @@ class SubmitProposalVC: UIViewController, UITextViewDelegate {
                             ]
                     ]
                     
-                    usersCollection.append(contentsOf: newElement)
-                    self.database.child("\(childPath)/proposals").setValue(usersCollection, withCompletionBlock: { error, _ in
+                    postsCollection.append(contentsOf: newElement)
+                    self.database.child("\(childPath)/proposals").setValue(postsCollection, withCompletionBlock: { error, _ in
                         guard error == nil else {
                             return
                         }

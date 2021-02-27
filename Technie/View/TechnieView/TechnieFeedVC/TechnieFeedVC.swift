@@ -163,7 +163,11 @@ class TechnieFeedVC: UIViewController {
         view.backgroundColor = UIColor(named: "BackgroundAppearance")
         setupViews()
         fetchData()
+//        UserDefaults.standard.removeObject(forKey: "persistUsersInfo")
+//        guard let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo") else { return }
+//        print("persistUsersInfo: \(getUsersPersistedInfo)")
         
+     
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -224,7 +228,7 @@ class TechnieFeedVC: UIViewController {
                 guard let self = self else { return }
                 switch result {
                 case .success(let posts):
-                    self.postModel.append(posts)
+                    self.postModel = posts
                     self.tableView.reloadData()
 
                     return

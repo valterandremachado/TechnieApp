@@ -338,7 +338,7 @@ class LoginVC: UIViewController {
         //        guard let email = emailTxtFld.text?.trimmingCharacters(in: .whitespacesAndNewlines),
         //              let password = passwordTxtFld.text?.trimmingCharacters(in: .whitespacesAndNewlines)
         //        else { return }
-        
+        try! Auth.auth().signOut()
         // SignIn user
         Auth.auth().signIn(withEmail: emailTxtFld.text!, password: passwordTxtFld.text!) { [self] (result, error) in
             if error != nil {
@@ -347,14 +347,14 @@ class LoginVC: UIViewController {
             }
             
             guard let uid = result?.user.uid else { return }
-            guard let user = result?.user else { return }
+//            guard let user = result?.user else { return }
             
             if pickAccountType == 0 {
                 DatabaseManager.shared.getAllTechnicians(completion: { result in
                     switch result {
                     case .success(let users):
                         if uid == users.profileInfo.id {
-                            self.persistData(withEmail: user.email, withName: users.profileInfo.name, withLocation: users.profileInfo.location)
+                            self.persistData(withUID: users.profileInfo.id, withName: users.profileInfo.name, withEmail: users.profileInfo.email, withLocation: users.profileInfo.location)
                             
                             let vc = TechnieTabController()
                             (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootViewController(vc)
@@ -375,7 +375,7 @@ class LoginVC: UIViewController {
                         //                    print("budget: \(posts.budget)")
                         
                         if uid == users.profileInfo.id {
-                            self.persistData(withEmail: user.email, withName: users.profileInfo.name, withLocation: users.profileInfo.location)
+                            self.persistData(withUID: users.profileInfo.id, withName: users.profileInfo.name, withEmail: users.profileInfo.email, withLocation: users.profileInfo.location)
                             
                             let vc = ClientTabController()
                             (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootViewController(vc)
@@ -432,26 +432,27 @@ class LoginVC: UIViewController {
         
         
     }
-    
-    private func persistData(withEmail email: String?, withName name: String?, withLocation location: String?) {
-        guard let name = name,
+   
+    private func persistData(withUID uid: String?, withName name: String?, withEmail email: String?, withLocation location: String?) {
+        guard let uid = uid,
+              let name = name,
               let email = email ,
               let location = location
         else { return }
-        
-        let newItem = UserPersistedInfo(name: name,
+        let newItem = UserPersistedInfo(uid: uid,
+                                        name: name,
                                         email: email,
                                         location: location,
                                         accountType: nil,
                                         locationInLongLat: nil,
                                         profileImage: nil)
         
-        if email != self.persistUsersInfo.first?.email {
+//        if email != self.persistUsersInfo.first?.email {
             self.persistUsersInfo.append(newItem)
             print("data persisted: \(self.persistUsersInfo)")
-        } else {
-            print("existing Name")
-        }
+//        } else {
+//            print("existing Name")
+//        }
         
         self.defaults.set(object: self.persistUsersInfo, forKey: "persistUsersInfo")
     }

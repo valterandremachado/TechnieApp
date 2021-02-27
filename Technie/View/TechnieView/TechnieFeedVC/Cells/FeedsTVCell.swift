@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import TTGTagCollectionView
 
 class FeedsTVCell: UITableViewCell {
     
@@ -136,38 +137,15 @@ class FeedsTVCell: UITableViewCell {
         return stack
     }()
     
-    lazy var skillTagsCollectionView: UICollectionView = {
-        let collectionLayout = UICollectionViewFlowLayout()
-        collectionLayout.scrollDirection = .vertical
-        collectionLayout.minimumLineSpacing = 5
-//        collectionLayout.minimumInteritemSpacing = 10
-//        collectionLayout.estimatedItemSize = .zero
-//        collectionLayout.itemSize = .init(width: 50, height: 25)
-        let cv = UICollectionView(frame: .zero, collectionViewLayout: collectionLayout)
-        cv.translatesAutoresizingMaskIntoConstraints = false
-        cv.backgroundColor = .white
-        cv.isScrollEnabled = false
-//        cv.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        
-        // Avoid collectionView to self adjust its size
-//        cv.contentInsetAdjustmentBehavior = .never
-        let numberOfCharInEachElement = dataArray.map {$0.count}
-        let totalSumOfTheChars = numberOfCharInEachElement.reduce(0, +)
-//        print(numberOfCharInEachElement, totalSumOfTheChars)
-        if dataArray.count <= 4 && totalSumOfTheChars <= 34 {
-            // for 1 row
-            cv.withHeight(30)
-        } else {
-            // for potentially 2 row
-            cv.withHeight(65)
-        }
-        
-        cv.delegate = self
-        cv.dataSource = self
-        // Registration of the cell
-        cv.register(SkillTagsCell.self, forCellWithReuseIdentifier: SkillTagsCell.cellID)
-       
-        return cv
+    lazy var skillTagsCollectionView: TTGTextTagCollectionView = {
+        let tag = TTGTextTagCollectionView()
+        tag.isUserInteractionEnabled = false
+        tag.enableTagSelection = false
+//        tag.delegate = self
+        tag.alignment = .left
+        tag.clipsToBounds = true
+
+        return tag
     }()
     
     var dataArray = [String]()
@@ -180,10 +158,25 @@ class FeedsTVCell: UITableViewCell {
             jobBudget.text = postModel.budget
             jobLocation.text = postModel.location
             dataArray = postModel.requiredSkills
-            
-     
             jobPostTimeTrackerLabel.text = calculateTimeFrame(initialTime: postModel.dateTime)
+            
+            // Avoid duplicated items as this didSet is called multiple times
+            if  skillTagsCollectionView.allTags()?.count == 0 {
+                let config = TTGTextTagConfig()
+                config.backgroundColor = .systemGray5
+                config.textColor = .black
+                config.borderWidth = 0.5
+                config.borderColor = .lightGray
+                config.cornerRadius = 15
+                config.exactHeight = 25
+                config.textFont = .systemFont(ofSize: 13.5)
+
+                skillTagsCollectionView.addTags(dataArray, with: config)
+                return
+            }
+           
         }
+    
     }
     
 //    func calculateTimeFrame(initialTime: String) -> String {
@@ -235,84 +228,6 @@ class FeedsTVCell: UITableViewCell {
 }
 
 // CollectionDataSourceAndDelegate Extension
-extension FeedsTVCell: CollectionDataSourceAndDelegate {
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return dataArray.count
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: SkillTagsCell.cellID, for: indexPath) as! SkillTagsCell
-        cell.textLabel.text = dataArray[indexPath.item]
-//        var heights = [10.0,20.0,30.0,40.0,50.0,60.0,70.0,80.0,90.0,100.0,110.0] as [CGFloat]
-//        let some = heights[indexPath.row]
-//        cell.frame = CGRect(x: cell.frame.origin.x, y: cell.frame.origin.y, width: cell.frame.size.width, height: heights[indexPath.row])
-
-        return cell
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let label = UILabel(frame: CGRect.zero)
-        label.text = dataArray[indexPath.item]
-        label.sizeToFit()
-        return CGSize(width: label.frame.width + 10, height: 30)
-    }
-    
-    
-//    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-//        
-//        let noOfCellsInRow = 2
-//        /// changing sizeForItem when user switches through the segnment
-//        let flowLayout = collectionViewLayout as! UICollectionViewFlowLayout
-//        let totalSpace = flowLayout.sectionInset.left
-//            + flowLayout.sectionInset.right
-//            + (flowLayout.minimumInteritemSpacing * CGFloat(noOfCellsInRow - 1))
-//        //        flowLayout.sectionInset.left = 5
-//        //        flowLayout.sectionInset.right = 5
-//        
-//        let size = ((collectionView.bounds.width) - totalSpace) / CGFloat(noOfCellsInRow)
-//        let finalSize = CGSize(width: size, height: size)
-//        
-////        let viewSize = view.frame.size
-////        var collectionViewSize = CGSize(width: 0, height: 0)
-//        
-//        return finalSize
-//    }
-}
-
-
-class SkillTagsCell: UICollectionViewCell {
-    static let cellID = "SkillTagsCellID"
-    // MARK: - Properties
-    lazy var textLabel: UILabel = {
-        let lbl = UILabel()
-        lbl.translatesAutoresizingMaskIntoConstraints = false
-//        lbl.text = "Skill 1 Skill 2 Skill 3 Skill 4 Skill 5"
-        lbl.textAlignment = .center
-        lbl.font = .systemFont(ofSize: 13.5)
-        return lbl
-    }()
-    
-    // MARK: - Init
-    override init(frame: CGRect) {
-        super.init(frame: .zero)
-        backgroundColor = .systemGray5
-        setupViews()
-    }
-    
-    // MARK: - Methods
-    fileprivate func setupViews() {
-        // Customize Cell
-        self.layer.cornerRadius = 15
-        self.clipsToBounds = true
-
-        [textLabel].forEach {self.addSubview($0)}
-        textLabel.anchor(top: self.topAnchor, leading: self.leadingAnchor, bottom: self.bottomAnchor, trailing: self.trailingAnchor)
-    }
-    // MARK: - Selectors
-
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-}
+//extension FeedsTVCell: TTGTextTagCollectionViewDelegate {
+//
+//}

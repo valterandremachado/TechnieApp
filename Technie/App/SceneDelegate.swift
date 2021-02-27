@@ -22,24 +22,26 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo")
         
-        var userPersistedEmail = ""
+//        var userPersistedEmail = ""
         if let info = getUsersPersistedInfo {
-            userPersistedEmail = info.first!.email
-        }
-        
-        // Window setup
-        window = UIWindow(frame: windowScene.coordinateSpace.bounds)
-        window?.windowScene = windowScene
-        //Main ViewController
-        if userPersistedEmail == "client@hotmail.com" {
-            let mainVC = ClientTabController()
-            window?.rootViewController = mainVC//UINavigationController(rootViewController: mainVC)
 
-        } else if userPersistedEmail == "technician2@gmail.com" {
-            let mainVC = TechnieTabController()
-            window?.rootViewController = mainVC//UINavigationController(rootViewController: mainVC)
+            for userInfo in info {
+                // Window setup
+                window = UIWindow(frame: windowScene.coordinateSpace.bounds)
+                window?.windowScene = windowScene
+                //Main ViewController
+                if userInfo.email == "client@hotmail.com" {
+                    let mainVC = ClientTabController()
+                    window?.rootViewController = mainVC//UINavigationController(rootViewController: mainVC)
+                    
+                } else if userInfo.email  == "technician@gmail.com" {
+                    let mainVC = TechnieTabController()
+                    window?.rootViewController = mainVC//UINavigationController(rootViewController: mainVC)
+                }
+            }
         }
-//        window?.rootViewController = mainVC//UINavigationController(rootViewController: mainVC)
+
+//        window?.rootViewController = UINavigationController(rootViewController: ChooseAccountTypeVC())
         
         // Window visibility
         window?.makeKeyAndVisible()

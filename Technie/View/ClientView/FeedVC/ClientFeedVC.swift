@@ -166,6 +166,8 @@ class ClientFeedVC: UIViewController {
         fetchData()
         setupViews()
         print("viewDidLoadFeed: \(didShowSearchResultViewObservable.value)")
+        guard let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo") else { return }
+        print("persistUsersInfo: \(getUsersPersistedInfo)")
 //        UserDefaults.standard.removeObject(forKey: "persistUsersInfo")
 //        DatabaseManager.shared.getAllClientPosts(completion: { result in
 //            switch result {

@@ -563,6 +563,7 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         if sender.title(for: .normal) == "Hire Valter" {
             let vc = MyJobsVC()
             vc.myJobsVCDismissalDelegate = self
+            vc.technicianModel = technicianModel
             present(UINavigationController(rootViewController: vc), animated: true)
           
         } else {

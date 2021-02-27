@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import TTGTagCollectionView
 
 class JobDetailTVCell0: UITableViewCell {
     
@@ -290,45 +291,39 @@ class JobDetailTVCell4: UITableViewCell {
         let lbl = UILabel()
         lbl.translatesAutoresizingMaskIntoConstraints = false
         lbl.text = "Skills"
+        lbl.font = .boldSystemFont(ofSize: 16)
         return lbl
     }()
     
-    lazy var skillTagsCollectionView: UICollectionView = {
-        let collectionLayout = UICollectionViewFlowLayout()
-        collectionLayout.scrollDirection = .vertical
-        collectionLayout.minimumLineSpacing = 5
-//        collectionLayout.minimumInteritemSpacing = 10
-//        collectionLayout.estimatedItemSize = .zero
-//        collectionLayout.itemSize = .init(width: 50, height: 25)
-        let cv = UICollectionView(frame: .zero, collectionViewLayout: collectionLayout)
-        cv.translatesAutoresizingMaskIntoConstraints = false
-        cv.backgroundColor = .white
-        cv.isScrollEnabled = false
-//        cv.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        
-        // Avoid collectionView to self adjust its size
-//        cv.contentInsetAdjustmentBehavior = .never
-        let numberOfCharInEachElement = dataArray.map {$0.count}
-        let totalSumOfTheChars = numberOfCharInEachElement.reduce(0, +)
-//        print(numberOfCharInEachElement, totalSumOfTheChars)
-        if dataArray.count <= 4 && totalSumOfTheChars <= 34 {
-            // for 1 row
-            cv.withHeight(30)
-        } else {
-            // for potentially 2 row
-            cv.withHeight(65)
-        }
-        
-        cv.delegate = self
-        cv.dataSource = self
-        // Registration of the cell
-        cv.register(SkillTagsCell.self, forCellWithReuseIdentifier: SkillTagsCell.cellID)
-       
-        return cv
+    lazy var skillTagsCollectionView: TTGTextTagCollectionView = {
+        let tag = TTGTextTagCollectionView()
+        tag.isUserInteractionEnabled = false
+//        tag.enableTagSelection = false
+//        tag.delegate = self
+        tag.alignment = .left
+        tag.clipsToBounds = true
+//        tag.backgroundColor = .red
+        return tag
     }()
     
-    var dataArray = [String]()
+//    var dataArray = [String]()
 
+    var dataArray: [String]! {
+        didSet {
+            // Avoid duplicated items as this didSet is called multiple times
+            if  skillTagsCollectionView.allTags()?.count == 0 {
+                let config = TTGTextTagConfig()
+                config.backgroundColor = .systemGray5
+                config.textColor = .black
+                config.borderWidth = 0.5
+                config.borderColor = .lightGray
+                config.cornerRadius = 15
+                config.exactHeight = 25
+                config.textFont = .systemFont(ofSize: 13.5)
+                skillTagsCollectionView.addTags(dataArray, with: config)
+            }
+        }
+    }
     // MARK: - Inits
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -343,33 +338,13 @@ class JobDetailTVCell4: UITableViewCell {
     }
     
     func setupViews() {
-        [skillsHeaderLabel, skillTagsCollectionView].forEach { self.addSubview($0)}
-        skillsHeaderLabel.anchor(top: self.topAnchor, leading: self.leadingAnchor, bottom: nil, trailing: self.trailingAnchor, padding: UIEdgeInsets(top: 10, left: 20, bottom: 0, right: 20))
-        skillTagsCollectionView.anchor(top: skillsHeaderLabel.bottomAnchor, leading: skillsHeaderLabel.leadingAnchor, bottom: self.bottomAnchor, trailing: skillsHeaderLabel.trailingAnchor, padding: UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0))
+        [skillsHeaderLabel, skillTagsCollectionView].forEach { contentView.addSubview($0)}
+        skillsHeaderLabel.anchor(top: contentView.topAnchor, leading: contentView.leadingAnchor, bottom: nil, trailing: contentView.trailingAnchor, padding: UIEdgeInsets(top: 10, left: 20, bottom: 0, right: 20), size: CGSize(width: 0, height: 20))
+        skillTagsCollectionView.anchor(top: skillsHeaderLabel.bottomAnchor, leading: skillsHeaderLabel.leadingAnchor, bottom: contentView.bottomAnchor, trailing: skillsHeaderLabel.trailingAnchor, padding: UIEdgeInsets(top: 10, left: 0, bottom: 0, right: 0))
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-}
-
-extension JobDetailTVCell4: CollectionDataSourceAndDelegate {
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return dataArray.count
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: SkillTagsCell.cellID, for: indexPath) as! SkillTagsCell
-        cell.textLabel.text = dataArray[indexPath.item]
-        return cell
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let label = UILabel(frame: CGRect.zero)
-        label.text = dataArray[indexPath.item]
-        label.sizeToFit()
-        return CGSize(width: label.frame.width + 5, height: 30)
     }
     
 }

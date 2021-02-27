@@ -8,6 +8,7 @@
 import Foundation
 
 struct UserPersistedInfo: Codable {
+    let uid: String
     let name: String
     let email: String
     let location: String
@@ -15,13 +16,15 @@ struct UserPersistedInfo: Codable {
     let locationInLongLat: LocationInLongAndLat?
     let profileImage: String?
     
-    init(name: String,
+    init(uid: String,
+         name: String,
          email: String,
          location: String,
          accountType: String?,
          locationInLongLat: LocationInLongAndLat?,
          profileImage: String?) {
         
+        self.uid = uid
         self.name = name
         self.email = email
         self.location = location

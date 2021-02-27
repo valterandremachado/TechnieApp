@@ -19,6 +19,8 @@ class MyJobsVC: UIViewController {
     var selectedIndexes = [IndexPath]()
     
     var userPostModel = [PostModel]()
+    var technicianModel: TechnicianModel!
+    
     weak var myJobsVCDismissalDelegate: MyJobsVCDismissalDelegate?
 
     // MARK: - Properties
@@ -123,14 +125,32 @@ class MyJobsVC: UIViewController {
                     let childPath = "posts/\(postID)"
                     // create that array
                     let upadateElement = [ // pass the info to the technician and when he/she accepts the hiring update this element
-//                        "availabilityStatus": false,
                         "hiringStatus": [
-                        "isHired": false,
-                        "technicianToHireEmail": "nil"
-                            ]
+                            "isHired": false,
+                            "technicianToHireEmail": technicianModel.profileInfo.email
+                        ]
                     ] as [String : Any]
                     
                     self.database.child("\(childPath)").updateChildValues(upadateElement, withCompletionBlock: { error, _ in
+                        if error != nil {
+                            print("error on hiring: \(error?.localizedDescription ?? "nil")")
+                            return
+                        }
+//                        print("try: \(error?.localizedDescription ?? "N/A")")
+                        let notification = TechnicianNotificationModel(type: "Hiring",
+                                                                       title: "Hiring Notification",
+                                                                       description: "he wants to hire you",
+                                                                       dateTime: PostFormVC.dateFormatter.string(from: Date()),
+                                                                       postChildPath: childPath)
+                        
+                        DatabaseManager.shared.insertTechnicianNotification(with: notification, with: self.technicianModel.profileInfo.email, completion: { success in
+                            if success {
+                                print("success")
+                            } else {
+                                print("failed")
+                            }
+                        })
+
                     })
                 }
             }

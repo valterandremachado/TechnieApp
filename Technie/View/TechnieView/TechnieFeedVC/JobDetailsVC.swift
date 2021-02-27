@@ -296,7 +296,6 @@ extension JobDetailsVC: TableViewDataSourceAndDelegate {
             let cell = tableView.dequeueReusableCell(withIdentifier: JobDetailTVCell4.cellID, for: indexPath) as! JobDetailTVCell4
             cell.setupViews()
             cell.dataArray = postModel.requiredSkills
-            cell.skillsHeaderLabel.font = .boldSystemFont(ofSize: 16)
             return cell
         case 6:
             let cell = tableView.dequeueReusableCell(withIdentifier: JobDetailTVCell5.cellID, for: indexPath) as! JobDetailTVCell5

@@ -600,23 +600,113 @@ extension DatabaseManager {
         })
     }
     
+    public func getAllTechnicianNotifications(completion: @escaping (Result<NotificationModel, Error>) -> Void) {
+//        database.child("users/technicians").observeSingleEvent(of: .value, with: { [weak self] snapshot in
+//            guard let self = self else { return }
+//            guard let techniciansCollection = snapshot.value as? [String: Any] else {
+//                completion(.failure(DatabaseError.failedToFetch))
+//                return
+//            }
+            
+            guard let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo") else { return }
+
+            
+            for id in getUsersPersistedInfo {
+                let uid = id.uid
+                print("UID: "+uid)
+                self.database.child("users/technicians/\(uid)").observeSingleEvent(of: .value, with: { snapshot in
+                    guard let value = snapshot.value else { return }
+                    do {
+                        let model = try FirebaseDecoder().decode(NotificationModel.self, from: value)
+                        print("Notifications: \(model)")
+                        completion(.success(model))
+                    } catch let error {
+                        print(error)
+                    }
+                })
+            }
+//        })
+    }
+    
+    public func insertTechnicianNotification(with technicianNotificationModel: TechnicianNotificationModel, with technicianEmail: String, completion: @escaping (Bool) -> Void) {
+        let data = try! FirebaseEncoder().encode([technicianNotificationModel])
+        
+        database.child("users/technicians").observeSingleEvent(of: .value, with: { [weak self] snapshot in
+            guard let strongSelf = self else { return }
+            guard let techniciansCollection = snapshot.value as? [String: Any] else {
+                return
+            }
+            
+            for (key, _) in techniciansCollection {
+                strongSelf.database.child("users/technicians/\(key)").observeSingleEvent(of: .value, with: { snapshot in
+                    guard let value = snapshot.value else { return }
+                    do {
+                        let model = try FirebaseDecoder().decode(TechnicianModel.self, from: value)
+                        let email = model.profileInfo.email
+//                        print("email: \(model.profileInfo.email)")
+                        
+                        if email == technicianEmail {
+                            
+//                            print("email:  \(email), technicianEmail: \(technicianEmail), keyPath: \(key)")
+                            let db = strongSelf.database.child("users/technicians/\(key)/notifications")
+                            
+                            db.observeSingleEvent(of: .value, with: { snapshot in
+                                
+                                if var notificationsCollection = snapshot.value as? [[String: Any]] {
+                                    // append to user dictionary
+                                    let newElement = [
+                                        [
+                                            "type": technicianNotificationModel.type,
+                                            "title": technicianNotificationModel.title,
+                                            "description": technicianNotificationModel.description,
+                                            "dateTime": technicianNotificationModel.dateTime,
+                                            "postChildPath": technicianNotificationModel.postChildPath
+                                        ]
+                                    ]
+                                    
+                                    notificationsCollection.append(contentsOf: newElement)
+                                    db.setValue(notificationsCollection, withCompletionBlock: { error, _ in
+                                        guard error == nil else {
+                                            return
+                                        }
+                                        
+                                    })
+                                } else {
+                                    db.setValue(data, withCompletionBlock: { error, _ in
+                                    })
+                                }
+                            })
+                            
+                            
+                        }
+//                        completion(true)
+                    } catch let error {
+                        print(error)
+                    }
+                })
+            }
+        })
+        
+        
+    }
+    
     /// Gets all posts from database
-    public func getAllPosts(completion: @escaping (Result<PostModel, Error>) -> Void) {
+    public func getAllPosts(completion: @escaping (Result<[PostModel], Error>) -> Void) {
         database.child("posts").observeSingleEvent(of: .value, with: { snapshot in
             guard let postsCollection = snapshot.value as? [String: Any] else {
                 completion(.failure(DatabaseError.failedToFetch))
                 return
             }
             
-//            var posts = [PostModel]()
+            var posts = [PostModel]()
 
             for (key, _) in postsCollection {
                 Database.database().reference().child("posts/\(key)").observeSingleEvent(of: .value, with: { snapshot in
                     guard let value = snapshot.value else { return }
                     do {
                         let model = try FirebaseDecoder().decode(PostModel.self, from: value)
-//                        posts.append(model)
-                        completion(.success(model))
+                        posts.append(model)
+                        completion(.success(posts))
                     } catch let error {
                         print(error)
                     }
@@ -659,14 +749,15 @@ extension DatabaseManager {
     
     /// Gets all clients from database
     public func getAllClients(completion: @escaping (Result<ClientModel, Error>) -> Void) {
-        database.child("users/clients").observeSingleEvent(of: .value, with: { snapshot in
-            guard let postsCollection = snapshot.value as? [String: Any] else {
+        database.child("users/clients").observeSingleEvent(of: .value, with: { [weak self] snapshot in
+            guard let self = self else { return }
+            guard let usersCollection = snapshot.value as? [String: Any] else {
                 completion(.failure(DatabaseError.failedToFetch))
                 return
             }
 
-            for (key, _) in postsCollection {
-                Database.database().reference().child("users/clients/\(key)").observeSingleEvent(of: .value, with: { snapshot in
+            for (key, _) in usersCollection {
+                self.database.child("users/clients/\(key)").observeSingleEvent(of: .value, with: { snapshot in
                     guard let value = snapshot.value else { return }
                     do {
                         let model = try FirebaseDecoder().decode(ClientModel.self, from: value)
@@ -682,14 +773,15 @@ extension DatabaseManager {
     
     /// Gets all technician from database
     public func getAllTechnicians(completion: @escaping (Result<TechnicianModel, Error>) -> Void) {
-        database.child("users/technicians").observeSingleEvent(of: .value, with: { snapshot in
-            guard let postsCollection = snapshot.value as? [String: Any] else {
+        database.child("users/technicians").observeSingleEvent(of: .value, with: { [weak self] snapshot in
+            guard let self = self else { return }
+            guard let techniciansCollection = snapshot.value as? [String: Any] else {
                 completion(.failure(DatabaseError.failedToFetch))
                 return
             }
             
-            for (key, _) in postsCollection {
-                Database.database().reference().child("users/technicians/\(key)").observeSingleEvent(of: .value, with: { snapshot in
+            for (key, _) in techniciansCollection {
+                self.database.child("users/technicians/\(key)").observeSingleEvent(of: .value, with: { snapshot in
                     guard let value = snapshot.value else { return }
                     do {
                         let model = try FirebaseDecoder().decode(TechnicianModel.self, from: value)
@@ -1645,9 +1737,9 @@ struct TechnicianModel: Codable {
     let technieRank: Int
     let profileInfo: TechnicianProfileInfo
 //    let hired: [Hired]?
+//    let notifications: [TechnicianNotificationModel]?
     
 //    clientsSatisfaction[],
-//    notifications[],
 //    chats[]
 }
 
@@ -1667,8 +1759,32 @@ struct TechnicianProfileInfo: Codable {
 }
 
 struct Hired: Codable { //Added to the db only when technician accept the hiring offer
-    var servicePostID: String
+    var postChildPath: String
     var isCompleted: Bool
+}
+
+struct HiredJobs: Codable {
+    var hiredJobs: [Hired]
+}
+
+struct TechnicianNotificationModel: Codable {
+    var type: String
+    var title: String
+    var description: String
+    var dateTime: String
+    var postChildPath: String
+}
+
+struct NotificationModel: Codable {
+    var notifications: [Notifications]?
+}
+
+struct Notifications: Codable {
+    var type: String
+    var title: String
+    var description: String
+    var dateTime: String
+    var postChildPath: String?
 }
 
 struct PostModel: Codable {
@@ -1710,4 +1826,10 @@ struct HiringStatus: Codable {
 struct Proposals: Codable {
     var technicianEmail: String
     var coverLetter: String
+}
+
+struct LocationModel: Codable {
+    var geoLocation: String
+    var lat: Double
+    var long: Double
 }
