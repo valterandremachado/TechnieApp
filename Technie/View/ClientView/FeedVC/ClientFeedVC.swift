@@ -163,11 +163,13 @@ class ClientFeedVC: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         view.backgroundColor = UIColor(named: "BackgroundAppearance")
+        fetchUserPosts()
         fetchData()
         setupViews()
         print("viewDidLoadFeed: \(didShowSearchResultViewObservable.value)")
-        guard let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo") else { return }
-        print("persistUsersInfo: \(getUsersPersistedInfo)")
+//        guard let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo") else { return }
+//        print("persistUsersInfo: \(getUsersPersistedInfo)")
+        
 //        UserDefaults.standard.removeObject(forKey: "persistUsersInfo")
 //        DatabaseManager.shared.getAllClientPosts(completion: { result in
 //            switch result {
@@ -221,6 +223,19 @@ class ClientFeedVC: UIViewController {
                 self.clientFeedCollectionView.reloadData()
             case .failure(let error):
                 print("Failed to get technicians: \(error.localizedDescription)")
+            }
+        })
+    }
+    
+    var userPostModel = [PostModel]()
+
+    fileprivate func fetchUserPosts()  {
+        DatabaseManager.shared.getAllClientPosts(completion: { [self] result in
+            switch result {
+            case .success(let userPosts):
+                userPostModel = userPosts
+            case .failure(let error):
+                print(error)
             }
         })
     }
@@ -350,6 +365,7 @@ extension ClientFeedVC: CollectionDataSourceAndDelegate {
         case false:
             let vc = TechnicianProfileDetailsVC()
             vc.technicianModel = technicianModel[indexPath.item]
+            vc.userPostModel = userPostModel
             navigationItem.backBarButtonItem = UIBarButtonItem(title: "Feeds", style: .plain, target: self, action: nil)
             navigationController?.pushViewController(vc, animated: true)
         }

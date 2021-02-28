@@ -14,7 +14,7 @@ protocol MyJobsVCDismissalDelegate: class {
 }
 
 class MyJobsVC: UIViewController {
-
+    
     fileprivate var defaults = UserDefaults.standard
     var selectedIndexes = [IndexPath]()
     
@@ -46,23 +46,30 @@ class MyJobsVC: UIViewController {
         return tv
     }()
     
+    private let database = Database.database().reference()
+    
+    var isSentByDeclineAction = false
+
     // MARK: - Inits
     override func loadView() {
         super.loadView()
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         view.backgroundColor = .white
         setupViews()
-        fetchData()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        //        tableView.reloadData()
-        //        print("viewWillAppear")
+        
+//        for i in 0..<tableView.numberOfSections {
+//            for j in 0..<tableView.numberOfRows(inSection: i) {
+//                let indexPath = IndexPath(row: j, section: i)
+//            }
+//        } // End of loop
     }
     
     // MARK: - Methods
@@ -75,42 +82,56 @@ class MyJobsVC: UIViewController {
     
     fileprivate func setupNavBar() {
         guard let navBar = navigationController?.navigationBar else { return }
-        navigationItem.title = "Jobs"
         navBar.prefersLargeTitles = false
         navigationItem.largeTitleDisplayMode = .never
         
         let leftNavBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(leftNavBarBtnTapped))
         let rightNavBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(rightNavBarBtnTapped))
-
-        self.navigationItem.leftBarButtonItem = leftNavBarButton
-        self.navigationItem.rightBarButtonItem = rightNavBarButton
+        
+        if isSentByDeclineAction == true {
+            navigationItem.title = "Hired Jobs"
+            self.navigationItem.leftBarButtonItem = leftNavBarButton
+        } else {
+            navigationItem.title = "Jobs"
+            self.navigationItem.leftBarButtonItem = leftNavBarButton
+            self.navigationItem.rightBarButtonItem = rightNavBarButton
+        }
+        
     }
     
-    fileprivate func fetchData()  {
-        DatabaseManager.shared.getAllClientPosts(completion: { [self] result in
-            switch result {
-            case .success(let userPosts):
-                userPostModel = userPosts
-                tableView.reloadData()
-            case .failure(let error):
-                print(error)
+    fileprivate func presentAlertSheetForPullbackHiring() {
+        let alertController = UIAlertController(title: "Decline Hiring", message: "Are you sure you want to turn down this hire?", preferredStyle: .alert)
+        
+        let yesAction = UIAlertAction(title: "Yes", style: .default) { [self] (_) in
+            
+            for indexPath in selectedIndexes {
+                let newCell = tableView.cellForRow(at: indexPath)
+                if newCell?.accessoryType == UITableViewCell.AccessoryType.none
+                {
+                    newCell?.accessoryType = .checkmark
+                    selectedIndexes.append(indexPath)
+                } else {
+                    guard let removeThisIndexPath = selectedIndexes.firstIndex(of: indexPath) else { return }
+                    newCell?.accessoryType = .none
+                    selectedIndexes.remove(at: removeThisIndexPath)
+                }
             }
-        })
+            
+        }
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
+        alertController.addAction(yesAction)
+        alertController.addAction(cancelAction)
+        present(alertController, animated: true)
     }
     
-    // MARK: - Selectors
-    @objc fileprivate func leftNavBarBtnTapped() {
-        dismiss(animated: true, completion: nil)
+    fileprivate func presentAlertSheetForSelectionOfJobs() {
+        let alertController = UIAlertController(title: "Oops!", message: "You have not assign any job to this technician. Please press cancel instead.", preferredStyle: .alert)
+
+        let cancelAction = UIAlertAction(title: "Ok", style: .cancel)
+        alertController.addAction(cancelAction)
+        present(alertController, animated: true)
     }
-    
-    @objc fileprivate func rightNavBarBtnTapped() {
-        updatePost(with: selectedIndexes)
-        dismiss(animated: true, completion: nil)
-        myJobsVCDismissalDelegate?.jobsVCDismissalSingleton(isDismissed: true)
-    }
-    
-    private let database = Database.database().reference()
-    
     
     fileprivate func updatePost(with selectedIndexPaths: [IndexPath]) {
         var postModel = [PostModel]()
@@ -156,6 +177,23 @@ class MyJobsVC: UIViewController {
             }
     }
     
+    // MARK: - Selectors
+    @objc fileprivate func leftNavBarBtnTapped() {
+        dismiss(animated: true, completion: nil)
+    }
+    
+    @objc fileprivate func rightNavBarBtnTapped() {
+        if selectedIndexes.count == 0 {
+            presentAlertSheetForSelectionOfJobs()
+        } else {
+            updatePost(with: selectedIndexes)
+            dismiss(animated: true, completion: nil)
+            myJobsVCDismissalDelegate?.jobsVCDismissalSingleton(isDismissed: true)
+        }
+    }
+    
+    
+        
 }
 
 // MARK: - TableViewDataSourceAndDelegate Extension
@@ -170,13 +208,19 @@ extension MyJobsVC: TableViewDataSourceAndDelegate {
         cell = MyJobsCell(style: .subtitle, reuseIdentifier: MyJobsCell.cellID)
         let model = userPostModel[indexPath.row]
         cell.userPostModel = model
-        print("userPostModel Count: \(userPostModel.count)")
-
-//        if indexPath == selectedIndexPath {
-//            cell.accessoryType = .checkmark
-//        } else {
-//            cell.accessoryType = .none
-//        }
+        
+        if technicianModel.profileInfo.email == model.hiringStatus?.technicianToHireEmail && model.hiringStatus?.isHired == true && isSentByDeclineAction == true {
+            cell.accessoryType = .checkmark
+            selectedIndexes.append(indexPath)
+        } else  if technicianModel.profileInfo.email == model.hiringStatus?.technicianToHireEmail && model.hiringStatus?.isHired == true && isSentByDeclineAction == false {
+            cell.accessoryType = .checkmark
+        }
+        
+        //        if indexPath == selectedIndexPath {
+        //            cell.accessoryType = .checkmark
+        //        } else {
+        //            cell.accessoryType = .none
+        //        }
         
         return cell
     }
@@ -196,10 +240,17 @@ extension MyJobsVC: TableViewDataSourceAndDelegate {
             selectedIndexes.append(indexPath)
         } else {
             guard let removeThisIndexPath = selectedIndexes.firstIndex(of: indexPath) else { return }
-            newCell?.accessoryType = .none
-            selectedIndexes.remove(at: removeThisIndexPath)
+            let model = userPostModel[indexPath.row]
+            if technicianModel.profileInfo.email == model.hiringStatus?.technicianToHireEmail && model.hiringStatus?.isHired == true && isSentByDeclineAction == true  {
+                presentAlertSheetForPullbackHiring()
+            } else {
+                newCell?.accessoryType = .none
+                selectedIndexes.remove(at: removeThisIndexPath)
+            }
+           
         }
         print("didSelectRowAt: \(selectedIndexes)")
+       
        
 
 //        let oldCell = tableView.cellForRow(at: selectedIndexPath!)

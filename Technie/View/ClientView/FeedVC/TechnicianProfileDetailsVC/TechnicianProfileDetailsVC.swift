@@ -10,6 +10,9 @@ import UIKit
 class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelegate, UIScrollViewDelegate {
 
     var technicianModel: TechnicianModel!
+    var userPostModel = [PostModel]()
+    var tempUserPosts = [PostModel]()
+
     // MARK: - Properties
     lazy var profileImageView: UIImageView = {
         var iv = UIImageView()
@@ -273,6 +276,19 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         return sv
     }()
     
+    var isSearching = false
+    
+    lazy var titleView: UILabel = {
+        let lbl = UILabel()
+        lbl.translatesAutoresizingMaskIntoConstraints = false
+//        lbl.backgroundColor = .red
+        lbl.font = .boldSystemFont(ofSize: 16)
+        lbl.text = nameLabel.text
+        lbl.isHidden = true
+        return lbl
+    }()
+    
+    
     override func loadView() {
         super.loadView()
     }
@@ -285,7 +301,7 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         setupViews()
         setupSwitchableContainerView()
         populateSections()
-        
+        fetchUserPosts()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -335,9 +351,7 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
             }
         }
     }
-    
-  
-    
+        
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
@@ -351,18 +365,6 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         setupNavBar()
     }
     
-    var isSearching = false
-    
-    lazy var titleView: UILabel = {
-        let lbl = UILabel()
-        lbl.translatesAutoresizingMaskIntoConstraints = false
-//        lbl.backgroundColor = .red
-        lbl.font = .boldSystemFont(ofSize: 16)
-        lbl.text = nameLabel.text
-        lbl.isHidden = true
-        return lbl
-    }()
-    
     fileprivate func setupNavBar() {
         guard let navBar = navigationController?.navigationBar else { return }
         if isSearching == true {
@@ -371,6 +373,33 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         
         navigationItem.largeTitleDisplayMode = .never
         navigationItem.titleView = titleView
+    }
+
+    var hiredUserJobs = [PostModel]()
+    fileprivate func fetchUserPosts() {
+        for post in userPostModel {
+            if technicianModel.profileInfo.email != post.hiringStatus?.technicianToHireEmail {
+                tempUserPosts.append(post)
+            } else if userPostModel.count == 1 && technicianModel.profileInfo.email == post.hiringStatus?.technicianToHireEmail {
+                UIView.animate(withDuration: 0.5) { [self] in
+                    post.hiringStatus?.isHired == false ? hireBtn.setTitle("Pending...", for: .normal) : hireBtn.setTitle("Hired", for: .normal)
+                    hireBtn.setTitleColor(.systemGray4, for: .normal)
+                    hireBtn.backgroundColor = UIColor.systemPink.withAlphaComponent(0.8)
+                }
+            } else if userPostModel.count > 1 && technicianModel.profileInfo.email == post.hiringStatus?.technicianToHireEmail {
+                UIView.animate(withDuration: 0.5) { [self] in
+                    hireBtn.setTitle("Currently hired in one of my jobs", for: .normal)
+                    hireBtn.setTitleColor(.systemGray4, for: .normal)
+                    hireBtn.backgroundColor = UIColor.systemPink.withAlphaComponent(0.8)
+                }
+                hiredUserJobs.append(post)
+
+            }
+//            else if technicianModel.profileInfo.email == post.hiringStatus?.technicianToHireEmail {
+//                print("technicianToHireEmail")
+//            }
+        }
+        
     }
     
     fileprivate func presentSelectionBar() {
@@ -560,14 +589,24 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
     
     // MARK: - Selectors
     @objc fileprivate func hireBtnPressed(_ sender: UIButton) {
-        if sender.title(for: .normal) == "Hire Valter" {
+        switch sender.title(for: .normal) {
+        case "Hire Valter":
             let vc = MyJobsVC()
             vc.myJobsVCDismissalDelegate = self
             vc.technicianModel = technicianModel
+            vc.userPostModel = tempUserPosts
             present(UINavigationController(rootViewController: vc), animated: true)
-          
-        } else {
+            
+        case "Pending...":
             presentAlertSheetForHireBtn()
+            
+        case "Hired":
+            presentAlertSheetForHireBtn()
+            
+        case "Currently hired in one of my jobs":
+            presentActionSheetForHireBtn()
+        default:
+            break
         }
         
     }
@@ -604,6 +643,40 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
         alertController.addAction(inviteAction)
         alertController.addAction(dmAction)
+        alertController.addAction(cancelAction)
+        alertController.fixActionSheetConstraintsError()
+        present(alertController, animated: true)
+    }
+    
+    fileprivate func presentActionSheetForHireBtn() {
+        let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        let declineAction = UIAlertAction(title: "Decline Hiring", style: .default) { [self] (_) in
+            if hiredUserJobs.count != 1 {
+                let vc = MyJobsVC()
+                vc.myJobsVCDismissalDelegate = self
+                vc.userPostModel = hiredUserJobs
+                vc.technicianModel = technicianModel
+                vc.isSentByDeclineAction = true
+                present(UINavigationController(rootViewController: vc), animated: true)
+            } else {
+                presentAlertSheetForHireBtn()
+            }
+            
+        }
+        
+        let viewAction = UIAlertAction(title: "View Jobs", style: .default) { [self] (_) in
+            let vc = MyJobsVC()
+            vc.myJobsVCDismissalDelegate = self
+            vc.userPostModel = userPostModel
+            vc.technicianModel = technicianModel
+            vc.isSentByDeclineAction = false
+            present(UINavigationController(rootViewController: vc), animated: true)
+        }
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
+        alertController.addAction(declineAction)
+        alertController.addAction(viewAction)
         alertController.addAction(cancelAction)
         alertController.fixActionSheetConstraintsError()
         present(alertController, animated: true)

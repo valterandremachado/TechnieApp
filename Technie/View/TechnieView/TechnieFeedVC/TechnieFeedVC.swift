@@ -221,7 +221,6 @@ class TechnieFeedVC: UIViewController {
         
     }
     
-
     fileprivate func fetchData()  {
         DispatchQueue.main.async {
             DatabaseManager.shared.getAllPosts(completion: {[weak self] result in

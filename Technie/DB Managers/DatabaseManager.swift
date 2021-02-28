@@ -648,7 +648,7 @@ extension DatabaseManager {
                         if email == technicianEmail {
                             
 //                            print("email:  \(email), technicianEmail: \(technicianEmail), keyPath: \(key)")
-                            let db = strongSelf.database.child("users/technicians/\(key)/notifications")
+                            let db = strongSelf.database.child("users/technicians/\(key)/notifications")//.childByAutoId()
                             
                             db.observeSingleEvent(of: .value, with: { snapshot in
                                 
@@ -705,8 +705,15 @@ extension DatabaseManager {
                     guard let value = snapshot.value else { return }
                     do {
                         let model = try FirebaseDecoder().decode(PostModel.self, from: value)
-                        posts.append(model)
-                        completion(.success(posts))
+                        if model.availabilityStatus != false {
+                            posts.append(model)
+
+                            let sortedArray = posts.sorted(by: { PostFormVC.dateFormatter.date(from: $0.dateTime)?.compare(PostFormVC.dateFormatter.date(from: $1.dateTime) ?? Date()) == .orderedDescending })
+//                            print("sortedArray: \(sortedArray)")
+//                            print("NOTsortedArray: \(posts)")
+                            completion(.success(sortedArray))
+                        }
+                       
                     } catch let error {
                         print(error)
                     }
@@ -1820,7 +1827,7 @@ struct PostOwnerInfo: Codable {
 
 struct HiringStatus: Codable {
     var isHired: Bool
-    var hiredTechnicianEmail: String
+    var technicianToHireEmail: String
 }
 
 struct Proposals: Codable {

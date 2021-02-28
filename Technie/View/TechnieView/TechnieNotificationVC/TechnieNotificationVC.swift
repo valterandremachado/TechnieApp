@@ -37,7 +37,7 @@ class TechnieNotificationVC: UIViewController {
     }()
     
     var database = Database.database().reference()
-    var postChildPath = "nil"
+    var postChildPath = ""
 
     // MARK: - Inits
     override func viewDidLoad() {
@@ -82,63 +82,66 @@ class TechnieNotificationVC: UIViewController {
       
     }
     
-    @objc func acceptBtnPressed() {
-        print("this: \(postChildPath)")
-        guard let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo") else { return }
-        guard let hiredTechnicanEmail = getUsersPersistedInfo.first?.email else { return }
-        guard let technicianChildPath = getUsersPersistedInfo.first?.uid else { return }
+    @objc func acceptBtnPressed(sender: UIButton) {
+        print("this: \(postChildPath), \(sender.tag)")
+//        NotificationCenter.default.post(name: Notification.Name("AcceptButtonObserver"), object: sender.tag)
         
-        let upadateElement = [
-            "availabilityStatus": false,
-            "hiringStatus": [
-                "isHired": true,
-                "technicianToHireEmail": hiredTechnicanEmail,
-                "date": PostFormVC.dateFormatter.string(from: Date())
-            ]
-        ] as [String : Any]
-        
-        self.database.child("\(postChildPath)").updateChildValues(upadateElement, withCompletionBlock: { error, _ in
-            if error != nil {
-                print("error on hiring: \(error?.localizedDescription ?? "nil")")
-                return
-            }
-            
-            self.database.child("users/technicians/\(technicianChildPath)/hiredJobs").observeSingleEvent(of: .value, with: { [weak self] snapshot in
-                guard let self = self else { return }
-                
-                if var hiredJobsCollection = snapshot.value as? [[String: Any]] {
-                    // append to user dictionary
-                    let newElement = [
-                        [
-                            "postChildPath": self.postChildPath,
-                            "isCompleted": false
-                        ]
-                    ]
-                    
-                    hiredJobsCollection.append(contentsOf: newElement)
-                    self.database.child("users/technicians/\(technicianChildPath)/hiredJobs").setValue(hiredJobsCollection, withCompletionBlock: { error, _ in
-                        guard error == nil else {
-                            return
-                        }
-                        
-                    })
-                } else {
-                    // create that array
-                    let newElement = [
-                        [
-                            "postChildPath": self.postChildPath,
-                            "isCompleted": false
-                        ]
-                    ]
-                    
-                    self.database.child("users/technicians/\(technicianChildPath)/hiredJobs").setValue(newElement, withCompletionBlock: { error, _ in
-                    })
-                }
-            })
-        })
+//        guard let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo") else { return }
+//        guard let hiredTechnicanEmail = getUsersPersistedInfo.first?.email else { return }
+//        guard let technicianChildPath = getUsersPersistedInfo.first?.uid else { return }
+//
+//        let upadateElement = [
+//            "availabilityStatus": false,
+//            "hiringStatus": [
+//                "isHired": true,
+//                "technicianToHireEmail": hiredTechnicanEmail,
+//                "date": PostFormVC.dateFormatter.string(from: Date())
+//            ]
+//        ] as [String : Any]
+//
+//        self.database.child("\(postChildPath)").updateChildValues(upadateElement, withCompletionBlock: { error, _ in
+//            if error != nil {
+//                print("error on hiring: \(error?.localizedDescription ?? "nil")")
+//                return
+//            }
+//
+//            self.database.child("users/technicians/\(technicianChildPath)/hiredJobs").observeSingleEvent(of: .value, with: { [weak self] snapshot in
+//                guard let self = self else { return }
+//
+//                if var hiredJobsCollection = snapshot.value as? [[String: Any]] {
+//                    // append to user dictionary
+//                    let newElement = [
+//                        [
+//                            "postChildPath": self.postChildPath,
+//                            "isCompleted": false
+//                        ]
+//                    ]
+//
+//                    hiredJobsCollection.append(contentsOf: newElement)
+//                    self.database.child("users/technicians/\(technicianChildPath)/hiredJobs").setValue(hiredJobsCollection, withCompletionBlock: { error, _ in
+//                        guard error == nil else {
+//                            return
+//                        }
+//
+//                    })
+//                } else {
+//                    // create that array
+//                    let newElement = [
+//                        [
+//                            "postChildPath": self.postChildPath,
+//                            "isCompleted": false
+//                        ]
+//                    ]
+//
+//                    self.database.child("users/technicians/\(technicianChildPath)/hiredJobs").setValue(newElement, withCompletionBlock: { error, _ in
+//                    })
+//                }
+//            })
+//        })
     }
     
 //    let notifications = ["technie", "client", "technie", "client", "technie", "client", "technie", "client", "technie"]
+    var selectedIndex = IndexPath()
 }
 
 // MARK: - Extension
@@ -153,9 +156,12 @@ extension TechnieNotificationVC: TableViewDataSourceAndDelegate {
         
         let model = userNotifications.notifications?[indexPath.row]
         if model?.type == "Hiring" {
-            postChildPath = model?.postChildPath ?? "nil"
+//            postChildPath = model?.postChildPath ?? ""
+            cell.postChildPath = model?.postChildPath ?? ""
+
+            cell.acceptBtn.tag = indexPath.row
             cell.declineBtn.addTarget(self, action: #selector(declineBtnPressed), for: .touchUpInside)
-            cell.acceptBtn.addTarget(self, action: #selector(acceptBtnPressed), for: .touchUpInside)
+//            cell.acceptBtn.addTarget(self, action: #selector(acceptBtnPressed), for: .touchUpInside)
             cell.setupViews2()
             cell.userNotification = model
         } else {
@@ -165,6 +171,9 @@ extension TechnieNotificationVC: TableViewDataSourceAndDelegate {
         return cell
     }
     
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        selectedIndex = indexPath
+    }
     
     
 }
