@@ -227,7 +227,8 @@ class TechnieFeedVC: UIViewController {
                 guard let self = self else { return }
                 switch result {
                 case .success(let posts):
-                    self.postModel = posts
+                    let sortedArray = posts.sorted(by: { PostFormVC.dateFormatter.date(from: $0.dateTime)?.compare(PostFormVC.dateFormatter.date(from: $1.dateTime) ?? Date()) == .orderedDescending })
+                    self.postModel = sortedArray
                     self.tableView.reloadData()
 
                     return
@@ -247,7 +248,8 @@ class TechnieFeedVC: UIViewController {
                     // Remove existing items to avoid duplicated items
                     self.postModel.removeAll()
                     print("childChanged")
-                    self.postModel = posts
+                    let sortedArray = posts.sorted(by: { PostFormVC.dateFormatter.date(from: $0.dateTime)?.compare(PostFormVC.dateFormatter.date(from: $1.dateTime) ?? Date()) == .orderedDescending })
+                    self.postModel = sortedArray
                     self.tableView.reloadData()
                     return
                 case .failure(let error):

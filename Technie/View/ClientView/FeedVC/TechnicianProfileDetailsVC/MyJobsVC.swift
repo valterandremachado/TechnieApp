@@ -134,6 +134,9 @@ class MyJobsVC: UIViewController {
     }
     
     fileprivate func updatePost(with selectedIndexPaths: [IndexPath]) {
+        guard let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo") else { return }
+        guard let clientName = getUsersPersistedInfo.first?.name else { return }
+        guard let clientKeyPath = getUsersPersistedInfo.first?.uid else { return }
         var postModel = [PostModel]()
         
         for indexPath in selectedIndexPaths {
@@ -158,11 +161,13 @@ class MyJobsVC: UIViewController {
                             return
                         }
 //                        print("try: \(error?.localizedDescription ?? "N/A")")
-                        let notification = TechnicianNotificationModel(type: "Hiring",
+                        let notification = TechnicianNotificationModel(id: "nil",
+                                                                       type: "Hiring",
                                                                        title: "Hiring Notification",
-                                                                       description: "he wants to hire you",
+                                                                       description: "\(clientName) wants to hire you as a technician to do a service at his place.",
                                                                        dateTime: PostFormVC.dateFormatter.string(from: Date()),
-                                                                       postChildPath: childPath)
+                                                                       postChildPath: childPath,
+                                                                       clientKeyPath: clientKeyPath)
                         
                         DatabaseManager.shared.insertTechnicianNotification(with: notification, with: self.technicianModel.profileInfo.email, completion: { success in
                             if success {

@@ -9,6 +9,8 @@ import UIKit
 
 class ClientNotificationVC: UIViewController {
 
+    var userNotifications = [ClientNotificationModel]()
+
     // MARK: - Properties
     lazy var tableView: UITableView = {
         let tv = UITableView(frame: .zero, style: .plain)
@@ -29,7 +31,7 @@ class ClientNotificationVC: UIViewController {
         
         tv.delegate = self
         tv.dataSource = self
-        tv.register(TechnieNotificationsCell.self, forCellReuseIdentifier: TechnieNotificationsCell.cellID)
+        tv.register(ClientNotificationCell.self, forCellReuseIdentifier: ClientNotificationCell.cellID)
         return tv
     }()
     
@@ -38,7 +40,13 @@ class ClientNotificationVC: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         view.backgroundColor = .white
+        fetchData()
+        notificationChangesListener()
         setupViews()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
     }
     
     // MARK: - Methods
@@ -56,22 +64,62 @@ class ClientNotificationVC: UIViewController {
         navigationItem.title = "Notifications"
     }
     
+    fileprivate func fetchData() {
+        DatabaseManager.shared.getAllClientNotifications(completion: {[weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let notifications):
+                let sortedArray = notifications.sorted(by: { PostFormVC.dateFormatter.date(from: $0.dateTime)?.compare(PostFormVC.dateFormatter.date(from: $1.dateTime) ?? Date()) == .orderedDescending })
+                self.userNotifications = sortedArray
+                self.tableView.reloadData()
+                print("success")
+            case .failure(let error):
+                print("Failed to get technicians: \(error.localizedDescription)")
+            }
+        })
+    }
+    
+    fileprivate func notificationChangesListener() {
+        DatabaseManager.shared.listenToClientNotificationChanges(completion: {[weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let notifications):
+                self.userNotifications.removeAll()
+                print("childChanged")
+                let sortedArray = notifications.sorted(by: { PostFormVC.dateFormatter.date(from: $0.dateTime)?.compare(PostFormVC.dateFormatter.date(from: $1.dateTime) ?? Date()) == .orderedDescending })
+                self.userNotifications = sortedArray
+                self.tableView.reloadData()
+                return
+            case .failure(let error):
+                print("Failed to get technicians: \(error.localizedDescription)")
+            }
+        })
+    }
+    
     // MARK: - Selectors
     
-    let notifications = ["technie", "client", "technie", "client", "technie", "client", "technie", "client", "technie"]
+//    let notifications = ["technie", "client", "technie", "client", "technie", "client", "technie", "client", "technie"]
 }
 
 // MARK: - Extension
 extension ClientNotificationVC: TableViewDataSourceAndDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return notifications.count
+        return userNotifications.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: TechnieNotificationsCell.cellID, for: indexPath) as! TechnieNotificationsCell
-
-        cell.setupViews()
+        let cell = tableView.dequeueReusableCell(withIdentifier: ClientNotificationCell.cellID, for: indexPath) as! ClientNotificationCell
+        let model = userNotifications[indexPath.row]
+        cell.userNotification = model
+        cell.startChatBtn.tag = indexPath.row
+        if model.wasAccepted == true {
+            cell.setupViews2()
+            cell.buttonsStackView.isHidden = false
+        } else {
+            cell.buttonsStackView.isHidden = true
+            cell.setupViews()
+        }
         
         return cell
     }

@@ -27,6 +27,7 @@
 		8A41E7B725B07D6C00265D5C /* TechineProfileTVCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A41E7B625B07D6C00265D5C /* TechineProfileTVCell.swift */; };
 		8A41E7BC25B07F1D00265D5C /* TechnieProfileTVOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A41E7BB25B07F1D00265D5C /* TechnieProfileTVOptions.swift */; };
 		8A4288C825E7F25700091020 /* UserPersistedInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A4288C725E7F25600091020 /* UserPersistedInfo.swift */; };
+		8A467E9B25ED364500E92D67 /* ClientNotificationCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A467E9A25ED364500E92D67 /* ClientNotificationCell.swift */; };
 		8A4B746525C6D7E40051619C /* SubmitProposalVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A4B746425C6D7E40051619C /* SubmitProposalVC.swift */; };
 		8A4B746A25C6DBAB0051619C /* SubmitProposalCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A4B746925C6DBAB0051619C /* SubmitProposalCell.swift */; };
 		8A54D19425CBE19100045D37 /* CustomSegmentedControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A54D19325CBE19100045D37 /* CustomSegmentedControl.swift */; };
@@ -185,6 +186,7 @@
 		8A41E7B625B07D6C00265D5C /* TechineProfileTVCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechineProfileTVCell.swift; sourceTree = "<group>"; };
 		8A41E7BB25B07F1D00265D5C /* TechnieProfileTVOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnieProfileTVOptions.swift; sourceTree = "<group>"; };
 		8A4288C725E7F25600091020 /* UserPersistedInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPersistedInfo.swift; sourceTree = "<group>"; };
+		8A467E9A25ED364500E92D67 /* ClientNotificationCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientNotificationCell.swift; sourceTree = "<group>"; };
 		8A4B746425C6D7E40051619C /* SubmitProposalVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubmitProposalVC.swift; sourceTree = "<group>"; };
 		8A4B746925C6DBAB0051619C /* SubmitProposalCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubmitProposalCell.swift; sourceTree = "<group>"; };
 		8A54D19325CBE19100045D37 /* CustomSegmentedControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomSegmentedControl.swift; sourceTree = "<group>"; };
@@ -490,6 +492,7 @@
 			isa = PBXGroup;
 			children = (
 				8A8F8532258A358400C4CEF9 /* ClientNotificationVC.swift */,
+				8A467E9A25ED364500E92D67 /* ClientNotificationCell.swift */,
 			);
 			path = NotificationVC;
 			sourceTree = "<group>";
@@ -1162,6 +1165,7 @@
 				8A6A32752598C73A001FE408 /* PostSectionVC.swift in Sources */,
 				8AC93A9525B6EF3A00663BE3 /* ChatModels.swift in Sources */,
 				8A41E7BC25B07F1D00265D5C /* TechnieProfileTVOptions.swift in Sources */,
+				8A467E9B25ED364500E92D67 /* ClientNotificationCell.swift in Sources */,
 				8A54D19425CBE19100045D37 /* CustomSegmentedControl.swift in Sources */,
 				8AC93A9B25B6F04600663BE3 /* ConversationVC.swift in Sources */,
 				8A159DFD25B307D900D45C60 /* JobDetailCVCell.swift in Sources */,

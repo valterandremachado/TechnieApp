@@ -10,7 +10,7 @@ import FirebaseDatabase
 
 class TechnieNotificationVC: UIViewController {
 
-    var userNotifications = NotificationModel()
+    var userNotifications = [TechnicianNotificationModel]()
     
     // MARK: - Properties
     lazy var tableView: UITableView = {
@@ -46,6 +46,7 @@ class TechnieNotificationVC: UIViewController {
         view.backgroundColor = .white
         setupViews()
         fetchData()
+        notificationChangesListener()
     }
     
     // MARK: - Methods
@@ -68,7 +69,8 @@ class TechnieNotificationVC: UIViewController {
             guard let self = self else { return }
             switch result {
             case .success(let notifications):
-                self.userNotifications = notifications
+                let sortedArray = notifications.sorted(by: { PostFormVC.dateFormatter.date(from: $0.dateTime)?.compare(PostFormVC.dateFormatter.date(from: $1.dateTime) ?? Date()) == .orderedDescending })
+                self.userNotifications = sortedArray
                 self.tableView.reloadData()
                 print("success")
             case .failure(let error):
@@ -77,68 +79,52 @@ class TechnieNotificationVC: UIViewController {
         })
     }
     
-    // MARK: - Selectors
-    @objc func declineBtnPressed() {
-      
+    fileprivate func notificationChangesListener() {
+        DatabaseManager.shared.listenToTechnicianNotificationChanges(completion: {[weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let notifications):
+                self.userNotifications.removeAll()
+                print("childChanged")
+                let sortedArray = notifications.sorted(by: { PostFormVC.dateFormatter.date(from: $0.dateTime)?.compare(PostFormVC.dateFormatter.date(from: $1.dateTime) ?? Date()) == .orderedDescending })
+                self.userNotifications = sortedArray
+                self.tableView.reloadData()
+                return
+            case .failure(let error):
+                print("Failed to get technicians: \(error.localizedDescription)")
+            }
+        })
     }
     
-    @objc func acceptBtnPressed(sender: UIButton) {
-        print("this: \(postChildPath), \(sender.tag)")
-//        NotificationCenter.default.post(name: Notification.Name("AcceptButtonObserver"), object: sender.tag)
+    // MARK: - Selectors
+    @objc func declineBtnPressed(sender: UIButton) {
+        let index = sender.tag
+        let indexedNotificationModel = userNotifications[index]
         
-//        guard let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo") else { return }
-//        guard let hiredTechnicanEmail = getUsersPersistedInfo.first?.email else { return }
-//        guard let technicianChildPath = getUsersPersistedInfo.first?.uid else { return }
-//
-//        let upadateElement = [
-//            "availabilityStatus": false,
-//            "hiringStatus": [
-//                "isHired": true,
-//                "technicianToHireEmail": hiredTechnicanEmail,
-//                "date": PostFormVC.dateFormatter.string(from: Date())
-//            ]
-//        ] as [String : Any]
-//
-//        self.database.child("\(postChildPath)").updateChildValues(upadateElement, withCompletionBlock: { error, _ in
-//            if error != nil {
-//                print("error on hiring: \(error?.localizedDescription ?? "nil")")
-//                return
-//            }
-//
-//            self.database.child("users/technicians/\(technicianChildPath)/hiredJobs").observeSingleEvent(of: .value, with: { [weak self] snapshot in
-//                guard let self = self else { return }
-//
-//                if var hiredJobsCollection = snapshot.value as? [[String: Any]] {
-//                    // append to user dictionary
-//                    let newElement = [
-//                        [
-//                            "postChildPath": self.postChildPath,
-//                            "isCompleted": false
-//                        ]
-//                    ]
-//
-//                    hiredJobsCollection.append(contentsOf: newElement)
-//                    self.database.child("users/technicians/\(technicianChildPath)/hiredJobs").setValue(hiredJobsCollection, withCompletionBlock: { error, _ in
-//                        guard error == nil else {
-//                            return
-//                        }
-//
-//                    })
-//                } else {
-//                    // create that array
-//                    let newElement = [
-//                        [
-//                            "postChildPath": self.postChildPath,
-//                            "isCompleted": false
-//                        ]
-//                    ]
-//
-//                    self.database.child("users/technicians/\(technicianChildPath)/hiredJobs").setValue(newElement, withCompletionBlock: { error, _ in
-//                    })
-//                }
-//            })
-//        })
+        guard let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo") else { return }
+        guard let technicanName = getUsersPersistedInfo.first?.name else { return }
+        guard let technicianKeyPath = getUsersPersistedInfo.first?.uid else { return }
+        guard let clientKeyPath = indexedNotificationModel.clientKeyPath else { return }
+        guard let postChildPath = indexedNotificationModel.postChildPath else { return }
+
+        let technieChildPathToDelete = "users/technicians/\(technicianKeyPath)/notifications/\(indexedNotificationModel.id)"
+//        print("model: \(indexedNotificationModel), childPath: \(technieChildPathToDelete), tag: \(sender.tag)")
+        let clientPostChildPathToDelete = "\(postChildPath)/hiringStatus"
+
+        DatabaseManager.shared.deleteNotification(withTechnieChildPath: technieChildPathToDelete, withPostChildPath: clientPostChildPathToDelete, clientKeyPath: clientKeyPath, technicianName: technicanName, completion: { success in
+            if success {
+                print("notification deleted")
+                self.userNotifications.remove(at: index)
+                self.tableView.beginUpdates()
+                self.tableView.deleteRows(at: [IndexPath(row: index, section: 0)], with: .left)
+                self.tableView.endUpdates()
+
+            } else {
+                print("failed to delete notification")
+            }
+        })
     }
+    
     
 //    let notifications = ["technie", "client", "technie", "client", "technie", "client", "technie", "client", "technie"]
     var selectedIndex = IndexPath()
@@ -148,22 +134,24 @@ class TechnieNotificationVC: UIViewController {
 extension TechnieNotificationVC: TableViewDataSourceAndDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return userNotifications.notifications?.count ?? 0
+        return userNotifications.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: TechnieNotificationsCell.cellID, for: indexPath) as! TechnieNotificationsCell
         
-        let model = userNotifications.notifications?[indexPath.row]
-        if model?.type == "Hiring" {
+        let model = userNotifications[indexPath.row]
+        if model.type == "Hiring" {
 //            postChildPath = model?.postChildPath ?? ""
-            cell.postChildPath = model?.postChildPath ?? ""
+            cell.postChildPath = model.postChildPath ?? ""
 
             cell.acceptBtn.tag = indexPath.row
+            cell.declineBtn.tag = indexPath.row
             cell.declineBtn.addTarget(self, action: #selector(declineBtnPressed), for: .touchUpInside)
 //            cell.acceptBtn.addTarget(self, action: #selector(acceptBtnPressed), for: .touchUpInside)
             cell.setupViews2()
             cell.userNotification = model
+            
         } else {
             cell.setupViews()
             cell.userNotification = model

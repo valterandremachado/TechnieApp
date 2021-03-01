@@ -378,7 +378,7 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
     var hiredUserJobs = [PostModel]()
     fileprivate func fetchUserPosts() {
         for post in userPostModel {
-            if technicianModel.profileInfo.email != post.hiringStatus?.technicianToHireEmail {
+            if technicianModel.profileInfo.email != post.hiringStatus?.technicianToHireEmail && post.hiringStatus?.isHired == false  {
                 tempUserPosts.append(post)
             } else if userPostModel.count == 1 && technicianModel.profileInfo.email == post.hiringStatus?.technicianToHireEmail {
                 UIView.animate(withDuration: 0.5) { [self] in
@@ -388,12 +388,14 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
                 }
             } else if userPostModel.count > 1 && technicianModel.profileInfo.email == post.hiringStatus?.technicianToHireEmail {
                 UIView.animate(withDuration: 0.5) { [self] in
-                    hireBtn.setTitle("Currently hired in one of my jobs", for: .normal)
+                    post.hiringStatus?.isHired == false ? hireBtn.setTitle("Pending...", for: .normal) : hireBtn.setTitle("Currently hired in one of my jobs", for: .normal)
                     hireBtn.setTitleColor(.systemGray4, for: .normal)
                     hireBtn.backgroundColor = UIColor.systemPink.withAlphaComponent(0.8)
                 }
                 hiredUserJobs.append(post)
 
+            } else {
+                tempUserPosts.append(post)
             }
 //            else if technicianModel.profileInfo.email == post.hiringStatus?.technicianToHireEmail {
 //                print("technicianToHireEmail")
