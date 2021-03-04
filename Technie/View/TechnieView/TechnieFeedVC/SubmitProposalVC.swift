@@ -14,6 +14,8 @@ class SubmitProposalVC: UIViewController, UITextViewDelegate {
     var postID = ""
     var numberOfProposals: Int = 0
     
+    var postModel: PostModel!
+
     // MARK: - Properties
     lazy var tableView: UITableView = {
         let tv = UITableView(frame: .zero, style: .grouped)
@@ -127,13 +129,20 @@ class SubmitProposalVC: UIViewController, UITextViewDelegate {
     @objc fileprivate func proposalBtnPressed() {
         guard let coverLetter = coverLetterTextField.text else { return }
         guard !coverLetter.replacingOccurrences(of: " ", with: "").isEmpty else { return}
+        guard let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo") else { return }
+        guard let technicianEmail = getUsersPersistedInfo.first?.email else { return }
+        guard let technicianName = getUsersPersistedInfo.first?.name else { return }
+        guard let technicanUID = getUsersPersistedInfo.first?.uid else { return }
+        guard let clientKeyPath = postModel.postOwnerInfo?.keyPath else { return }
+        guard let jobTitle = postModel.title as? String else { return }
+        
         numberOfProposals += 1
-
+        
         let updateElement = [
-                "numberOfProposals": numberOfProposals,
+            "numberOfProposals": numberOfProposals,
         ] as [String : Any] //as? [AnyHashable: Any]
-       
-
+        
+        
         let childPath = "posts/\(postID)"
         database.child(childPath).updateChildValues(updateElement, withCompletionBlock: { error, _ in
             self.database.child("\(childPath)/proposals").observeSingleEvent(of: .value, with: { snapshot in
@@ -141,10 +150,11 @@ class SubmitProposalVC: UIViewController, UITextViewDelegate {
                 if var postsCollection = snapshot.value as? [[String: Any]] {
                     // append to user dictionary
                     let newElement = [
-                            [
-                                "technicianEmail": "email",
-                                "coverLetter": coverLetter
-                            ]
+                        [
+                            "technicianUID": technicanUID,
+                            "technicianEmail": technicianEmail,
+                            "coverLetter": coverLetter
+                        ]
                     ]
                     
                     postsCollection.append(contentsOf: newElement)
@@ -153,15 +163,30 @@ class SubmitProposalVC: UIViewController, UITextViewDelegate {
                             return
                         }
                         
+                        let clientNotificationModel = ClientNotificationModel(id: "nil",
+                                                                              type: "Proposal",
+                                                                              title: "Proposal",
+                                                                              description: "\(technicianName) sent a proposal for \(jobTitle) job, please take a look on his cover letter.",
+                                                                              dateTime: PostFormVC.dateFormatter.string(from: Date()))
+                        DatabaseManager.shared.insertClientNotification(with: clientNotificationModel, with: clientKeyPath, completion: { _ in })
+                        
                     })
                 } else {
                     // create that array
                     let newElement = [
-                            [
-                                "technicianEmail": "email",
-                                "coverLetter": coverLetter
-                            ]
+                        [
+                            "technicianUID": technicanUID,
+                            "technicianEmail": technicianEmail,
+                            "coverLetter": coverLetter
+                        ]
                     ]
+                    
+                    let clientNotificationModel = ClientNotificationModel(id: "nil",
+                                                                          type: ClientNotificationType.proposal.rawValue,
+                                                                          title: ClientNotificationType.proposal.rawValue,
+                                                                          description: "\(technicianName) sent a proposal for \(jobTitle) job, please take a look on his cover letter.",
+                                                                          dateTime: PostFormVC.dateFormatter.string(from: Date()))
+                    DatabaseManager.shared.insertClientNotification(with: clientNotificationModel, with: clientKeyPath, completion: { _ in })
                     
                     self.database.child("\(childPath)/proposals").setValue(newElement, withCompletionBlock: { error, _ in
                     })

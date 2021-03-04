@@ -244,6 +244,7 @@ class JobDetailsVC: UIViewController {
         let vc = SubmitProposalVC()
         vc.postID = postModel.id ?? ""
         vc.numberOfProposals = postModel.numberOfProposals
+        vc.postModel = postModel
         navigationController?.pushViewController(vc, animated: true)
     }
     
@@ -267,6 +268,7 @@ extension JobDetailsVC: TableViewDataSourceAndDelegate {
         case 1:
             let cell = tableView.dequeueReusableCell(withIdentifier: JobDetailTVCell1.cellID, for: indexPath) as! JobDetailTVCell1
             cell.jobDescriptionLabel.text = postModel.description
+            cell.jobLocationLabel.text = postModel.postOwnerInfo?.location
             cell.setupViews()
             return cell
         case 2:

@@ -13,6 +13,13 @@ class TechnieNotificationVC: UIViewController {
     var userNotifications = [TechnicianNotificationModel]()
     
     // MARK: - Properties
+    lazy var refresher: UIRefreshControl = {
+        let rc = UIRefreshControl()
+//        rc.isEnabled = false
+        rc.addTarget(self, action: #selector(refreshData), for: .valueChanged)
+        return rc
+    }()
+    
     lazy var tableView: UITableView = {
         let tv = UITableView(frame: .zero, style: .plain)
         tv.translatesAutoresizingMaskIntoConstraints = false
@@ -22,7 +29,8 @@ class TechnieNotificationVC: UIViewController {
         tv.rowHeight = UITableView.automaticDimension
         tv.estimatedRowHeight = UITableView.automaticDimension
         tv.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
-
+        
+        tv.refreshControl = refresher
         /// Fix extra padding space at the top of the section of grouped tableView
         var frame = CGRect.zero
         frame.size.height = .leastNormalMagnitude
@@ -52,7 +60,7 @@ class TechnieNotificationVC: UIViewController {
     // MARK: - Methods
     fileprivate func setupViews() {
         [tableView].forEach {view.addSubview($0)}
-        tableView.anchor(top: view.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor)
+        tableView.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor)
         
         setupNavBar()
     }
@@ -96,6 +104,23 @@ class TechnieNotificationVC: UIViewController {
         })
     }
     
+    fileprivate func refreshNotificationData() {
+        DatabaseManager.shared.getAllTechnicianNotifications(completion: {[weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let notifications):
+                self.userNotifications.removeAll()
+                let sortedArray = notifications.sorted(by: { PostFormVC.dateFormatter.date(from: $0.dateTime)?.compare(PostFormVC.dateFormatter.date(from: $1.dateTime) ?? Date()) == .orderedDescending })
+                self.userNotifications = sortedArray
+                self.tableView.reloadData()
+                self.refresher.endRefreshing()
+                print("success")
+            case .failure(let error):
+                print("Failed to get technicians: \(error.localizedDescription)")
+            }
+        })
+    }
+    
     // MARK: - Selectors
     @objc func declineBtnPressed(sender: UIButton) {
         let index = sender.tag
@@ -104,7 +129,7 @@ class TechnieNotificationVC: UIViewController {
         guard let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo") else { return }
         guard let technicanName = getUsersPersistedInfo.first?.name else { return }
         guard let technicianKeyPath = getUsersPersistedInfo.first?.uid else { return }
-        guard let clientKeyPath = indexedNotificationModel.clientKeyPath else { return }
+        guard let clientKeyPath = indexedNotificationModel.clientInfo?.keyPath else { return }
         guard let postChildPath = indexedNotificationModel.postChildPath else { return }
 
         let technieChildPathToDelete = "users/technicians/\(technicianKeyPath)/notifications/\(indexedNotificationModel.id)"
@@ -125,6 +150,54 @@ class TechnieNotificationVC: UIViewController {
         })
     }
     
+    @objc func refreshData(_ refreshController: UIRefreshControl){
+//        let refreshDeadline = DispatchTime.now() + .seconds(Int(1.5))
+        DispatchQueue.main.async {
+            self.refreshNotificationData()
+//            refreshController.endRefreshing()
+        }
+        
+    }
+    
+    @objc func startChatBtnPressed(sender: UIButton) {
+        let indexedTag = sender.tag
+        guard let name = userNotifications[indexedTag].clientInfo?.name else { return }
+        guard let email = userNotifications[indexedTag].clientInfo?.email else { return }
+        createNewConversation(resultEmail: email,
+                              resultName: name)
+    }
+    
+    private func createNewConversation(resultEmail: String, resultName: String) {
+        let name = resultName
+        let email = DatabaseManager.safeEmail(emailAddress: resultEmail)
+
+        // check in database if conversation with these two users exists
+        // if it does, reuse conversation id
+        // otherwise use existing code
+
+        DatabaseManager.shared.conversationExists(with: email, completion: { [weak self] result in
+            guard let strongSelf = self else {
+                return
+            }
+            switch result {
+            case .success(let convoId):
+                print("success")
+                let vc = ChatVC(with: email, id: convoId)
+                vc.isNewConvo = false
+                vc.title = name
+                vc.navigationItem.largeTitleDisplayMode = .never
+                strongSelf.present(UINavigationController(rootViewController: vc), animated: true)
+            case .failure(let failure):
+                print("failure: \(failure)")
+                let vc = ChatVC(with: email, id: nil)
+                vc.isNewConvo = true
+                vc.title = name
+                vc.navigationItem.largeTitleDisplayMode = .never
+                strongSelf.present(UINavigationController(rootViewController: vc), animated: true)
+            }
+        })
+    }
+    
     
 //    let notifications = ["technie", "client", "technie", "client", "technie", "client", "technie", "client", "technie"]
     var selectedIndex = IndexPath()
@@ -141,14 +214,15 @@ extension TechnieNotificationVC: TableViewDataSourceAndDelegate {
         let cell = tableView.dequeueReusableCell(withIdentifier: TechnieNotificationsCell.cellID, for: indexPath) as! TechnieNotificationsCell
         
         let model = userNotifications[indexPath.row]
-        if model.type == "Hiring" {
+        if model.type == TechnicianNotificationType.hiringOffer.rawValue {
 //            postChildPath = model?.postChildPath ?? ""
             cell.postChildPath = model.postChildPath ?? ""
 
             cell.acceptBtn.tag = indexPath.row
             cell.declineBtn.tag = indexPath.row
+            cell.startChatBtn.tag = indexPath.row
             cell.declineBtn.addTarget(self, action: #selector(declineBtnPressed), for: .touchUpInside)
-//            cell.acceptBtn.addTarget(self, action: #selector(acceptBtnPressed), for: .touchUpInside)
+            cell.startChatBtn.addTarget(self, action: #selector(startChatBtnPressed), for: .touchUpInside)
             cell.setupViews2()
             cell.userNotification = model
             

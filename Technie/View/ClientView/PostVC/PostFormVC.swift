@@ -358,6 +358,12 @@ class PostFormVC: UIViewController {
               !imageDataArray.isEmpty
         else { return }
         
+        guard let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo") else { return }
+        guard let clientEmail = getUsersPersistedInfo.first?.email else { return }
+        guard let clientName = getUsersPersistedInfo.first?.name else { return }
+        guard let clientLocation = getUsersPersistedInfo.first?.location else { return }
+        guard let clientUID = getUsersPersistedInfo.first?.uid else { return }
+
         var postsImageUrl = [String]()
         StorageManager.shared.uploadPostImages(with: imageDataArray, with: imageNameArray, completion: { [weak self] result in
             guard let self = self else { return }
@@ -368,6 +374,9 @@ class PostFormVC: UIViewController {
                 if postsImageUrl.count == self.imageDataArray.count {
                     self.postAttachments = postsImageUrl
                     print("download url returned: \(postsImageUrl), count: \(postsImageUrl.count)")
+                    
+                    let postOwnerInfo = PostOwnerInfo(name: clientName, email: clientEmail, location: clientLocation, keyPath: clientUID, profileImage: nil)
+                    
                     let post = PostModel(id: nil,
                                          title: self.postTitle,
                                          description: self.postDescription,
@@ -382,7 +391,7 @@ class PostFormVC: UIViewController {
                                          numberOfUnansweredInvites: self.postNumberOfUnansweredInvites,
                                          dateTime: dateString,
                                          field: self.fieldOfService,
-                                         postOwnerInfo: nil,
+                                         postOwnerInfo: postOwnerInfo,
                                          hiringStatus: nil,
                                          proposals: nil)
                     

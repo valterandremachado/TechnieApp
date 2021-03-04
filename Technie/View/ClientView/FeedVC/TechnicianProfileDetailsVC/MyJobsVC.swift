@@ -136,6 +136,7 @@ class MyJobsVC: UIViewController {
     fileprivate func updatePost(with selectedIndexPaths: [IndexPath]) {
         guard let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo") else { return }
         guard let clientName = getUsersPersistedInfo.first?.name else { return }
+        guard let clientEmail = getUsersPersistedInfo.first?.email else { return }
         guard let clientKeyPath = getUsersPersistedInfo.first?.uid else { return }
         var postModel = [PostModel]()
         
@@ -161,13 +162,16 @@ class MyJobsVC: UIViewController {
                             return
                         }
 //                        print("try: \(error?.localizedDescription ?? "N/A")")
+                        let clientInfo = ClientInfo(name: clientName,
+                                                    email: clientEmail,
+                                                    keyPath: clientKeyPath)
                         let notification = TechnicianNotificationModel(id: "nil",
-                                                                       type: "Hiring",
-                                                                       title: "Hiring Notification",
+                                                                       type: TechnicianNotificationType.hiringOffer.rawValue,
+                                                                       title: TechnicianNotificationType.hiringOffer.rawValue,
                                                                        description: "\(clientName) wants to hire you as a technician to do a service at his place.",
                                                                        dateTime: PostFormVC.dateFormatter.string(from: Date()),
                                                                        postChildPath: childPath,
-                                                                       clientKeyPath: clientKeyPath)
+                                                                       clientInfo: clientInfo)
                         
                         DatabaseManager.shared.insertTechnicianNotification(with: notification, with: self.technicianModel.profileInfo.email, completion: { success in
                             if success {
@@ -240,7 +244,7 @@ extension MyJobsVC: TableViewDataSourceAndDelegate {
         // toggle old one off and the new one on
         let newCell = tableView.cellForRow(at: indexPath)
         if newCell?.accessoryType == UITableViewCell.AccessoryType.none
-        {
+        && isSentByDeclineAction == false {
             newCell?.accessoryType = .checkmark
             selectedIndexes.append(indexPath)
         } else {

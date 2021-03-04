@@ -16,3 +16,13 @@ struct SectionHandler {
         self.sectionDetail = detail
     }
 }
+
+struct SectionHandlerWithModel {
+    var sectionTitle: String?
+    var sectionDetail: [PostModel]
+    
+    init(title: String, detail: [PostModel]) {
+        self.sectionTitle = title
+        self.sectionDetail = detail
+    }
+}

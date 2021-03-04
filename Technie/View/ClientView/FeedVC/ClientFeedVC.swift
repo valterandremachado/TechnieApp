@@ -181,6 +181,11 @@ class ClientFeedVC: UIViewController {
 //        })
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        listenToPostsChange()
+    }
+    
     fileprivate func collectionViewFlowLayoutSetup(with Width: CGFloat){
         if let flowLayout = clientFeedCollectionView.collectionViewLayout as? UICollectionViewFlowLayout {
             flowLayout.estimatedItemSize = CGSize(width: Width, height: 300)
@@ -240,6 +245,24 @@ class ClientFeedVC: UIViewController {
         })
     }
     
+    fileprivate func listenToPostsChange() {
+        DispatchQueue.main.async {
+            DatabaseManager.shared.listenToClientPostChanges(completion: { result in
+                switch result {
+                case .success(let posts):
+                    // Remove existing items to avoid duplicated items
+                    self.userPostModel.removeAll()
+                    print("childChanged")
+//                    let sortedArray = posts.sorted(by: { PostFormVC.dateFormatter.date(from: $0.dateTime)?.compare(PostFormVC.dateFormatter.date(from: $1.dateTime) ?? Date()) == .orderedDescending })
+                    self.userPostModel = posts
+                    return
+                case .failure(let error):
+                    print("Failed to get posts: \(error.localizedDescription)")
+                }
+            })
+        }
+    }
+    
     fileprivate func showSearchResultView() {
         
         UIView.animate(withDuration: 0.5, delay: 0.15, usingSpringWithDamping: 1.0, initialSpringVelocity: 0, options: .curveEaseInOut, animations: { [self] in
@@ -279,6 +302,14 @@ class ClientFeedVC: UIViewController {
         navigationController?.pushViewController(vc, animated: true)
     }
     
+    lazy var dateFormatter: DateFormatter = {
+        let formattre = DateFormatter()
+        formattre.dateStyle = .medium
+        formattre.timeStyle = .long
+        formattre.locale = .current
+        return formattre
+    }()
+    
 }
 
 // MARK: - UISearchBarDelegate Extension
@@ -306,6 +337,8 @@ extension ClientFeedVC: UISearchBarDelegate {
         vc.title = "\(searchedString) results".lowercased()
         navigationController?.pushViewController(vc, animated: true)
     }
+    
+  
 }
 
 // MARK: - CollectionViewDelegateAndDataSource Extension
@@ -363,14 +396,23 @@ extension ClientFeedVC: CollectionDataSourceAndDelegate {
             navigationItem.backBarButtonItem = UIBarButtonItem(title: "Search", style: .plain, target: self, action: nil)
             navigationController?.pushViewController(vc, animated: true)
         case false:
+            
             let vc = TechnicianProfileDetailsVC()
             vc.technicianModel = technicianModel[indexPath.item]
             vc.userPostModel = userPostModel
+            vc.nameLabel.text = technicianModel[indexPath.item].profileInfo.name
+            vc.locationLabel.text = "\(technicianModel[indexPath.item].profileInfo.location), Philippines"
+            vc.technicianExperienceLabel.text = "• \(technicianModel[indexPath.item].profileInfo.experience) Year of Exp."
+            
+            let delimiter = "at"
+            let slicedString = technicianModel[indexPath.item].profileInfo.membershipDate.components(separatedBy: delimiter)[0]
+            vc.memberShipDateLabel.text = "• Member since " + slicedString
             navigationItem.backBarButtonItem = UIBarButtonItem(title: "Feeds", style: .plain, target: self, action: nil)
             navigationController?.pushViewController(vc, animated: true)
         }
         
     }
+    
     
     // CollectionView layouts
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {

@@ -17,12 +17,12 @@ import UIKit
 // Calculates distance between dateTime
 extension UIView {
     func calculateTimeFrame(initialTime: String) -> String {
-        let start = PostFormVC.dateFormatter.date(from: initialTime)
+        let start = PostFormVC.dateFormatter.date(from: initialTime) ?? Date()
         let end = PostFormVC.dateFormatter.date(from: PostFormVC.dateFormatter.string(from: Date()))
 
         let relativeDateTime = RelativeDateTimeFormatter()
         relativeDateTime.unitsStyle = .full
-        let timeFrame = relativeDateTime.localizedString(for: start!, relativeTo: end!)
+        let timeFrame = relativeDateTime.localizedString(for: start, relativeTo: end!)
         return timeFrame == "in 0 seconds" ? ("just now") : (timeFrame)
     }
 }

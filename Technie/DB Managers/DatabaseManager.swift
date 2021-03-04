@@ -585,19 +585,23 @@ extension DatabaseManager {
                 
                 let updateElement2 = [
                     "isHiringAccepted": true,
-                    "description": "Don’t let your new client awaiting , start a conversation with the job owner now."
+                    "description": "Don’t let your new client awaiting, start a conversation with the job owner now."
                 ] as [String : Any]
                 
                 self.database.child("users/technicians/\(technicianKeyPath)/notifications/\(technicianNotificationKeyPath)").updateChildValues(updateElement2, withCompletionBlock: { error, _ in
                     guard error == nil else {
                         return
                     }
+                    let technieInfo = TechnicianInfo(name: technicianName,
+                                                     email: technicianEmail,
+                                                     keyPath: technicianKeyPath)
                     let clientNotificationModel = ClientNotificationModel(id: "nil",
-                                                                          type: "accepted/rejected hiring",
-                                                                          title: "accepted/rejected hiring",
+                                                                          type: ClientNotificationType.hiringOfferStatus.rawValue,
+                                                                          title: ClientNotificationType.hiringOfferStatus.rawValue,
                                                                           description: "\(technicianName) has accepted your hiring offer, you can now be directly in touch with each other.",
                                                                           dateTime: PostFormVC.dateFormatter.string(from: Date()),
-                                                                          wasAccepted: true)
+                                                                          wasAccepted: true,
+                                                                          technicianInfo: technieInfo)
                     self.insertClientNotification(with: clientNotificationModel, with: clientKeyPath, completion: { _ in })
                     
                     let upadateElement = [
@@ -640,7 +644,7 @@ extension DatabaseManager {
             
             for (key, _) in postsCollection {
                 print("randomKey: \(randoUIDkey), key: \(key)")
-                if key == randoUIDkey {
+                if key == "SEQ0IMTLF4YZMXtjwR7AkiuypSg1" {
                     print("InsideRandomKey: \(randoUIDkey), insideKey: \(key)")
                     
                     strongSelf.database.child("users/clients/\(key)/servicePosts").observeSingleEvent(of: .value, with: { snapshot in
@@ -748,8 +752,8 @@ extension DatabaseManager {
                 }
                 
                 let clientNotificationModel = ClientNotificationModel(id: "nil",
-                                                                      type: "accepted/rejected hiring",
-                                                                      title: "accepted/rejected hiring",
+                                                                      type: ClientNotificationType.hiringOfferStatus.rawValue,
+                                                                      title: ClientNotificationType.hiringOfferStatus.rawValue,
                                                                       description: "The technician '\(technicianName)' you tried to hire has rejected your hiring offer, we’re sorry please try hiring someone nearby your place.",
                                                                       dateTime: PostFormVC.dateFormatter.string(from: Date()))
                 self.insertClientNotification(with: clientNotificationModel, with: clientKeyPath, completion: { success in
@@ -977,6 +981,92 @@ extension DatabaseManager {
         })
     }
     
+    public func getAllSpecificTechnician(techniciankeyPath: String, completion: @escaping (Result<[String], Error>) -> Void) {
+                var jobs = [String]()
+            
+//            for (key, _) in techniciansCollection {
+                self.database.child("users/technicians/\(techniciankeyPath)/hiredJobs").observeSingleEvent(of: .value, with: { snapshot in
+                    guard let hiredJobs = snapshot.value as? [String: Any] else { return }
+                    for (_ , value) in hiredJobs {
+                    do {
+                        let model = try FirebaseDecoder().decode(HiredJobs.self, from: value)
+                       
+                        let delimiter = "/"
+                        let slicedString = model.postChildPath.components(separatedBy: delimiter)[1]
+                        jobs.append(slicedString)
+//                        print("model: \(jobs)")
+                        completion(.success(jobs))
+                    } catch let error {
+                        print(error)
+                    }
+                    }
+                })
+//            }
+//        })
+    }
+    
+    public func getAllHiredJobs(technicianHiredJobKeyPaths: [String], completion: @escaping (Result<[PostModel], Error>) -> Void) {
+        database.child("posts").observeSingleEvent(of: .value, with: { snapshot in
+            guard let postsCollection = snapshot.value as? [String: Any] else {
+                completion(.failure(DatabaseError.failedToFetch))
+                return
+            }
+            
+            var posts = [PostModel]()
+            
+            for (key, _) in postsCollection {
+                technicianHiredJobKeyPaths.forEach { technieKey in
+                    if key == technieKey {
+                        Database.database().reference().child("posts/\(key)").observeSingleEvent(of: .value, with: { snapshot in
+                            guard let value = snapshot.value else { return }
+                            do {
+                                let model = try FirebaseDecoder().decode(PostModel.self, from: value)
+                                if posts.count < technicianHiredJobKeyPaths.count {
+                                    posts.append(model)
+                                    completion(.success(posts))
+                                }
+                                
+                            } catch let error {
+                                print(error)
+                            }
+                        })
+                    }
+                }
+            }
+        })
+    }
+    
+    public func getAllActiveHiredJobs(technicianHiredJobKeyPaths: [String], completion: @escaping (Result<[PostModel], Error>) -> Void) {
+        database.child("posts").observeSingleEvent(of: .value, with: { snapshot in
+            guard let postsCollection = snapshot.value as? [String: Any] else {
+                completion(.failure(DatabaseError.failedToFetch))
+                return
+            }
+            
+            var posts = [PostModel]()
+            
+            for (key, _) in postsCollection {
+                technicianHiredJobKeyPaths.forEach { technieKey in
+                    if key == technieKey {
+                        Database.database().reference().child("posts/\(key)").observeSingleEvent(of: .value, with: { snapshot in
+                            guard let value = snapshot.value else { return }
+                            do {
+                                let model = try FirebaseDecoder().decode(PostModel.self, from: value)
+                                if posts.count < technicianHiredJobKeyPaths.count {
+                                    posts.append(model)
+                                    completion(.success(posts))
+                                }
+                                
+                            } catch let error {
+                                print(error)
+                            }
+                        })
+                    }
+                }
+            }
+        })
+    }
+    
     // MARK: - Listeners
     public func listenToPostChanges(completion: @escaping (Result<[PostModel], Error>) -> Void) {
         Database.database().reference().child("posts").observeSingleEvent(of: .childChanged, with: { [self] snapshot in
@@ -1001,6 +1091,94 @@ extension DatabaseManager {
 //                            print("model: \(model)")
                             updatedPosts.append(model)
                             completion(.success(updatedPosts))
+                        } catch let error {
+                            print(error)
+                        }
+                    })
+                }
+            })
+        })
+    }
+    
+    public func listenToClientPostChanges(completion: @escaping (Result<[PostModel], Error>) -> Void) {
+        let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo")
+        
+        var userPersistedEmail = ""
+        if let info = getUsersPersistedInfo {
+            userPersistedEmail = info.first!.email
+        }
+        
+        Database.database().reference().child("posts").observeSingleEvent(of: .childChanged, with: { [self] snapshot in
+            guard let postsCollection = snapshot.value as? [String: Any] else {
+                completion(.failure(DatabaseError.failedToFetch))
+                return
+            }
+            
+            database.child("posts").observeSingleEvent(of: .value, with: { [weak self] snapshot in
+                guard let self = self else { return }
+                
+                guard let postsCollection = snapshot.value as? [String: Any] else {
+                    completion(.failure(DatabaseError.failedToFetch))
+                    return
+                }
+                
+                var posts = [PostModel]()
+                var userPostIDs = [String]()
+                
+                for (key, _) in postsCollection {
+                    self.database.child("posts/\(key)").observeSingleEvent(of: .value, with: { snapshot in
+                        guard let value = snapshot.value else { return }
+                        do {
+                            let postModel = try FirebaseDecoder().decode(PostModel.self, from: value)
+                            
+                            self.database.child("users/clients").observeSingleEvent(of: .value, with: { snapshot in
+                                guard let postsCollection = snapshot.value as? [String: Any] else {
+                                    completion(.failure(DatabaseError.failedToFetch))
+                                    return
+                                }
+                                
+                                
+                                for (key, _) in postsCollection {
+                                    self.database.child("users/clients/\(key)").observeSingleEvent(of: .value, with: { snapshot in
+                                        guard let value = snapshot.value else { return }
+                                        do {
+                                            let userModel = try FirebaseDecoder().decode(ClientModel.self, from: value)
+                                            let email = userModel.profileInfo.email
+                                            
+                                            //                                        print("email: \(email)")
+                                            if userPersistedEmail == email {
+                                                //                                            print("Equal email: \(email)")
+                                                userModel.servicePosts?.forEach({ (post) in
+                                                    if userPostIDs.count != userModel.servicePosts?.count {
+                                                        userPostIDs.append(post.postID)
+                                                        //                                                    print("userPostIDs: \(userPostIDs)")
+                                                    }
+                                                    
+                                                })
+                                                
+                                                if  userPostIDs.count == userModel.servicePosts?.count {
+                                                    for ids in userPostIDs {
+                                                        if postModel.id == ids {
+                                                            posts.append(postModel)
+                                                            //                                                        print("posts: \(posts), count: \(posts.count)")
+                                                            completion(.success(posts))
+                                                        }
+                                                    }
+                                                }
+                                                //                                            guard let postID = userModel.servicePosts?.first?.postID else { return }
+                                                
+                                                
+                                            }
+                                            
+                                        } catch let error {
+                                            print(error)
+                                        }
+                                    })
+                                }
+                            })
+                            
+                            
+                            
                         } catch let error {
                             print(error)
                         }
@@ -1860,6 +2038,13 @@ struct ClientNotificationModel: Codable {
     var description: String
     var dateTime: String
     var wasAccepted: Bool?
+    var technicianInfo: TechnicianInfo?
+}
+
+struct TechnicianInfo: Codable {
+    var name: String
+    var email: String
+    var keyPath: String?
 }
 
 struct TechnicianModel: Codable {
@@ -1906,7 +2091,14 @@ struct TechnicianNotificationModel: Codable {
     var dateTime: String
     var postChildPath: String?
     var isHiringAccepted: Bool? // only available if the notification type is hiring
-    var clientKeyPath: String? //  only available if the notification type is hiring
+    var clientInfo: ClientInfo?
+}
+
+
+struct ClientInfo: Codable {
+    var name: String
+    var email: String
+    var keyPath: String? //  only available if the notification type is hiring
 }
 
 struct PostModel: Codable {
@@ -1933,11 +2125,11 @@ struct PostModel: Codable {
 }
 
 struct PostOwnerInfo: Codable {
-    var id: String
     var name: String
     var email: String
     var location: String
-    var profileImage: String
+    var keyPath: String
+    var profileImage: String?
 }
 
 struct HiringStatus: Codable {

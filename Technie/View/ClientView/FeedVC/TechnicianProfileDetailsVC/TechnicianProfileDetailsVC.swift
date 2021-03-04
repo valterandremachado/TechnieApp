@@ -140,6 +140,7 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         btn.layer.cornerRadius = 10
         btn.clipsToBounds = true
 //        btn.withWidth(180)
+        btn.titleLabel?.font = .systemFont(ofSize: 13.5)
         btn.addTarget(self, action: #selector(hireBtnPressed), for: .touchUpInside)
         return btn
     }()
@@ -376,6 +377,10 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
     }
 
     var hiredUserJobs = [PostModel]()
+    var jobTrack = ""
+    var jobPending = ""
+    var sureHires = [Bool]()
+    
     fileprivate func fetchUserPosts() {
         for post in userPostModel {
             if technicianModel.profileInfo.email != post.hiringStatus?.technicianToHireEmail && post.hiringStatus?.isHired == false  {
@@ -387,13 +392,28 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
                     hireBtn.backgroundColor = UIColor.systemPink.withAlphaComponent(0.8)
                 }
             } else if userPostModel.count > 1 && technicianModel.profileInfo.email == post.hiringStatus?.technicianToHireEmail {
+                hiredUserJobs.append(post)
+                sureHires.append(post.hiringStatus!.isHired)
+
                 UIView.animate(withDuration: 0.5) { [self] in
-                    post.hiringStatus?.isHired == false ? hireBtn.setTitle("Pending...", for: .normal) : hireBtn.setTitle("Currently hired in one of my jobs", for: .normal)
+                    let numberOfTrue = sureHires.filter{$0}.count
+                    let numberOfFalse = sureHires.filter{!$0}.count
+
+                    numberOfTrue == 1 ? (jobTrack = "one") : (jobTrack = "\(numberOfTrue)")
+                    numberOfFalse == 1 ? (jobPending = "one") : (jobPending = "\(numberOfFalse)")
+//                    switch numberOfFalse {
+//                    case 0:
+//                        hireBtn.setTitle("Currently hired in \(jobTrack) of my jobs", for: .normal)
+//                    case 1:
+//                        hireBtn.setTitle("Currently hired with \(one) offer pending...", for: .normal)
+//                    default:
+//                        break
+//                    }
+                    numberOfFalse == 0 ? hireBtn.setTitle("Currently hired in \(jobTrack) of my jobs", for: .normal) : hireBtn.setTitle("Currently hired with \(jobPending) offer pending...", for: .normal)
                     hireBtn.setTitleColor(.systemGray4, for: .normal)
                     hireBtn.backgroundColor = UIColor.systemPink.withAlphaComponent(0.8)
                 }
-                hiredUserJobs.append(post)
-
+                
             } else {
                 tempUserPosts.append(post)
             }
@@ -605,7 +625,10 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         case "Hired":
             presentAlertSheetForHireBtn()
             
-        case "Currently hired in one of my jobs":
+        case "Currently hired in \(jobTrack) of my jobs":
+            presentActionSheetForHireBtn()
+            
+        case "Currently hired with \(jobPending) offer pending...":
             presentActionSheetForHireBtn()
         default:
             break

@@ -156,7 +156,7 @@ class FeedsTVCell: UITableViewCell {
             jobTitleLabel.text = postModel.title
             jobDescriptionLabel.text = postModel.description
             jobBudget.text = postModel.budget
-            jobLocation.text = postModel.location
+            jobLocation.text = postModel.postOwnerInfo?.location
             dataArray = postModel.requiredSkills
             jobPostTimeTrackerLabel.text = calculateTimeFrame(initialTime: postModel.dateTime)
             
