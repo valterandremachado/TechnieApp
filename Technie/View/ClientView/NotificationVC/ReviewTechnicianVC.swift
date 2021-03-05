@@ -10,6 +10,8 @@ import Cosmos
 
 class ReviewTechnicianVC: UIViewController, UITextViewDelegate {
 
+    var userPostModel: PostModel!
+    
     lazy var tableView: UITableView = {
         let tv = UITableView(frame: .zero, style: .grouped)
         tv.translatesAutoresizingMaskIntoConstraints = false
@@ -83,6 +85,8 @@ class ReviewTechnicianVC: UIViewController, UITextViewDelegate {
         sectionSetter.append(SectionHandler(title: "Rating", detail: [""]))
 
         setupViews()
+        
+        print("print that post: \(userPostModel)")
     }
     
     func setupViews() {
@@ -117,10 +121,40 @@ class ReviewTechnicianVC: UIViewController, UITextViewDelegate {
         }
     }
     
+    var workReview = [Int]()
+    
     @objc fileprivate func leftNavBarBtnTapped() {
         print("rating2: \(ratingView.rating)")
+        let rating = ratingView.rating
+        let jobTitle = userPostModel.title
+        let dateOfReview = PostFormVC.dateFormatter.string(from: Date())
+        
+        guard let dateOfHiring = userPostModel.hiringStatus?.date else { return }
+        guard let clientName = userPostModel.postOwnerInfo?.name else { return }
+        guard let technicianEmail = userPostModel.hiringStatus?.technicianToHireEmail else { return }
 
-        dismiss(animated: true, completion: nil)
+        guard let reviewComment = reviewCommentTextField.text else { return }
+        
+        let clientsSatisfaction = ClientsSatisfaction(workSpeedAvrg: rating,
+                                                      workQualityAvrg: rating,
+                                                      responseTimeAvrg: rating,
+                                                      ratingAvrg: rating)
+        let clientReview = Review(jobTitle: jobTitle,
+                                  reviewComment: reviewComment,
+                                  clientName: clientName,
+                                  dateOfReview: dateOfReview,
+                                  dateOfHiring: dateOfHiring,
+                                  workSpeed: workReview[0],
+                                  workQuality: workReview[0],
+                                  responseTime: workReview[0],
+                                  rating: rating)
+        
+        DatabaseManager.shared.insertClientSatisfaction(with: clientsSatisfaction, with: clientReview, with: technicianEmail) { success in
+            if success {
+                self.dismiss(animated: true, completion: nil)
+            }
+        }
+        
     }
     
     
@@ -141,6 +175,7 @@ extension ReviewTechnicianVC: TableViewDataSourceAndDelegate {
         let cell = tableView.dequeueReusableCell(withIdentifier: ReviewTechnicianCell.cellID, for: indexPath) as! ReviewTechnicianCell
         cell.segment.tag = indexPath.section
         cell.segment.addTarget(self, action: #selector(segmentPressed), for: .valueChanged)
+        print("check: \(cell.segment.selectedSegmentIndex)")
 
         if indexPath.section == 3 {
             cell.segment.isHidden =  true

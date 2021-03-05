@@ -727,6 +727,31 @@ extension DatabaseManager {
         })
     }
     
+    public func insertClientSatisfaction(with clientsSatisfactionModel: ClientsSatisfaction, with reviewModel: Review, with technicianKeyPath: String, completion: @escaping (Bool) -> Void) {
+        let data = try! FirebaseEncoder().encode(clientsSatisfactionModel)
+
+        let mainChildPath = "users/technician/\(technicianKeyPath)/clientsSatisfaction"
+        let db = database.child(mainChildPath)
+        
+        db.setValue(data, withCompletionBlock: { [self] error, _ in
+            guard error == nil else {
+                completion(false)
+                return
+            }
+            
+            let reviewData = try! FirebaseEncoder().encode(reviewModel)
+            let childPath = "/\(mainChildPath)/reviews"
+            
+            database.child(childPath).childByAutoId().setValue(reviewData, withCompletionBlock: { error, _ in
+                guard error == nil else {
+                    completion(false)
+                    return
+                }
+                completion(true)
+            })
+        })
+    }
+    
     /// Deletion
     public func deleteChildPath(withChildPath: String, completion: @escaping (Bool) -> Void) {
         database.child(withChildPath).removeValue { (error, _) in
@@ -763,6 +788,45 @@ extension DatabaseManager {
                 })
             }
         }
+    }
+    
+    public func markAJobAsDone(withTechnieHiredJobsChildPath: String, withPostChildPath: String, clientKeyPath: String, technicianName: String, completedJobUID: String, completion: @escaping (Bool) -> Void) {
+        let newElement = [
+            "isCompleted": true
+        ]
+        
+        database.child(withPostChildPath).updateChildValues(newElement, withCompletionBlock: { [weak self] error, _ in
+            guard let self = self else { return }
+            guard error == nil else {
+                completion(false)
+                return
+            }
+            
+            let newElement = [
+                "isCompleted": true
+            ]
+            
+            self.database.child(withTechnieHiredJobsChildPath).updateChildValues(newElement, withCompletionBlock: { error, _ in
+                guard error == nil else {
+                    completion(false)
+                    return
+                }
+                
+                let clientNotificationModel = ClientNotificationModel(id: "nil",
+                                                                      type: ClientNotificationType.review.rawValue,
+                                                                      title: ClientNotificationType.review.rawValue,
+                                                                      description: "'\(technicianName)' has mark your job has completed. Please give your honest review on this technician.",
+                                                                      dateTime: PostFormVC.dateFormatter.string(from: Date()),
+                                                                      completedJobUID: completedJobUID)
+                self.insertClientNotification(with: clientNotificationModel, with: clientKeyPath, completion: { success in
+                    if success {
+                        completion(true)
+                        return
+                    }
+                })
+                
+            })
+        })
     }
     
     
@@ -981,7 +1045,23 @@ extension DatabaseManager {
         })
     }
     
-    public func getAllSpecificTechnician(techniciankeyPath: String, completion: @escaping (Result<[String], Error>) -> Void) {
+    public func getHiredJobs(techniciankeyPath: String, completion: @escaping (Result<[HiredJobs], Error>) -> Void) {
+        var jobs = [HiredJobs]()
+        self.database.child("users/technicians/\(techniciankeyPath)/hiredJobs").observeSingleEvent(of: .value, with: { snapshot in
+            guard let hiredJobs = snapshot.value as? [String: Any] else { return }
+            for (_ , value) in hiredJobs {
+                do {
+                    let model = try FirebaseDecoder().decode(HiredJobs.self, from: value)
+                    jobs.append(model)
+                    completion(.success(jobs))
+                } catch let error {
+                    print(error)
+                }
+            }
+        })
+    }
+    
+    public func getAllActiveHiredJobs(techniciankeyPath: String, completion: @escaping (Result<[String], Error>) -> Void) {
                 var jobs = [String]()
             
 //            for (key, _) in techniciansCollection {
@@ -993,9 +1073,37 @@ extension DatabaseManager {
                        
                         let delimiter = "/"
                         let slicedString = model.postChildPath.components(separatedBy: delimiter)[1]
-                        jobs.append(slicedString)
-//                        print("model: \(jobs)")
-                        completion(.success(jobs))
+                        if model.isCompleted == false {
+                            jobs.append(slicedString)
+//                            print("model: \(jobs)")
+                            completion(.success(jobs))
+                        }
+                    } catch let error {
+                        print(error)
+                    }
+                    }
+                })
+//            }
+//        })
+    }
+    
+    public func getAllPreviousHiredJobs(techniciankeyPath: String, completion: @escaping (Result<[String], Error>) -> Void) {
+                var jobs = [String]()
+            
+//            for (key, _) in techniciansCollection {
+                self.database.child("users/technicians/\(techniciankeyPath)/hiredJobs").observeSingleEvent(of: .value, with: { snapshot in
+                    guard let hiredJobs = snapshot.value as? [String: Any] else { return }
+                    for (_ , value) in hiredJobs {
+                    do {
+                        let model = try FirebaseDecoder().decode(HiredJobs.self, from: value)
+                       
+                        let delimiter = "/"
+                        let slicedString = model.postChildPath.components(separatedBy: delimiter)[1]
+                        if model.isCompleted != false {
+                            jobs.append(slicedString)
+//                            print("model: \(jobs)")
+                            completion(.success(jobs))
+                        }
                     } catch let error {
                         print(error)
                     }
@@ -2038,6 +2146,7 @@ struct ClientNotificationModel: Codable {
     var description: String
     var dateTime: String
     var wasAccepted: Bool?
+    var completedJobUID: String?
     var technicianInfo: TechnicianInfo?
 }
 
@@ -2057,7 +2166,7 @@ struct TechnicianModel: Codable {
 //    let hired: HiredJobs?
 //    let notifications: TechnicianNotificationModel? //array of notification with uid
     
-//    clientsSatisfaction[],
+    var clientsSatisfaction: ClientsSatisfaction?
 //    chats[]
 }
 
@@ -2078,6 +2187,7 @@ struct TechnicianProfileInfo: Codable {
 
 
 struct HiredJobs: Codable { //Added to the db only when technician accept the hiring offer
+    var id: String?
     var postChildPath: String
     var isCompleted: Bool
     var clientEmail: String?
@@ -2092,6 +2202,28 @@ struct TechnicianNotificationModel: Codable {
     var postChildPath: String?
     var isHiringAccepted: Bool? // only available if the notification type is hiring
     var clientInfo: ClientInfo?
+}
+
+struct ClientsSatisfaction: Codable {
+    var workSpeedAvrg: Double
+    var workQualityAvrg: Double
+    var responseTimeAvrg: Double
+    var ratingAvrg: Double
+    
+    var reviews: [Review]?
+}
+
+struct Review: Codable {
+    var jobTitle: String
+    var reviewComment: String
+    var clientName: String
+    var dateOfReview: String
+    var dateOfHiring: String
+//    var description: String
+    var workSpeed: Int
+    var workQuality: Int
+    var responseTime: Int
+    var rating: Double
 }
 
 
@@ -2113,6 +2245,7 @@ struct PostModel: Codable {
     let requiredSkills: [String]
 
     let availabilityStatus: Bool
+    var isCompleted: Bool
     let numberOfProposals: Int
     let numberOfInvitesSent: Int
     let numberOfUnansweredInvites: Int
@@ -2133,6 +2266,7 @@ struct PostOwnerInfo: Codable {
 }
 
 struct HiringStatus: Codable {
+    var date: String
     var isHired: Bool
     var technicianToHireEmail: String
 }

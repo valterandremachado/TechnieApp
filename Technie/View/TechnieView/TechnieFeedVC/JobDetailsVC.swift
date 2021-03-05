@@ -124,6 +124,8 @@ class JobDetailsVC: UIViewController {
         return view
     }()
     
+    var isComingFromServiceVC = false
+    
     // MARK: - Init
     override func loadView() {
         super.loadView()
@@ -147,8 +149,12 @@ class JobDetailsVC: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         // Do any additional setup after loading the view.
-        self.tabBarController?.setTabBar(hidden: true, animated: true, along: nil)
-        presentSelectionBar()
+        if isComingFromServiceVC == true {
+            closeSelectionBar()
+        } else {
+            self.tabBarController?.setTabBar(hidden: true, animated: true, along: nil)
+            presentSelectionBar()
+        }
     }
     
     var dynamicBottomConstraint: NSLayoutConstraint?
@@ -184,8 +190,10 @@ class JobDetailsVC: UIViewController {
     func setupNavBar() {
         guard let navBar = navigationController?.navigationBar else { return }
 //        navigationItem.title = "Job Details"
-        isSearching ? (navBar.topItem?.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)) : (navBar.topItem?.backBarButtonItem = UIBarButtonItem(title: "Feeds", style: .plain, target: self, action: nil))
-       
+        if isComingFromServiceVC == false {
+            isSearching ? (navBar.topItem?.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)) : (navBar.topItem?.backBarButtonItem = UIBarButtonItem(title: "Feeds", style: .plain, target: self, action: nil))
+        }
+        
         navigationItem.largeTitleDisplayMode = .never
         navigationItem.titleView = navBarTitleStackView
     }
@@ -304,7 +312,7 @@ extension JobDetailsVC: TableViewDataSourceAndDelegate {
             cell.setupViews()
             cell.proposals.text = "\(postModel.numberOfProposals)"
             cell.invitesSent.text = "\(postModel.numberOfInvitesSent)"
-            cell.unansweredInvites.text = "\(postModel.numberOfUnansweredInvites)"
+            cell.unansweredInvitesStack.isHidden = true//text = "\(postModel.numberOfUnansweredInvites)"
             cell.jobStatus.text = postModel.availabilityStatus == false ? ("Closed") : ("Active")
 
             cell.activityHeaderLabel.font = .boldSystemFont(ofSize: 16)
@@ -312,11 +320,14 @@ extension JobDetailsVC: TableViewDataSourceAndDelegate {
         case 7:
             let cell = tableView.dequeueReusableCell(withIdentifier: JobDetailTVCell6.cellID, for: indexPath) as! JobDetailTVCell6
             cell.setupViews()
-            cell.loactionLabel.text = postModel.location
+            cell.loactionLabel.text = postModel.postOwnerInfo?.location
 //            cell.numberOfPostedJobsLabel.text = postModel.title
-//            cell.statusLabel.text = postModel.title
-//            cell.numberOfOpenJobsLabel.text = postModel.title
-
+            //            cell.numberOfOpenJobsLabel.text = postModel.title
+            cell.statusLabel.text = nil
+            
+            let delimiter = "at"
+            let slicedString = postModel.dateTime.components(separatedBy: delimiter)[0]
+            cell.dateOfMembershipLabel.text = "Member since " + slicedString
             cell.aboutTheClientHeaderLabel.font = .boldSystemFont(ofSize: 16)
             return cell
         default:

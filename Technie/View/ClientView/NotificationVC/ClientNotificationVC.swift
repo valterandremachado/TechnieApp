@@ -249,9 +249,18 @@ extension ClientNotificationVC: TableViewDataSourceAndDelegate {
                 }
             }
             
-        } else {
-            let vc = ReviewTechnicianVC()
-            present(UINavigationController(rootViewController: vc), animated: true)
+        } else if notificationModel.type == ClientNotificationType.review.rawValue {
+            
+            for post in userPostModel {
+                if notificationModel.completedJobUID == post.id {
+                    let vc = ReviewTechnicianVC()
+                    vc.userPostModel = post
+                    present(UINavigationController(rootViewController: vc), animated: true)
+                    return
+                }
+            }
+           
+           
             
         }
     }

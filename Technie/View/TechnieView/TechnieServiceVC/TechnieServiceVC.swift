@@ -78,43 +78,68 @@ class TechnieServiceVC: UIViewController {
     }
     
     fileprivate func fetchData()  {
-        DispatchQueue.main.async {
+        guard let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo") else { return }
+        guard let technicianKeyPath = getUsersPersistedInfo.first?.uid else { return }
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
             
-            guard let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo") else { return }
-//            guard let technicanName = getUsersPersistedInfo.first?.name else { return }
-            guard let technicianKeyPath = getUsersPersistedInfo.first?.uid else { return }
-//            guard let clientKeyPath = indexedNotificationModel.clientInfo?.keyPath else { return }
-//            guard let postChildPath = indexedNotificationModel.postChildPath else { return }
-            
-            DatabaseManager.shared.getAllSpecificTechnician(techniciankeyPath: technicianKeyPath, completion: {[weak self] result in
-                    guard let self = self else { return }
-                    switch result {
-                    case .success(let technicians):
-//                        self.hiredJobsPostUID = technicians
-                        
-                            DatabaseManager.shared.getAllHiredJobs(technicianHiredJobKeyPaths: technicians, completion: {[weak self] result in
-                                guard let self = self else { return }
-                                switch result {
-                                case .success(let posts):
-                                    let sortedArray = posts.sorted(by: { PostFormVC.dateFormatter.date(from: $0.dateTime)?.compare(PostFormVC.dateFormatter.date(from: $1.dateTime) ?? Date()) == .orderedDescending })
-                                    self.activeJobsModel = sortedArray
-                                    self.tableView.reloadData()
-//                                    print("jobs: \(self.postModel)")
-                                    return
-                                case .failure(let error):
-                                    print("Failed to get posts: \(error.localizedDescription)")
-                                }
-                            })
-                          
-                    case .failure(let error):
-                        print("Failed to get technicians: \(error.localizedDescription)")
-                    }
-                })
-            
-           
-            
+            self.getActiveHiredJobs(technicianKeyPath: technicianKeyPath)
+            self.getPreviousHiredJobs(technicianKeyPath: technicianKeyPath)
         }
         
+    }
+    
+    fileprivate func getActiveHiredJobs(technicianKeyPath: String) {
+        DatabaseManager.shared.getAllActiveHiredJobs(techniciankeyPath: technicianKeyPath, completion: {[weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let techniciansHiredJobsUID):
+                //                        self.hiredJobsPostUID = technicians
+                
+                DatabaseManager.shared.getAllHiredJobs(technicianHiredJobKeyPaths: techniciansHiredJobsUID, completion: {[weak self] result in
+                    guard let self = self else { return }
+                    switch result {
+                    case .success(let posts):
+                        let sortedArray = posts.sorted(by: { PostFormVC.dateFormatter.date(from: $0.dateTime)?.compare(PostFormVC.dateFormatter.date(from: $1.dateTime) ?? Date()) == .orderedDescending })
+                        self.activeJobsModel = sortedArray
+                        self.tableView.reloadData()
+                        //                                    print("jobs: \(self.postModel)")
+                        return
+                    case .failure(let error):
+                        print("Failed to get posts: \(error.localizedDescription)")
+                    }
+                })
+                
+            case .failure(let error):
+                print("Failed to get technicians: \(error.localizedDescription)")
+            }
+        })
+    }
+    
+    fileprivate func getPreviousHiredJobs(technicianKeyPath: String) {
+        DatabaseManager.shared.getAllPreviousHiredJobs(techniciankeyPath: technicianKeyPath, completion: {[weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let technicians):
+                
+                DatabaseManager.shared.getAllHiredJobs(technicianHiredJobKeyPaths: technicians, completion: {[weak self] result in
+                    guard let self = self else { return }
+                    switch result {
+                    case .success(let posts):
+                        let sortedArray = posts.sorted(by: { PostFormVC.dateFormatter.date(from: $0.dateTime)?.compare(PostFormVC.dateFormatter.date(from: $1.dateTime) ?? Date()) == .orderedDescending })
+                        self.previousJobsModel = sortedArray
+                        self.tableView.reloadData()
+                        return
+                    case .failure(let error):
+                        print("Failed to get posts: \(error.localizedDescription)")
+                    }
+                })
+                
+            case .failure(let error):
+                print("Failed to get technicians: \(error.localizedDescription)")
+            }
+        })
     }
     
     // MARK: - Selectors
@@ -134,45 +159,122 @@ extension TechnieServiceVC: TableViewDataSourceAndDelegate {
         if section == 0 {
             return activeJobsModel.count
         } else {
-            return 0
+            return previousJobsModel.count
         }
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 //        let sectionTitles =  sections[indexPath.section]
 //        let title = sectionTitles.sectionDetail[indexPath.row]
-        let model = activeJobsModel[indexPath.row]
+
         switch indexPath.section {
         case 0:
+            let model = activeJobsModel[indexPath.row]
+
             var cell = tableView.dequeueReusableCell(withIdentifier: ActiveJobsTVCell.cellID, for: indexPath) as! ActiveJobsTVCell
             cell = ActiveJobsTVCell(style: .subtitle, reuseIdentifier: ActiveJobsTVCell.cellID)
-            cell.selectionStyle = .none
+//            cell.selectionStyle = .none
             cell.textLabel?.text = model.title
             cell.detailTextLabel?.textColor = .systemGray
-            cell.detailTextLabel?.text = "hired \(view.calculateTimeFrame(initialTime: model.dateTime))"
-
+            cell.detailTextLabel?.text = "Hired \(view.calculateTimeFrame(initialTime: model.dateTime))"
+            cell.accessoryType = .detailButton
             return cell
         case 1:
-            let cell = tableView.dequeueReusableCell(withIdentifier: PreviousJobsTVCell.cellID, for: indexPath) as! PreviousJobsTVCell
+            let modelTwo = previousJobsModel[indexPath.row]
+
+            var cell = tableView.dequeueReusableCell(withIdentifier: PreviousJobsTVCell.cellID, for: indexPath) as! PreviousJobsTVCell
+            cell = PreviousJobsTVCell(style: .subtitle, reuseIdentifier: PreviousJobsTVCell.cellID)
+
             cell.selectionStyle = .none
-//            cell.textLabel?.text = title
+            cell.detailTextLabel?.textColor = .systemGray
+            cell.detailTextLabel?.text = "Hired \(view.calculateTimeFrame(initialTime: modelTwo.dateTime))"
+            cell.textLabel?.text = modelTwo.title
             return cell
         default:
             return UITableViewCell()
         }
     }
     
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
+    
+    func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
+        presentAccessoryButtonAlert(indexPath: indexPath)
+    }
    
-    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let headerView = UIView(frame: CGRect(x: 0, y: 0, width: tableView.frame.width, height: 35))
-        headerView.backgroundColor = .white
+    
+    fileprivate func presentAccessoryButtonAlert(indexPath: IndexPath) {
+        print(indexPath.row)
+        let alertController = UIAlertController(title: "Info", message: nil, preferredStyle: .alert)
         
-        let headerLabel = UILabel(frame: CGRect(x: tableView.separatorInset.left, y: 0, width: tableView.frame.width, height: 35))
-        headerLabel.textColor = .systemGray
-        headerLabel.font = .systemFont(ofSize: 13)
-        headerLabel.text = sectionTitle[section].uppercased()
-        headerView.addSubview(headerLabel)
-        return headerView
+        let markAsCompletedAction = UIAlertAction(title: "Mark as completed", style: .default) { action in
+            self.markJobAsCompleted(indexPath: indexPath)
+        }
+        
+        let viewPostAction = UIAlertAction(title: "View job details", style: .default) { [self] action in
+            let vc = JobDetailsVC()
+            vc.postModel = activeJobsModel[indexPath.row]
+            vc.navBarViewSubtitleLbl.text = "posted \(view.calculateTimeFrame(initialTime: activeJobsModel[indexPath.row].dateTime))"
+            vc.isComingFromServiceVC = true
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
+        
+        alertController.addAction(markAsCompletedAction)
+        alertController.addAction(viewPostAction)
+        alertController.addAction(cancelAction)
+        alertController.fixActionSheetConstraintsError()
+        present(alertController, animated: true)
+    }
+
+    fileprivate func markJobAsCompleted(indexPath: IndexPath) {
+        let model = activeJobsModel[indexPath.row]
+        guard let jobID = model.id else { return }
+        let postChildPath = "posts/\(jobID)"
+        guard let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo") else { return }
+        guard let technicanName = getUsersPersistedInfo.first?.name else { return }
+        guard let technicianKeyPath = getUsersPersistedInfo.first?.uid else { return }
+
+
+        DatabaseManager.shared.getHiredJobs(techniciankeyPath: technicianKeyPath) { success in
+            switch success {
+            case .success(let hiredJobs):
+                for job in hiredJobs {
+                    if job.postChildPath == postChildPath {
+                        let hiredJobKeyPath = job.id
+                        let technieHiredJobsChildPath = "users/technicians/\(technicianKeyPath)/hiredJobs/\(hiredJobKeyPath ?? "")"
+                        
+                        DatabaseManager.shared.markAJobAsDone(withTechnieHiredJobsChildPath: technieHiredJobsChildPath, withPostChildPath: postChildPath, clientKeyPath: model.postOwnerInfo!.keyPath, technicianName: technicanName, completedJobUID: jobID) { success in
+                            if success {
+                                guard let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo") else { return }
+                                guard let technicianKeyPath = getUsersPersistedInfo.first?.uid else { return }
+                                
+                                self.getPreviousHiredJobs(technicianKeyPath: technicianKeyPath)
+                                
+                                self.activeJobsModel.remove(at: indexPath.row)
+                                self.tableView.beginUpdates()
+                                self.tableView.deleteRows(at: [IndexPath(row: indexPath.row, section: 0)], with: .left)
+                                self.tableView.endUpdates()
+                                return
+                            }
+                        }
+                    }
+                }
+            case .failure(let error):
+                print(error)
+            }
+        }
+        
+    }
+    
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        if section == 0 {
+            return activeJobsModel.isEmpty ? (nil) : (sectionTitle[0])
+        } else {
+            return previousJobsModel.isEmpty ? (nil) : (sectionTitle[1])
+        }
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {

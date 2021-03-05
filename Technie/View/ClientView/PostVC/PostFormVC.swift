@@ -386,6 +386,7 @@ class PostFormVC: UIViewController {
                                          location: nil,
                                          requiredSkills: self.postRequiredSkills,
                                          availabilityStatus: self.postAvailabilityStatus,
+                                         isCompleted: false,
                                          numberOfProposals: self.postNumberOfProposals,
                                          numberOfInvitesSent: self.postNumberOfInvitesSent,
                                          numberOfUnansweredInvites: self.postNumberOfUnansweredInvites,
