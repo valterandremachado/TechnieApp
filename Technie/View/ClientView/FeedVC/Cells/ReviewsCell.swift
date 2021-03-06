@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Cosmos
 
 class ReviewsCell: UITableViewCell {
 
@@ -93,6 +94,25 @@ class ReviewsCell: UITableViewCell {
         return sv
     }()
     
+    lazy var ratingView: CosmosView = {
+        let view = CosmosView()
+//        view.backgroundColor = .red
+        view.settings.filledColor = .systemPink
+//        view.settings.emptyColor = .systemPink
+//        view.settings.emptyImage = UIImage(systemName: "star")?.withTintColor(.systemPink, renderingMode: .alwaysOriginal)
+//        view.settings.filledImage = UIImage(systemName: "star.fill")?.withTintColor(.systemPink, renderingMode: .alwaysOriginal)
+        view.settings.updateOnTouch = false
+        view.settings.starMargin = -1
+        view.settings.starSize = 17
+        view.settings.fillMode = .half
+        view.withWidth(80)
+//        view.didFinishTouchingCosmos = { rating in
+//            print("rating: \(rating)")
+//        }
+
+        return view
+    }()
+    
     lazy var ratingWithIconStackView: UIStackView = {
         let config = UIImage.SymbolConfiguration(pointSize: 70, weight: .bold, scale: .large)
         var wiredProfileImage = UIImage(named: "rating4", in: nil, with: config)?.withTintColor(.systemPink, renderingMode: .alwaysOriginal)
@@ -103,7 +123,7 @@ class ReviewsCell: UITableViewCell {
 //        iconIV.backgroundColor = .brown
         iconIV.image = wiredProfileImage?.withAlignmentRectInsets(UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0))
 
-        let sv = UIStackView(arrangedSubviews: [iconIV, ratingLabel])
+        let sv = UIStackView(arrangedSubviews: [ratingView, ratingLabel])
         sv.translatesAutoresizingMaskIntoConstraints = false
         sv.axis = .horizontal
         sv.spacing = 5
@@ -111,7 +131,7 @@ class ReviewsCell: UITableViewCell {
         sv.distribution = .fillProportionally
 //        sv.addBackground(color: .cyan)
         sv.withWidth(frame.width - frame.width/3)
-        sv.withHeight(20)
+        sv.withHeight(17)
         return sv
     }()
     
@@ -126,6 +146,19 @@ class ReviewsCell: UITableViewCell {
 //        sv.withHeight(150)
         return sv
     }()
+    
+    var reviews: Review! {
+        didSet {
+            let delimiter = "at"
+            let slicedString = reviews.dateOfHiring.components(separatedBy: delimiter)[0]
+            serviceNameLabel.text = reviews.jobTitle
+            ratingLabel.text = "\(reviews.rating)"
+            reviewCommentLabel.text = reviews.reviewComment
+            serviceDateLabel.text = slicedString
+            clientNameLabel.text = "\(reviews.clientName) - \(calculateTimeFrame(initialTime: reviews.dateOfReview))".lowercased()
+            ratingView.rating = reviews.rating
+        }
+    }
     
     // MARK: - Inits
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -170,7 +203,7 @@ class ProficiencyReviewCell: UITableViewCell {
         lbl.text = "90%"
         lbl.textAlignment = .center
 //        lbl.withHeight(25)
-        lbl.font = .systemFont(ofSize: 14)
+        lbl.font = .systemFont(ofSize: 12)
 //        lbl.backgroundColor = .brown
         lbl.numberOfLines = 0
         lbl.textColor = UIColor(named: "LabelPrimaryAppearance")
@@ -196,7 +229,7 @@ class ProficiencyReviewCell: UITableViewCell {
         lbl.text = "90%"
         lbl.textAlignment = .center
 //        lbl.withHeight(25)
-        lbl.font = .systemFont(ofSize: 14)
+        lbl.font = .systemFont(ofSize: 12)
 //        lbl.backgroundColor = .brown
         lbl.numberOfLines = 0
         lbl.textColor = UIColor(named: "LabelPrimaryAppearance")
@@ -314,13 +347,14 @@ class ProficiencyReviewCell: UITableViewCell {
     lazy var ratingAndReviewsLabel: UILabel = {
         let lbl = UILabel()
         lbl.translatesAutoresizingMaskIntoConstraints = false
-        lbl.text = "4.5 | 400 services"//★
+        lbl.text = " 4.5 | 400 services"//★
         lbl.textColor = UIColor(named: "LabelPrimaryAppearance")
         lbl.textAlignment = .left
         lbl.font = .systemFont(ofSize: 14)
 //        lbl.numberOfLines = 0
         return lbl
     }()
+    
     
     lazy var ratingAndReviewsStackView: UIStackView = {
         let config = UIImage.SymbolConfiguration(pointSize: CGFloat(11))
@@ -384,7 +418,15 @@ class ProficiencyReviewCell: UITableViewCell {
         return sv
     }()
     
-   
+    let items = ["Poor", "Fair", "Good", "Excellent"]
+
+    var satisfactionAvrg: ClientsSatisfaction! {
+        didSet {
+            workSpeedLabel.text = "\(items[Int(satisfactionAvrg.workSpeedAvrg.rounded(.toNearestOrAwayFromZero))])"
+            workQualityLabel.text = "\(items[Int(satisfactionAvrg.workQualityAvrg.rounded(.toNearestOrAwayFromZero))])"
+            responseTimeLabel.text = "\(items[Int(satisfactionAvrg.responseTimeAvrg.rounded(.toNearestOrAwayFromZero))])"
+        }
+    }
     
     // MARK: - Inits
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {

@@ -21,7 +21,9 @@ class ClientFeedVC: UIViewController {
     
     let sections = ["Technician's Ranking", "Nearby Technicians"]
     
+    var userPostModel = [PostModel]()
     var technicianModel = [TechnicianModel]()
+    
     // MARK: - Properties
     var customindexPath = IndexPath(item: 0, section: 0)
     
@@ -232,8 +234,6 @@ class ClientFeedVC: UIViewController {
         })
     }
     
-    var userPostModel = [PostModel]()
-
     fileprivate func fetchUserPosts()  {
         DatabaseManager.shared.getAllClientPosts(completion: { [self] result in
             switch result {

@@ -13,6 +13,9 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
     var userPostModel = [PostModel]()
     var tempUserPosts = [PostModel]()
 
+    var satisfactionAvrg: ClientsSatisfaction?
+    var reviews = [Review]()
+    
     // MARK: - Properties
     lazy var profileImageView: UIImageView = {
         var iv = UIImageView()
@@ -132,7 +135,11 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
     lazy var hireBtn: UIButton = {
         let btn = UIButton(type: .system)
         btn.translatesAutoresizingMaskIntoConstraints = false
-        btn.setTitle("Hire Valter", for: .normal)
+        
+        let delimiter = " "
+        let technicianFirstName = technicianModel.profileInfo.name.components(separatedBy: delimiter)[0]
+        
+        btn.setTitle("Hire \(technicianFirstName.uppercased())", for: .normal)
 //        btn.setTitleColor(.white, for: .normal)
         btn.setTitleColor(.white, for: .normal)
         btn.backgroundColor = .systemPink
@@ -299,6 +306,8 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         // Do any additional setup after loading the view.
         view.backgroundColor = .systemBackground
         currentSegmentIndex = 0
+        
+        getClientSatisfaction()
         setupViews()
         setupSwitchableContainerView()
         populateSections()
@@ -422,6 +431,31 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
 //            }
         }
         
+    }
+    
+    func getClientSatisfaction() {
+        let technicianKeyPath = technicianModel.profileInfo.id
+
+        DatabaseManager.shared.getAllClientSatisfactionWithReviews(with: technicianKeyPath) { result in
+            
+            switch result {
+            case .success(let satisfactionAvrg):
+                self.satisfactionAvrg = satisfactionAvrg
+                self.reviewsTableView.reloadData()
+                print(satisfactionAvrg)
+            case .failure(let error):
+                print(error)
+            }
+        } onReviewCompletion: { result in
+            
+            switch result {
+            case .success(let reviews):
+                self.reviews = reviews
+                self.reviewsTableView.reloadData()
+            case .failure(let error):
+                print(error)
+            }
+        }
     }
     
     fileprivate func presentSelectionBar() {
@@ -554,7 +588,7 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
             }
             
         case 1:
-            if reviewsSectionSetter[2].sectionDetail.count == 0 {
+            if reviews.count == 0 {
                 let noReviewsView = UIView()
                 noReviewsView.backgroundColor = .systemBackground
                 switchableViews[currentSegmentIndex].addSubview(noReviewsView)
@@ -611,8 +645,11 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
     
     // MARK: - Selectors
     @objc fileprivate func hireBtnPressed(_ sender: UIButton) {
+        let delimiter = " "
+        let technicianFirstName = technicianModel.profileInfo.name.components(separatedBy: delimiter)[0]
+        
         switch sender.title(for: .normal) {
-        case "Hire Valter":
+        case "Hire \(technicianFirstName.uppercased())":
             let vc = MyJobsVC()
             vc.myJobsVCDismissalDelegate = self
             vc.technicianModel = technicianModel
@@ -852,7 +889,7 @@ extension TechnicianProfileDetailsVC: TableViewDataSourceAndDelegate {
         case 0:
             return aboutSectionSetter.count
         case 1:
-            return reviewsSectionSetter.count
+            return 3
         default:
             return 0
         }
@@ -863,7 +900,10 @@ extension TechnicianProfileDetailsVC: TableViewDataSourceAndDelegate {
         case 0:
             return aboutSectionSetter[section].sectionDetail.count
         case 1:
-            return reviewsSectionSetter[section].sectionDetail.count
+            if section > 1 {
+                return reviews.count
+            }
+            return 1
         default:
             return aboutSectionSetter[section].sectionDetail.count
         }
@@ -886,14 +926,17 @@ extension TechnicianProfileDetailsVC: TableViewDataSourceAndDelegate {
             case 0:
                 let cell = tableView.dequeueReusableCell(withIdentifier: ProficiencyReviewCell.cellID, for: indexPath) as! ProficiencyReviewCell
                 cell.setupViews()
+                cell.satisfactionAvrg = satisfactionAvrg
                 return cell
             case 1:
                 let cell = tableView.dequeueReusableCell(withIdentifier: ProficiencyReviewCell.cellID, for: indexPath) as! ProficiencyReviewCell
                 cell.setupReliabilityStackView()
+                cell.ratingAndReviewsLabel.text = " \(String(format:"%.1f", satisfactionAvrg!.ratingAvrg)) | \(technicianModel.numberOfActiveServices + technicianModel.numberOfActiveServices) services"
                 return cell
             case 2:
                 let cell = tableView.dequeueReusableCell(withIdentifier: ReviewsCell.cellID, for: indexPath) as! ReviewsCell
                 cell.setupViews()
+                cell.reviews = reviews[indexPath.row]
                 return cell
             default:
                 return UITableViewCell()
@@ -917,7 +960,7 @@ extension TechnicianProfileDetailsVC: TableViewDataSourceAndDelegate {
             if section <= 1 {
                 return nil
             }
-            return reviewsSectionSetter[section].sectionTitle! + " (40)"
+            return reviewsSectionSetter[section].sectionTitle! + " (\(reviews.count))"
         default:
             return nil
         }

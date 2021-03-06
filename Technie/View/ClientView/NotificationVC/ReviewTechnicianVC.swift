@@ -11,6 +11,8 @@ import Cosmos
 class ReviewTechnicianVC: UIViewController, UITextViewDelegate {
 
     var userPostModel: PostModel!
+    var satisfactionAvrg: ClientsSatisfaction?
+    var reviews = [Review]()
     
     lazy var tableView: UITableView = {
         let tv = UITableView(frame: .zero, style: .grouped)
@@ -84,6 +86,7 @@ class ReviewTechnicianVC: UIViewController, UITextViewDelegate {
         sectionSetter.append(SectionHandler(title: "Response Time", detail: [""]))
         sectionSetter.append(SectionHandler(title: "Rating", detail: [""]))
 
+        getClientSatisfaction()
         setupViews()
         
         print("print that post: \(userPostModel)")
@@ -121,40 +124,100 @@ class ReviewTechnicianVC: UIViewController, UITextViewDelegate {
         }
     }
     
-    var workReview = [Int]()
+    var workReview = [0, 0, 0]
     
     @objc fileprivate func leftNavBarBtnTapped() {
-        print("rating2: \(ratingView.rating)")
+//        print("rating2: \(ratingView.rating)")
         let rating = ratingView.rating
         let jobTitle = userPostModel.title
         let dateOfReview = PostFormVC.dateFormatter.string(from: Date())
         
         guard let dateOfHiring = userPostModel.hiringStatus?.date else { return }
         guard let clientName = userPostModel.postOwnerInfo?.name else { return }
-        guard let technicianEmail = userPostModel.hiringStatus?.technicianToHireEmail else { return }
+        guard let technicianKeyPath = userPostModel.hiringStatus?.technicianKeyPath else { return }
 
         guard let reviewComment = reviewCommentTextField.text else { return }
         
-        let clientsSatisfaction = ClientsSatisfaction(workSpeedAvrg: rating,
-                                                      workQualityAvrg: rating,
-                                                      responseTimeAvrg: rating,
-                                                      ratingAvrg: rating)
-        let clientReview = Review(jobTitle: jobTitle,
-                                  reviewComment: reviewComment,
-                                  clientName: clientName,
-                                  dateOfReview: dateOfReview,
-                                  dateOfHiring: dateOfHiring,
-                                  workSpeed: workReview[0],
-                                  workQuality: workReview[0],
-                                  responseTime: workReview[0],
-                                  rating: rating)
-        
-        DatabaseManager.shared.insertClientSatisfaction(with: clientsSatisfaction, with: clientReview, with: technicianEmail) { success in
-            if success {
-                self.dismiss(animated: true, completion: nil)
+        if reviews.count >= 1 {
+            print("reviews > 1")
+            let divisor = Double(reviews.count + 1)
+            let workSpeedAvrg = calculateMeanAverage(dividend: satisfactionAvrg!.workSpeedAvrg + Double(workReview[0]), divisor: divisor)
+            let workQualityAvrg = calculateMeanAverage(dividend: satisfactionAvrg!.workQualityAvrg + Double(workReview[1]), divisor: divisor)
+            let responseTimeAvrg = calculateMeanAverage(dividend: satisfactionAvrg!.responseTimeAvrg + Double(workReview[2]), divisor: divisor)
+            let ratingAvrg = calculateMeanAverage(dividend: satisfactionAvrg!.ratingAvrg + rating, divisor: divisor)
+            
+            let clientsSatisfaction = ClientsSatisfaction(workSpeedAvrg: workSpeedAvrg,
+                                                          workQualityAvrg: workQualityAvrg,
+                                                          responseTimeAvrg: responseTimeAvrg,
+                                                          ratingAvrg: ratingAvrg)
+            
+            let clientReview = Review(jobTitle: jobTitle,
+                                      reviewComment: reviewComment,
+                                      clientName: clientName,
+                                      dateOfReview: dateOfReview,
+                                      dateOfHiring: dateOfHiring,
+                                      workSpeed: workReview[0],
+                                      workQuality: workReview[1],
+                                      responseTime: workReview[2],
+                                      rating: rating)
+            
+            DatabaseManager.shared.insertClientSatisfaction(with: clientsSatisfaction, with: clientReview, with: technicianKeyPath) { success in
+                if success {
+                    self.dismiss(animated: true, completion: nil)
+                }
+            }
+            
+        } else {
+            print("reviews == 0")
+            let clientsSatisfaction = ClientsSatisfaction(workSpeedAvrg: Double(workReview[0]),
+                                                          workQualityAvrg: Double(workReview[1]),
+                                                          responseTimeAvrg: Double(workReview[2]),
+                                                          ratingAvrg: rating)
+            
+            let clientReview = Review(jobTitle: jobTitle,
+                                      reviewComment: reviewComment,
+                                      clientName: clientName,
+                                      dateOfReview: dateOfReview,
+                                      dateOfHiring: dateOfHiring,
+                                      workSpeed: workReview[0],
+                                      workQuality: workReview[1],
+                                      responseTime: workReview[2],
+                                      rating: rating)
+            
+            DatabaseManager.shared.insertClientSatisfaction(with: clientsSatisfaction, with: clientReview, with: technicianKeyPath) { success in
+                if success {
+                    self.dismiss(animated: true, completion: nil)
+                }
             }
         }
-        
+
+    }
+    
+    func calculateMeanAverage(dividend: Double, divisor: Double) -> Double {
+        let result = (dividend)/divisor
+        return result
+    }
+    
+    func getClientSatisfaction() {
+        guard let technicianKeyPath = userPostModel.hiringStatus?.technicianKeyPath else { return }
+
+        DatabaseManager.shared.getAllClientSatisfactionWithReviews(with: technicianKeyPath) { result in
+            
+            switch result {
+            case .success(let satisfactionAvrg):
+                self.satisfactionAvrg = satisfactionAvrg
+            case .failure(let error):
+                print(error)
+            }
+        } onReviewCompletion: { result in
+            
+            switch result {
+            case .success(let reviews):
+                self.reviews = reviews
+            case .failure(let error):
+                print(error)
+            }
+        }
     }
     
     
@@ -175,7 +238,6 @@ extension ReviewTechnicianVC: TableViewDataSourceAndDelegate {
         let cell = tableView.dequeueReusableCell(withIdentifier: ReviewTechnicianCell.cellID, for: indexPath) as! ReviewTechnicianCell
         cell.segment.tag = indexPath.section
         cell.segment.addTarget(self, action: #selector(segmentPressed), for: .valueChanged)
-        print("check: \(cell.segment.selectedSegmentIndex)")
 
         if indexPath.section == 3 {
             cell.segment.isHidden =  true
@@ -193,7 +255,21 @@ extension ReviewTechnicianVC: TableViewDataSourceAndDelegate {
     }
     
     @objc func segmentPressed(_ sender: UISegmentedControl) {
-        print("Index: \(sender.selectedSegmentIndex)")
+        let index = sender.tag
+        let selectedItem = sender.selectedSegmentIndex
+        switch index {
+        case 0:
+            workReview[0] = selectedItem
+        case 1:
+            workReview[1] = selectedItem
+        case 2:
+            workReview[2] = selectedItem
+        default:
+            break
+        }
+        print("Selected Item: \(selectedItem), section number: \(index)")
+        print("workReview: \(workReview)")
+
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {

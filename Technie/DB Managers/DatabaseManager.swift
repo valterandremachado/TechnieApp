@@ -609,6 +609,7 @@ extension DatabaseManager {
                         "hiringStatus": [
                             "isHired": true,
                             "technicianToHireEmail": technicianEmail,
+                            "technicianKeyPath": technicianKeyPath,
                             "date": PostFormVC.dateFormatter.string(from: Date())
                         ]
                     ] as [String : Any]
@@ -728,28 +729,82 @@ extension DatabaseManager {
     }
     
     public func insertClientSatisfaction(with clientsSatisfactionModel: ClientsSatisfaction, with reviewModel: Review, with technicianKeyPath: String, completion: @escaping (Bool) -> Void) {
-        let data = try! FirebaseEncoder().encode(clientsSatisfactionModel)
-
-        let mainChildPath = "users/technician/\(technicianKeyPath)/clientsSatisfaction"
-        let db = database.child(mainChildPath)
         
-        db.setValue(data, withCompletionBlock: { [self] error, _ in
-            guard error == nil else {
-                completion(false)
+        let reviewData = try! FirebaseEncoder().encode(reviewModel)
+        //        let clientSatisfactionData = try! FirebaseEncoder().encode(clientsSatisfactionModel)
+        
+        let mainChildPath = "users/technicians/\(technicianKeyPath)/clientsSatisfaction"
+        let reviewChildPath = "/\(mainChildPath)/reviews"
+        
+        database.child(mainChildPath).observeSingleEvent(of: .value, with: { [weak self] snapshot in
+            
+            guard let strongSelf = self else {
                 return
             }
             
-            let reviewData = try! FirebaseEncoder().encode(reviewModel)
-            let childPath = "/\(mainChildPath)/reviews"
+            let updateElement = [
+                "workSpeedAvrg":  clientsSatisfactionModel.workSpeedAvrg,
+                "workQualityAvrg": clientsSatisfactionModel.workQualityAvrg,
+                "responseTimeAvrg": clientsSatisfactionModel.responseTimeAvrg,
+                "ratingAvrg": clientsSatisfactionModel.ratingAvrg
+            ]
             
-            database.child(childPath).childByAutoId().setValue(reviewData, withCompletionBlock: { error, _ in
+            strongSelf.database.child(mainChildPath).updateChildValues(updateElement, withCompletionBlock: { error, _ in
                 guard error == nil else {
                     completion(false)
                     return
                 }
-                completion(true)
+                
+                let db = strongSelf.database.child(reviewChildPath)
+                let randomKeyDB = db.childByAutoId()
+                randomKeyDB.setValue(reviewData, withCompletionBlock: { error, _ in
+                    guard error == nil else {
+                        completion(false)
+                        return
+                    }
+                    completion(true)
+                    
+                })
             })
+            
         })
+    }
+    
+    public func getAllClientSatisfactionWithReviews(with technicianKeyPath: String, onClientSatisfactionCompletion: @escaping (Result<ClientsSatisfaction, Error>) -> Void, onReviewCompletion: @escaping (Result<[Review], Error>) -> Void) {
+      
+        var reviews = [Review]()
+        
+        let mainChildPath = "users/technicians/\(technicianKeyPath)/clientsSatisfaction"
+
+        self.database.child(mainChildPath).observeSingleEvent(of: .value, with: { snapshot in
+            guard let value = snapshot.value as? [String: Any] else { return }
+            
+            do {
+                let model = try FirebaseDecoder().decode(ClientsSatisfaction.self, from: value)
+                onClientSatisfactionCompletion(.success(model))
+            } catch let error {
+                print(error)
+            }
+            
+        })
+        
+        let reviewChildPath = "users/technicians/\(technicianKeyPath)/clientsSatisfaction/reviews"
+            self.database.child(reviewChildPath).observeSingleEvent(of: .value, with: { snapshot in
+                guard let reviewCollection = snapshot.value as? [String: Any] else { return }
+                for (keyPath, _) in reviewCollection {
+                    self.database.child("\(reviewChildPath)/\(keyPath)").observeSingleEvent(of: .value, with: { snapshot in
+                        guard let value = snapshot.value else { return }
+                        do {
+                            let model = try FirebaseDecoder().decode(Review.self, from: value)
+                            reviews.append(model)
+                            onReviewCompletion(.success(reviews))
+                        } catch let error {
+                            print(error)
+                        }
+                    })
+                }
+                
+            })
     }
     
     /// Deletion
@@ -2210,7 +2265,7 @@ struct ClientsSatisfaction: Codable {
     var responseTimeAvrg: Double
     var ratingAvrg: Double
     
-    var reviews: [Review]?
+//    var reviews: [Review]?
 }
 
 struct Review: Codable {
@@ -2269,6 +2324,7 @@ struct HiringStatus: Codable {
     var date: String
     var isHired: Bool
     var technicianToHireEmail: String
+    var technicianKeyPath: String
 }
 
 struct Proposals: Codable {
