@@ -31,6 +31,15 @@ class TechnieStatsCell: UITableViewCell {
         return lbl
     }()
     
+    lazy var responseTimeBarLabel: UILabel = {
+        let lbl = UILabel()
+        lbl.translatesAutoresizingMaskIntoConstraints = false
+        lbl.text = "Response time: 70%"
+        lbl.font = .systemFont(ofSize: 12)
+        lbl.textAlignment = .center
+        return lbl
+    }()
+    
     lazy var workSpeedBar: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -67,8 +76,26 @@ class TechnieStatsCell: UITableViewCell {
         return view
     }()
     
+    lazy var responseTimeBar: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.backgroundColor = .systemPink
+        view.layer.cornerRadius = 5
+        view.withHeight(30)
+//        view.withWidth(40)
+        plotBarThreeChart(bar: view)
+
+        view.addSubview(responseTimeBarLabel)
+        responseTimeBarLabel.anchor(top: view.topAnchor,
+                                 leading: view.leadingAnchor,
+                                 bottom: view.bottomAnchor,
+                                 trailing: view.trailingAnchor,
+                                 padding: UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5))
+        return view
+    }()
+    
     lazy var barStackView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [workSpeedBar, workQualityBar])
+        let sv = UIStackView(arrangedSubviews: [workSpeedBar, workQualityBar, responseTimeBar])
         sv.translatesAutoresizingMaskIntoConstraints = false
         sv.axis = .vertical
         sv.distribution = .equalSpacing
@@ -106,6 +133,20 @@ class TechnieStatsCell: UITableViewCell {
     }
     
     func plotBarTwoChart(bar: UIView) {
+        let barTwoWidth = CGFloat.random(in: 120..<(frame.width))
+
+        DispatchQueue.global().asyncAfter(deadline: .now() + .milliseconds(10)) {
+            DispatchQueue.main.async {
+                UIView.animate(withDuration: 0.5) {
+                    bar.withWidth(barTwoWidth)
+                    self.layoutIfNeeded()
+                }
+            }
+        }
+        
+    }
+    
+    func plotBarThreeChart(bar: UIView) {
         let barTwoWidth = CGFloat.random(in: 120..<(frame.width))
 
         DispatchQueue.global().asyncAfter(deadline: .now() + .milliseconds(10)) {

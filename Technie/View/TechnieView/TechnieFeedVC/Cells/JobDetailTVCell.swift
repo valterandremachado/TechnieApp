@@ -160,7 +160,7 @@ class JobDetailTVCell2: UITableViewCell {
     lazy var jobFieldLabel: UILabel = {
         let lbl = UILabel()
         lbl.translatesAutoresizingMaskIntoConstraints = false
-        lbl.text = "Field"
+        lbl.text = "Expertise"
         lbl.textAlignment = .right
         lbl.textColor = .systemGray
         return lbl
@@ -320,6 +320,8 @@ class JobDetailTVCell4: UITableViewCell {
                 config.cornerRadius = 15
                 config.exactHeight = 25
                 config.textFont = .systemFont(ofSize: 13.5)
+                
+                skillTagsCollectionView.numberOfLines = 2
                 skillTagsCollectionView.addTags(dataArray, with: config)
             }
         }
@@ -340,7 +342,8 @@ class JobDetailTVCell4: UITableViewCell {
     func setupViews() {
         [skillsHeaderLabel, skillTagsCollectionView].forEach { contentView.addSubview($0)}
         skillsHeaderLabel.anchor(top: contentView.topAnchor, leading: contentView.leadingAnchor, bottom: nil, trailing: contentView.trailingAnchor, padding: UIEdgeInsets(top: 10, left: 20, bottom: 0, right: 20), size: CGSize(width: 0, height: 20))
-        skillTagsCollectionView.anchor(top: skillsHeaderLabel.bottomAnchor, leading: skillsHeaderLabel.leadingAnchor, bottom: contentView.bottomAnchor, trailing: skillsHeaderLabel.trailingAnchor, padding: UIEdgeInsets(top: 10, left: 0, bottom: 0, right: 0))
+        
+        skillTagsCollectionView.anchor(top: skillsHeaderLabel.bottomAnchor, leading: skillsHeaderLabel.leadingAnchor, bottom: contentView.bottomAnchor, trailing: skillsHeaderLabel.trailingAnchor, padding: UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0))
     }
     
     required init?(coder: NSCoder) {

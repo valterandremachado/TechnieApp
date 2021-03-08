@@ -38,18 +38,38 @@ class TechnieServiceVC: UIViewController {
         return tv
     }()
     
+    let sectionTitle = ["Active Jobs", "Previous Jobs"]
+
+    lazy var warningLabel: UILabel = {
+        let lbl = UILabel()
+        lbl.translatesAutoresizingMaskIntoConstraints = false
+        lbl.textAlignment = .center
+        lbl.text = "You haven't been hired yet, keep applying."
+        return lbl
+    }()
+    
     // MARK: - Inits
     override func loadView() {
         super.loadView()
     }
     
-    let sectionTitle = ["Active Jobs", "Previous Jobs"]
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
         fetchData()
         setupViews()
+        if activeJobsModel.count == 0 {
+            tableView.isHidden = true
+            view.addSubview(warningLabel)
+            NSLayoutConstraint.activate([
+                warningLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+                warningLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+            ])
+        } else {
+            tableView.isHidden = false
+        }
         
 //        sections.append(SectionHandler(title: "Active Jobs", detail: ["Active 1", "Active 2", "Active 3", "Active 4"]))
 //        sections.append(SectionHandler(title: "Previous Jobs", detail: ["previous 1", "previous 2", "previous 3", "previous 4", "previous 5", "previous 6"]))

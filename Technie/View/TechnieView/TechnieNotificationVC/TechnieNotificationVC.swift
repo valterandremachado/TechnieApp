@@ -44,6 +44,14 @@ class TechnieNotificationVC: UIViewController {
         return tv
     }()
     
+    lazy var warningLabel: UILabel = {
+        let lbl = UILabel()
+        lbl.translatesAutoresizingMaskIntoConstraints = false
+        lbl.textAlignment = .center
+        lbl.text = "You have no notification to be shown."
+        return lbl
+    }()
+    
     var database = Database.database().reference()
     var postChildPath = ""
 
@@ -55,6 +63,17 @@ class TechnieNotificationVC: UIViewController {
         setupViews()
         fetchData()
         notificationChangesListener()
+        
+        if userNotifications.count == 0 {
+            tableView.isHidden = true
+            view.addSubview(warningLabel)
+            NSLayoutConstraint.activate([
+                warningLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+                warningLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+            ])
+        } else {
+            tableView.isHidden = false
+        }
     }
     
     // MARK: - Methods

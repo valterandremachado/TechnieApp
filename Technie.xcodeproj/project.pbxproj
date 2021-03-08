@@ -144,6 +144,7 @@
 		8AF76A7E258B440D00ED14C2 /* UIScrollView+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AF76A76258B440D00ED14C2 /* UIScrollView+.swift */; };
 		8AF76A86258B64FC00ED14C2 /* TechnieRankingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AF76A85258B64FC00ED14C2 /* TechnieRankingCell.swift */; };
 		8AF76A8E258B671500ED14C2 /* HeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AF76A8D258B671500ED14C2 /* HeaderView.swift */; };
+		8AFAF4AD25F60DFF00494845 /* TagListView in Frameworks */ = {isa = PBXBuildFile; productRef = 8AFAF4AC25F60DFF00494845 /* TagListView */; };
 		F422771D35CC7008371B84D1 /* Pods_Technie_TechnieUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 583B6750D252DA954CA48DB6 /* Pods_Technie_TechnieUITests.framework */; };
 		F615929100B23AE69709F5FD /* Pods_TechnieTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FFA879CA9FAC3DDD95970C0F /* Pods_TechnieTests.framework */; };
 		FAC04EE8597FB7C092875D9C /* Pods_Technie.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3608D5D19A7FDEC3B4F67809 /* Pods_Technie.framework */; };
@@ -313,6 +314,7 @@
 				8A54FAD225B56ED100814216 /* MessageKit in Frameworks */,
 				8AADFB8C25B5A59700D3A5CC /* SDWebImage in Frameworks */,
 				FAC04EE8597FB7C092875D9C /* Pods_Technie.framework in Frameworks */,
+				8AFAF4AD25F60DFF00494845 /* TagListView in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -843,6 +845,7 @@
 				8AA43A2025D145FF00140649 /* NotificationBannerSwift */,
 				8AC5603F25E66E18000FD89F /* CodableFirebase */,
 				8AF2D99625F1117A004A2219 /* Cosmos */,
+				8AFAF4AC25F60DFF00494845 /* TagListView */,
 			);
 			productName = Technie;
 			productReference = 8AC1B11F258A2D8D000F2569 /* Technie.app */;
@@ -926,6 +929,7 @@
 				8AA43A1F25D145FF00140649 /* XCRemoteSwiftPackageReference "NotificationBanner" */,
 				8AC5603E25E66E18000FD89F /* XCRemoteSwiftPackageReference "CodableFirebase" */,
 				8AF2D99525F1117A004A2219 /* XCRemoteSwiftPackageReference "Cosmos" */,
+				8AFAF4AB25F60DFF00494845 /* XCRemoteSwiftPackageReference "TagListView" */,
 			);
 			productRefGroup = 8AC1B120258A2D8D000F2569 /* Products */;
 			projectDirPath = "";
@@ -1612,6 +1616,14 @@
 				minimumVersion = 23.0.0;
 			};
 		};
+		8AFAF4AB25F60DFF00494845 /* XCRemoteSwiftPackageReference "TagListView" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ElaWorkshop/TagListView";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.4.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1649,6 +1661,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 8AF2D99525F1117A004A2219 /* XCRemoteSwiftPackageReference "Cosmos" */;
 			productName = Cosmos;
+		};
+		8AFAF4AC25F60DFF00494845 /* TagListView */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8AFAF4AB25F60DFF00494845 /* XCRemoteSwiftPackageReference "TagListView" */;
+			productName = TagListView;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

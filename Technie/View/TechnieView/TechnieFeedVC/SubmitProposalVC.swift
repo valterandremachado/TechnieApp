@@ -73,10 +73,12 @@ class SubmitProposalVC: UIViewController, UITextViewDelegate {
         let btn = UIButton(type: .system)
         btn.translatesAutoresizingMaskIntoConstraints = false
         btn.setTitle("Submit", for: .normal)
+        btn.setTitleColor(.white, for: .normal)
+
 //        btn.contentHorizontalAlignment = .left
         btn.layer.cornerRadius = 10
         btn.clipsToBounds = true
-        btn.backgroundColor = .cyan
+        btn.backgroundColor = .systemPink
 //        btn.withWidth(view.frame.width - 100)
         btn.addTarget(self, action: #selector(proposalBtnPressed), for: .touchUpInside)
         return btn

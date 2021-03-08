@@ -728,6 +728,26 @@ extension DatabaseManager {
         })
     }
     
+    public func insertSavedPost(withKeyPath technicianKeyPath: String, withPostUID postUID: String, completion: @escaping (Bool) -> Void) {
+        
+        let mainChildPath = "users/technicians/\(technicianKeyPath)/savedJobs"
+        
+        let db = database.child(mainChildPath)
+        let dbPostID = db.childByAutoId()
+        
+        let updateElement = [
+            "postUID": postUID,
+        ]
+        
+        dbPostID.updateChildValues(updateElement, withCompletionBlock: { error, _ in
+            guard error == nil else {
+                completion(false)
+                return
+            }
+            completion(true)
+        })
+    }
+    
     public func insertClientSatisfaction(with clientsSatisfactionModel: ClientsSatisfaction, with reviewModel: Review, with technicianKeyPath: String, completion: @escaping (Bool) -> Void) {
         
         let reviewData = try! FirebaseEncoder().encode(reviewModel)
@@ -1230,6 +1250,39 @@ extension DatabaseManager {
         })
     }
     
+    public func getAllSavedJobs(technicianKeyPath: String, completion: @escaping (Result<[String], Error>) -> Void) {
+        database.child("users/technicians/\(technicianKeyPath)/savedJobs").observeSingleEvent(of: .value, with: { snapshot in
+            guard let savedJobCollection = snapshot.value as? [String: Any] else {
+                completion(.failure(DatabaseError.failedToFetch))
+                return
+            }
+            
+            var postUIDs = [String]()
+            
+            for (key, _) in savedJobCollection {
+//                technicianHiredJobKeyPaths.forEach { technieKey in
+//                    if key == technieKey {
+                        Database.database().reference().child("users/technicians/\(technicianKeyPath)/savedJobs/\(key)").observeSingleEvent(of: .value, with: { snapshot in
+                            guard let value = snapshot.value else { return }
+                            do {
+                                let model = try FirebaseDecoder().decode(SavedJobs.self, from: value)
+                                postUIDs.append(model.postUID)
+                                    completion(.success(postUIDs))
+                                
+                            } catch let error {
+                                print(error)
+                            }
+                        })
+//                    }
+//                }
+            }
+        })
+    }
+    
+    struct SavedJobs: Codable {
+        var postUID: String
+    }
+    
     // MARK: - Listeners
     public func listenToPostChanges(completion: @escaping (Result<[PostModel], Error>) -> Void) {
         Database.database().reference().child("posts").observeSingleEvent(of: .childChanged, with: { [self] snapshot in
@@ -1252,8 +1305,10 @@ extension DatabaseManager {
                         do {
                             let model = try FirebaseDecoder().decode(PostModel.self, from: value)
 //                            print("model: \(model)")
-                            updatedPosts.append(model)
-                            completion(.success(updatedPosts))
+                            if model.availabilityStatus != false {
+                                updatedPosts.append(model)
+                                completion(.success(updatedPosts))
+                            }
                         } catch let error {
                             print(error)
                         }

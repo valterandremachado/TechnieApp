@@ -8,7 +8,11 @@
 import UIKit
 import FirebaseDatabase
 
-class TechnieFeedVC: UIViewController {
+protocol TechnieFeedVCDelegate {
+    func saveJobLinkMethod(cell: UITableViewCell, button: UIButton)
+}
+
+class TechnieFeedVC: UIViewController, TechnieFeedVCDelegate {
     
     // Cells ID
     private let feedCellOnSection1ID = "feedCellID1"
@@ -20,6 +24,8 @@ class TechnieFeedVC: UIViewController {
     
     let sections = ["Technician's Ranking", "Nearby Technicians"]
     var postModel = [PostModel]()
+    var filteredData: [PostModel] = []
+
     // MARK: - Properties
     var customindexPath = IndexPath(item: 0, section: 0)
     
@@ -167,7 +173,6 @@ class TechnieFeedVC: UIViewController {
 //        guard let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo") else { return }
 //        print("persistUsersInfo: \(getUsersPersistedInfo)")
         
-     
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -221,8 +226,37 @@ class TechnieFeedVC: UIViewController {
         
     }
     
+    var savedJobsUIDs = [String]()
+    var savedJobs = [PostModel]()
+
     fileprivate func fetchData()  {
+        guard let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo") else { return }
+        guard let technicianKeyPath = getUsersPersistedInfo.first?.uid else { return }
+        
         DispatchQueue.main.async {
+            DatabaseManager.shared.getAllSavedJobs(technicianKeyPath: technicianKeyPath) { result in
+                switch result {
+                case .success(let savedJobsUIDs):
+                    self.savedJobsUIDs = savedJobsUIDs
+                    self.tableView.reloadData()
+                    
+                    for uid in savedJobsUIDs {
+                        self.postModel.forEach { post in
+                            if self.savedJobs.count < savedJobsUIDs.count {
+                            if uid == post.id {
+                                self.savedJobs.append(post)
+//                                print("savedJobs: \(self.savedJobs)")
+                                NotificationCenter.default.post(name: NSNotification.Name("SavedJobsNotificationObserver"), object: self.savedJobs)
+                            }
+                            }
+                        }
+                        
+                    }
+                case .failure(let error):
+                    print(error)
+                }
+            }
+            
             DatabaseManager.shared.getAllPosts(completion: {[weak self] result in
                 guard let self = self else { return }
                 switch result {
@@ -231,13 +265,17 @@ class TechnieFeedVC: UIViewController {
                     self.postModel = sortedArray
                     self.tableView.reloadData()
 
+                    
+                    for _ in 0..<(sortedArray.count) {
+                        self.buttonStates.append(false)
+                        // in my case, all buttons are off, but be sure to implement logic here
+                    }
                     return
                 case .failure(let error):
                     print("Failed to get posts: \(error.localizedDescription)")
                 }
             })
         }
-        
     }
     
     fileprivate func listenToPostsChange() {
@@ -271,6 +309,35 @@ class TechnieFeedVC: UIViewController {
         navigationController?.pushViewController(vc, animated: true)
     }
     
+    var buttonStates = [Bool]()
+    
+    // MARK: - Like button delegate
+    func saveJobLinkMethod(cell: UITableViewCell, button: UIButton) {
+        let imageSaved = UIImage(systemName: "bookmark.fill")
+        let imageUnsaved = UIImage(systemName: "bookmark")
+        guard let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo") else { return }
+        guard let technicianKeyPath = getUsersPersistedInfo.first?.uid else { return }
+        guard let tappedIndexPath = tableView.indexPath(for: cell) else { return }
+        
+        buttonStates[tappedIndexPath.item] = !buttonStates[tappedIndexPath.item]
+
+        if buttonStates[tappedIndexPath.item] == true {
+            buttonStates[tappedIndexPath.item] = true
+            button.setImage(imageSaved, for: .normal)
+            guard let postUID = postModel[tappedIndexPath.row].id else { return }
+            DatabaseManager.shared.insertSavedPost(withKeyPath: technicianKeyPath, withPostUID: postUID) { success in
+                if success {
+                    print("success")
+                }
+            }
+            
+        } else {
+//            buttonStates[tappedIndexPath.item] = false
+            button.setImage(imageUnsaved, for: .normal)
+
+        }
+        
+    }
 }
 
 // MARK: - UISearchBarDelegate Extension
@@ -288,16 +355,40 @@ extension TechnieFeedVC: UISearchBarDelegate {
 //        searchController.searchBar.becomeFirstResponder()
 //    }
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
         searchBar.searchTextField.autocapitalizationType = .none
         guard let searchedString = searchBar.text else { return }
-        presentSearchResults(searchedString)
+        presentSearchResults(searchedString, filteredData)
     }
     
-    fileprivate func presentSearchResults(_ searchedString: String) {
+    fileprivate func presentSearchResults(_ searchedString: String,_ filteredPost: [PostModel]) {
         let vc = JobSearchResultsVC()
         vc.title = "\(searchedString) results".lowercased()
+        vc.postModel = filteredPost
         navigationController?.pushViewController(vc, animated: true)
     }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        //        searchBar.text = searchText.lowercased()
+        if searchBar.text!.trimmingCharacters(in: .whitespaces).isEmpty {
+            //            print("isEmpty")
+//            collectionView.isHidden = true
+//            collectionView.reloadData()
+        } else {
+//            collectionView.isHidden = false
+//            collectionView.reloadData()
+        }
+        
+        filteredData = postModel
+        if searchText.isEmpty == false {
+            filteredData = postModel.filter({ $0.field!.contains(searchText) })
+//            print(filteredData)
+//            isSearching = true
+//            collectionView.reloadData()
+        }
+       
+    }
+    
 }
 
 // MARK: - TableViewDelegateAndDataSource Extension
@@ -310,8 +401,19 @@ extension TechnieFeedVC: TableViewDataSourceAndDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 //        tableView.deselectRow(at: indexPath, animated: true)
         let cell = tableView.dequeueReusableCell(withIdentifier: FeedsTVCell.cellID, for: indexPath) as! FeedsTVCell
+        cell.linkedDelegate = self
         let post = postModel[indexPath.row]
         cell.postModel = post
+        
+        
+        for uid in savedJobsUIDs {
+            if uid == post.id {
+                self.buttonStates[indexPath.item] = true
+            } else {
+                self.buttonStates[indexPath.item] = false
+            }
+//            tableView.reloadData()
+        }
         return cell
     }
     
@@ -361,8 +463,11 @@ extension TechnieFeedVC: CollectionDataSourceAndDelegate {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         print("didSelectItemAt: \(indexPath.row)")
+        let professions = professionArray[indexPath.item]
+        let filteredByProfession = professions == "Others" ? (postModel) : (postModel.filter({ $0.field!.contains(professions)}))
         let vc = JobSearchResultsVC()
         vc.title = "\(professionArray[indexPath.item]) job results".lowercased()
+        vc.postModel = filteredByProfession
         navigationController?.pushViewController(vc, animated: true)
 //        presentSearchResults()
     }

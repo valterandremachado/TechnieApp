@@ -48,7 +48,7 @@ class TechnieStatsVC: UIViewController {
         setupViews()
         
         sectionSetter.append(SectionHandler(title: "Proficiency", detail: [""]))
-        sectionSetter.append(SectionHandler(title: "Reliability", detail: ["", ""]))
+        sectionSetter.append(SectionHandler(title: "Reliability", detail: [""]))
         sectionSetter.append(SectionHandler(title: "Reviews", detail: ["Reviews", "Reviews", "Reviews", "Reviews", "Reviews", "Reviews", "Reviews", "Reviews", "Reviews"]))
     }
     
@@ -99,11 +99,7 @@ extension TechnieStatsVC: TableViewDataSourceAndDelegate {
             return cell
         case 1:
             let cell = tableView.dequeueReusableCell(withIdentifier: ProficiencyReviewCell.cellID, for: indexPath) as! ProficiencyReviewCell
-            if indexPath.row == 0 {
-                cell.setupResponseTimeStackView()
-            } else {
-                cell.setupReliabilityStackView()
-            }
+            cell.setupReliabilityStackView()
             return cell
         case 2:
             let cell = tableView.dequeueReusableCell(withIdentifier: ReviewsCell.cellID, for: indexPath) as! ReviewsCell

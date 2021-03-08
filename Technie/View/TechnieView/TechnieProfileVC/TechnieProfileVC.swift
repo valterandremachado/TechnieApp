@@ -49,7 +49,9 @@ class TechnieProfileVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
+        NotificationCenter.default.addObserver(self, selector: #selector(self.fetchSavedJobs(notification:)), name: NSNotification.Name("SavedJobsNotificationObserver"), object: nil)
+
         setupViews()
         
         sections.append(SectionHandler(title: "UserInfo", detail: [""]))
@@ -58,6 +60,9 @@ class TechnieProfileVC: UIViewController {
         sections.append(SectionHandler(title: "Logout", detail: [""]))
     }
    
+    @objc func fetchSavedJobs(notification: NSNotification) {
+        print("Value of notification : ", notification.object ?? "")
+    }
     
     // MARK: - Methods
     fileprivate func setupViews() {

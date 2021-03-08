@@ -9,6 +9,8 @@ import UIKit
 
 class JobSearchResultsVC: UIViewController {
 
+    var postModel = [PostModel]()
+    
     // MARK: - Properties
     lazy var tableView: UITableView = {
         let tv = UITableView(frame: .zero, style: .grouped)
@@ -34,13 +36,33 @@ class JobSearchResultsVC: UIViewController {
     }()
     
     let stringArray = ["Lalala", "Lalala", "Lalala", "Lalala", "Lalala", "Lalala", "Lalala", "Lalala"]
-
+    
+    lazy var warningLabel: UILabel = {
+        let lbl = UILabel()
+        lbl.translatesAutoresizingMaskIntoConstraints = false
+        lbl.textAlignment = .center
+        lbl.text = "No results found!"
+        return lbl
+    }()
+    
     // MARK: - Inits
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        view.backgroundColor = .cyan
+        view.backgroundColor = .systemBackground
         setupViews()
+        
+        if postModel.count == 0 {
+            tableView.isHidden = true
+            view.addSubview(warningLabel)
+            NSLayoutConstraint.activate([
+                warningLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+                warningLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+            ])
+        }
+//        else {
+//            tableView.isHidden = false
+//        }
     }
     
     // MARK: - Methods
@@ -68,18 +90,21 @@ class JobSearchResultsVC: UIViewController {
 extension JobSearchResultsVC: TableViewDataSourceAndDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return stringArray.count
+        return postModel.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: FeedsTVCell.cellID, for: indexPath) as! FeedsTVCell
-        cell.jobDescriptionLabel.text = stringArray[indexPath.row]
+//        cell.jobDescriptionLabel.text = stringArray[indexPath.row]
+        let post = postModel[indexPath.row]
+        cell.postModel = post
         return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let vc = JobDetailsVC()
         vc.isSearching = true
+        vc.postModel = postModel[indexPath.row]
         navigationController?.pushViewController(vc, animated: true)
     }
     

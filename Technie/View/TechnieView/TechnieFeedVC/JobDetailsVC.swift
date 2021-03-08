@@ -52,9 +52,10 @@ class JobDetailsVC: UIViewController {
         btn.translatesAutoresizingMaskIntoConstraints = false
         btn.setTitle("Submit Proposal", for: .normal)
 //        btn.contentHorizontalAlignment = .left
+        btn.setTitleColor(.white, for: .normal)
         btn.layer.cornerRadius = 10
         btn.clipsToBounds = true
-        btn.backgroundColor = .cyan
+        btn.backgroundColor = .systemPink
 //        btn.withWidth(180)
         btn.addTarget(self, action: #selector(proposalBtnPressed), for: .touchUpInside)
         return btn
@@ -137,6 +138,8 @@ class JobDetailsVC: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         view.backgroundColor = .white
+        
+        handleBtnTitle()
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -198,6 +201,26 @@ class JobDetailsVC: UIViewController {
         navigationItem.titleView = navBarTitleStackView
     }
     
+    func handleBtnTitle() {
+        guard let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo") else { return }
+        guard let technicianEmail = getUsersPersistedInfo.first?.email else { return }
+        postModel.proposals?.forEach { proposal in
+            
+            if proposal.technicianEmail == technicianEmail {
+                proposalBtn.setTitle("Proposal Submitted", for: .normal)
+                proposalBtn.setTitleColor(.systemGray4, for: .normal)
+                proposalBtn.backgroundColor = UIColor.systemPink.withAlphaComponent(0.8)
+                proposalBtn.isUserInteractionEnabled = false
+            } else {
+                proposalBtn.setTitleColor(.white, for: .normal)
+                proposalBtn.setTitle("Submit Proposal", for: .normal)
+                proposalBtn.isUserInteractionEnabled = true
+            }
+            
+        }
+        
+    }
+    
     fileprivate func presentSelectionBar() {
         let screenSize = UIScreen.main.bounds.size
         guard let tabHeight = tabBarController?.tabBar.frame.height else { return }
@@ -248,12 +271,23 @@ class JobDetailsVC: UIViewController {
     }
     
     // MARK: - Selectors
-    @objc fileprivate func proposalBtnPressed() {
-        let vc = SubmitProposalVC()
-        vc.postID = postModel.id ?? ""
-        vc.numberOfProposals = postModel.numberOfProposals
-        vc.postModel = postModel
-        navigationController?.pushViewController(vc, animated: true)
+    @objc fileprivate func proposalBtnPressed(sender: UIButton) {
+        
+        switch sender.title(for: .normal) {
+        case "Submit Proposal":
+            let vc = SubmitProposalVC()
+            vc.postID = postModel.id ?? ""
+            vc.numberOfProposals = postModel.numberOfProposals
+            vc.postModel = postModel
+            navigationController?.pushViewController(vc, animated: true)
+            
+        case "Proposal Submitted":
+            print("Proposal Submitted")
+        default:
+            break
+        }
+        
+     
     }
     
 }
