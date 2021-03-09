@@ -234,24 +234,49 @@ class TechnieFeedVC: UIViewController, TechnieFeedVCDelegate {
         guard let technicianKeyPath = getUsersPersistedInfo.first?.uid else { return }
         
         DispatchQueue.main.async {
-            DatabaseManager.shared.getAllSavedJobs(technicianKeyPath: technicianKeyPath) { result in
+            DatabaseManager.shared.getAllSavedJobs(technicianKeyPath: technicianKeyPath) { [self] result in
                 switch result {
-                case .success(let savedJobsUIDs):
-                    self.savedJobsUIDs = savedJobsUIDs
-                    self.tableView.reloadData()
-                    
-                    for uid in savedJobsUIDs {
-                        self.postModel.forEach { post in
-                            if self.savedJobs.count < savedJobsUIDs.count {
-                            if uid == post.id {
-                                self.savedJobs.append(post)
-//                                print("savedJobs: \(self.savedJobs)")
-                                NotificationCenter.default.post(name: NSNotification.Name("SavedJobsNotificationObserver"), object: self.savedJobs)
+                case .success(let savedJobs):
+                    self.savedJobs = savedJobs
+                    print("success")
+
+                    for i in 0..<tableView.numberOfSections {
+                        for j in 0..<tableView.numberOfRows(inSection: i) {
+                            
+                            let indexPath = IndexPath(row: j, section: i)
+                            let model = postModel[indexPath.row]
+                            
+                            for job in savedJobs {
+                                if savedJobsUIDs.count > 0 {
+                                    savedJobsUIDs.forEach { title in
+                                        if title != model.title && savedJobsUIDs.count < savedJobs.count {
+                                            if job.title == model.title {
+//                                                print("title: \(job.title)")
+                                                self.buttonStates[indexPath.row] = true
+                                                savedJobsUIDs.append(job.title)
+                                            } else {
+                                                self.buttonStates[indexPath.row] = false
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    if job.title == model.title {
+//                                        print("title2: \(job.title)")
+                                        self.buttonStates[indexPath.row] = true
+                                        savedJobsUIDs.append(job.title)
+                                    } else {
+                                        self.buttonStates[indexPath.row] = false
+                                    }
+                                }
                             }
-                            }
+                            
+//                            print("update... ", self.buttonStates[indexPath.row])
+                            tableView.reloadData()
+                            
                         }
-                        
                     }
+                    
+
                 case .failure(let error):
                     print(error)
                 }
@@ -264,7 +289,6 @@ class TechnieFeedVC: UIViewController, TechnieFeedVCDelegate {
                     let sortedArray = posts.sorted(by: { PostFormVC.dateFormatter.date(from: $0.dateTime)?.compare(PostFormVC.dateFormatter.date(from: $1.dateTime) ?? Date()) == .orderedDescending })
                     self.postModel = sortedArray
                     self.tableView.reloadData()
-
                     
                     for _ in 0..<(sortedArray.count) {
                         self.buttonStates.append(false)
@@ -310,11 +334,11 @@ class TechnieFeedVC: UIViewController, TechnieFeedVCDelegate {
     }
     
     var buttonStates = [Bool]()
-    
+    let imageSaved = UIImage(systemName: "bookmark.fill")
+    let imageUnsaved = UIImage(systemName: "bookmark")
     // MARK: - Like button delegate
     func saveJobLinkMethod(cell: UITableViewCell, button: UIButton) {
-        let imageSaved = UIImage(systemName: "bookmark.fill")
-        let imageUnsaved = UIImage(systemName: "bookmark")
+        
         guard let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo") else { return }
         guard let technicianKeyPath = getUsersPersistedInfo.first?.uid else { return }
         guard let tappedIndexPath = tableView.indexPath(for: cell) else { return }
@@ -401,19 +425,23 @@ extension TechnieFeedVC: TableViewDataSourceAndDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 //        tableView.deselectRow(at: indexPath, animated: true)
         let cell = tableView.dequeueReusableCell(withIdentifier: FeedsTVCell.cellID, for: indexPath) as! FeedsTVCell
+        
         cell.linkedDelegate = self
-        let post = postModel[indexPath.row]
-        cell.postModel = post
+        let posts = postModel[indexPath.row]
+        cell.postModel = posts
         
-        
-        for uid in savedJobsUIDs {
-            if uid == post.id {
-                self.buttonStates[indexPath.item] = true
-            } else {
-                self.buttonStates[indexPath.item] = false
-            }
-//            tableView.reloadData()
+        // buttonStates switcher
+        if self.buttonStates[indexPath.item] == true {
+            cell.likeBtn.setImage(self.imageSaved, for: .normal)
+            self.buttonStates[indexPath.item] = true
+        } else {
+            cell.likeBtn.setImage(self.imageUnsaved, for: .normal)
+            self.buttonStates[indexPath.item] = false
         }
+        
+        
+       
+        
         return cell
     }
     

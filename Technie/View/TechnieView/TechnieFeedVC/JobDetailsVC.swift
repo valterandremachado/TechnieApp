@@ -126,7 +126,8 @@ class JobDetailsVC: UIViewController {
     }()
     
     var isComingFromServiceVC = false
-    
+    var isComingFromSavedJobsVC = false
+
     // MARK: - Init
     override func loadView() {
         super.loadView()
@@ -145,7 +146,9 @@ class JobDetailsVC: UIViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         // Do any additional setup after loading the view.
-//        self.tabBarController?.setTabBar(hidden: false, animated: true, along: nil)
+        if isComingFromSavedJobsVC == true {
+            self.tabBarController?.setTabBar(hidden: false, animated: true, along: nil)
+        }
         closeSelectionBar()
     }
     
@@ -195,6 +198,10 @@ class JobDetailsVC: UIViewController {
 //        navigationItem.title = "Job Details"
         if isComingFromServiceVC == false {
             isSearching ? (navBar.topItem?.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)) : (navBar.topItem?.backBarButtonItem = UIBarButtonItem(title: "Feeds", style: .plain, target: self, action: nil))
+        }
+        
+        if isComingFromSavedJobsVC == true {
+            navBar.topItem?.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
         }
         
         navigationItem.largeTitleDisplayMode = .never

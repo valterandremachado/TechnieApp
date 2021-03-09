@@ -50,8 +50,6 @@ class TechnieProfileVC: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         view.backgroundColor = .systemBackground
-        NotificationCenter.default.addObserver(self, selector: #selector(self.fetchSavedJobs(notification:)), name: NSNotification.Name("SavedJobsNotificationObserver"), object: nil)
-
         setupViews()
         
         sections.append(SectionHandler(title: "UserInfo", detail: [""]))
@@ -59,10 +57,17 @@ class TechnieProfileVC: UIViewController {
         sections.append(SectionHandler(title: "Share and Help", detail: ["", "", ""]))
         sections.append(SectionHandler(title: "Logout", detail: [""]))
     }
-   
-    @objc func fetchSavedJobs(notification: NSNotification) {
-        print("Value of notification : ", notification.object ?? "")
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+//        NotificationCenter.default.addObserver(self, selector: #selector(self.fetchSavedJobs(notification:)), name: NSNotification.Name("SavedJobsNotificationObserver"), object: nil)
     }
+        
+//    @objc func fetchSavedJobs(notification: NSNotification) {
+////        guard let jobs = notification.object as? [PostModel] else { return }
+////        userSavedJobs  = jobs
+//        print("Value of notification : ", notification.object)
+//    }
     
     // MARK: - Methods
     fileprivate func setupViews() {
@@ -116,12 +121,12 @@ extension TechnieProfileVC: TableViewDataSourceAndDelegate {
 //            let userName = UserDefaults.standard.value(forKey: "email") as? String ?? ""
             let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo")
             
-            var userPersistedEmail = ""
+            var userPersistedName = ""
             if let info = getUsersPersistedInfo {
-                userPersistedEmail = info.first!.email
+                userPersistedName = info.first!.name
             }
             
-            cell.textLabel?.text = userPersistedEmail //"Valter A. Machado"
+            cell.textLabel?.text = userPersistedName 
             cell.detailTextLabel?.text = "Baguio City"
             let newImage = UIImage().resizeImage(image: UIImage(named: "technie")!, toTheSize: CGSize(width: 40, height: 40))
             cell.imageView?.clipsToBounds = true

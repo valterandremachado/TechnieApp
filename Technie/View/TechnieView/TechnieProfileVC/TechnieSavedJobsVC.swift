@@ -32,6 +32,16 @@ class TechnieSavedJobsVC: UIViewController {
         return tv
     }()
     
+    lazy var warningLabel: UILabel = {
+        let lbl = UILabel()
+        lbl.translatesAutoresizingMaskIntoConstraints = false
+        lbl.textAlignment = .center
+        lbl.text = "You have no saved jobs."
+        return lbl
+    }()
+    
+    var savedJobs = [PostModel]()
+
     // MARK: - Inits
     override func loadView() {
         super.loadView()
@@ -41,6 +51,7 @@ class TechnieSavedJobsVC: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         view.backgroundColor = .white
+        fetchData()
         setupViews()
     }
     
@@ -66,6 +77,35 @@ class TechnieSavedJobsVC: UIViewController {
         navigationItem.title = "Saved Jobs"
     }
     
+    fileprivate func fetchData()  {
+        guard let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo") else { return }
+        guard let technicianKeyPath = getUsersPersistedInfo.first?.uid else { return }
+        
+        DispatchQueue.main.async {
+            DatabaseManager.shared.getAllSavedJobs(technicianKeyPath: technicianKeyPath) { [self] result in
+                switch result {
+                case .success(let savedJobs):
+                    self.savedJobs = savedJobs
+                    
+                    if savedJobs.count == 0 {
+                        tableView.isHidden = true
+                        view.addSubview(warningLabel)
+                        NSLayoutConstraint.activate([
+                            warningLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+                            warningLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+                        ])
+                    } else {
+                        tableView.isHidden = false
+                    }
+                    
+                    self.tableView.reloadData()
+                case .failure(let error):
+                    print(error)
+                }
+            }
+        }
+    }
+    
     // MARK: - Selectors
     
     
@@ -75,22 +115,28 @@ class TechnieSavedJobsVC: UIViewController {
 extension TechnieSavedJobsVC: TableViewDataSourceAndDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 2
+        return savedJobs.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         var cell = tableView.dequeueReusableCell(withIdentifier: TechnieSavedJobsCell.cellID, for: indexPath) as! TechnieSavedJobsCell
         cell = TechnieSavedJobsCell(style: .subtitle, reuseIdentifier: TechnieSavedJobsCell.cellID)
-        
+        let model = savedJobs[indexPath.row]
         cell.detailTextLabel?.textColor = .systemGray
-        cell.detailTextLabel?.text = "detailTextLabel"
-        cell.textLabel?.text = "textLabel"
-
+        cell.detailTextLabel?.text = "Posted \(view.calculateTimeFrame(initialTime: model.dateTime))"
+        cell.textLabel?.text = model.title
+        cell.accessoryType = .disclosureIndicator
         return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+        
+        let vc = JobDetailsVC()
+        vc.isComingFromSavedJobsVC = true
+        vc.postModel = savedJobs[indexPath.row]
+        vc.navBarViewSubtitleLbl.text = "posted \(view.calculateTimeFrame(initialTime: savedJobs[indexPath.row].dateTime))"
+        self.navigationController?.pushViewController(vc, animated: true)
     }
     
     func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {

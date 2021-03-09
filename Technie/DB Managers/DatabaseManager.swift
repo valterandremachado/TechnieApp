@@ -1250,29 +1250,55 @@ extension DatabaseManager {
         })
     }
     
-    public func getAllSavedJobs(technicianKeyPath: String, completion: @escaping (Result<[String], Error>) -> Void) {
+    public func getAllSavedJobs(technicianKeyPath: String, completion: @escaping (Result<[PostModel], Error>) -> Void) {
         database.child("users/technicians/\(technicianKeyPath)/savedJobs").observeSingleEvent(of: .value, with: { snapshot in
             guard let savedJobCollection = snapshot.value as? [String: Any] else {
                 completion(.failure(DatabaseError.failedToFetch))
                 return
             }
             
+            var savedJobs = [PostModel]()
             var postUIDs = [String]()
-            
             for (key, _) in savedJobCollection {
 //                technicianHiredJobKeyPaths.forEach { technieKey in
 //                    if key == technieKey {
-                        Database.database().reference().child("users/technicians/\(technicianKeyPath)/savedJobs/\(key)").observeSingleEvent(of: .value, with: { snapshot in
-                            guard let value = snapshot.value else { return }
-                            do {
-                                let model = try FirebaseDecoder().decode(SavedJobs.self, from: value)
-                                postUIDs.append(model.postUID)
-                                    completion(.success(postUIDs))
+                Database.database().reference().child("users/technicians/\(technicianKeyPath)/savedJobs/\(key)").observeSingleEvent(of: .value, with: { snapshot in
+                    guard let value = snapshot.value else { return }
+                    do {
+                        let model = try FirebaseDecoder().decode(SavedJobs.self, from: value)
+                        postUIDs.append(model.postUID)
+                        
+                        postUIDs.forEach { uid in
+                            
+                            self.database.child("posts/\(uid)").observeSingleEvent(of: .value, with: { snapshot in
+                                guard let value = snapshot.value else { return }
+                                do {
+                                    let model = try FirebaseDecoder().decode(PostModel.self, from: value)
+                                    if savedJobs.count > 0 {
+                                        savedJobs.forEach { post in
+                                            if post.title != model.title {
+                                                savedJobs.append(model)
+                                                completion(.success(savedJobs))
+                                            }
+                                        }
+                                        
+                                    } else {
+                                        savedJobs.append(model)
+                                        completion(.success(savedJobs))
+                                    }
+                                    
+                                } catch let error {
+                                    print(error)
+                                }
                                 
-                            } catch let error {
-                                print(error)
-                            }
-                        })
+                            })
+                            
+                        }
+                        
+                    } catch let error {
+                        print(error)
+                    }
+                })
 //                    }
 //                }
             }
@@ -2321,6 +2347,10 @@ struct ClientsSatisfaction: Codable {
     var ratingAvrg: Double
     
 //    var reviews: [Review]?
+}
+
+struct SavedJobs: Codable {
+    var postUID: String
 }
 
 struct Review: Codable {
