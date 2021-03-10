@@ -15,6 +15,7 @@ struct UserPersistedInfo: Codable {
     let accountType: String?
     let locationInLongLat: LocationInLongAndLat?
     let profileImage: String?
+    let hourlyRate: Int?
     
     init(uid: String,
          name: String,
@@ -22,7 +23,8 @@ struct UserPersistedInfo: Codable {
          location: String,
          accountType: String?,
          locationInLongLat: LocationInLongAndLat?,
-         profileImage: String?) {
+         profileImage: String?,
+         hourlyRate: Int?) {
         
         self.uid = uid
         self.name = name
@@ -31,6 +33,7 @@ struct UserPersistedInfo: Codable {
         self.accountType = accountType
         self.locationInLongLat = locationInLongLat
         self.profileImage = profileImage
+        self.hourlyRate = hourlyRate
     }
 }
 

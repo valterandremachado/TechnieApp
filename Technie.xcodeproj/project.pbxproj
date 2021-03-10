@@ -132,6 +132,8 @@
 		8AF2D98C25F1018F004A2219 /* ReviewTechnicianVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AF2D98B25F1018E004A2219 /* ReviewTechnicianVC.swift */; };
 		8AF2D99125F10394004A2219 /* ReviewTechnicianCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AF2D99025F10394004A2219 /* ReviewTechnicianCell.swift */; };
 		8AF2D99725F1117A004A2219 /* Cosmos in Frameworks */ = {isa = PBXBuildFile; productRef = 8AF2D99625F1117A004A2219 /* Cosmos */; };
+		8AF6618B25F9401D0059C248 /* SummaryVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AF6618A25F9401D0059C248 /* SummaryVC.swift */; };
+		8AF6619025F940950059C248 /* ExpertiseVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AF6618F25F940950059C248 /* ExpertiseVC.swift */; };
 		8AF76A4E258B0B0700ED14C2 /* UserProfileVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AF76A4D258B0B0700ED14C2 /* UserProfileVC.swift */; };
 		8AF76A53258B23BF00ED14C2 /* ProfileTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AF76A52258B23BF00ED14C2 /* ProfileTableViewCell.swift */; };
 		8AF76A77258B440D00ED14C2 /* KeyboardLayoutConstraint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AF76A6F258B440D00ED14C2 /* KeyboardLayoutConstraint.swift */; };
@@ -282,6 +284,8 @@
 		8AF2D98625F0E33F004A2219 /* NotificationEnums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationEnums.swift; sourceTree = "<group>"; };
 		8AF2D98B25F1018E004A2219 /* ReviewTechnicianVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewTechnicianVC.swift; sourceTree = "<group>"; };
 		8AF2D99025F10394004A2219 /* ReviewTechnicianCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewTechnicianCell.swift; sourceTree = "<group>"; };
+		8AF6618A25F9401D0059C248 /* SummaryVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryVC.swift; sourceTree = "<group>"; };
+		8AF6618F25F940950059C248 /* ExpertiseVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpertiseVC.swift; sourceTree = "<group>"; };
 		8AF76A4D258B0B0700ED14C2 /* UserProfileVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfileVC.swift; sourceTree = "<group>"; };
 		8AF76A52258B23BF00ED14C2 /* ProfileTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileTableViewCell.swift; sourceTree = "<group>"; };
 		8AF76A6F258B440D00ED14C2 /* KeyboardLayoutConstraint.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyboardLayoutConstraint.swift; sourceTree = "<group>"; };
@@ -768,6 +772,8 @@
 				8A13FDF825DE3E560034945D /* TechnieSavedJobsVC.swift */,
 				8A630B1725E52B5200733475 /* TechnieStatsVC.swift */,
 				8A13FDDD25DE3AD20034945D /* TechnieGeneralVC.swift */,
+				8AF6618A25F9401D0059C248 /* SummaryVC.swift */,
+				8AF6618F25F940950059C248 /* ExpertiseVC.swift */,
 				8A41E7B525B07D5600265D5C /* Cells */,
 			);
 			path = TechnieProfileVC;
@@ -1162,6 +1168,7 @@
 				8AF76A8E258B671500ED14C2 /* HeaderView.swift in Sources */,
 				8AAE554F25DC08FE003AB202 /* ClientPostHistoryVC.swift in Sources */,
 				8ACD6AF325C438B200CC057D /* PhotoCollectionViewerCell.swift in Sources */,
+				8AF6618B25F9401D0059C248 /* SummaryVC.swift in Sources */,
 				8A4288C825E7F25700091020 /* UserPersistedInfo.swift in Sources */,
 				8A13FDDE25DE3AD20034945D /* TechnieGeneralVC.swift in Sources */,
 				8A68A56625B705BA000D988F /* StorageManager.swift in Sources */,
@@ -1185,6 +1192,7 @@
 				8AAE556025DC0CAE003AB202 /* ClientSettingsVC.swift in Sources */,
 				8AF76A7C258B440D00ED14C2 /* Typealias.swift in Sources */,
 				8A997F3025A823AE00B144CD /* SkillSelectionVC.swift in Sources */,
+				8AF6619025F940950059C248 /* ExpertiseVC.swift in Sources */,
 				8A6A32752598C73A001FE408 /* PostSectionVC.swift in Sources */,
 				8AC93A9525B6EF3A00663BE3 /* ChatModels.swift in Sources */,
 				8A41E7BC25B07F1D00265D5C /* TechnieProfileTVOptions.swift in Sources */,

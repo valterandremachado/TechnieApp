@@ -209,8 +209,8 @@ class JobDetailsVC: UIViewController {
     }
     
     func handleBtnTitle() {
-        guard let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo") else { return }
-        guard let technicianEmail = getUsersPersistedInfo.first?.email else { return }
+        guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
+        let technicianEmail = getUsersPersistedInfo.email
         postModel.proposals?.forEach { proposal in
             
             if proposal.technicianEmail == technicianEmail {

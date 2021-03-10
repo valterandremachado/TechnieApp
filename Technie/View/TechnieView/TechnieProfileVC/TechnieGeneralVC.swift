@@ -75,21 +75,21 @@ class TechnieGeneralVC: UIViewController {
 extension TechnieGeneralVC: TableViewDataSourceAndDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 2
+        return 1
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: SettingsCell.cellID, for: indexPath) as! SettingsCell
         
-        switch indexPath.row {
-        case 0:
-            cell.setupSwitcherStackView()
-            cell.titleLabel.text = "In-App Notification"
-        case 1:
+//        switch indexPath.row {
+//        case 0:
+//            cell.setupSwitcherStackView()
+//            cell.titleLabel.text = "In-App Notification"
+//        case 1:
             cell.setupVersionStackView()
-        default:
-            break
-        }
+//        default:
+//            break
+//        }
         
         return cell
     }

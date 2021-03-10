@@ -156,7 +156,16 @@ class TechnieFeedVC: UIViewController, TechnieFeedVCDelegate {
     
     let professionArray = ["Handyman", "Electrician", "Repairer", "Others"]//Household Appliances Repairers
 
+    private var indicator: ProgressIndicatorLarge!
         
+    lazy var warningLabel: UILabel = {
+        let lbl = UILabel()
+        lbl.translatesAutoresizingMaskIntoConstraints = false
+        lbl.textAlignment = .center
+        lbl.text = "Our service is offline, please try again later."
+        return lbl
+    }()
+    
     // MARK: - Init
     override func loadView() {
         super.loadView()
@@ -167,8 +176,16 @@ class TechnieFeedVC: UIViewController, TechnieFeedVCDelegate {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         view.backgroundColor = UIColor(named: "BackgroundAppearance")
-        setupViews()
+        
+        indicator = ProgressIndicatorLarge(inview: self.view, loadingViewColor: UIColor.clear, indicatorColor: UIColor.gray, msg: "")
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        
+        if postModel.count == 0 {
+            indicator.start()
+        }
+        
         fetchData()
+        setupViews()
 //        UserDefaults.standard.removeObject(forKey: "persistUsersInfo")
 //        guard let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo") else { return }
 //        print("persistUsersInfo: \(getUsersPersistedInfo)")
@@ -189,12 +206,20 @@ class TechnieFeedVC: UIViewController, TechnieFeedVCDelegate {
     
     // MARK: - Methods
     fileprivate func setupViews(){
-        [tableView, searchResultView].forEach {view.addSubview($0)}
+        [tableView, searchResultView, indicator].forEach {view.addSubview($0)}
         
         guard let tabHeight = tabBarController?.tabBar.frame.height else { return } // SafeAreaPadding
         tableView.anchor(top: view.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor, padding: UIEdgeInsets(top: 0, left: 0, bottom: tabHeight, right: 0))
 //        guard let navBarHeight = navigationController?.navigationBar.frame.height else { return }
         searchResultView.anchor(top: view.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor, padding: UIEdgeInsets(top: 0 , left: 0, bottom: 0, right: 0))
+        
+        NSLayoutConstraint.activate([
+            indicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            indicator.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 10),
+            indicator.heightAnchor.constraint(equalToConstant: 50),
+            indicator.widthAnchor.constraint(equalToConstant: 50),
+        ])
+        
     }
     
     func setupNavBar(){
@@ -230,8 +255,8 @@ class TechnieFeedVC: UIViewController, TechnieFeedVCDelegate {
     var savedJobs = [PostModel]()
 
     fileprivate func fetchData()  {
-        guard let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo") else { return }
-        guard let technicianKeyPath = getUsersPersistedInfo.first?.uid else { return }
+        guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
+        let technicianKeyPath = getUsersPersistedInfo.uid
         
         DispatchQueue.main.async {
             DatabaseManager.shared.getAllSavedJobs(technicianKeyPath: technicianKeyPath) { [self] result in
@@ -257,8 +282,8 @@ class TechnieFeedVC: UIViewController, TechnieFeedVCDelegate {
                                             } else {
                                                 self.buttonStates[indexPath.row] = false
                                             }
-                                        }
-                                    }
+                                        } // End of inner conditional statement
+                                    } // End of inner loop
                                 } else {
                                     if job.title == model.title {
 //                                        print("title2: \(job.title)")
@@ -267,10 +292,9 @@ class TechnieFeedVC: UIViewController, TechnieFeedVCDelegate {
                                     } else {
                                         self.buttonStates[indexPath.row] = false
                                     }
-                                }
-                            }
+                                } // End of first conditional statement
+                            } // End of for loop
                             
-//                            print("update... ", self.buttonStates[indexPath.row])
                             tableView.reloadData()
                             
                         }
@@ -288,14 +312,29 @@ class TechnieFeedVC: UIViewController, TechnieFeedVCDelegate {
                 case .success(let posts):
                     let sortedArray = posts.sorted(by: { PostFormVC.dateFormatter.date(from: $0.dateTime)?.compare(PostFormVC.dateFormatter.date(from: $1.dateTime) ?? Date()) == .orderedDescending })
                     self.postModel = sortedArray
-                    self.tableView.reloadData()
                     
                     for _ in 0..<(sortedArray.count) {
                         self.buttonStates.append(false)
                         // in my case, all buttons are off, but be sure to implement logic here
                     }
+                    
+                    self.indicator.stop()
+                    self.tableView.reloadData()
+        
                     return
                 case .failure(let error):
+                    if self.savedJobs.count == 0 {
+                        self.tableView.isHidden = true
+                        self.view.addSubview(self.warningLabel)
+                        NSLayoutConstraint.activate([
+                            self.warningLabel.centerYAnchor.constraint(equalTo: self.view.centerYAnchor),
+                            self.warningLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor)
+                        ])
+                    } else {
+                        self.tableView.isHidden = false
+                    }
+                    
+                    self.indicator.stop()
                     print("Failed to get posts: \(error.localizedDescription)")
                 }
             })
@@ -339,8 +378,8 @@ class TechnieFeedVC: UIViewController, TechnieFeedVCDelegate {
     // MARK: - Like button delegate
     func saveJobLinkMethod(cell: UITableViewCell, button: UIButton) {
         
-        guard let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo") else { return }
-        guard let technicianKeyPath = getUsersPersistedInfo.first?.uid else { return }
+        guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
+        let technicianKeyPath = getUsersPersistedInfo.uid
         guard let tappedIndexPath = tableView.indexPath(for: cell) else { return }
         
         buttonStates[tappedIndexPath.item] = !buttonStates[tappedIndexPath.item]

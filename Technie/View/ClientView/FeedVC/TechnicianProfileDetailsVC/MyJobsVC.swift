@@ -134,10 +134,10 @@ class MyJobsVC: UIViewController {
     }
     
     fileprivate func updatePost(with selectedIndexPaths: [IndexPath]) {
-        guard let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo") else { return }
-        guard let clientName = getUsersPersistedInfo.first?.name else { return }
-        guard let clientEmail = getUsersPersistedInfo.first?.email else { return }
-        guard let clientKeyPath = getUsersPersistedInfo.first?.uid else { return }
+        guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
+        let clientName = getUsersPersistedInfo.name
+        let clientEmail = getUsersPersistedInfo.email
+        let clientKeyPath = getUsersPersistedInfo.uid
         var postModel = [PostModel]()
         
         for indexPath in selectedIndexPaths {

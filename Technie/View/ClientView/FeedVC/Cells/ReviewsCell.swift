@@ -21,7 +21,7 @@ class ReviewsCell: UITableViewCell {
 //        lbl.backgroundColor = .green
         //        lbl.withHeight(25)
 //        lbl.numberOfLines = 0
-        lbl.font = .boldSystemFont(ofSize: 16)
+        lbl.font = .boldSystemFont(ofSize: 15)
         lbl.textColor = UIColor(named: "LabelPrimaryAppearance")
         return lbl
     }()
@@ -46,6 +46,7 @@ class ReviewsCell: UITableViewCell {
 //        lbl.textAlignment = .center
 //        lbl.withHeight(25)
 //        lbl.backgroundColor = .brown
+        lbl.font = .systemFont(ofSize: 14.5)
         lbl.numberOfLines = 0
         lbl.textColor = UIColor(named: "LabelPrimaryAppearance")
         
@@ -71,7 +72,7 @@ class ReviewsCell: UITableViewCell {
         lbl.text = "4.5"
 //        lbl.textAlignment = .center
 //        lbl.withHeight(25)
-//        lbl.font = .systemFont(ofSize: 13)
+        lbl.font = .systemFont(ofSize: 14.5)
 //        lbl.backgroundColor = .systemPink
 //        lbl.clipsToBounds = true
 //        lbl.layer.cornerRadius = 5

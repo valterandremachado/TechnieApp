@@ -26,7 +26,7 @@ class TechnieStatsVC: UIViewController {
         tv.tableHeaderView = UIView(frame: frame)
         tv.tableFooterView = UIView(frame: frame)
         //        tv.contentInsetAdjustmentBehavior = .never
-        
+        tv.isHidden = true
         tv.delegate = self
         tv.dataSource = self
         // Register Custom Cells for each section
@@ -38,13 +38,29 @@ class TechnieStatsVC: UIViewController {
         return tv
     }()
     
-    var sectionSetter = [SectionHandler]()
+    lazy var warningLabel: UILabel = {
+        let lbl = UILabel()
+        lbl.translatesAutoresizingMaskIntoConstraints = false
+        lbl.textAlignment = .center
+        lbl.text = "You have no stats to be shown."
+        return lbl
+    }()
     
+    var sectionSetter = [SectionHandler]()
+    private var indicator: ProgressIndicatorLarge!
+
     // MARK: - Inits
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        //        view.backgroundColor = .cyan
+         view.backgroundColor = .systemBackground
+        getClientSatisfaction()
+        indicator = ProgressIndicatorLarge(inview: self.view, loadingViewColor: UIColor.clear, indicatorColor: UIColor.gray, msg: "")
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        
+        if reviews.count == 0 {
+            indicator.start()
+        }
         setupViews()
         
         sectionSetter.append(SectionHandler(title: "Proficiency", detail: [""]))
@@ -54,8 +70,16 @@ class TechnieStatsVC: UIViewController {
     
     // MARK: - Methods
     fileprivate func setupViews() {
-        [tableView].forEach {view.addSubview($0)}
+        [tableView, indicator].forEach {view.addSubview($0)}
         tableView.anchor(top: view.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor, padding: UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0))
+        
+        NSLayoutConstraint.activate([
+            indicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            indicator.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 10),
+            indicator.heightAnchor.constraint(equalToConstant: 50),
+            indicator.widthAnchor.constraint(equalToConstant: 50),
+        ])
+        
         setupNavBar()
     }
     
@@ -67,6 +91,78 @@ class TechnieStatsVC: UIViewController {
         navigationItem.largeTitleDisplayMode = .never
         
         //        self.navigationItem.rightBarButtonItem = rightNavBarButton
+    }
+    
+    var satisfactionAvrg: ClientsSatisfaction?
+    var reviews = [Review]()
+    var technicianModel: TechnicianModel?
+    
+    private func getClientSatisfaction() {
+        guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
+        let technicianKeyPath = getUsersPersistedInfo.uid
+
+        DatabaseManager.shared.getAllClientSatisfactionWithReviews(with: technicianKeyPath) { result in
+            
+            switch result {
+            case .success(let satisfactionAvrg):
+                self.satisfactionAvrg = satisfactionAvrg
+                
+                self.tableView.reloadData()
+                print(satisfactionAvrg)
+            case .failure(let error):
+                print(error)
+            }
+        } onReviewCompletion: { result in
+            
+            switch result {
+            case .success(let reviews):
+                self.reviews = reviews
+                
+                UIView.animate(withDuration: 0.5) {
+                    self.tableView.isHidden = false
+                    self.indicator.stop()
+                }
+               
+                self.tableView.reloadData()
+            case .failure(let error):
+                if self.reviews.count == 0 {
+                    self.tableView.isHidden = true
+                    self.view.addSubview(self.warningLabel)
+                    NSLayoutConstraint.activate([
+                        self.warningLabel.centerYAnchor.constraint(equalTo: self.view.centerYAnchor),
+                        self.warningLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor)
+                    ])
+                } else {
+                    self.tableView.isHidden = false
+                }
+                
+                self.indicator.stop()
+                
+                print(error)
+            }
+        }
+        
+        getTechnicianInfo()
+    }
+    
+    var numberOfServices = 0
+
+    private func getTechnicianInfo() {
+        guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
+        let technicianKeyPath = getUsersPersistedInfo.uid
+
+        DatabaseManager.shared.getSpecificTechnician(technicianKeyPath: technicianKeyPath) { result in
+            switch result {
+            case .success(let technicianInfo):
+                self.technicianModel = technicianInfo
+                self.numberOfServices = technicianInfo.numberOfServices
+//                print("services: ", technicianInfo.numberOfServices)
+                self.tableView.reloadData()
+            case .failure(let error):
+                print(error)
+            }
+        }
+        
     }
     
     // MARK: - Selectors
@@ -85,7 +181,11 @@ extension TechnieStatsVC: TableViewDataSourceAndDelegate {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return sectionSetter[section].sectionDetail.count
+        if section == 2 {
+            return reviews.count
+        }
+        return 1
+//        return sectionSetter[section].sectionDetail.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -96,14 +196,20 @@ extension TechnieStatsVC: TableViewDataSourceAndDelegate {
         case 0:
             let cell = tableView.dequeueReusableCell(withIdentifier: TechnieStatsCell.cellID, for: indexPath) as! TechnieStatsCell
             cell.setupViews()
+            cell.clientsSatisfaction = satisfactionAvrg
             return cell
         case 1:
             let cell = tableView.dequeueReusableCell(withIdentifier: ProficiencyReviewCell.cellID, for: indexPath) as! ProficiencyReviewCell
             cell.setupReliabilityStackView()
+            
+            var serviceText = ""
+            numberOfServices == 1 ? (serviceText = "service") : (serviceText = "services")
+            cell.ratingAndReviewsLabel.text = " \(String(format:"%.1f", satisfactionAvrg?.ratingAvrg ?? 0)) | \(numberOfServices) " + serviceText
             return cell
         case 2:
             let cell = tableView.dequeueReusableCell(withIdentifier: ReviewsCell.cellID, for: indexPath) as! ReviewsCell
             cell.setupViews()
+            cell.reviews = reviews[indexPath.row]
             return cell
         default:
             return UITableViewCell()
@@ -121,7 +227,7 @@ extension TechnieStatsVC: TableViewDataSourceAndDelegate {
         } else if section == 0 {
             return sectionSetter[section].sectionTitle!
         }
-        return sectionSetter[section].sectionTitle! + " (40)"
+        return sectionSetter[section].sectionTitle! + " (\(reviews.count))"
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {

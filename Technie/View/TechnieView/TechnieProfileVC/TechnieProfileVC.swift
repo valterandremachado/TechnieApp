@@ -7,6 +7,7 @@
 
 import UIKit
 import FirebaseAuth
+import MessageUI
 
 class TechnieProfileVC: UIViewController {
         
@@ -44,7 +45,10 @@ class TechnieProfileVC: UIViewController {
     }()
     
     var sections = [SectionHandler]()
-
+    
+    var getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo")
+//    var userPersistedName = ""
+//    var userPersistedLocation = ""
     // MARK: - Inits
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -61,6 +65,9 @@ class TechnieProfileVC: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 //        NotificationCenter.default.addObserver(self, selector: #selector(self.fetchSavedJobs(notification:)), name: NSNotification.Name("SavedJobsNotificationObserver"), object: nil)
+        
+//        NotificationCenter.default.addObserver(self, selector: #selector(self.fetchSavedJobs(notification:)), name: NSNotification.Name("updatePersistedData"), object: nil)
+
     }
         
 //    @objc func fetchSavedJobs(notification: NSNotification) {
@@ -87,6 +94,20 @@ class TechnieProfileVC: UIViewController {
     
     // MARK: - Selectors
     
+    
+}
+
+// MARK: - TechnieEditProfileVCDismissalDelegate Extension
+extension TechnieProfileVC: TechnieEditProfileVCDismissalDelegate {
+    
+    func TechnieEditProfileVCDismissalSingleton(updatedPersistedData: UserPersistedInfo) {
+        guard !updatedPersistedData.uid.isEmpty else { return }
+        getUsersPersistedInfo = updatedPersistedData
+        print("updatedPersistedData2: \(getUsersPersistedInfo)")
+//        userPersistedName = getUsersPersistedInfo?.first?.name ?? "username"
+//        userPersistedLocation = getUsersPersistedInfo?.first?.location ?? "userlocation"
+        tableView.reloadData()
+    }
     
 }
 
@@ -119,15 +140,12 @@ extension TechnieProfileVC: TableViewDataSourceAndDelegate {
         switch indexPath.section {
         case 0:
 //            let userName = UserDefaults.standard.value(forKey: "email") as? String ?? ""
-            let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo")
+            let userPersistedName = getUsersPersistedInfo?.name ?? "username"
+            let userPersistedLocation = getUsersPersistedInfo?.location ?? "userlocation"
             
-            var userPersistedName = ""
-            if let info = getUsersPersistedInfo {
-                userPersistedName = info.first!.name
-            }
-            
+            cell.textLabel?.font = .boldSystemFont(ofSize: 16)
             cell.textLabel?.text = userPersistedName 
-            cell.detailTextLabel?.text = "Baguio City"
+            cell.detailTextLabel?.text = userPersistedLocation
             let newImage = UIImage().resizeImage(image: UIImage(named: "technie")!, toTheSize: CGSize(width: 40, height: 40))
             cell.imageView?.clipsToBounds = true
             cell.imageView?.layer.cornerRadius = 40 / 2
@@ -175,6 +193,7 @@ extension TechnieProfileVC: TableViewDataSourceAndDelegate {
         switch indexPath.section {
         case 0:
             let vc = TechnieEditProfileVC()
+            vc.dismissalDelegate = self
             navigationController?.pushViewController(vc, animated: true)
         case 1:
             if indexPath.row == 0 {
@@ -191,9 +210,12 @@ extension TechnieProfileVC: TableViewDataSourceAndDelegate {
             if indexPath.row == 0 {
                 let vc = TechnieGeneralVC()
                 navigationController?.pushViewController(vc, animated: true)
+            } else if indexPath.row == 1 {
+                showMailComposer()
+//                let vc = ClientTabController()
+//                (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootViewController(vc)
             } else {
-                let vc = ClientTabController()
-                (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootViewController(vc)
+                presentShareSheet()
             }
          
         case 3:
@@ -205,6 +227,18 @@ extension TechnieProfileVC: TableViewDataSourceAndDelegate {
         default:
             break
         }
+    }
+    
+    fileprivate func presentShareSheet() {
+        
+//        let indexedUrl = favoritedPostArray[indexPath.item].sourceUrl
+//        guard let url = URL(string: "https://www.google.com") else { return }
+        let textToShare = "Hey, Technie is a fast, simple and secure app that I use to boost up my freelancing career. Give it a try."
+        let thingsToShare: [Any] = [textToShare]
+        
+        let shareSheetVC = UIActivityViewController(activityItems: thingsToShare , applicationActivities: nil)
+//        shareSheetVC.popoverPresentationController?.sourceView = self.view
+        present(shareSheetVC, animated: true)
     }
     
 //    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
@@ -248,6 +282,50 @@ extension TechnieProfileVC: TableViewDataSourceAndDelegate {
     }
     
 }
+
+extension TechnieProfileVC: MFMailComposeViewControllerDelegate {
+    
+    func showMailComposer() {
+        
+        guard MFMailComposeViewController.canSendMail() else {
+            //Show alert informing the user
+            return
+        }
+        
+        let composer = MFMailComposeViewController()
+        composer.mailComposeDelegate = self
+        composer.setToRecipients(["support@technie.com"])
+        composer.setSubject("HELP!")
+        composer.setMessageBody("", isHTML: false)
+        
+        present(composer, animated: true)
+    }
+    
+    func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
+        
+        if let _ = error {
+            //Show error alert
+            controller.dismiss(animated: true)
+            return
+        }
+        
+        switch result {
+        case .cancelled:
+            print("Cancelled")
+        case .failed:
+            print("Failed to send")
+        case .saved:
+            print("Saved")
+        case .sent:
+            print("Email Sent")
+        @unknown default:
+            break
+        }
+        
+        controller.dismiss(animated: true)
+    }
+}
+
 
 // MARK: - TechnieProfileVCPreviews
 import SwiftUI

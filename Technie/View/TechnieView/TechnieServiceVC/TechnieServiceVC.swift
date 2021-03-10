@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import FirebaseDatabase
 
 class TechnieServiceVC: UIViewController {
         
@@ -48,6 +49,14 @@ class TechnieServiceVC: UIViewController {
         return lbl
     }()
     
+    private var indicator: ProgressIndicatorLarge!
+
+    var database = Database.database().reference()
+    var technicianModel: TechnicianModel?
+
+    var updatedActiveServices = 0
+    var updatedCompletedServices = 0
+    
     // MARK: - Inits
     override func loadView() {
         super.loadView()
@@ -58,18 +67,11 @@ class TechnieServiceVC: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         view.backgroundColor = .systemBackground
+        indicator = ProgressIndicatorLarge(inview: self.view, loadingViewColor: UIColor.clear, indicatorColor: UIColor.gray, msg: "")
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        
         fetchData()
         setupViews()
-        if activeJobsModel.count == 0 {
-            tableView.isHidden = true
-            view.addSubview(warningLabel)
-            NSLayoutConstraint.activate([
-                warningLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-                warningLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor)
-            ])
-        } else {
-            tableView.isHidden = false
-        }
         
 //        sections.append(SectionHandler(title: "Active Jobs", detail: ["Active 1", "Active 2", "Active 3", "Active 4"]))
 //        sections.append(SectionHandler(title: "Previous Jobs", detail: ["previous 1", "previous 2", "previous 3", "previous 4", "previous 5", "previous 6"]))
@@ -84,9 +86,17 @@ class TechnieServiceVC: UIViewController {
     // MARK: - Methods
     fileprivate func setupViews() {
         setupNavBar()
-        [tableView].forEach { view.addSubview($0)}
+        [tableView, indicator].forEach { view.addSubview($0)}
+        indicator.start()
         
         tableView.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.leadingAnchor, bottom: view.safeAreaLayoutGuide.bottomAnchor, trailing: view.trailingAnchor, padding: UIEdgeInsets(top: 5, left: 0, bottom: 0, right: 0))
+        
+        NSLayoutConstraint.activate([
+            indicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            indicator.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 10),
+            indicator.heightAnchor.constraint(equalToConstant: 50),
+            indicator.widthAnchor.constraint(equalToConstant: 50),
+        ])
     }
     
     fileprivate func setupNavBar() {
@@ -97,9 +107,49 @@ class TechnieServiceVC: UIViewController {
         
     }
     
+    private func getTechnicianInfo() {
+        guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
+        let technicianKeyPath = getUsersPersistedInfo.uid
+
+        DatabaseManager.shared.getSpecificTechnician(technicianKeyPath: technicianKeyPath) { result in
+            switch result {
+            case .success(let technicianInfo):
+                self.technicianModel = technicianInfo
+                
+                self.updatedActiveServices = technicianInfo.numberOfActiveServices - 1
+                self.updatedCompletedServices = technicianInfo.numberOfCompletedServices + 1
+                
+                self.updateActiveAndCompletedServices()
+            case .failure(let error):
+                print(error)
+            }
+        }
+        
+    }
+    
+    func updateActiveAndCompletedServices() {
+        guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
+        let technicianKeyPath = getUsersPersistedInfo.uid
+
+//        guard let technicianInfo = self.technicianModel else { return }
+
+        let updateElement = [
+            "numberOfActiveServices": updatedActiveServices,
+            "numberOfCompletedServices": updatedCompletedServices
+        ] as [String : Any]
+        
+        
+        let childPath = "users/technicians/\(technicianKeyPath)"
+        self.database.child(childPath).updateChildValues(updateElement, withCompletionBlock: { error, _ in
+            guard error == nil else {
+                return
+            }
+        })
+    }
+    
     fileprivate func fetchData()  {
-        guard let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo") else { return }
-        guard let technicianKeyPath = getUsersPersistedInfo.first?.uid else { return }
+        guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
+        let technicianKeyPath = getUsersPersistedInfo.uid
         
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
@@ -123,15 +173,40 @@ class TechnieServiceVC: UIViewController {
                     case .success(let posts):
                         let sortedArray = posts.sorted(by: { PostFormVC.dateFormatter.date(from: $0.dateTime)?.compare(PostFormVC.dateFormatter.date(from: $1.dateTime) ?? Date()) == .orderedDescending })
                         self.activeJobsModel = sortedArray
+                        
+                        self.indicator.stop()
                         self.tableView.reloadData()
                         //                                    print("jobs: \(self.postModel)")
                         return
+                        
                     case .failure(let error):
+                        if self.activeJobsModel.count == 0 {
+                            self.tableView.isHidden = true
+                            self.view.addSubview(self.warningLabel)
+                            NSLayoutConstraint.activate([
+                                self.warningLabel.centerYAnchor.constraint(equalTo: self.view.centerYAnchor),
+                                self.warningLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor)
+                            ])
+                        } else {
+                            self.tableView.isHidden = false
+                        }
+                        self.indicator.stop()
                         print("Failed to get posts: \(error.localizedDescription)")
                     }
                 })
                 
             case .failure(let error):
+                if self.activeJobsModel.count == 0 {
+                    self.tableView.isHidden = true
+                    self.view.addSubview(self.warningLabel)
+                    NSLayoutConstraint.activate([
+                        self.warningLabel.centerYAnchor.constraint(equalTo: self.view.centerYAnchor),
+                        self.warningLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor)
+                    ])
+                } else {
+                    self.tableView.isHidden = false
+                }
+                self.indicator.stop()
                 print("Failed to get technicians: \(error.localizedDescription)")
             }
         })
@@ -149,14 +224,28 @@ class TechnieServiceVC: UIViewController {
                     case .success(let posts):
                         let sortedArray = posts.sorted(by: { PostFormVC.dateFormatter.date(from: $0.dateTime)?.compare(PostFormVC.dateFormatter.date(from: $1.dateTime) ?? Date()) == .orderedDescending })
                         self.previousJobsModel = sortedArray
+                        
+                        self.indicator.stop()
                         self.tableView.reloadData()
                         return
+                        
                     case .failure(let error):
                         print("Failed to get posts: \(error.localizedDescription)")
                     }
                 })
                 
             case .failure(let error):
+                if self.activeJobsModel.count == 0 && self.previousJobsModel.count == 0 {
+                    self.tableView.isHidden = true
+                    self.view.addSubview(self.warningLabel)
+                    NSLayoutConstraint.activate([
+                        self.warningLabel.centerYAnchor.constraint(equalTo: self.view.centerYAnchor),
+                        self.warningLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor)
+                    ])
+                } else {
+                    self.tableView.isHidden = false
+                }
+                self.indicator.stop()
                 print("Failed to get technicians: \(error.localizedDescription)")
             }
         })
@@ -222,7 +311,6 @@ extension TechnieServiceVC: TableViewDataSourceAndDelegate {
     func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
         presentAccessoryButtonAlert(indexPath: indexPath)
     }
-   
     
     fileprivate func presentAccessoryButtonAlert(indexPath: IndexPath) {
         print(indexPath.row)
@@ -230,6 +318,7 @@ extension TechnieServiceVC: TableViewDataSourceAndDelegate {
         
         let markAsCompletedAction = UIAlertAction(title: "Mark as completed", style: .default) { action in
             self.markJobAsCompleted(indexPath: indexPath)
+            self.getTechnicianInfo()
         }
         
         let viewPostAction = UIAlertAction(title: "View job details", style: .default) { [self] action in
@@ -253,9 +342,9 @@ extension TechnieServiceVC: TableViewDataSourceAndDelegate {
         let model = activeJobsModel[indexPath.row]
         guard let jobID = model.id else { return }
         let postChildPath = "posts/\(jobID)"
-        guard let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo") else { return }
-        guard let technicanName = getUsersPersistedInfo.first?.name else { return }
-        guard let technicianKeyPath = getUsersPersistedInfo.first?.uid else { return }
+        guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
+        let technicanName = getUsersPersistedInfo.name
+        let technicianKeyPath = getUsersPersistedInfo.uid
 
 
         DatabaseManager.shared.getHiredJobs(techniciankeyPath: technicianKeyPath) { success in
@@ -268,8 +357,8 @@ extension TechnieServiceVC: TableViewDataSourceAndDelegate {
                         
                         DatabaseManager.shared.markAJobAsDone(withTechnieHiredJobsChildPath: technieHiredJobsChildPath, withPostChildPath: postChildPath, clientKeyPath: model.postOwnerInfo!.keyPath, technicianName: technicanName, completedJobUID: jobID) { success in
                             if success {
-                                guard let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo") else { return }
-                                guard let technicianKeyPath = getUsersPersistedInfo.first?.uid else { return }
+                                guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
+                                let technicianKeyPath = getUsersPersistedInfo.uid
                                 
                                 self.getPreviousHiredJobs(technicianKeyPath: technicianKeyPath)
                                 

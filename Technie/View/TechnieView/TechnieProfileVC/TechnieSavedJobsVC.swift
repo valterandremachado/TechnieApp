@@ -40,6 +40,8 @@ class TechnieSavedJobsVC: UIViewController {
         return lbl
     }()
     
+    private var indicator: ProgressIndicatorLarge!
+
     var savedJobs = [PostModel]()
 
     // MARK: - Inits
@@ -51,6 +53,14 @@ class TechnieSavedJobsVC: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         view.backgroundColor = .white
+        
+        indicator = ProgressIndicatorLarge(inview: self.view, loadingViewColor: UIColor.clear, indicatorColor: UIColor.gray, msg: "")
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        
+        if savedJobs.count == 0 {
+            indicator.start()
+        }
+        
         fetchData()
         setupViews()
     }
@@ -63,9 +73,16 @@ class TechnieSavedJobsVC: UIViewController {
     
     // MARK: - Methods
     fileprivate func setupViews() {
-        [tableView].forEach { view.addSubview($0)}
+        [tableView, indicator].forEach { view.addSubview($0)}
         
         tableView.anchor(top: view.topAnchor, leading: view.leadingAnchor, bottom: view.safeAreaLayoutGuide.bottomAnchor, trailing: view.trailingAnchor, padding: UIEdgeInsets(top: 5, left: 0, bottom: 0, right: 0))
+        
+        NSLayoutConstraint.activate([
+            indicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            indicator.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 10),
+            indicator.heightAnchor.constraint(equalToConstant: 50),
+            indicator.widthAnchor.constraint(equalToConstant: 50),
+        ])
         
         setupNavBar()
     }
@@ -77,15 +94,20 @@ class TechnieSavedJobsVC: UIViewController {
         navigationItem.title = "Saved Jobs"
     }
     
+    
     fileprivate func fetchData()  {
-        guard let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo") else { return }
-        guard let technicianKeyPath = getUsersPersistedInfo.first?.uid else { return }
+        guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
+        let technicianKeyPath = getUsersPersistedInfo.uid
         
         DispatchQueue.main.async {
             DatabaseManager.shared.getAllSavedJobs(technicianKeyPath: technicianKeyPath) { [self] result in
                 switch result {
                 case .success(let savedJobs):
                     self.savedJobs = savedJobs
+                    
+                    indicator.stop()
+                    self.tableView.reloadData()
+                case .failure(let error):
                     
                     if savedJobs.count == 0 {
                         tableView.isHidden = true
@@ -98,8 +120,9 @@ class TechnieSavedJobsVC: UIViewController {
                         tableView.isHidden = false
                     }
                     
+                    indicator.stop()
+                    
                     self.tableView.reloadData()
-                case .failure(let error):
                     print(error)
                 }
             }

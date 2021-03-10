@@ -18,7 +18,7 @@ class LoginVC: UIViewController {
     // UserAuthViewModel
     
     fileprivate var defaults = UserDefaults.standard
-    var persistUsersInfo = [UserPersistedInfo]()
+    var persistUsersInfo: UserPersistedInfo?
     
     let imageBackground = UIImage(named: "balance.jpg")
     let logo = UIImage(named: "guidetech-06.png")
@@ -445,10 +445,11 @@ class LoginVC: UIViewController {
                                         location: location,
                                         accountType: nil,
                                         locationInLongLat: nil,
-                                        profileImage: nil)
+                                        profileImage: nil,
+                                        hourlyRate: nil)
         
 //        if email != self.persistUsersInfo.first?.email {
-            self.persistUsersInfo.append(newItem)
+            self.persistUsersInfo = newItem 
             print("data persisted: \(self.persistUsersInfo)")
 //        } else {
 //            print("existing Name")

@@ -6,13 +6,26 @@
 //
 
 import UIKit
+import FirebaseDatabase
+
+protocol TechnieEditProfileVCDismissalDelegate: class {
+    func TechnieEditProfileVCDismissalSingleton(updatedPersistedData: UserPersistedInfo)
+}
 
 class TechnieEditProfileVC: UIViewController {
 
     // MARK: - Properties
+    let database = Database.database().reference()
+    fileprivate var defaults = UserDefaults.standard
+    var updatePersistedData: UserPersistedInfo?
+
+    weak var dismissalDelegate: TechnieEditProfileVCDismissalDelegate?
+    
     var newProfileImage = Data()
     var newUserName = ""
     var newLocation = ""
+    
+    var getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo")
     
     lazy var tableView: UITableView = {
         let tv = UITableView(frame: .zero, style: .grouped)
@@ -46,12 +59,21 @@ class TechnieEditProfileVC: UIViewController {
         // Do any additional setup after loading the view.
         view.backgroundColor = .white
         setupViews()
+//        defaults.removeObject(forKey: "persistUsersInfo")
+        print("defaults: \(getUsersPersistedInfo)")
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         //        tableView.reloadData()
         //        print("viewWillAppear")
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        guard let newData = updatePersistedData else { return }
+        dismissalDelegate?.TechnieEditProfileVCDismissalSingleton(updatedPersistedData: newData)
+//        NotificationCenter.default.post(Notification(name: Notification.Name("updatePersistedData"), object: updatePersistedData, userInfo: nil))
     }
     
     // MARK: - Methods
@@ -78,11 +100,14 @@ class TechnieEditProfileVC: UIViewController {
 extension TechnieEditProfileVC: TableViewDataSourceAndDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 3
+        return 5
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: TechnieEditProfileCell.cellID, for: indexPath) as! TechnieEditProfileCell
+//        let persistedProfileImage = getUsersPersistedInfo?.first?.profileImage
+        let persistedUserName = getUsersPersistedInfo?.name ?? "username"
+        let persistedLocation = getUsersPersistedInfo?.location ?? "userlocation"
         
         switch indexPath.row {
         case 0:
@@ -96,15 +121,21 @@ extension TechnieEditProfileVC: TableViewDataSourceAndDelegate {
             
         case 1:
             var userDisplayName = ""
-            newUserName == "" ? (userDisplayName = "username") : (userDisplayName = newUserName)
+            newUserName == "" ? (userDisplayName = persistedUserName) : (userDisplayName = newUserName)
             cell.titleLabel.text = "Display Name"
             cell.descriptionLabel.text = userDisplayName
             
         case 2:
             var userLocation = ""
-            newLocation == "" ? (userLocation = "Baguio city") : (userLocation = newLocation)
+            newLocation == "" ? (userLocation = persistedLocation) : (userLocation = newLocation)
             cell.titleLabel.text = "Location"
             cell.descriptionLabel.text = userLocation
+
+        case 3:
+            cell.titleLabel.text = "Summary"
+
+        case 4:
+            cell.titleLabel.text = "Expertise"
 
         default:
             break
@@ -122,11 +153,39 @@ extension TechnieEditProfileVC: TableViewDataSourceAndDelegate {
             presentChangeDisplayNameAlertController()
         case 2:
             presentChangeLocationAlertController()
+            
+        case 3:
+            let vc = SummaryVC()
+            navigationController?.pushViewController(vc, animated: true)
+            
+        case 4:
+            let vc = ExpertiseVC()
+            navigationController?.pushViewController(vc, animated: true)
+            
         default:
             break
         }
     }
     
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        return UIView(frame: CGRect(x: 0, y: 0, width: 0, height: 0))
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return .leastNormalMagnitude
+    }
+    
+    func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        // remove bottom extra 20px space.
+        return UIView(frame: CGRect(x: 0, y: 0, width: 0, height: CGFloat.leastNormalMagnitude))
+    }
+    
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        // remove bottom extra 20px space.
+        return .leastNormalMagnitude
+    }
+    
+    // AlertControllers
     fileprivate func presentChangePhotoAlertController() {
         let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
@@ -160,7 +219,7 @@ extension TechnieEditProfileVC: TableViewDataSourceAndDelegate {
         let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
         let enterLocation = UIAlertAction(title: "Enter Location", style: .default) { [self] (_) in
-            print("enterLocation")
+//            print("enterLocation")
             presentEnterLocationAlertController()
         }
         
@@ -189,6 +248,8 @@ extension TechnieEditProfileVC: TableViewDataSourceAndDelegate {
             guard let firstNameField = alertController.textFields?[0] else { return }
             guard let lastNameField = alertController.textFields?[1] else { return }
             newUserName = "\(firstNameField.text!) " + lastNameField.text!
+            changeUserName(name: newUserName)
+            
             self.tableView.beginUpdates()
             self.tableView.reloadRows(at: [IndexPath(row: 1, section: 0)], with: .automatic)
             self.tableView.endUpdates()
@@ -222,6 +283,8 @@ extension TechnieEditProfileVC: TableViewDataSourceAndDelegate {
         let save = UIAlertAction(title: "Save", style: .default) { [self] (action) in
             guard let locationInput = alertController.textFields?[0] else { return }
             newLocation = locationInput.text!
+            changeUserLocation(location: newLocation)
+            
             self.tableView.beginUpdates()
             self.tableView.reloadRows(at: [IndexPath(row: 2, section: 0)], with: .automatic)
             self.tableView.endUpdates()
@@ -241,24 +304,124 @@ extension TechnieEditProfileVC: TableViewDataSourceAndDelegate {
         present(alertController, animated: true, completion: nil)
     }
     
-    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        return UIView(frame: CGRect(x: 0, y: 0, width: 0, height: 0))
+    // Database updates
+    private func changeUserName(name: String) {
+        let updatedPersistedData = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo")
+
+        guard let technicianKeyPath = updatedPersistedData?.uid else { return }
+        let childPath = "users/technicians/\(technicianKeyPath)/profileInfo"
+
+        guard let uid = updatedPersistedData?.uid,
+              let email = updatedPersistedData?.email,
+              let location = updatedPersistedData?.location
+//              let accountType = updatedPersistedData?.first?.accountType,
+//              let locationInLongLat = updatedPersistedData?.first?.locationInLongLat,
+//              let profileImage = updatedPersistedData?.first?.profileImage,
+//              let hourlyRate = updatedPersistedData?.first?.hourlyRate
+        else { return }
+        
+        let newData = UserPersistedInfo(uid: uid,
+                                  name: name,
+                                  email: email,
+                                  location: location,
+                                  accountType: nil,
+                                  locationInLongLat: nil,
+                                  profileImage: nil,
+                                  hourlyRate: nil)
+        
+        let updateElement = [
+            "name": name
+        ]
+        
+        database.child(childPath).updateChildValues(updateElement, withCompletionBlock: { error, _ in
+            guard error == nil else {
+                print("error changing database")
+                return
+            }
+            self.updatePersistedData(data: newData)
+        })
     }
     
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return .leastNormalMagnitude
+    private func changeUserLocation(location: String) {
+        let updatedPersistedData = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo")
+
+        guard let technicianKeyPath = updatedPersistedData?.uid else { return }
+        let childPath = "users/technicians/\(technicianKeyPath)/profileInfo"
+
+        guard let uid = updatedPersistedData?.uid,
+              let name = updatedPersistedData?.name,
+              let email = updatedPersistedData?.email
+//              let accountType = updatedPersistedData?.first?.accountType,
+//              let locationInLongLat = updatedPersistedData?.first?.locationInLongLat,
+//              let profileImage = updatedPersistedData?.first?.profileImage,
+//              let hourlyRate = updatedPersistedData?.first?.hourlyRate
+        else { return }
+        
+        let newData = UserPersistedInfo(uid: uid,
+                                  name: name,
+                                  email: email,
+                                  location: location,
+                                  accountType: nil,
+                                  locationInLongLat: nil,
+                                  profileImage: nil,
+                                  hourlyRate: nil)
+        
+        let updateElement = [
+            "location": location
+        ]
+        
+        database.child(childPath).updateChildValues(updateElement, withCompletionBlock: { error, _ in
+            guard error == nil else {
+                print("error changing database")
+                return
+            }
+            self.updatePersistedData(data: newData)
+        })
     }
     
-    func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-        // remove bottom extra 20px space.
-        return UIView(frame: CGRect(x: 0, y: 0, width: 0, height: CGFloat.leastNormalMagnitude))
+    private func changeUserProfileImage(image: String) {
+        let updatedPersistedData = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo")
+
+        guard let technicianKeyPath = updatedPersistedData?.uid else { return }
+        let childPath = "users/technicians/\(technicianKeyPath)/profileInfo"
+
+        guard let uid = updatedPersistedData?.uid,
+              let name = updatedPersistedData?.name,
+              let email = updatedPersistedData?.email,
+              let location = updatedPersistedData?.location
+//              let accountType = updatedPersistedData?.first?.accountType,
+//              let locationInLongLat = updatedPersistedData?.first?.locationInLongLat,
+//              let hourlyRate = updatedPersistedData?.first?.hourlyRate
+        else { return }
+        
+        let newData = UserPersistedInfo(uid: uid,
+                                  name: name,
+                                  email: email,
+                                  location: location,
+                                  accountType: nil,
+                                  locationInLongLat: nil,
+                                  profileImage: image,
+                                  hourlyRate: nil)
+        
+        let updateElement = [
+            "profileImage": image
+        ]
+        
+        database.child(childPath).updateChildValues(updateElement, withCompletionBlock: { error, _ in
+            guard error == nil else {
+                print("error changing database")
+                return
+            }
+            self.updatePersistedData(data: newData)
+        })
     }
     
-    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        // remove bottom extra 20px space.
-        return .leastNormalMagnitude
+    private func updatePersistedData(data: UserPersistedInfo) {
+        updatePersistedData = data
+        self.defaults.set(object: updatePersistedData, forKey: "persistUsersInfo")
+        print("newData: ", updatePersistedData)
     }
-    
+
 }
 
 // MARK: - UIImagePickerControllerDelegate Extension

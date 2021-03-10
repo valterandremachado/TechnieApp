@@ -931,7 +931,11 @@ extension TechnicianProfileDetailsVC: TableViewDataSourceAndDelegate {
             case 1:
                 let cell = tableView.dequeueReusableCell(withIdentifier: ProficiencyReviewCell.cellID, for: indexPath) as! ProficiencyReviewCell
                 cell.setupReliabilityStackView()
-                cell.ratingAndReviewsLabel.text = " \(String(format:"%.1f", satisfactionAvrg!.ratingAvrg)) | \(technicianModel.numberOfActiveServices + technicianModel.numberOfActiveServices) services"
+                
+                let numberOfServices = technicianModel.numberOfServices
+                var serviceText = ""
+                numberOfServices == 1 ? (serviceText = "service") : (serviceText = "services")
+                cell.ratingAndReviewsLabel.text = " \(String(format:"%.1f", satisfactionAvrg!.ratingAvrg)) | \(numberOfServices) " + serviceText
                 return cell
             case 2:
                 let cell = tableView.dequeueReusableCell(withIdentifier: ReviewsCell.cellID, for: indexPath) as! ReviewsCell

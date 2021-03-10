@@ -358,11 +358,11 @@ class PostFormVC: UIViewController {
               !imageDataArray.isEmpty
         else { return }
         
-        guard let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo") else { return }
-        guard let clientEmail = getUsersPersistedInfo.first?.email else { return }
-        guard let clientName = getUsersPersistedInfo.first?.name else { return }
-        guard let clientLocation = getUsersPersistedInfo.first?.location else { return }
-        guard let clientUID = getUsersPersistedInfo.first?.uid else { return }
+        guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
+        let clientEmail = getUsersPersistedInfo.email
+        let clientName = getUsersPersistedInfo.name
+        let clientLocation = getUsersPersistedInfo.location
+        let clientUID = getUsersPersistedInfo.uid
 
         var postsImageUrl = [String]()
         StorageManager.shared.uploadPostImages(with: imageDataArray, with: imageNameArray, completion: { [weak self] result in

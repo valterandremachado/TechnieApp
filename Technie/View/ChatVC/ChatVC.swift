@@ -39,12 +39,12 @@ class ChatVC: MessagesViewController {
     private var messages = [Message]()
     
     private var selfSender: Sender? {
-        let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo")
-        
+        let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo")
+
         var userPersistedEmail = ""
 //        var userPersistedName = ""
         if let info = getUsersPersistedInfo {
-            userPersistedEmail = info.first!.email
+            userPersistedEmail = info.email
 //            userPersistedName = info.first!.name
         }
 //        guard let email = UserDefaults.standard.value(forKey: "email") as? String else {
@@ -181,11 +181,11 @@ class ChatVC: MessagesViewController {
             self?.presentLocationPicker()
         }
         
-        let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo")
-        
+        let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo")
+
         var userPersistedEmail = ""
         if let info = getUsersPersistedInfo {
-            userPersistedEmail = info.first!.email
+            userPersistedEmail = info.email
         }
         messageInputBar.setLeftStackViewWidthConstant(to: 70, animated: false)
         messageInputBar.setStackViewItems(userPersistedEmail == "client@hotmail.com" ? ([photoMessageBarBtn, locationMessageBarBtn]) : ([photoMessageBarBtn]), forStack: .left, animated: false)
@@ -328,11 +328,11 @@ class ChatVC: MessagesViewController {
 //            return nil
 //        }
         
-        let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo")
-        
+        let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo")
+
         var userPersistedEmail = ""
         if let info = getUsersPersistedInfo {
-            userPersistedEmail = info.first!.email
+            userPersistedEmail = info.email
         }
         
         let safeCurrentEmail = DatabaseManager.safeEmail(emailAddress: userPersistedEmail)

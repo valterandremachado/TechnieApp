@@ -104,11 +104,11 @@ class ConversationVC: UIViewController {
         guard let lastMessage = messages.last else { return }
         let lastUserDefaultsMessage = UserDefaults.standard.value(forKey: "lastMessage") as? String ?? ""
 
-        let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo")
+        let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo")
 //        print("messages: \(messages.last)")
         var userPersistedEmail = ""
         if let info = getUsersPersistedInfo {
-            userPersistedEmail = info.first!.email
+            userPersistedEmail = info.email
         }
         
 //        let userEmail = UserDefaults.standard.value(forKey: "email") as? String ?? ""
@@ -181,12 +181,12 @@ class ConversationVC: UIViewController {
     
     /// Fetches currentUser's convos (get's currentUser email from userDefaullts in order to differ between sender and receiver)
     private func startListeningForConversations() {
-        let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo")
-        
+        let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo")
+
         var userPersistedEmail = ""
 //        var userPersistedName = ""
         if let info = getUsersPersistedInfo {
-            userPersistedEmail = info.first!.email
+            userPersistedEmail = info.email
 //            userPersistedName = info.first!.name
         }
         

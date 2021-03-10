@@ -11,9 +11,9 @@ import Foundation
 
 class ProgressIndicator: UIView {
 
-    var indicatorColor:UIColor
-    var loadingViewColor:UIColor
-    var loadingMessage:String
+    var indicatorColor: UIColor
+    var loadingViewColor: UIColor
+    var loadingMessage: String
     var messageFrame = UIView()
     var activityIndicator = UIActivityIndicatorView()
 

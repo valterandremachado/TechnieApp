@@ -534,14 +534,14 @@ extension SignupVC: UIImagePickerControllerDelegate, UINavigationControllerDeleg
                     let randomNumberForPosts = Int.random(in: 0...500)
                     let randomNumberForActivePosts = Int.random(in: 0...500)
                     let randomNumberForInactivePosts = Int.random(in: 0...500)
-                    let randomNumberForCompletedServices = Int.random(in: 0...500)
-                    let randomNumberForActiveServices = Int.random(in: 0...500)
                     let randomNumberExp = Int.random(in: 0...20)
-                    let randomNumberForPreviousServices = Int.random(in: 0...500)
-                    let randomNumberForTechnieRank = Int.random(in: 0...500)
                     let randomHourlyRate = Int.random(in: 200...800)
                     
-
+//                    let randomNumberForCompletedServices = Int.random(in: 0...500)
+//                    let randomNumberForActiveServices = Int.random(in: 0...500)
+//                    let randomNumberForPreviousServices = Int.random(in: 0...500)
+//                    let randomNumberForTechnieRank = Int.random(in: 0...500)
+                    
                     guard let uid = result?.user.uid else { return }
 
                     let dateString = PostFormVC.dateFormatter.string(from: Date())
@@ -561,6 +561,7 @@ extension SignupVC: UIImagePickerControllerDelegate, UINavigationControllerDeleg
                     let technicianProfileInfo = TechnicianProfileInfo(id: uid,
                                                                       name: "\(firstName) "+lastName,
                                                                       email: email,
+                                                                      profileImage: nil,
                                                                       location: location,
                                                                       profileSummary: "I am this and that",
                                                                       experience: "\(randomNumberExp)",
@@ -569,10 +570,10 @@ extension SignupVC: UIImagePickerControllerDelegate, UINavigationControllerDeleg
                                                                       skills: ["Plumber", "Handyman"],
                                                                       membershipDate: dateString)
                     
-                    let technician = TechnicianModel(numberOfCompletedServices: randomNumberForCompletedServices,
-                                                     numberOfActiveServices: randomNumberForActiveServices,
-                                                     numberOfPreviousServices: randomNumberForPreviousServices,
-                                                     technieRank: randomNumberForTechnieRank,
+                    let technician = TechnicianModel(numberOfCompletedServices: 0,
+                                                     numberOfActiveServices: 0,
+                                                     numberOfServices: 0,
+                                                     technieRank: 0,
                                                      profileInfo: technicianProfileInfo)
                     if pickAccountType == 0 {
                         DatabaseManager.shared.insertTechnician(with: technician, with: uid, firstName: firstName, lastName: lastName, completion: { success in

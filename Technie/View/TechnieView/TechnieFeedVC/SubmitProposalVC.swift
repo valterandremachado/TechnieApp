@@ -131,10 +131,10 @@ class SubmitProposalVC: UIViewController, UITextViewDelegate {
     @objc fileprivate func proposalBtnPressed() {
         guard let coverLetter = coverLetterTextField.text else { return }
         guard !coverLetter.replacingOccurrences(of: " ", with: "").isEmpty else { return}
-        guard let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo") else { return }
-        guard let technicianEmail = getUsersPersistedInfo.first?.email else { return }
-        guard let technicianName = getUsersPersistedInfo.first?.name else { return }
-        guard let technicanUID = getUsersPersistedInfo.first?.uid else { return }
+        guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
+        let technicianEmail = getUsersPersistedInfo.email
+        let technicianName = getUsersPersistedInfo.name
+        let technicanUID = getUsersPersistedInfo.uid
         guard let clientKeyPath = postModel.postOwnerInfo?.keyPath else { return }
         guard let jobTitle = postModel.title as? String else { return }
         

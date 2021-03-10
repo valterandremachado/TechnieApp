@@ -169,7 +169,7 @@ class ClientFeedVC: UIViewController {
         fetchData()
         setupViews()
         print("viewDidLoadFeed: \(didShowSearchResultViewObservable.value)")
-//        guard let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo") else { return }
+//        guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
 //        print("persistUsersInfo: \(getUsersPersistedInfo)")
         
 //        UserDefaults.standard.removeObject(forKey: "persistUsersInfo")
@@ -181,6 +181,7 @@ class ClientFeedVC: UIViewController {
 //                print(error)
 //            }
 //        })
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {

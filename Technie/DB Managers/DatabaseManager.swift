@@ -797,7 +797,10 @@ extension DatabaseManager {
         let mainChildPath = "users/technicians/\(technicianKeyPath)/clientsSatisfaction"
 
         self.database.child(mainChildPath).observeSingleEvent(of: .value, with: { snapshot in
-            guard let value = snapshot.value as? [String: Any] else { return }
+            guard let value = snapshot.value as? [String: Any] else {
+                onClientSatisfactionCompletion(.failure(DatabaseError.failedToFetch))
+                return
+            }
             
             do {
                 let model = try FirebaseDecoder().decode(ClientsSatisfaction.self, from: value)
@@ -810,7 +813,10 @@ extension DatabaseManager {
         
         let reviewChildPath = "users/technicians/\(technicianKeyPath)/clientsSatisfaction/reviews"
             self.database.child(reviewChildPath).observeSingleEvent(of: .value, with: { snapshot in
-                guard let reviewCollection = snapshot.value as? [String: Any] else { return }
+                guard let reviewCollection = snapshot.value as? [String: Any] else {
+                    onReviewCompletion(.failure(DatabaseError.failedToFetch))
+                    return
+                }
                 for (keyPath, _) in reviewCollection {
                     self.database.child("\(reviewChildPath)/\(keyPath)").observeSingleEvent(of: .value, with: { snapshot in
                         guard let value = snapshot.value else { return }
@@ -908,38 +914,40 @@ extension DatabaseManager {
     // MARK: - Getters
     public func getAllTechnicianNotifications(completion: @escaping (Result<[TechnicianNotificationModel], Error>) -> Void) {
       
-        guard let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo") else { return }
+        guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
         var notifications = [TechnicianNotificationModel]()
         
-        for id in getUsersPersistedInfo {
-            let uid = id.uid
-            print("UID: "+uid)
+            let uid = getUsersPersistedInfo.uid
+//            print("UID: "+uid)
             self.database.child("users/technicians/\(uid)/notifications").observeSingleEvent(of: .value, with: { snapshot in
-                guard let notificationsCollection = snapshot.value as? [String: Any] else { return }
+                guard let notificationsCollection = snapshot.value as? [String: Any] else {
+                    completion(.failure(DatabaseError.failedToFetch))
+                    return
+                }
+                
                 for (keyPath, _) in notificationsCollection {
                     self.database.child("users/technicians/\(uid)/notifications/\(keyPath)").observeSingleEvent(of: .value, with: { snapshot in
                         guard let value = snapshot.value else { return }
                         do {
                             let model = try FirebaseDecoder().decode(TechnicianNotificationModel.self, from: value)
                             notifications.append(model)
+                            print("notifications: \(notifications)", notifications.count)
                             completion(.success(notifications))
                         } catch let error {
-                            print(error)
+                            print("notifications error: \(error)")
                         }
                     })
                 }
                 
             })
-        }
     }
     
     public func getAllClientNotifications(completion: @escaping (Result<[ClientNotificationModel], Error>) -> Void) {
       
-        guard let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo") else { return }
+        guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
         var notifications = [ClientNotificationModel]()
         
-        for id in getUsersPersistedInfo {
-            let uid = id.uid
+            let uid = getUsersPersistedInfo.uid
             self.database.child("users/clients/\(uid)/notifications").observeSingleEvent(of: .value, with: { snapshot in
                 guard let notificationsCollection = snapshot.value as? [String: Any] else { return }
                 for (keyPath, _) in notificationsCollection {
@@ -956,7 +964,6 @@ extension DatabaseManager {
                 }
                 
             })
-        }
     }
     
     /// Gets all posts from database
@@ -1038,14 +1045,72 @@ extension DatabaseManager {
         })
     }
     
+    public func getSpecificTechnician(technicianKeyPath: String, completion: @escaping (Result<TechnicianModel, Error>) -> Void) {
+        
+        self.database.child("users/technicians/\(technicianKeyPath)").observeSingleEvent(of: .value, with: { snapshot in
+            guard let value = snapshot.value else {
+                completion(.failure(DatabaseError.failedToFetch))
+                return
+            }
+            
+            do {
+                let model = try FirebaseDecoder().decode(TechnicianModel.self, from: value)
+                //print("email: \(model)")
+                completion(.success(model))
+            } catch let error {
+                print(error)
+            }
+        })
+    }
+    
+    public func listenToSpecificTechnicianChanges(technicianKeyPath: String, completion: @escaping (Result<TechnicianModel, Error>) -> Void) {
+        
+        self.database.child("users/technicians/\(technicianKeyPath)").observeSingleEvent(of: .childChanged, with: { snapshot in
+            guard let _ = snapshot.value as? [String: Any] else {
+                completion(.failure(DatabaseError.failedToFetch))
+                return
+            }
+            
+            self.database.child("users/technicians/\(technicianKeyPath)").observeSingleEvent(of: .value, with: { snapshot in
+                guard let value = snapshot.value else {
+                    completion(.failure(DatabaseError.failedToFetch))
+                    return
+                }
+                
+                do {
+                    let model = try FirebaseDecoder().decode(TechnicianModel.self, from: value)
+                    //print("email: \(model)")
+                    completion(.success(model))
+                } catch let error {
+                    print(error)
+                }
+            })
+        })
+    }
+    
+    public func getSpecificClient(clientKeyPath: String, completion: @escaping (Result<ClientModel, Error>) -> Void) {
+        
+        self.database.child("users/clients/\(clientKeyPath)").observeSingleEvent(of: .value, with: { snapshot in
+            guard let value = snapshot.value else {
+                completion(.failure(DatabaseError.failedToFetch))
+                return
+            }
+            
+            do {
+                let model = try FirebaseDecoder().decode(ClientModel.self, from: value)
+                //print("email: \(model)")
+                completion(.success(model))
+            } catch let error {
+                print(error)
+            }
+        })
+    }
+    
     public func getAllClientPosts(completion: @escaping (Result<[PostModel], Error>) -> Void) {
         
-        let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo")
-        
-        var userPersistedEmail = ""
-        if let info = getUsersPersistedInfo {
-            userPersistedEmail = info.first!.email
-        }
+        guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
+
+        let userPersistedEmail = getUsersPersistedInfo.email
         
         database.child("posts").observeSingleEvent(of: .value, with: { [weak self] snapshot in
             guard let self = self else { return }
@@ -1141,7 +1206,11 @@ extension DatabaseManager {
             
 //            for (key, _) in techniciansCollection {
                 self.database.child("users/technicians/\(techniciankeyPath)/hiredJobs").observeSingleEvent(of: .value, with: { snapshot in
-                    guard let hiredJobs = snapshot.value as? [String: Any] else { return }
+                    guard let hiredJobs = snapshot.value as? [String: Any] else {
+                        completion(.failure(DatabaseError.failedToFetch))
+                        return
+                    }
+                    
                     for (_ , value) in hiredJobs {
                     do {
                         let model = try FirebaseDecoder().decode(HiredJobs.self, from: value)
@@ -1167,7 +1236,11 @@ extension DatabaseManager {
             
 //            for (key, _) in techniciansCollection {
                 self.database.child("users/technicians/\(techniciankeyPath)/hiredJobs").observeSingleEvent(of: .value, with: { snapshot in
-                    guard let hiredJobs = snapshot.value as? [String: Any] else { return }
+                    guard let hiredJobs = snapshot.value as? [String: Any] else {
+                        completion(.failure(DatabaseError.failedToFetch))
+                        return
+                    }
+                    
                     for (_ , value) in hiredJobs {
                     do {
                         let model = try FirebaseDecoder().decode(HiredJobs.self, from: value)
@@ -1305,10 +1378,6 @@ extension DatabaseManager {
         })
     }
     
-    struct SavedJobs: Codable {
-        var postUID: String
-    }
-    
     // MARK: - Listeners
     public func listenToPostChanges(completion: @escaping (Result<[PostModel], Error>) -> Void) {
         Database.database().reference().child("posts").observeSingleEvent(of: .childChanged, with: { [self] snapshot in
@@ -1345,12 +1414,9 @@ extension DatabaseManager {
     }
     
     public func listenToClientPostChanges(completion: @escaping (Result<[PostModel], Error>) -> Void) {
-        let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo")
-        
-        var userPersistedEmail = ""
-        if let info = getUsersPersistedInfo {
-            userPersistedEmail = info.first!.email
-        }
+        guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
+
+        let userPersistedEmail = getUsersPersistedInfo.email
         
         Database.database().reference().child("posts").observeSingleEvent(of: .childChanged, with: { [self] snapshot in
             guard let postsCollection = snapshot.value as? [String: Any] else {
@@ -1434,11 +1500,10 @@ extension DatabaseManager {
     
     public func listenToTechnicianNotificationChanges(completion: @escaping (Result<[TechnicianNotificationModel], Error>) -> Void) {
         
-        guard let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo") else { return }
+        guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
         var notifications = [TechnicianNotificationModel]()
         
-        for id in getUsersPersistedInfo {
-            let uid = id.uid
+            let uid = getUsersPersistedInfo.uid
             Database.database().reference().child("users/technicians/\(uid)/notifications").observeSingleEvent(of: .childChanged, with: { [self] snapshot in
                 guard let _ = snapshot.value as? [String: Any] else {
                     completion(.failure(DatabaseError.failedToFetch))
@@ -1463,16 +1528,14 @@ extension DatabaseManager {
                     
                 })
             })
-        }
     }
     
     public func listenToClientNotificationChanges(completion: @escaping (Result<[ClientNotificationModel], Error>) -> Void) {
         
-        guard let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo") else { return }
+        guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
         var notifications = [ClientNotificationModel]()
         
-        for id in getUsersPersistedInfo {
-            let uid = id.uid
+            let uid = getUsersPersistedInfo.uid
             Database.database().reference().child("users/technicians/\(uid)/notifications").observeSingleEvent(of: .childChanged, with: { [self] snapshot in
                 guard let _ = snapshot.value as? [String: Any] else {
                     completion(.failure(DatabaseError.failedToFetch))
@@ -1497,7 +1560,6 @@ extension DatabaseManager {
                     
                 })
             })
-        }
     }
     
     // MARK: - -----
@@ -1611,14 +1673,10 @@ extension DatabaseManager {
     /// Creates a new conversation with target user emamil and first message sent
     public func createNewConversation(with otherUserEmail: String, name: String, firstMessage: Message, completion: @escaping (Bool) -> Void) {
         
-        let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo")
-        
-        var userPersistedEmail = ""
-        var userPersistedName = ""
-        if let info = getUsersPersistedInfo {
-            userPersistedEmail = info.first!.email
-            userPersistedName = info.first!.name
-        }
+        let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo")
+
+        let userPersistedEmail = getUsersPersistedInfo?.email ?? ""
+        let userPersistedName = getUsersPersistedInfo?.name
         
 //        guard let currentEmail = UserDefaults.standard.value(forKey: "email") as? String,
 //        let currentNamme = UserDefaults.standard.value(forKey: "name") as? String else {
@@ -1781,11 +1839,11 @@ extension DatabaseManager {
             break
         }
         
-        let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo")
-        
+        let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo")
+
         var userPersistedEmail = ""
         if let info = getUsersPersistedInfo {
-            userPersistedEmail = info.first!.email
+            userPersistedEmail = info.email
         }
 
 //        guard let myEmmail = UserDefaults.standard.value(forKey: "email") as? String else {
@@ -1940,12 +1998,12 @@ extension DatabaseManager {
         // update sender latest message
         // update recipient latest message
 
-        let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo")
-        
+        let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo")
+
         var myEmail = ""
 //        var userPersistedName = ""
         if let info = getUsersPersistedInfo {
-            myEmail = info.first!.email
+            myEmail = info.email
 //            userPersistedName = info.first!.name
         }
         
@@ -2001,11 +2059,11 @@ extension DatabaseManager {
                 break
             }
 
-            let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo")
-            
+            let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo")
+
             var userPersistedEmail = ""
             if let info = getUsersPersistedInfo {
-                userPersistedEmail = info.first!.email
+                userPersistedEmail = info.email
             }
             
 //            guard let myEmmail = UserDefaults.standard.value(forKey: "email") as? String else {
@@ -2163,11 +2221,11 @@ extension DatabaseManager {
 //        guard let email = UserDefaults.standard.value(forKey: "email") as? String else {
 //            return
 //        }
-        let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo")
-        
+        let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo")
+
         var userPersistedEmail = ""
         if let info = getUsersPersistedInfo {
-            userPersistedEmail = info.first!.email
+            userPersistedEmail = info.email
         }
         
         let safeEmail = DatabaseManager.safeEmail(emailAddress: userPersistedEmail)
@@ -2206,12 +2264,12 @@ extension DatabaseManager {
 
     public func conversationExists(with targetRecipientEmail: String, completion: @escaping (Result<String, Error>) -> Void) {
         let safeRecipientEmail = DatabaseManager.safeEmail(emailAddress: targetRecipientEmail)
-        let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo")
-        
+        let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo")
+
         var userPersistedEmail = ""
 //        var userPersistedName = ""
         if let info = getUsersPersistedInfo {
-            userPersistedEmail = info.first!.email
+            userPersistedEmail = info.email
 //            userPersistedName = info.first!.name
         }
 //        print("email: \(userPersistedEmail)")
@@ -2296,7 +2354,7 @@ struct TechnicianModel: Codable {
     
     let numberOfCompletedServices: Int
     let numberOfActiveServices: Int
-    let numberOfPreviousServices: Int
+    let numberOfServices: Int
     let technieRank: Int
     let profileInfo: TechnicianProfileInfo
 //    let hired: HiredJobs?
@@ -2310,7 +2368,7 @@ struct TechnicianProfileInfo: Codable {
     let id: String
     let name: String
     let email: String
-//    let profileImage: String
+    let profileImage: String?
 //    let coverImage: String
     let location: String
     let profileSummary: String

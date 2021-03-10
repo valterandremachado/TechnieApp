@@ -52,6 +52,8 @@ class TechnieNotificationVC: UIViewController {
         return lbl
     }()
     
+    private var indicator: ProgressIndicatorLarge!
+
     var database = Database.database().reference()
     var postChildPath = ""
 
@@ -60,26 +62,27 @@ class TechnieNotificationVC: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         view.backgroundColor = .white
-        setupViews()
+        indicator = ProgressIndicatorLarge(inview: self.view, loadingViewColor: UIColor.clear, indicatorColor: UIColor.gray, msg: "")
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        
         fetchData()
         notificationChangesListener()
-        
-        if userNotifications.count == 0 {
-            tableView.isHidden = true
-            view.addSubview(warningLabel)
-            NSLayoutConstraint.activate([
-                warningLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-                warningLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor)
-            ])
-        } else {
-            tableView.isHidden = false
-        }
+        setupViews()
     }
     
     // MARK: - Methods
     fileprivate func setupViews() {
-        [tableView].forEach {view.addSubview($0)}
+        [tableView, indicator].forEach {view.addSubview($0)}
+        indicator.start()
+
         tableView.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor)
+        
+        NSLayoutConstraint.activate([
+            indicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            indicator.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 10),
+            indicator.heightAnchor.constraint(equalToConstant: 50),
+            indicator.widthAnchor.constraint(equalToConstant: 50),
+        ])
         
         setupNavBar()
     }
@@ -98,9 +101,23 @@ class TechnieNotificationVC: UIViewController {
             case .success(let notifications):
                 let sortedArray = notifications.sorted(by: { PostFormVC.dateFormatter.date(from: $0.dateTime)?.compare(PostFormVC.dateFormatter.date(from: $1.dateTime) ?? Date()) == .orderedDescending })
                 self.userNotifications = sortedArray
+                
+                self.indicator.stop()
                 self.tableView.reloadData()
-                print("success")
             case .failure(let error):
+                if self.userNotifications.count == 0 {
+                    self.tableView.isHidden = true
+                    self.view.addSubview(self.warningLabel)
+                    NSLayoutConstraint.activate([
+                        self.warningLabel.centerYAnchor.constraint(equalTo: self.view.centerYAnchor),
+                        self.warningLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor)
+                    ])
+                } else {
+                    self.tableView.isHidden = false
+                }
+
+                self.indicator.stop()
+                self.tableView.reloadData()
                 print("Failed to get technicians: \(error.localizedDescription)")
             }
         })
@@ -145,9 +162,9 @@ class TechnieNotificationVC: UIViewController {
         let index = sender.tag
         let indexedNotificationModel = userNotifications[index]
         
-        guard let getUsersPersistedInfo = UserDefaults.standard.object([UserPersistedInfo].self, with: "persistUsersInfo") else { return }
-        guard let technicanName = getUsersPersistedInfo.first?.name else { return }
-        guard let technicianKeyPath = getUsersPersistedInfo.first?.uid else { return }
+        guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
+        let technicanName = getUsersPersistedInfo.name
+        let technicianKeyPath = getUsersPersistedInfo.uid
         guard let clientKeyPath = indexedNotificationModel.clientInfo?.keyPath else { return }
         guard let postChildPath = indexedNotificationModel.postChildPath else { return }
 
