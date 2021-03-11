@@ -7,7 +7,8 @@
 
 import UIKit
 import TTGTagCollectionView
-
+import ReadMoreTextView
+    
 class JobDetailTVCell0: UITableViewCell {
     
     static let cellID = "JobDetailTVCellID0"
@@ -49,13 +50,19 @@ class JobDetailTVCell0: UITableViewCell {
 class JobDetailTVCell1: UITableViewCell {
     static let cellID = "JobDetailTVCellID1"
 
-    lazy var jobDescriptionLabel: UILabel = {
-        let lbl = UILabel()
+    lazy var jobDescriptionLabel: ReadMoreTextView = {
+        let lbl = ReadMoreTextView()
         lbl.translatesAutoresizingMaskIntoConstraints = false
-        lbl.text = "jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel"
-        lbl.numberOfLines = 0
+//        lbl.text = "jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel"
+//        lbl.numberOfLines = 0
+        lbl.font = .systemFont(ofSize: 17)
         lbl.textAlignment = .justified
 //        lbl.backgroundColor = .red
+        
+//        lbl.shouldTrim = true
+//        lbl.maximumNumberOfLines = 3
+//        lbl.attributedReadMoreText = NSAttributedString(string: "... See More")
+//        lbl.attributedReadLessText = NSAttributedString(string: " \nSee Less")
         return lbl
     }()
     
@@ -109,6 +116,19 @@ class JobDetailTVCell1: UITableViewCell {
 //        sv.addBackground(color: .lightGray)
         return sv
     }()
+    
+//    var postModel: PostModel! {
+//        didSet {
+//            jobDescriptionLabel.backgroundColor = .red
+//            jobDescriptionLabel.text = postModel.description
+//            jobLocationLabel.text = postModel.postOwnerInfo?.location
+//            jobDescriptionLabel.shouldTrim = true
+////            jobDescriptionLabel.maximumNumberOfLines = 4
+//            jobDescriptionLabel.attributedReadMoreText = NSAttributedString(string: "... See More")
+//            jobDescriptionLabel.attributedReadLessText = NSAttributedString(string: " \nSee Less")
+////            self.layoutIfNeeded()
+//        }
+//    }
     // MARK: - Inits
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -120,14 +140,15 @@ class JobDetailTVCell1: UITableViewCell {
 //        self.layer.cornerRadius = 15
 //        self.clipsToBounds = true
 //        backgroundColor = .yellow
+        setupViews()
     }
     
     func setupViews() {
-        [jobDescriptionLabel, locationStackView].forEach { self.addSubview($0)}
+        [jobDescriptionLabel, locationStackView].forEach { contentView.addSubview($0)}
         
-        jobDescriptionLabel.anchor(top: self.topAnchor, leading: self.leadingAnchor, bottom: nil, trailing: self.trailingAnchor, padding: UIEdgeInsets(top: 10, left: 20, bottom: 0, right: 20))
+        jobDescriptionLabel.anchor(top: contentView.topAnchor, leading: contentView.leadingAnchor, bottom: nil, trailing: contentView.trailingAnchor, padding: UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20))
         
-        locationStackView.anchor(top: jobDescriptionLabel.bottomAnchor, leading: jobDescriptionLabel.leadingAnchor, bottom: self.bottomAnchor, trailing: jobDescriptionLabel.trailingAnchor, padding: UIEdgeInsets(top: 10, left: -5, bottom: 10, right: 0))
+        locationStackView.anchor(top: jobDescriptionLabel.bottomAnchor, leading: jobDescriptionLabel.leadingAnchor, bottom: contentView.bottomAnchor, trailing: jobDescriptionLabel.trailingAnchor, padding: UIEdgeInsets(top: 0, left: -5, bottom: 10, right: 0))
         
 //        jobPostTimeTrackerLabel.anchor(top: locationStackView.bottomAnchor, leading: jobDescriptionLabel.leadingAnchor, bottom: self.bottomAnchor, trailing: jobDescriptionLabel.trailingAnchor, padding: UIEdgeInsets(top: 10, left: 0, bottom: 10, right: 0))
     }

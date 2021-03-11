@@ -139,7 +139,8 @@ class JobDetailsVC: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         view.backgroundColor = .white
-        
+//        tableView.estimatedRowHeight = 100
+//        tableView.rowHeight = UITableView.automaticDimension
         handleBtnTitle()
     }
 
@@ -316,9 +317,27 @@ extension JobDetailsVC: TableViewDataSourceAndDelegate {
             return cell
         case 1:
             let cell = tableView.dequeueReusableCell(withIdentifier: JobDetailTVCell1.cellID, for: indexPath) as! JobDetailTVCell1
+           
+            cell.jobDescriptionLabel.isEditable = false
+            cell.jobDescriptionLabel.maximumNumberOfLines = 4
+            cell.jobDescriptionLabel.shouldTrim = true
+            
+            let readMoreAttribute = NSAttributedString(string: "... See More", attributes: [.foregroundColor: UIColor.systemBlue, .backgroundColor: UIColor.clear])
+            let readLessAttribute = NSAttributedString(string: " \tSee Less", attributes: [.foregroundColor: UIColor.systemBlue, .backgroundColor: UIColor.clear])
+
+            cell.jobDescriptionLabel.attributedReadMoreText = readMoreAttribute
+            cell.jobDescriptionLabel.attributedReadLessText = readLessAttribute
+            cell.jobDescriptionLabel.layoutIfNeeded()
+            
             cell.jobDescriptionLabel.text = postModel.description
             cell.jobLocationLabel.text = postModel.postOwnerInfo?.location
-            cell.setupViews()
+            
+            cell.jobDescriptionLabel.onSizeChange = { lbl in
+                lbl.textAlignment = .justified
+                tableView.beginUpdates()
+                tableView.endUpdates()
+            }
+
             return cell
         case 2:
             let cell = tableView.dequeueReusableCell(withIdentifier: JobDetailTVCell2.cellID, for: indexPath) as! JobDetailTVCell2
@@ -384,7 +403,18 @@ extension JobDetailsVC: TableViewDataSourceAndDelegate {
             vc.navigationItem.title = "Attachments"
             navigationController?.pushViewController(vc, animated: true)
         }
+//        else if indexPath.row == 1 {
+//            tableView.beginUpdates()
+//            tableView.endUpdates()
+//        }
     }
+    
+//    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+//        if indexPath.row == 1 {
+//            return 100
+//        }
+//        return UITableView.automaticDimension
+//    }
     
     func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
         // remove bottom extra 20px space.
@@ -419,3 +449,4 @@ struct JobDetailsVCPreviews: PreviewProvider {
     }
     
 }
+

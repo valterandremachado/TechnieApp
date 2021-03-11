@@ -8,6 +8,9 @@
 import UIKit
 import TTGTagCollectionView
 import TagListView
+//import ExpandableLabel
+//import TTTAttributedLabel
+import ReadMoreTextView
 
 class FeedsTVCell: UITableViewCell {
     
@@ -25,25 +28,27 @@ class FeedsTVCell: UITableViewCell {
         return lbl
     }()
     
+//    var jobDescriptionLabel = ExpandableLabel()
+//    var jobDescriptionLabel = TTTAttributedLabel()
+
     lazy var jobDescriptionLabel: UILabel = {
         let lbl = UILabel()
-        lbl.translatesAutoresizingMaskIntoConstraints = false
+//        lbl.translatesAutoresizingMaskIntoConstraints = false
         lbl.text = "jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel"
-        lbl.numberOfLines = 0
-//        lbl.lineBreakMode = .byWordWrapping
+        
+      
+        lbl.numberOfLines = 4
+//        var trunc = NSMutableAttributedString(string: "...See More")
+//        trunc.addAttribute(NSAttributedString.Key.font, value: UIFont.boldSystemFont(ofSize: 15), range: NSMakeRange(0, 11))
+//        trunc.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.systemBlue, range: NSMakeRange(0, 11))
+//        trunc.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.black, range: NSMakeRange(0, 3))
+//        lbl.attributedTruncationToken = trunc
+
         lbl.textAlignment = .justified
-//        lbl.backgroundColor = .red
-//        lbl.sizeToFit()
-//        lbl.clipsToBounds = true
-//        lbl.autoresize()
-//        lbl.withHeight(lesserHeight)
-//        let font = UIFont.systemFont(ofSize: 17.0)
-//        lbl.font = font
-//        let text = lbl.text! as NSString
-//        let size = text.size(withAttributes: [NSAttributedString.Key.font:font])
-//        lbl.frame = CGRect(x: 0, y: 0, width: size.width, height: size.height)
+
         return lbl
     }()
+    
     
     lazy var jobLocation: UILabel = {
         let lbl = UILabel()
@@ -207,6 +212,7 @@ class FeedsTVCell: UITableViewCell {
         didSet {
             jobTitleLabel.text = postModel.title
             jobDescriptionLabel.text = postModel.description
+            
             labelDynamicHeight = LabelDynamicHeight.height(text: postModel.description, font: UIFont.systemFont(ofSize: 17), width: self.frame.width - self.separatorInset.left + 6)
             
             jobBudget.text = postModel.budget
@@ -229,6 +235,9 @@ class FeedsTVCell: UITableViewCell {
                 skillTagsCollectionView.addTags(dataArray, with: config)
                 return
             }
+
+
+            
 //            jobDescriptionLabelContainerView.withHeight(labelDynamicHeight)
 ////            jobDescriptionLabelContainerView.layoutIfNeeded()
 //            skillTagsCollectionView.layoutIfNeeded()

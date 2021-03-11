@@ -156,12 +156,12 @@ extension TechnieEditProfileVC: TableViewDataSourceAndDelegate {
             
         case 3:
             let vc = SummaryVC()
-            navigationController?.pushViewController(vc, animated: true)
+            present(UINavigationController(rootViewController: vc), animated: true)
             
         case 4:
             let vc = ExpertiseVC()
-            navigationController?.pushViewController(vc, animated: true)
-            
+            present(UINavigationController(rootViewController: vc), animated: true)
+
         default:
             break
         }

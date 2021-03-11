@@ -116,6 +116,7 @@
 		8ACD6B0325C4547500CC057D /* LocationCollectionViewerCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ACD6B0225C4547500CC057D /* LocationCollectionViewerCell.swift */; };
 		8AD3D07725B1D3FD00858CAD /* JobDetailsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AD3D07625B1D3FD00858CAD /* JobDetailsVC.swift */; };
 		8AD772A625D2643700955B9A /* RecommendationCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AD772A525D2643700955B9A /* RecommendationCell.swift */; };
+		8AD7C78A25F9F6700030AA2F /* ExpertiseCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AD7C78925F9F6700030AA2F /* ExpertiseCell.swift */; };
 		8AD8743425B88B8400BB2F6F /* PhotoViewerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AD8743325B88B8400BB2F6F /* PhotoViewerVC.swift */; };
 		8ADA18AE25C0557C0040D3C6 /* ChatInfoVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ADA18AD25C0557B0040D3C6 /* ChatInfoVC.swift */; };
 		8ADECCC425B026F600F871EF /* FeedsTVCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ADECCC325B026F600F871EF /* FeedsTVCell.swift */; };
@@ -269,6 +270,7 @@
 		8ACD6B0225C4547500CC057D /* LocationCollectionViewerCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationCollectionViewerCell.swift; sourceTree = "<group>"; };
 		8AD3D07625B1D3FD00858CAD /* JobDetailsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobDetailsVC.swift; sourceTree = "<group>"; };
 		8AD772A525D2643700955B9A /* RecommendationCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecommendationCell.swift; sourceTree = "<group>"; };
+		8AD7C78925F9F6700030AA2F /* ExpertiseCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpertiseCell.swift; sourceTree = "<group>"; };
 		8AD8743325B88B8400BB2F6F /* PhotoViewerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoViewerVC.swift; sourceTree = "<group>"; };
 		8ADA18AD25C0557B0040D3C6 /* ChatInfoVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatInfoVC.swift; sourceTree = "<group>"; };
 		8ADECCC325B026F600F871EF /* FeedsTVCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedsTVCell.swift; sourceTree = "<group>"; };
@@ -381,6 +383,7 @@
 				8A13FE0525DE4F130034945D /* TechnieSavedJobsCell.swift */,
 				8A13FE0A25DE51410034945D /* TechnieEditProfileCell.swift */,
 				8A630B1F25E52FCA00733475 /* TechnieStatsCell.swift */,
+				8AD7C78925F9F6700030AA2F /* ExpertiseCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -1140,6 +1143,7 @@
 				8A997F3825A8380E00B144CD /* SkillSelectionTVCell.swift in Sources */,
 				8AF76A4E258B0B0700ED14C2 /* UserProfileVC.swift in Sources */,
 				8AD3D07725B1D3FD00858CAD /* JobDetailsVC.swift in Sources */,
+				8AD7C78A25F9F6700030AA2F /* ExpertiseCell.swift in Sources */,
 				8AF76A7D258B440D00ED14C2 /* SpeechService.swift in Sources */,
 				8A68A56725B705BA000D988F /* DatabaseManager.swift in Sources */,
 				8A76FA67258E1CDF0094C524 /* SearchResultCell.swift in Sources */,
