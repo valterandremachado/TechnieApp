@@ -6,10 +6,22 @@
 //
 
 import UIKit
+import FirebaseDatabase
+
+protocol EditProfileVCDismissalDelegate: class {
+    func EditProfileVCDismissalSingleton(updatedPersistedData: UserPersistedInfo)
+}
 
 class EditProfileVC: UIViewController {
 
     // MARK: - Properties
+    let database = Database.database().reference()
+    fileprivate var defaults = UserDefaults.standard
+    var updatePersistedData: UserPersistedInfo?
+    var getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo")
+
+    weak var dismissalDelegate: EditProfileVCDismissalDelegate?
+
     var newProfileImage = Data()
     var newUserName = ""
     var newLocation = ""
@@ -56,6 +68,12 @@ class EditProfileVC: UIViewController {
         //        print("viewWillAppear")
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        guard let newData = updatePersistedData else { return }
+        dismissalDelegate?.EditProfileVCDismissalSingleton(updatedPersistedData: newData)
+    }
+    
     // MARK: - Methods
     fileprivate func setupViews() {
         [tableView].forEach { view.addSubview($0)}
@@ -70,6 +88,127 @@ class EditProfileVC: UIViewController {
 //        navBar.prefersLargeTitles = true
 //        navigationItem.largeTitleDisplayMode = .never
         navigationItem.title = "Edit Profile"
+    }
+    
+    // Database updates
+    private func changeUserName(name: String) {
+        let updatedPersistedData = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo")
+
+        guard let technicianKeyPath = updatedPersistedData?.uid else { return }
+        let childPath = "users/clients/\(technicianKeyPath)/profileInfo"
+
+        guard let uid = updatedPersistedData?.uid,
+              let email = updatedPersistedData?.email,
+              let location = updatedPersistedData?.location
+//              let locationInLongLat = updatedPersistedData?.first?.locationInLongLat,
+//              let profileImage = updatedPersistedData?.first?.profileImage,
+        else { return }
+        
+        let newData = UserPersistedInfo(uid: uid,
+                                  name: name,
+                                  email: email,
+                                  location: location,
+                                  accountType: nil,
+                                  locationInLongLat: nil,
+                                  profileImage: nil,
+                                  hourlyRate: nil)
+        
+        let updateElement = [
+            "name": name
+        ]
+        
+        database.child(childPath).updateChildValues(updateElement, withCompletionBlock: { error, _ in
+            guard error == nil else {
+                print("error changing database")
+                return
+            }
+            self.updatePersistedData(data: newData)
+        })
+    }
+    
+    private func changeUserLocation(location: String) {
+        let updatedPersistedData = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo")
+
+        guard let technicianKeyPath = updatedPersistedData?.uid else { return }
+        let childPath = "users/clients/\(technicianKeyPath)/profileInfo"
+
+        guard let uid = updatedPersistedData?.uid,
+              let name = updatedPersistedData?.name,
+              let email = updatedPersistedData?.email
+//              let locationInLongLat = updatedPersistedData?.first?.locationInLongLat,
+//              let profileImage = updatedPersistedData?.first?.profileImage,
+        else { return }
+        
+        let newData = UserPersistedInfo(uid: uid,
+                                  name: name,
+                                  email: email,
+                                  location: location,
+                                  accountType: nil,
+                                  locationInLongLat: nil,
+                                  profileImage: "https://firebasestorage.googleapis.com/v0/b/technie-39e49.appspot.com/o/message_images%2Fphoto_message_j568OKOf1Sbgrtxia72TFmC0yPG3-gmail-com_wRLcuiUx4JY6yTN9KpnmK0tA9tk1-gmail-com_Jan-20%2C-2021-at-11%3A16%3A18-PM-GMT%2B8.png?alt=media&token=04d40ea1-632c-4182-bb8c-620112edf15e",
+                                  hourlyRate: nil)
+        
+        let updateElement = [
+            "location": location
+        ]
+        
+        database.child(childPath).updateChildValues(updateElement, withCompletionBlock: { error, _ in
+            guard error == nil else {
+                print("error changing database")
+                return
+            }
+            self.updatePersistedData(data: newData)
+        })
+    }
+    
+    private func changeUserProfileImage(image: Data) {
+        let updatedPersistedData = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo")
+        guard let clientKeyPath = updatedPersistedData?.uid else { return }
+        let childPath = "users/clients/\(clientKeyPath)/profileInfo"
+
+        guard let uid = updatedPersistedData?.uid,
+              let name = updatedPersistedData?.name,
+              let email = updatedPersistedData?.email,
+              let location = updatedPersistedData?.location
+//              let locationInLongLat = updatedPersistedData?.first?.locationInLongLat,
+        else { return }
+        
+        let fileName = "\(email)_\(UUID().uuidString)_changedProfileImage"
+        StorageManager.shared.uploadProfilePicture(with: image, fileName: fileName) { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let profileImageUrl):
+                let newData = UserPersistedInfo(uid: uid,
+                                          name: name,
+                                          email: email,
+                                          location: location,
+                                          accountType: nil,
+                                          locationInLongLat: nil,
+                                          profileImage: profileImageUrl,
+                                          hourlyRate: nil)
+                
+                let updateElement = [
+                    "profileImage": profileImageUrl
+                ]
+                
+                self.database.child(childPath).updateChildValues(updateElement, withCompletionBlock: { error, _ in
+                    guard error == nil else {
+                        print("error changing database")
+                        return
+                    }
+                    self.updatePersistedData(data: newData)
+                })
+            case .failure(let error):
+                print(error)
+            }
+        }
+        
+    }
+    
+    private func updatePersistedData(data: UserPersistedInfo) {
+        updatePersistedData = data
+        self.defaults.set(object: updatePersistedData, forKey: "persistUsersInfo")
+        print("newData: ", updatePersistedData)
     }
     
     // MARK: - Selectors
@@ -87,24 +226,35 @@ extension EditProfileVC: TableViewDataSourceAndDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: EditProfileCell.cellID, for: indexPath) as! EditProfileCell
         
+        let persistedUserName = getUsersPersistedInfo?.name ?? "username"
+        let persistedLocation = getUsersPersistedInfo?.location ?? "userlocation"
+        let userPersistedProfileImage = getUsersPersistedInfo?.profileImage ?? ""
+        let profileImageUrl = URL(string: userPersistedProfileImage)
+
         switch indexPath.row {
         case 0:
-            var userProfileImage = UIImage(named: "technieDummyPhoto")
+//            var userProfileImage = UIImage(named: "technieDummyPhoto")
             let uploadedUserProfileImage = UIImage(data: newProfileImage)
-            uploadedUserProfileImage == nil ? (userProfileImage = userProfileImage) : (userProfileImage = uploadedUserProfileImage)
             
             cell.setupViewsOne()
             cell.titleLabel.text = "Profile Photo"
-            cell.profileImageView.image = userProfileImage
+            cell.profileImageView.backgroundColor = .systemGray6
+            
+            if uploadedUserProfileImage == nil {
+                cell.profileImageView.sd_setImage(with: profileImageUrl, completed: nil)
+            } else {
+                cell.profileImageView.image = uploadedUserProfileImage
+            }
+            
         case 1:
             var userDisplayName = ""
-            newUserName == "" ? (userDisplayName = "username") : (userDisplayName = newUserName)
+            newUserName == "" ? (userDisplayName = persistedUserName) : (userDisplayName = newUserName)
             cell.titleLabel.text = "Display Name"
             cell.descriptionLabel.text = userDisplayName
             
         case 2:
             var userLocation = ""
-            newLocation == "" ? (userLocation = "Baguio City") : (userLocation = newLocation)
+            newLocation == "" ? (userLocation = persistedLocation) : (userLocation = newLocation)
             cell.titleLabel.text = "Location"
             cell.descriptionLabel.text = userLocation
             
@@ -139,11 +289,11 @@ extension EditProfileVC: TableViewDataSourceAndDelegate {
         let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
         let camera = UIAlertAction(title: "Camera", style: .default) { (_) in
-            //            let imagePicker = UIImagePickerController()
-            //            imagePicker.sourceType = .photoLibrary
-            //            imagePicker.delegate = self
-            //            imagePicker.allowsEditing = true
-            //            self.present(imagePicker, animated: true)
+            let imagePicker = UIImagePickerController()
+            imagePicker.sourceType = .photoLibrary
+            imagePicker.delegate = self
+            imagePicker.allowsEditing = true
+            self.present(imagePicker, animated: true)
             print("camera")
         }
         
@@ -197,6 +347,8 @@ extension EditProfileVC: TableViewDataSourceAndDelegate {
             guard let firstNameField = alertController.textFields?[0] else { return }
             guard let lastNameField = alertController.textFields?[1] else { return }
             newUserName = "\(firstNameField.text!) " + lastNameField.text!
+            changeUserName(name: newUserName)
+
             self.tableView.beginUpdates()
             self.tableView.reloadRows(at: [IndexPath(row: 1, section: 0)], with: .automatic)
             self.tableView.endUpdates()
@@ -230,6 +382,8 @@ extension EditProfileVC: TableViewDataSourceAndDelegate {
         let save = UIAlertAction(title: "Save", style: .default) { [self] (action) in
             guard let locationInput = alertController.textFields?[0] else { return }
             newLocation = locationInput.text!
+            changeUserLocation(location: newLocation)
+
             self.tableView.beginUpdates()
             self.tableView.reloadRows(at: [IndexPath(row: 2, section: 0)], with: .automatic)
             self.tableView.endUpdates()
@@ -279,8 +433,9 @@ extension EditProfileVC: UIImagePickerControllerDelegate, UINavigationController
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         picker.dismiss(animated: true, completion: nil)
         
-        if let image = info[.editedImage] as? UIImage, let imageData =  image.pngData() {
+        if let image = info[.editedImage] as? UIImage, let imageData =  image.jpegData(compressionQuality: 0.8) {//image.pngData()
             newProfileImage = imageData
+            changeUserProfileImage(image: imageData)
             self.tableView.reloadData()
         }
     }

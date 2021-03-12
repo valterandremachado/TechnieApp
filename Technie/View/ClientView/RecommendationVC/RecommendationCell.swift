@@ -188,6 +188,13 @@ class RecommendationCell: UITableViewCell {
         return sv
     }()
     
+    var recommendedTechniciansModel: TechnicianModel! {
+        didSet {
+            nameLabel.text = recommendedTechniciansModel.profileInfo.name
+            profileImageView.sd_setImage(with: URL(string: recommendedTechniciansModel.profileInfo.profileImage ?? ""), completed: nil)
+        }
+    }
+    
     // MARK: - Inits
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)

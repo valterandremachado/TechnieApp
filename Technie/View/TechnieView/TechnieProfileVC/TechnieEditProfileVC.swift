@@ -108,16 +108,24 @@ extension TechnieEditProfileVC: TableViewDataSourceAndDelegate {
 //        let persistedProfileImage = getUsersPersistedInfo?.first?.profileImage
         let persistedUserName = getUsersPersistedInfo?.name ?? "username"
         let persistedLocation = getUsersPersistedInfo?.location ?? "userlocation"
+        let userPersistedProfileImage = getUsersPersistedInfo?.profileImage ?? ""
+        let profileImageUrl = URL(string: userPersistedProfileImage)
         
         switch indexPath.row {
         case 0:
-            var userProfileImage = UIImage(named: "technieDummyPhoto")
+//            var userProfileImage = UIImage(named: "technieDummyPhoto")
             let uploadedUserProfileImage = UIImage(data: newProfileImage)
-            uploadedUserProfileImage == nil ? (userProfileImage = userProfileImage) : (userProfileImage = uploadedUserProfileImage)
+//            uploadedUserProfileImage == nil ? (userProfileImage = userProfileImage) : (userProfileImage = uploadedUserProfileImage)
 
             cell.setupViewsOne()
             cell.titleLabel.text = "Profile Photo"
-            cell.profileImageView.image = userProfileImage
+            cell.profileImageView.backgroundColor = .systemGray6
+
+            if uploadedUserProfileImage == nil {
+                cell.profileImageView.sd_setImage(with: profileImageUrl, completed: nil)
+            } else {
+                cell.profileImageView.image = uploadedUserProfileImage
+            }
             
         case 1:
             var userDisplayName = ""
@@ -190,11 +198,11 @@ extension TechnieEditProfileVC: TableViewDataSourceAndDelegate {
         let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
         let camera = UIAlertAction(title: "Camera", style: .default) { (_) in
-//            let imagePicker = UIImagePickerController()
-//            imagePicker.sourceType = .photoLibrary
-//            imagePicker.delegate = self
-//            imagePicker.allowsEditing = true
-//            self.present(imagePicker, animated: true)
+            let imagePicker = UIImagePickerController()
+            imagePicker.sourceType = .photoLibrary
+            imagePicker.delegate = self
+            imagePicker.allowsEditing = true
+            self.present(imagePicker, animated: true)
             print("camera")
         }
         
@@ -379,41 +387,50 @@ extension TechnieEditProfileVC: TableViewDataSourceAndDelegate {
         })
     }
     
-    private func changeUserProfileImage(image: String) {
+    private func changeUserProfileImage(image: Data) {
         let updatedPersistedData = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo")
-
+        
         guard let technicianKeyPath = updatedPersistedData?.uid else { return }
         let childPath = "users/technicians/\(technicianKeyPath)/profileInfo"
-
+        
         guard let uid = updatedPersistedData?.uid,
               let name = updatedPersistedData?.name,
               let email = updatedPersistedData?.email,
               let location = updatedPersistedData?.location
-//              let accountType = updatedPersistedData?.first?.accountType,
-//              let locationInLongLat = updatedPersistedData?.first?.locationInLongLat,
-//              let hourlyRate = updatedPersistedData?.first?.hourlyRate
+        //              let accountType = updatedPersistedData?.first?.accountType,
+        //              let locationInLongLat = updatedPersistedData?.first?.locationInLongLat,
+        //              let hourlyRate = updatedPersistedData?.first?.hourlyRate
         else { return }
         
-        let newData = UserPersistedInfo(uid: uid,
-                                  name: name,
-                                  email: email,
-                                  location: location,
-                                  accountType: nil,
-                                  locationInLongLat: nil,
-                                  profileImage: image,
-                                  hourlyRate: nil)
-        
-        let updateElement = [
-            "profileImage": image
-        ]
-        
-        database.child(childPath).updateChildValues(updateElement, withCompletionBlock: { error, _ in
-            guard error == nil else {
-                print("error changing database")
-                return
+        let fileName = "\(email)_\(UUID().uuidString)_changedProfileImage"
+        StorageManager.shared.uploadProfilePicture(with: image, fileName: fileName) { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let profileImageUrl):
+                let newData = UserPersistedInfo(uid: uid,
+                                                name: name,
+                                                email: email,
+                                                location: location,
+                                                accountType: nil,
+                                                locationInLongLat: nil,
+                                                profileImage: profileImageUrl,
+                                                hourlyRate: nil)
+                
+                let updateElement = [
+                    "profileImage": profileImageUrl
+                ]
+                
+                self.database.child(childPath).updateChildValues(updateElement, withCompletionBlock: { error, _ in
+                    guard error == nil else {
+                        print("error changing database")
+                        return
+                    }
+                    self.updatePersistedData(data: newData)
+                })
+            case .failure(let error):
+                print(error)
             }
-            self.updatePersistedData(data: newData)
-        })
+        }
     }
     
     private func updatePersistedData(data: UserPersistedInfo) {
@@ -434,8 +451,9 @@ extension TechnieEditProfileVC: UIImagePickerControllerDelegate, UINavigationCon
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         picker.dismiss(animated: true, completion: nil)
         
-        if let image = info[.editedImage] as? UIImage, let imageData =  image.pngData() {
+        if let image = info[.editedImage] as? UIImage, let imageData =  image.jpegData(compressionQuality: 0.8) {
             newProfileImage = imageData
+            changeUserProfileImage(image: imageData)
             self.tableView.reloadData()
         }
     }

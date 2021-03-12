@@ -17,6 +17,7 @@ class ClientNotificationCell: UITableViewCell {
         let lbl = UILabel()
         lbl.translatesAutoresizingMaskIntoConstraints = false
         lbl.text = "Notification Title"
+        lbl.font = .boldSystemFont(ofSize: 16)
         return lbl
     }()
     
@@ -47,7 +48,7 @@ class ClientNotificationCell: UITableViewCell {
     }()
     
     lazy var mainStackView: UIStackView = {
-        let sv = UIStackView(arrangedSubviews: [descriptionLabel, dateLabel])
+        let sv = UIStackView(arrangedSubviews: [titleLabel, descriptionLabel, dateLabel])
         sv.translatesAutoresizingMaskIntoConstraints = false
         sv.axis = .vertical
         sv.alignment = .leading

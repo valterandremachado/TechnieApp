@@ -7,6 +7,8 @@
 
 import UIKit
 import NotificationBannerSwift
+import FirebaseDatabase
+import CodableFirebase
 
 struct Keys {
     static let pickerStoredIndex = "pickerIndex"
@@ -16,6 +18,8 @@ struct Keys {
 class PostFormVC: UIViewController {
     private let tableCellID = "cellID"
     var sections = [SectionHandler]()
+    var database = Database.database().reference()
+    
     // MARK: - Properties
     lazy var tableView: UITableView = {
         let tv = UITableView()
@@ -146,15 +150,28 @@ class PostFormVC: UIViewController {
     var serviceField = ""
     var selectedArea = ""
     
+    var postModel: PostModel?
+    var isComingFromPostHistory = false
+    
     // MARK: - Inits
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         view.backgroundColor = .cyan
 //        singleton.delegate = self
+        fetchData()
         setupViews()
         populateSection()
+        
+        if isComingFromPostHistory == true {
+            let index = customArray.firstIndex(of: postModel?.budget ?? "")
+//            budgetPicker.selectedRow(inComponent: index!)
+            finalPick = postModel?.budget ?? ""
+            budgetPicker.selectRow(index!, inComponent: 0, animated: true)
+            budgetPickerBtn.setTitle(finalPick, for: .normal)
+        }
         print("viewDidLoad")
+        self.hideKeyboardWhenTappedAround()
     }
     
     override func loadView() {
@@ -207,39 +224,93 @@ class PostFormVC: UIViewController {
 //        navBar.setBackgroundImage(UIImage(), for: .default)
 //        navBar.hideNavBarSeperator()
         navBar.topItem?.backBarButtonItem = backButton
-        title = "Completion Form"
-//        navBar.topItem?.title = "Add Skills"
+
 //        navBar.prefersLargeTitles = true
 //        navigationItem.largeTitleDisplayMode = .automatic
-        let rightNavBarButton = UIBarButtonItem(title: "Post", style: .done, target: self, action: #selector(rightNavBarItemPostBtnTapped))
-            //UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(leftNavBarBtnTapped))
+        if isComingFromPostHistory == true {
+            title = "Edit Post"
 
-//        self.navigationItem.leftBarButtonItem = leftNavBarButton
-        self.navigationItem.rightBarButtonItem = rightNavBarButton
+            let rightNavBarButton = UIBarButtonItem(barButtonSystemItem: .save, target: self, action: #selector(updatePostDetails))
+            let leftNavBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(closeEditPostVC))
+
+            self.navigationItem.leftBarButtonItem = leftNavBarButton
+            self.navigationItem.rightBarButtonItem = rightNavBarButton
+        } else {
+            title = "Post A Job"
+            let rightNavBarButton = UIBarButtonItem(title: "Post", style: .done, target: self, action: #selector(rightNavBarItemPostBtnTapped))
+            self.navigationItem.rightBarButtonItem = rightNavBarButton
+        }
+        
+//        let rightNavBarButton = UIBarButtonItem(title: "Post", style: .done, target: self, action: #selector(rightNavBarItemPostBtnTapped))
+//        self.navigationItem.rightBarButtonItem = rightNavBarButton
         navigationItem.largeTitleDisplayMode = .never
+    }
+    
+    @objc func updatePostDetails() {
+//        guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
+//        guard let updatedSummary = summaryTextField.text else { return }
+//        let technicianKeyPath = getUsersPersistedInfo.uid
+        guard let postKeyPath = postModel?.id else { return }
+        
+        postTitle = titleTextField.text
+        postDescription = descriptionTextField.text
+        postProjectType = chosenItem
+        postBudget = finalPick
+        
+        let removeWhiteSpace = initialSelectedSkill.firstIndex(of: "") ?? 400
+        if removeWhiteSpace != 400 {
+            initialSelectedSkill.remove(at: removeWhiteSpace)
+        }
+        postRequiredSkills = initialSelectedSkill
+        
+        let updateElement = [
+            "title": postTitle,
+            "description": postDescription,
+            "projectType": postProjectType,
+            "budget": postBudget,
+            "requiredSkills": postRequiredSkills,
+
+        ] as [String : Any]
+
+
+        let childPath = "posts/\(postKeyPath)"
+        database.child(childPath).updateChildValues(updateElement, withCompletionBlock: { error, _ in
+            guard error == nil else {
+                return
+            }
+        })
+        
+//        print("postTitle: ", postTitle, ", postDescription: ", postDescription, ", postProjectType: ", postProjectType, ", postBudget: ", postBudget, ", postRequiredSkills:", postRequiredSkills)
+        dismiss(animated: true, completion: nil)
+    }
+    
+    @objc func closeEditPostVC() {
+        dismiss(animated: true, completion: nil)
     }
     
     fileprivate func populateSection() {
 
-        switch serviceField {
-        case "Handyman":
-            initialSelectedSkill.removeAll()
-            initialSelectedSkill.append("")
-            initialSelectedSkill.insert(selectedArea, at: 0)
-  
-        case "Repairer":
-            initialSelectedSkill.removeAll()
-            initialSelectedSkill.append("")
-            initialSelectedSkill.insert(selectedArea, at: 0)
-
-        default:
-            break
+        if isComingFromPostHistory == false {
+            switch serviceField {
+            case "Handyman":
+                initialSelectedSkill.removeAll()
+                initialSelectedSkill.append("")
+                initialSelectedSkill.insert(selectedArea, at: 0)
+                
+            case "Repairer":
+                initialSelectedSkill.removeAll()
+                initialSelectedSkill.append("")
+                initialSelectedSkill.insert(selectedArea, at: 0)
+                
+            default:
+                break
+            }
         }
         
         sections.append(SectionHandler(title: "Project Title & Description", detail: ["0", "1", ""]))
         sections.append(SectionHandler(title: "Project Type", detail: ["0"]))
         sections.append(SectionHandler(title: "Project Budget", detail: ["0"]))
-        sections.append(SectionHandler(title: "Skills Required", detail: initialSelectedSkill))
+        sections.append(SectionHandler(title: "Preferred Skills", detail: initialSelectedSkill))
         tableView.reloadData()
     }
     
@@ -262,8 +333,9 @@ class PostFormVC: UIViewController {
     fileprivate func presentActionSheet() {
         let actionSheet = UIAlertController(title: nil, message: "Attach file (jpeg, png)", preferredStyle: .actionSheet)
         
-        let gallery = UIAlertAction(title: "Gallery", style: .default) { (action) in
+        let gallery = UIAlertAction(title: "Photo Library", style: .default) { (action) in
             let imagePicker = UIImagePickerController()
+            imagePicker.sourceType = .photoLibrary
             imagePicker.delegate = self
             self.present(imagePicker, animated: true, completion: nil)
         }
@@ -330,13 +402,13 @@ class PostFormVC: UIViewController {
     // MARK: - Selectors
     @objc fileprivate func rightNavBarItemPostBtnTapped() {
         let dateString = PostFormVC.dateFormatter.string(from: postDateTime)
-        
+
         postTitle = titleTextField.text
         postDescription = descriptionTextField.text
         postProjectType = chosenItem
         postBudget = finalPick
         serviceField != "Others" ? (fieldOfService = serviceField) : (fieldOfService = "Not Specified")
-        
+
         let removeWhiteSpace = initialSelectedSkill.firstIndex(of: "") ?? 400
         if removeWhiteSpace != 400 {
             initialSelectedSkill.remove(at: removeWhiteSpace)
@@ -370,13 +442,13 @@ class PostFormVC: UIViewController {
             switch result {
             case .success(let downloadUrl):
                 postsImageUrl.append(downloadUrl)
-                
+
                 if postsImageUrl.count == self.imageDataArray.count {
                     self.postAttachments = postsImageUrl
                     print("download url returned: \(postsImageUrl), count: \(postsImageUrl.count)")
-                    
+
                     let postOwnerInfo = PostOwnerInfo(name: clientName, email: clientEmail, location: clientLocation, keyPath: clientUID, profileImage: nil)
-                    
+
                     let post = PostModel(id: nil,
                                          title: self.postTitle,
                                          description: self.postDescription,
@@ -395,17 +467,25 @@ class PostFormVC: UIViewController {
                                          postOwnerInfo: postOwnerInfo,
                                          hiringStatus: nil,
                                          proposals: nil)
-                    
-                    DatabaseManager.shared.insertPost(with: post, completion: { success in
+
+                    DatabaseManager.shared.insertPost2(with: post, completion: { success in
                         if success {
-//                            self.navigationController?.popToRootViewController(animated: true)
-//                            self.showRecommendationBanner()
+                            self.navigationController?.popToRootViewController(animated: true)
                             print("success")
                         } else {
                             print("failed")
                         }
+                    }, completionOnPostID: { result in
+                        switch result {
+                        case .success(let postUID):
+                            if self.userDefaults.bool(forKey: "recommendationEngineOnOff") == true {
+                                self.showRecommendationBanner(jobPostKeyPath: postUID)
+                            }
+                        case .failure(let error):
+                            print(error)
+                        }
                     })
-                    
+
                     return // Get out of this function
                 }
             case .failure(let error):
@@ -415,48 +495,62 @@ class PostFormVC: UIViewController {
        
     }
     
-    fileprivate func showRecommendationBanner() {
-//        let banner = GrowingNotificationBanner(title: "Hello from banner",
-//                                               subtitle: "I will be your recommandation banner",
-//                                               leftView: nil,
-//                                               rightView: nil,
-//                                               style: .info,
-//                                               colors: nil,
-//                                               iconPosition: .center,
-//                                               sideViewSize: .leastNormalMagnitude)
-//
-//        let floatingBanner = FloatingNotificationBanner(title: "Hello from banner",
-//                                                        subtitle: "I will be your recommandation banner",
-//                                                        leftView: nil,
-//                                                        rightView: nil,
-//                                                        style: .info,
-//                                                        colors: nil,
-//                                                        iconPosition: .center)
-//        floatingBanner.show(queuePosition: .back,
-//                            bannerPosition: .top,
-//                            queue: .default,
-//                            on: self,
-//                            edgeInsets: UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8),
-//                            cornerRadius: nil,
-//                            shadowColor: .black,
-//                            shadowOpacity: 1,
-//                            shadowBlurRadius: 0,
-//                            shadowCornerRadius: 0,
-//                            shadowOffset: .zero,
-//                            shadowEdgeInsets: nil)
+    var recommendedTechniciansModel = [TechnicianModel]()
+    
+    fileprivate func fetchData()  {
+        DatabaseManager.shared.getAllTechnicians(completion: {[weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let technicians):
+                self.recommendedTechniciansModel.append(technicians)
+            case .failure(let error):
+                print("Failed to get technicians: \(error.localizedDescription)")
+            }
+        })
+    }
+        
+    fileprivate func showRecommendationBanner(jobPostKeyPath: String) {
+        print("jobPostKeyPath: \(jobPostKeyPath)")
+        guard !recommendedTechniciansModel.isEmpty else { return }
+        guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
+        let clientKeyPath = getUsersPersistedInfo.uid
+        
+        let clientNotificationModel = ClientNotificationModel(id: "nil",
+                                                              type: ClientNotificationType.recommendation.rawValue,
+                                                              title: ClientNotificationType.recommendation.rawValue,
+                                                              description: "We think you might want to consider these technicians nearby you as hiring candidates for the job you just posted.",
+                                                              dateTime: PostFormVC.dateFormatter.string(from: Date()),
+                                                              wasAccepted: nil,
+                                                              jobPostKeyPath: jobPostKeyPath,
+                                                              technicianInfo: nil)
+        
+        DatabaseManager.shared.insertClientNotification(with: clientNotificationModel, with: clientKeyPath, completion: { _ in })
+        
+        let updateElement = try! FirebaseEncoder().encode(recommendedTechniciansModel)
+
+        let childPath = "\(jobPostKeyPath)/recommendedTechnicians"
+        database.child(childPath).setValue(updateElement, withCompletionBlock: { error, _ in
+            guard error == nil else {
+                return
+            }
+        })
+        
         let config = UIImage.SymbolConfiguration(pointSize: 30, weight: .bold, scale: .large)
         let wiredProfileImage = UIImage(systemName: "chevron.forward.circle.fill", withConfiguration: config)?.withTintColor(.systemPink, renderingMode: .alwaysOriginal)
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.image = wiredProfileImage
         let banner = FloatingNotificationBanner(title: "Recommendation",
-                                                subtitle: "Check the best fit technicians nearby your area for the service you just posted.",
+                                                subtitle: "Check the best fit technicians nearby your area for the job you just posted.",
                                                 rightView: imageView,
                                                 style: .info)
         
 //        banner.autoDismiss = false
 //        banner.autoDismiss = true
-        
+        banner.titleLabel?.textColor = .black
+        banner.subtitleLabel?.textColor = .systemGray
+
+        banner.backgroundColor = UIColor.rgb(red: 237, green: 237, blue: 237)
         banner.subtitleLabel?.font = .systemFont(ofSize: 13)
         guard let tabHeight = tabBarController?.tabBar.frame.height else { return }
 //        DispatchQueue.global().asyncAfter(deadline: .now() + .seconds(Int(2))) { //[self] in
@@ -495,7 +589,7 @@ class PostFormVC: UIViewController {
             print("array is not empty")
             // GCD Schedule is being used as timer in order to get fully access of the used VC on time (avoiding error/crash)
             print("checked removed skill 1: \(initialSelectedSkill)")
-            DispatchQueue.global().asyncAfter(deadline: .now() + .milliseconds(10)) {
+            DispatchQueue.global().asyncAfter(deadline: .now() + .milliseconds(20)) {
                 // UI components must be in the main Grand Center Dispatch (GCD)
                 DispatchQueue.main.async { [self] in
                     for skills in initialSelectedSkill {
@@ -538,17 +632,20 @@ class PostFormVC: UIViewController {
        return lbl
    }()
    
-   lazy var descriptionTextField: UITextView = {
-       let txtView = UITextView()
-       txtView.delegate = self
-//        txtView.translatesAutoresizingMaskIntoConstraints = false
-    txtView.backgroundColor = .systemBackground//UIColor(named: "textViewBackgroundColor")
-       txtView.clipsToBounds = true
-//                    txtView.layer.cornerRadius = 10
-       txtView.isEditable = true
-       txtView.isScrollEnabled = false
-       return txtView
-   }()
+    lazy var descriptionTextField: UITextView = {
+        let txtView = UITextView()
+        txtView.delegate = self
+        txtView.font = .systemFont(ofSize: 15)
+        txtView.textAlignment = .natural
+
+        //        txtView.translatesAutoresizingMaskIntoConstraints = false
+        txtView.backgroundColor = .systemBackground//UIColor(named: "textViewBackgroundColor")
+        txtView.clipsToBounds = true
+        //                    txtView.layer.cornerRadius = 10
+        txtView.isEditable = true
+        txtView.isScrollEnabled = false
+        return txtView
+    }()
     
 
     lazy var titlePlaceHolderLabel: UILabel = {
@@ -561,16 +658,18 @@ class PostFormVC: UIViewController {
    }()
    
     lazy var titleTextField: UITextView = {
-       let txtView = UITextView()
-       txtView.delegate = self
-//        txtView.translatesAutoresizingMaskIntoConstraints = false
+        let txtView = UITextView()
+        txtView.delegate = self
+        txtView.font = .systemFont(ofSize: 15)
+        txtView.textAlignment = .natural
+        //        txtView.translatesAutoresizingMaskIntoConstraints = false
         txtView.backgroundColor = .systemBackground//UIColor(named: "textViewBackgroundColor")
-       txtView.clipsToBounds = true
-//                    txtView.layer.cornerRadius = 10
-       txtView.isEditable = true
-       txtView.isScrollEnabled = false
-       return txtView
-   }()
+        txtView.clipsToBounds = true
+        //                    txtView.layer.cornerRadius = 10
+        txtView.isEditable = true
+        txtView.isScrollEnabled = false
+        return txtView
+    }()
 }
 
 // MARK: - SkillSelectionVCSingleton Extension
@@ -760,20 +859,24 @@ extension PostFormVC: TableViewDataSourceAndDelegate, UITextViewDelegate {
             switch indexPath.row {
             case 0:
                 [titleTextField, titlePlaceHolderLabel].forEach{cell.contentView.addSubview($0)}
-                titleTextField.anchor(top: cell.contentView.topAnchor, leading: cell.contentView.leadingAnchor, bottom: cell.contentView.bottomAnchor, trailing: cell.contentView.trailingAnchor, padding: UIEdgeInsets(top: 0, left: cell.separatorInset.left, bottom: 0, right: cell.separatorInset.left))
+                titleTextField.anchor(top: cell.contentView.topAnchor, leading: cell.contentView.leadingAnchor, bottom: cell.contentView.bottomAnchor, trailing: cell.contentView.trailingAnchor, padding: UIEdgeInsets(top: 0, left: cell.separatorInset.left, bottom: 0, right: cell.separatorInset.right + 15))
                 
                 titlePlaceHolderLabel.anchor(top: titleTextField.topAnchor, leading: titleTextField.leadingAnchor, bottom: titleTextField.bottomAnchor, trailing: cell.contentView.trailingAnchor, padding: UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 0))
                                 
             case 1:
                
                 [descriptionTextField, descriptionPlaceHolderLabel].forEach{cell.contentView.addSubview($0)}
-                descriptionTextField.anchor(top: cell.contentView.topAnchor, leading: cell.contentView.leadingAnchor, bottom: cell.contentView.bottomAnchor, trailing: cell.contentView.trailingAnchor, padding: UIEdgeInsets(top: 0, left: cell.separatorInset.left, bottom: 0, right: 0))
+                descriptionTextField.anchor(top: cell.contentView.topAnchor, leading: cell.contentView.leadingAnchor, bottom: cell.contentView.bottomAnchor, trailing: cell.contentView.trailingAnchor, padding: UIEdgeInsets(top: 0, left: cell.separatorInset.left, bottom: 0, right: cell.separatorInset.right + 15))
                 
                 descriptionPlaceHolderLabel.anchor(top: descriptionTextField.topAnchor, leading: descriptionTextField.leadingAnchor, bottom: descriptionTextField.bottomAnchor, trailing: cell.contentView.trailingAnchor, padding: UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 0))
                 
             case 2:
                 cell.setupViews()
                 cell.attachFileBtn.addTarget(self, action: #selector(attachFileBtnTapped), for: .touchUpInside)
+                if isComingFromPostHistory == true {
+                    cell.attachFileBtn.isEnabled = false
+                }
+                
             default:
                 break
             }
@@ -785,6 +888,11 @@ extension PostFormVC: TableViewDataSourceAndDelegate, UITextViewDelegate {
             cell.setupViews()
             cell.projectTypeSwitcher.addTarget(self, action: #selector(projectTypeSegmentPressed), for: .valueChanged)
             items = cell.items
+            if isComingFromPostHistory == true {
+                let itemIndex = cell.items.firstIndex(of: postModel?.projectType ?? "nil")
+                chosenItem = postModel?.projectType ?? "nil"
+                cell.projectTypeSwitcher.selectedSegmentIndex = itemIndex!
+            }
             return cell
         case 2:
             // PostFormBudgetCell

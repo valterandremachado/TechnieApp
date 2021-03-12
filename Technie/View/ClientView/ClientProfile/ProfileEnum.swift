@@ -11,16 +11,18 @@ import UIKit
 enum TableViewOptions: Int, CustomStringConvertible {
     
     case EditProfile
-    case HelpCenter
     case ServiceHistory
+    case HelpCenter
+    case TellAFriend
     case Settings
     case Logout
     
     var description: String {
         switch self {
         case .EditProfile: return "Edit Profile"
-        case .HelpCenter: return "Help Center"
         case .ServiceHistory: return "Service History"
+        case .HelpCenter: return "Help"
+        case .TellAFriend: return "Tell a Friend"
         case .Settings: return "Settings"
         case .Logout: return "Logout"
         }
@@ -32,12 +34,16 @@ enum TableViewOptions: Int, CustomStringConvertible {
             let iconImage = UIImage(systemName: "square.and.pencil")
             return iconImage ?? UIImage()
         
+        case .ServiceHistory:
+            let iconImage = UIImage(systemName: "clock.arrow.circlepath")
+            return iconImage ?? UIImage()
+            
         case .HelpCenter:
             let iconImage = UIImage(systemName: "questionmark.circle")
             return iconImage ?? UIImage()
-            
-        case .ServiceHistory:
-            let iconImage = UIImage(systemName: "clock.arrow.circlepath")
+        
+        case .TellAFriend:
+            let iconImage = UIImage(systemName: "heart.circle")
             return iconImage ?? UIImage()
             
         case .Settings:

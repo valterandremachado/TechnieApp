@@ -65,7 +65,7 @@ class ClientPostVC: UIViewController {
         guard let nav = navigationController?.navigationBar else { return }
         nav.prefersLargeTitles = true
         navigationItem.largeTitleDisplayMode = .never
-        navigationItem.title = "Post Service"
+        navigationItem.title = "Post A Job"
     }
     
     // MARK: - Selectors

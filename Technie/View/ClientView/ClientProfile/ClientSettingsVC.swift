@@ -9,6 +9,8 @@ import UIKit
 
 class ClientSettingsVC: UIViewController {
 
+    let defaults = UserDefaults.standard
+    
     // MARK: - Properties
     var sections = [SectionHandler]()
     
@@ -34,6 +36,8 @@ class ClientSettingsVC: UIViewController {
         return tv
     }()
     
+    var switcherIsOn = false
+
     // MARK: - Inits
     override func loadView() {
         super.loadView()
@@ -70,28 +74,31 @@ class ClientSettingsVC: UIViewController {
     
     // MARK: - Selectors
     
-    
 }
 
 // MARK: - TableViewDataSourceAndDelegate Extension
 extension ClientSettingsVC: TableViewDataSourceAndDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 3
+        return 2
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: SettingsCell.cellID, for: indexPath) as! SettingsCell
         
         switch indexPath.row {
+//        case 0:
+//            cell.setupSwitcherStackView()
+//            cell.titleLabel.text = "In-App Notification"
         case 0:
             cell.setupSwitcherStackView()
-            cell.titleLabel.text = "In-App Notification"
-        case 1:
-            cell.setupSwitcherStackView()
+            cell.switcher.tag = indexPath.row
+            cell.switcher.isOn = defaults.bool(forKey: "recommendationEngineOnOff")
+            cell.switcher.addTarget(self, action: #selector(switcherPressed), for: .valueChanged)
             cell.titleLabel.text = "Recommendation Engine"
-        case 2:
+        case 1:
             cell.setupVersionStackView()
+//            defaults
         default:
             break
         }
@@ -99,6 +106,16 @@ extension ClientSettingsVC: TableViewDataSourceAndDelegate {
         return cell
     }
     
+    @objc func switcherPressed(_ sender: UISwitch) {
+        
+        if sender.isOn == true {
+            switcherIsOn = true
+            defaults.set(switcherIsOn, forKey: "recommendationEngineOnOff")
+        } else {
+            switcherIsOn = false
+            defaults.set(switcherIsOn, forKey: "recommendationEngineOnOff")
+        }
+    }
 //    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 //        tableView.deselectRow(at: indexPath, animated: true)
 //    }

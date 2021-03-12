@@ -8,11 +8,19 @@
 import UIKit
 import Cosmos
 
+
+protocol ReviewTechnicianVCDismissalDelegate: class {
+    func ReviewTechnicianVCDismissalSingleton(tappedRow: Int)
+}
+
 class ReviewTechnicianVC: UIViewController, UITextViewDelegate {
 
     var userPostModel: PostModel!
     var satisfactionAvrg: ClientsSatisfaction?
     var reviews = [Review]()
+    var notificationRow = -1
+    
+    weak var dismissalDelegate: ReviewTechnicianVCDismissalDelegate?
     
     lazy var tableView: UITableView = {
         let tv = UITableView(frame: .zero, style: .grouped)
@@ -89,7 +97,7 @@ class ReviewTechnicianVC: UIViewController, UITextViewDelegate {
         getClientSatisfaction()
         setupViews()
         
-        print("print that post: \(userPostModel)")
+//        print("print that post: \(userPostModel)")
     }
     
     func setupViews() {
@@ -139,18 +147,18 @@ class ReviewTechnicianVC: UIViewController, UITextViewDelegate {
         guard let reviewComment = reviewCommentTextField.text else { return }
         
         if reviews.count >= 1 {
-            print("reviews > 1")
+//            print("reviews > 1")
             let divisor = Double(reviews.count + 1)
             let workSpeedAvrg = calculateMeanAverage(dividend: satisfactionAvrg!.workSpeedAvrg + Double(workReview[0]), divisor: divisor)
             let workQualityAvrg = calculateMeanAverage(dividend: satisfactionAvrg!.workQualityAvrg + Double(workReview[1]), divisor: divisor)
             let responseTimeAvrg = calculateMeanAverage(dividend: satisfactionAvrg!.responseTimeAvrg + Double(workReview[2]), divisor: divisor)
             let ratingAvrg = calculateMeanAverage(dividend: satisfactionAvrg!.ratingAvrg + rating, divisor: divisor)
-            
+
             let clientsSatisfaction = ClientsSatisfaction(workSpeedAvrg: workSpeedAvrg,
                                                           workQualityAvrg: workQualityAvrg,
                                                           responseTimeAvrg: responseTimeAvrg,
                                                           ratingAvrg: ratingAvrg)
-            
+
             let clientReview = Review(jobTitle: jobTitle,
                                       reviewComment: reviewComment,
                                       clientName: clientName,
@@ -160,20 +168,21 @@ class ReviewTechnicianVC: UIViewController, UITextViewDelegate {
                                       workQuality: workReview[1],
                                       responseTime: workReview[2],
                                       rating: rating)
-            
+
             DatabaseManager.shared.insertClientSatisfaction(with: clientsSatisfaction, with: clientReview, with: technicianKeyPath) { success in
                 if success {
+                    self.dismissalDelegate?.ReviewTechnicianVCDismissalSingleton(tappedRow: self.notificationRow)
                     self.dismiss(animated: true, completion: nil)
                 }
             }
-            
+
         } else {
-            print("reviews == 0")
+//            print("reviews == 0")
             let clientsSatisfaction = ClientsSatisfaction(workSpeedAvrg: Double(workReview[0]),
                                                           workQualityAvrg: Double(workReview[1]),
                                                           responseTimeAvrg: Double(workReview[2]),
                                                           ratingAvrg: rating)
-            
+
             let clientReview = Review(jobTitle: jobTitle,
                                       reviewComment: reviewComment,
                                       clientName: clientName,
@@ -183,7 +192,7 @@ class ReviewTechnicianVC: UIViewController, UITextViewDelegate {
                                       workQuality: workReview[1],
                                       responseTime: workReview[2],
                                       rating: rating)
-            
+
             DatabaseManager.shared.insertClientSatisfaction(with: clientsSatisfaction, with: clientReview, with: technicianKeyPath) { success in
                 if success {
                     self.dismiss(animated: true, completion: nil)
@@ -191,6 +200,8 @@ class ReviewTechnicianVC: UIViewController, UITextViewDelegate {
             }
         }
 
+        self.dismissalDelegate?.ReviewTechnicianVCDismissalSingleton(tappedRow: self.notificationRow)
+        self.dismiss(animated: true, completion: nil)
     }
     
     func calculateMeanAverage(dividend: Double, divisor: Double) -> Double {

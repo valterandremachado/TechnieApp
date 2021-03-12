@@ -690,7 +690,7 @@ extension DatabaseManager {
     
     public func insertPost(with post: PostModel, completion: @escaping (Bool) -> Void) {
         let data = try! FirebaseEncoder().encode(post)
-        
+
         database.child("posts").observeSingleEvent(of: .value, with: { [weak self] snapshot in
             
             guard let strongSelf = self else {
@@ -704,6 +704,7 @@ extension DatabaseManager {
                     completion(false)
                     return
                 }
+
                 let postID = "\(dbPostID)"
                 let delimiter = "posts/"
                 let slicedString = postID.components(separatedBy: delimiter)[1]
@@ -724,6 +725,55 @@ extension DatabaseManager {
                 })
                 
                 completion(true)
+            })
+        })
+    }
+    
+    public func insertPost2(with post: PostModel, completion: @escaping (Bool) -> Void, completionOnPostID: @escaping (Result<String, Error>) -> Void) {
+        let data = try! FirebaseEncoder().encode(post)
+
+        database.child("posts").observeSingleEvent(of: .value, with: { [weak self] snapshot in
+            
+            guard let strongSelf = self else {
+                return
+            }
+            
+            let db = strongSelf.database.child("posts")
+            let dbPostID = db.childByAutoId()
+            dbPostID.setValue(data, withCompletionBlock: { error, _ in
+                guard error == nil else {
+                    completion(false)
+                    return
+                }
+
+                let postID = "\(dbPostID)"
+                let delimiter = "posts/"
+                let slicedString = postID.components(separatedBy: delimiter)[1]
+                DatabaseManager.shared.insertPostToUserDB(with: slicedString, completion: { success in
+                    if success {
+                        print("success")
+                    } else {
+                        print("failed")
+                    }
+                })
+                
+                let updateElement = [
+                    "id": slicedString,
+                ]
+                
+                let childPath = "posts/\(slicedString)"
+                strongSelf.database.child(childPath).updateChildValues(updateElement, withCompletionBlock: { error, _ in
+                    guard error == nil else {
+                        completion(false)
+                        return
+                    }
+                    
+                    let delimiter = "com/"
+                    let slicedString = postID.components(separatedBy: delimiter)[1]
+                    completion(true)
+                    completionOnPostID(.success(slicedString))
+                })
+                
             })
         })
     }
@@ -949,7 +999,10 @@ extension DatabaseManager {
         
             let uid = getUsersPersistedInfo.uid
             self.database.child("users/clients/\(uid)/notifications").observeSingleEvent(of: .value, with: { snapshot in
-                guard let notificationsCollection = snapshot.value as? [String: Any] else { return }
+                guard let notificationsCollection = snapshot.value as? [String: Any] else {
+                    completion(.failure(DatabaseError.failedToFetch))
+                    return
+                }
                 for (keyPath, _) in notificationsCollection {
                     self.database.child("users/clients/\(uid)/notifications/\(keyPath)").observeSingleEvent(of: .value, with: { snapshot in
                         guard let value = snapshot.value else { return }
@@ -1167,6 +1220,91 @@ extension DatabaseManager {
                                             
                                             
                                         }
+                                        
+                                    } catch let error {
+                                        print(error)
+                                    }
+                                })
+                            }
+                        })
+                        
+                        
+                        
+                    } catch let error {
+                        print(error)
+                    }
+                })
+            }
+        })
+    }
+    
+    public func getClientActiveAndPreviousPosts(completionOnActivePosts: @escaping (Result<[PostModel], Error>) -> Void, completionOnPreviousPosts: @escaping (Result<[PostModel], Error>) -> Void) {
+        
+        guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
+
+        let userPersistedEmail = getUsersPersistedInfo.email
+        
+        database.child("posts").observeSingleEvent(of: .value, with: { [weak self] snapshot in
+            guard let self = self else { return }
+            
+            guard let postsCollection = snapshot.value as? [String: Any] else {
+                completionOnActivePosts(.failure(DatabaseError.failedToFetch))
+                return
+            }
+            
+            var activePosts = [PostModel]()
+            var previousPosts = [PostModel]()
+
+            var userPostIDs = [String]()
+            
+            for (key, _) in postsCollection {
+                self.database.child("posts/\(key)").observeSingleEvent(of: .value, with: { snapshot in
+                    guard let value = snapshot.value else { return }
+                    do {
+                        let postModel = try FirebaseDecoder().decode(PostModel.self, from: value)
+
+                        self.database.child("users/clients").observeSingleEvent(of: .value, with: { snapshot in
+                            guard let postsCollection = snapshot.value as? [String: Any] else {
+                                completionOnActivePosts(.failure(DatabaseError.failedToFetch))
+                                return
+                            }
+                            
+                            
+                            for (key, _) in postsCollection {
+                                self.database.child("users/clients/\(key)").observeSingleEvent(of: .value, with: { snapshot in
+                                    guard let value = snapshot.value else { return }
+                                    do {
+                                        let userModel = try FirebaseDecoder().decode(ClientModel.self, from: value)
+                                        let email = userModel.profileInfo.email
+                                        
+//                                        print("email: \(email)")
+                                        if userPersistedEmail == email {
+//                                            print("Equal email: \(email)")
+                                            userModel.servicePosts?.forEach({ (post) in
+                                                if userPostIDs.count != userModel.servicePosts?.count {
+                                                    userPostIDs.append(post.postID)
+//                                                    print("userPostIDs: \(userPostIDs)")
+                                                }
+                                                
+                                            })
+                                            
+                                                if  userPostIDs.count == userModel.servicePosts?.count {
+                                                    for ids in userPostIDs {
+                                                        if postModel.id == ids {
+                                                            
+                                                            if postModel.isCompleted != true {
+                                                                activePosts.append(postModel)
+                                                                completionOnActivePosts(.success(activePosts))
+                                                            } else {
+                                                                previousPosts.append(postModel)
+                                                                completionOnPreviousPosts(.success(previousPosts))
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                
+                                        }
+                                            
                                         
                                     } catch let error {
                                         print(error)
@@ -1603,6 +1741,28 @@ extension DatabaseManager {
     
     
     /// Gets all users from database
+    public func getRecommendedTechnicians(postChildPath: String, completion: @escaping (Result<[TechnicianModel], Error>) -> Void) {
+        database.child("\(postChildPath)/recommendedTechnicians").observeSingleEvent(of: .value, with: { snapshot in
+
+            guard let techniciansCollection = snapshot.value as? [[String: Any]] else {
+                completion(.failure(DatabaseError.failedToFetch))
+                return
+            }
+            var technicians = [TechnicianModel]()
+            for technician in techniciansCollection {
+                do {
+                let technicianModel = try FirebaseDecoder().decode(TechnicianModel.self, from: technician)
+                    technicians.append(technicianModel)
+//                    print("notificationModel: ",technicians.count)
+                    completion(.success(technicians))
+                } catch {
+                    
+                }
+            }
+           
+        })
+    }
+    
     public func getAllUsers(completion: @escaping (Result<[[String: Any]], Error>) -> Void) {
         database.child("users").observeSingleEvent(of: .value, with: { snapshot in
 //            print(snapshot.value)
@@ -2322,7 +2482,7 @@ struct ClientModel: Codable {
 struct ClientProfileInfo: Codable {
     let id: String
     let email: String
-//    let profileImage: String
+    let profileImage: String?
 //    let coverImage: String
     let location: String
     let name: String
@@ -2341,6 +2501,7 @@ struct ClientNotificationModel: Codable {
     var dateTime: String
     var wasAccepted: Bool?
     var completedJobUID: String?
+    var jobPostKeyPath: String?
     var technicianInfo: TechnicianInfo?
 }
 
@@ -2452,6 +2613,7 @@ struct PostModel: Codable {
     let postOwnerInfo: PostOwnerInfo?
     let hiringStatus: HiringStatus?
     let proposals: [Proposals]?
+    var recommendedTechnicians: [TechnicianModel]?
  
 }
 

@@ -82,14 +82,30 @@ class TechnieProfileVC: UIViewController {
                 
         tableView.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.safeAreaLayoutGuide.trailingAnchor, padding: UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0), size: CGSize(width: 0, height: 0))
         
+        updateProfileImage()
         setupNavBar()
     }
     
+    var tempImage = UIImage().resizeImage(image: UIImage(systemName: "person.crop.circle.fill")?.withTintColor(.systemGray6, renderingMode: .alwaysOriginal) ?? UIImage(), toTheSize: CGSize(width: 40, height: 40))
+
     fileprivate func setupNavBar() {
         guard let navBar = navigationController?.navigationBar else { return }
         navBar.topItem?.title = "Settings"
         navBar.prefersLargeTitles = true
         navigationItem.largeTitleDisplayMode = .automatic
+       
+    }
+    
+    fileprivate func updateProfileImage() {
+        let userPersistedProfileImage = getUsersPersistedInfo?.profileImage ?? ""
+
+        UrlImageLoader.sharedInstance.imageForUrl(urlString: userPersistedProfileImage) { (image, url) in
+            guard let actualProfileImage = image else { return }
+            self.tempImage = UIImage().resizeImage(image: actualProfileImage, toTheSize: CGSize(width: 40, height: 40))
+//            self.tableView.reloadData()
+            self.tableView.reloadRows(at: [IndexPath(row: 0, section: 0)], with: .fade)
+            print(url)
+        }
     }
     
     // MARK: - Selectors
@@ -103,9 +119,10 @@ extension TechnieProfileVC: TechnieEditProfileVCDismissalDelegate {
     func TechnieEditProfileVCDismissalSingleton(updatedPersistedData: UserPersistedInfo) {
         guard !updatedPersistedData.uid.isEmpty else { return }
         getUsersPersistedInfo = updatedPersistedData
-        print("updatedPersistedData2: \(getUsersPersistedInfo)")
+//        print("updatedPersistedData2: \(getUsersPersistedInfo)")
 //        userPersistedName = getUsersPersistedInfo?.first?.name ?? "username"
 //        userPersistedLocation = getUsersPersistedInfo?.first?.location ?? "userlocation"
+        updateProfileImage()
         tableView.reloadData()
     }
     
@@ -142,15 +159,20 @@ extension TechnieProfileVC: TableViewDataSourceAndDelegate {
 //            let userName = UserDefaults.standard.value(forKey: "email") as? String ?? ""
             let userPersistedName = getUsersPersistedInfo?.name ?? "username"
             let userPersistedLocation = getUsersPersistedInfo?.location ?? "userlocation"
+            let userPersistedProfileImage = getUsersPersistedInfo?.profileImage ?? ""
+            let profileImageUrl = URL(string: userPersistedProfileImage)
             
             cell.textLabel?.font = .boldSystemFont(ofSize: 16)
             cell.textLabel?.text = userPersistedName 
-            cell.detailTextLabel?.text = userPersistedLocation
-            let newImage = UIImage().resizeImage(image: UIImage(named: "technie")!, toTheSize: CGSize(width: 40, height: 40))
+            cell.detailTextLabel?.text = userPersistedLocation + ", Philippines"
+//            let newImage = UIImage().resizeImage(image: UIImage(named: "technie")!, toTheSize: CGSize(width: 40, height: 40))
+//            var actualImage = UIImage()
             cell.imageView?.clipsToBounds = true
             cell.imageView?.layer.cornerRadius = 40 / 2
             cell.imageView?.contentMode = .scaleAspectFill
-            cell.imageView?.image = newImage
+            cell.imageView?.backgroundColor = .systemGray6
+            cell.imageView?.image = tempImage
+            
             cell.backgroundColor = UIColor.rgb(red: 250, green: 250, blue: 250)
             
         case 1:
@@ -283,6 +305,7 @@ extension TechnieProfileVC: TableViewDataSourceAndDelegate {
     
 }
 
+// MARK: - MFMailComposeViewControllerDelegate Extension
 extension TechnieProfileVC: MFMailComposeViewControllerDelegate {
     
     func showMailComposer() {

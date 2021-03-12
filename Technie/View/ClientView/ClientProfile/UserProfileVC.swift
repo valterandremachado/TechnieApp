@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import MessageUI
 
 class UserProfileVC: UIViewController {
         
@@ -14,6 +15,8 @@ class UserProfileVC: UIViewController {
     let imageArray = ["person.crop.circle.fill", "person.crop.circle.fill", "person.crop.circle.fill", "person.crop.circle.fill", "person.crop.circle.fill", "person.crop.circle.fill", "person.crop.circle.fill", "person.crop.circle.fill"]
     
     // MARK: - Properties
+    var getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo")
+
     lazy var tableView: UITableView = {
         let tv = UITableView(frame: .zero, style: .insetGrouped)
         tv.translatesAutoresizingMaskIntoConstraints = false
@@ -49,7 +52,7 @@ class UserProfileVC: UIViewController {
         iv.clipsToBounds = true
         //        iv.sizeToFit()
         iv.contentMode = .scaleAspectFill
-        iv.backgroundColor = .red
+        iv.backgroundColor = .systemGray6
         return iv
     }()
     
@@ -120,8 +123,29 @@ class UserProfileVC: UIViewController {
     }
     
     fileprivate func setupNavBar() {
-        guard let navBar = navigationController?.navigationBar else { return }
-        navigationItem.title = "@username"
+//        guard let navBar = navigationController?.navigationBar else { return }
+        let userPersistedName = getUsersPersistedInfo?.name ?? "username"
+        
+        let delimiter = " "
+        let slicedString = userPersistedName.components(separatedBy: delimiter)[1]
+        navigationItem.title = "@\(slicedString)"
+        
+        fetchUserInfo()
+    }
+    
+    fileprivate func fetchUserInfo() {
+        let userPersistedName = getUsersPersistedInfo?.name ?? "username"
+        let userPersistedLocation = getUsersPersistedInfo?.location ?? "userlocation"
+        let userPersistedProfileImage = getUsersPersistedInfo?.profileImage ?? "image"
+        let profileImageUrl = URL(string: userPersistedProfileImage)
+        
+        nameLabel.text = userPersistedName
+        locationLabel.text = userPersistedLocation + ", Philippines"
+        profileImageView.sd_setImage(with: profileImageUrl, completed: nil)
+        
+        //        UrlImageLoader.sharedInstance.imageForUrl(urlString: userPersistedProfileImage) { (image, url) in
+        //            self.profileImageView.image = image
+        //        }
     }
     
     // MARK: - Selectors
@@ -129,12 +153,30 @@ class UserProfileVC: UIViewController {
 
 }
 
+// MARK: - EditProfileVCDismissalDelegate Extension
+extension UserProfileVC: EditProfileVCDismissalDelegate {
+    
+    func EditProfileVCDismissalSingleton(updatedPersistedData: UserPersistedInfo) {
+        guard !updatedPersistedData.uid.isEmpty else { return }
+        let userPersistedName = updatedPersistedData.name
+        let userPersistedLocation = updatedPersistedData.location
+        let userPersistedProfileImage = getUsersPersistedInfo?.profileImage ?? ""
+        let profileImageUrl = URL(string: userPersistedProfileImage)
+        
+        nameLabel.text = userPersistedName
+        locationLabel.text = userPersistedLocation + ", Philippines"
+        profileImageView.sd_setImage(with: profileImageUrl, completed: nil)
+        getUsersPersistedInfo = updatedPersistedData
+    }
+    
+}
+
 
 // MARK: - TableViewDelegateAndDataSource Extension
 extension UserProfileVC: TableViewDataSourceAndDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 5 //stringArray.count
+        return 6 //stringArray.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -165,23 +207,84 @@ extension UserProfileVC: TableViewDataSourceAndDelegate {
         switch indexPath.row {
         case 0:
             let vc = EditProfileVC()
+            vc.dismissalDelegate = self
             navigationController?.pushViewController(vc, animated: true)
         case 1:
-            let vc = TechnieTabController()
-            (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootViewController(vc)
-        case 2:
             let vc = ClientPostHistoryVC()
             navigationController?.pushViewController(vc, animated: true)
+//            let vc = TechnieTabController()
+//            (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootViewController(vc)
+        case 2:
+            print("help")
+            showMailComposer()
         case 3:
+            print("tell a friend")
+            presentShareSheet()
+        case 4:
             let vc = ClientSettingsVC()
             navigationController?.pushViewController(vc, animated: true)
+        case 5:
+            print("log out")
         default:
             break
         }
       
     }
     
+    fileprivate func presentShareSheet() {
+        
+        let textToShare = "Hey, Technie is a fast, simple and secure app that I use to hire technicians from my town. Give it a try."
+        let thingsToShare: [Any] = [textToShare]
+        
+        let shareSheetVC = UIActivityViewController(activityItems: thingsToShare , applicationActivities: nil)
+        present(shareSheetVC, animated: true)
+    }
     
+    
+}
+
+// MARK: - MFMailComposeViewControllerDelegate Extension
+extension UserProfileVC: MFMailComposeViewControllerDelegate {
+    
+    func showMailComposer() {
+        
+        guard MFMailComposeViewController.canSendMail() else {
+            //Show alert informing the user
+            return
+        }
+        
+        let composer = MFMailComposeViewController()
+        composer.mailComposeDelegate = self
+        composer.setToRecipients(["support@technie.com"])
+        composer.setSubject("HELP!")
+        composer.setMessageBody("", isHTML: false)
+        
+        present(composer, animated: true)
+    }
+    
+    func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
+        
+        if let _ = error {
+            //Show error alert
+            controller.dismiss(animated: true)
+            return
+        }
+        
+        switch result {
+        case .cancelled:
+            print("Cancelled")
+        case .failed:
+            print("Failed to send")
+        case .saved:
+            print("Saved")
+        case .sent:
+            print("Email Sent")
+        @unknown default:
+            break
+        }
+        
+        controller.dismiss(animated: true)
+    }
 }
 
 // MARK: - UserProfileVCPreviews

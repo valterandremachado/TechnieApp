@@ -548,6 +548,7 @@ extension SignupVC: UIImagePickerControllerDelegate, UINavigationControllerDeleg
 //                    let autoUID = "\(email)_\(uid)"
                     let clientProfileInfo = ClientProfileInfo(id: uid,
                                                               email: email,
+                                                              profileImage: nil,
                                                               location: location,
                                                               name: "\(firstName) "+lastName,
                                                               membershipDate: dateString)

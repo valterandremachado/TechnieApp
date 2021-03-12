@@ -13,15 +13,15 @@ class SummaryVC: UIViewController, UITextViewDelegate {
     let database = Database.database().reference()
     
     // MARK: - Properties
-    lazy var txtLabel: UILabel = {
-        let lbl = UILabel()
-        lbl.translatesAutoresizingMaskIntoConstraints = false
-        lbl.text = "SUMMARY"
-        lbl.font = .systemFont(ofSize: 12)
-        lbl.numberOfLines = 0
-        lbl.isHidden = true
-        return lbl
-    }()
+//    lazy var txtLabel: UILabel = {
+//        let lbl = UILabel()
+//        lbl.translatesAutoresizingMaskIntoConstraints = false
+//        lbl.text = "SUMMARY"
+//        lbl.font = .systemFont(ofSize: 18)
+//        lbl.numberOfLines = 0
+//        lbl.isHidden = true
+//        return lbl
+//    }()
     
     lazy var placeHolderLabel: UILabel = {
         let lbl = UILabel()
@@ -36,6 +36,8 @@ class SummaryVC: UIViewController, UITextViewDelegate {
     lazy var summaryTextField: UITextView = {
         let txtView = UITextView()
         txtView.delegate = self
+        txtView.font = .systemFont(ofSize: 15)
+        txtView.textAlignment = .natural
 //        txtView.translatesAutoresizingMaskIntoConstraints = false
         txtView.backgroundColor = UIColor(named: "textViewBackgroundColor")
         txtView.clipsToBounds = true
@@ -64,11 +66,11 @@ class SummaryVC: UIViewController, UITextViewDelegate {
     
     // MARK: - Methods
     private func setupViews() {
-        [txtLabel, summaryTextField, placeHolderLabel, indicator].forEach {view.addSubview($0)}
+        [summaryTextField, placeHolderLabel, indicator].forEach {view.addSubview($0)}
         
-        txtLabel.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.leadingAnchor, bottom: nil, trailing: view.trailingAnchor, padding: UIEdgeInsets(top: 10, left: 20, bottom: 10, right: 20), size: CGSize(width: 0, height: 0))
+//        txtLabel.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.leadingAnchor, bottom: nil, trailing: view.trailingAnchor, padding: UIEdgeInsets(top: 10, left: 20, bottom: 10, right: 20), size: CGSize(width: 0, height: 0))
         
-        summaryTextField.anchor(top: txtLabel.bottomAnchor, leading: view.leadingAnchor, bottom: nil, trailing: view.trailingAnchor, padding: UIEdgeInsets(top: 10, left: 20, bottom: 10, right: 20), size: CGSize(width: 0, height: 0))
+        summaryTextField.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.leadingAnchor, bottom: nil, trailing: view.trailingAnchor, padding: UIEdgeInsets(top: 10, left: 20, bottom: 10, right: 20), size: CGSize(width: 0, height: 0))
         
         placeHolderLabel.anchor(top: summaryTextField.topAnchor, leading: view.leadingAnchor, bottom: summaryTextField.bottomAnchor, trailing: view.trailingAnchor, padding: UIEdgeInsets(top: 0, left: 25, bottom: 0, right: 0), size: CGSize(width: 0, height: 0))
         
@@ -108,7 +110,7 @@ class SummaryVC: UIViewController, UITextViewDelegate {
                     summaryTextField.isHidden = false
                     placeHolderLabel.fadeOut()
 //                    placeHolderLabel.isHidden = false
-                    txtLabel.isHidden = false
+//                    txtLabel.isHidden = false
                     summaryTextField.text = technicianInfo.profileInfo.profileSummary
 //                    view.layoutIfNeeded()
                 }

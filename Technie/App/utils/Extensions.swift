@@ -13,6 +13,17 @@ import UIKit
 //        return .darkContent
 //    }
 //}
+extension UIViewController {
+    func hideKeyboardWhenTappedAround() {
+        let tap = UITapGestureRecognizer(target: self, action: #selector(UIViewController.dismissTheKeyboard))
+        tap.cancelsTouchesInView = false
+        view.addGestureRecognizer(tap)
+    }
+    
+    @objc func dismissTheKeyboard() {
+        view.endEditing(true)
+    }
+}
 
 // Calculates distance between dateTime
 extension UIView {

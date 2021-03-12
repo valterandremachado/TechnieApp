@@ -9,6 +9,12 @@ import UIKit
 
 class RecommendationVC: UIViewController {
 
+    
+    var recommendedTechniciansModel = [TechnicianModel]()
+    var userNotification: ClientNotificationModel?
+    var jobPostKeyPath = ""
+    var posts = [PostModel]()
+    
     // MARK: - Properties
     lazy var tableView: UITableView = {
         let tv = UITableView(frame: .zero, style: .grouped)
@@ -39,6 +45,16 @@ class RecommendationVC: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
 //        view.backgroundColor = .cyan
+        DatabaseManager.shared.getRecommendedTechnicians(postChildPath: jobPostKeyPath) { result in
+            switch result {
+            case .success(let recommendedTechnicians):
+                self.recommendedTechniciansModel = recommendedTechnicians
+                print("recommendedTechnicians success")
+                self.tableView.reloadData()
+            case .failure(let error):
+                print(error)
+            }
+        }
         setupViews()
     }
     
@@ -73,11 +89,13 @@ class RecommendationVC: UIViewController {
 extension RecommendationVC: TableViewDataSourceAndDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 6
+        return recommendedTechniciansModel.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: RecommendationCell.cellID, for: indexPath) as! RecommendationCell
+        let recommendedTechnicians = recommendedTechniciansModel[indexPath.row]
+        cell.recommendedTechniciansModel = recommendedTechnicians
         return cell
     }
     

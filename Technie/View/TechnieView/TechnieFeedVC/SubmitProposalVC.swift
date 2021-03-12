@@ -60,6 +60,8 @@ class SubmitProposalVC: UIViewController, UITextViewDelegate {
     lazy var coverLetterTextField: UITextView = {
         let txtView = UITextView()
         txtView.delegate = self
+        txtView.font = .systemFont(ofSize: 15)
+        txtView.textAlignment = .natural
 //        txtView.translatesAutoresizingMaskIntoConstraints = false
         txtView.backgroundColor = UIColor(named: "textViewBackgroundColor")
         txtView.clipsToBounds = true

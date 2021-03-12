@@ -44,11 +44,24 @@ class ClientNotificationVC: UIViewController {
         return tv
     }()
     
+    lazy var warningLabel: UILabel = {
+        let lbl = UILabel()
+        lbl.translatesAutoresizingMaskIntoConstraints = false
+        lbl.textAlignment = .center
+        lbl.text = "You have no notification to be shown."
+        return lbl
+    }()
+    
+    private var indicator: ProgressIndicatorLarge!
+    
     // MARK: - Inits
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         view.backgroundColor = .white
+        indicator = ProgressIndicatorLarge(inview: self.view, loadingViewColor: UIColor.clear, indicatorColor: UIColor.gray, msg: "")
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        
         fetchUserPosts()
         fetchTechnician()
         fetchData()
@@ -62,8 +75,17 @@ class ClientNotificationVC: UIViewController {
     
     // MARK: - Methods
     fileprivate func setupViews() {
-        [tableView].forEach {view.addSubview($0)}
+        [tableView, indicator].forEach {view.addSubview($0)}
+        indicator.start()
+
         tableView.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor)
+        
+        NSLayoutConstraint.activate([
+            indicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            indicator.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 10),
+            indicator.heightAnchor.constraint(equalToConstant: 50),
+            indicator.widthAnchor.constraint(equalToConstant: 50),
+        ])
         
         setupNavBar()
     }
@@ -82,9 +104,24 @@ class ClientNotificationVC: UIViewController {
             case .success(let notifications):
                 let sortedArray = notifications.sorted(by: { PostFormVC.dateFormatter.date(from: $0.dateTime)?.compare(PostFormVC.dateFormatter.date(from: $1.dateTime) ?? Date()) == .orderedDescending })
                 self.userNotifications = sortedArray
+                
+                self.indicator.stop()
                 self.tableView.reloadData()
                 print("success")
             case .failure(let error):
+                if self.userNotifications.count == 0 {
+                    self.tableView.isHidden = true
+                    self.view.addSubview(self.warningLabel)
+                    NSLayoutConstraint.activate([
+                        self.warningLabel.centerYAnchor.constraint(equalTo: self.view.centerYAnchor),
+                        self.warningLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor)
+                    ])
+                } else {
+                    self.tableView.isHidden = false
+                }
+
+                self.indicator.stop()
+                
                 print("Failed to get technicians: \(error.localizedDescription)")
             }
         })
@@ -199,7 +236,39 @@ class ClientNotificationVC: UIViewController {
 //    let notifications = ["technie", "client", "technie", "client", "technie", "client", "technie", "client", "technie"]
 }
 
-// MARK: - Extension
+// MARK: - ReviewTechnicianVCDismissalDelegate Extension
+extension ClientNotificationVC: ReviewTechnicianVCDismissalDelegate {
+    
+    func ReviewTechnicianVCDismissalSingleton(tappedRow: Int) {
+        deleteIsReviewedNotification(index: tappedRow)
+    }
+    
+    fileprivate func deleteIsReviewedNotification(index: Int) {
+        let indexedNotificationModel = userNotifications[index]
+        
+        guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
+//        let clientName = getUsersPersistedInfo.name
+        let clientKeyPath = getUsersPersistedInfo.uid
+
+        let ChildPathToDelete = "users/clients/\(clientKeyPath)/notifications/\(indexedNotificationModel.id)"
+
+        DatabaseManager.shared.deleteChildPath(withChildPath: ChildPathToDelete, completion: { success in
+            if success {
+                print("notification deleted")
+                self.userNotifications.remove(at: index)
+                self.tableView.beginUpdates()
+                self.tableView.deleteRows(at: [IndexPath(row: index, section: 0)], with: .fade)
+                self.tableView.endUpdates()
+
+            } else {
+                print("failed to delete notification")
+            }
+        })
+    }
+    
+}
+
+// MARK: - TableViewDataSourceAndDelegate Extension
 extension ClientNotificationVC: TableViewDataSourceAndDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -220,6 +289,21 @@ extension ClientNotificationVC: TableViewDataSourceAndDelegate {
             cell.setupViews()
         }
         
+        if model.type == ClientNotificationType.recommendation.rawValue {
+            cell.titleLabel.text = "Recommendation"
+        }
+        
+        switch model.type {
+        case ClientNotificationType.recommendation.rawValue:
+            cell.titleLabel.text = "Recommendation"
+        case ClientNotificationType.proposal.rawValue:
+            cell.titleLabel.text = "Proposal"
+        case ClientNotificationType.review.rawValue:
+            cell.titleLabel.text = "Review"
+        default:
+            break
+        }
+        
         return cell
     }
     
@@ -228,7 +312,8 @@ extension ClientNotificationVC: TableViewDataSourceAndDelegate {
 //        let postModel = userPostModel[indexPath.row]
 //        let technieModel = technicianModel[indexPath.row]
 
-        if notificationModel.type == ClientNotificationType.proposal.rawValue {
+        switch notificationModel.type {
+        case ClientNotificationType.proposal.rawValue:
             
             guard !technicianModel.isEmpty,
                   !userPostModel.isEmpty
@@ -249,20 +334,67 @@ extension ClientNotificationVC: TableViewDataSourceAndDelegate {
                 }
             }
             
-        } else if notificationModel.type == ClientNotificationType.review.rawValue {
-            
+        case ClientNotificationType.review.rawValue:
             for post in userPostModel {
                 if notificationModel.completedJobUID == post.id {
                     let vc = ReviewTechnicianVC()
+//                    vc.isModalInPresentation = true
                     vc.userPostModel = post
+                    vc.notificationRow = indexPath.row
+                    vc.dismissalDelegate = self
                     present(UINavigationController(rootViewController: vc), animated: true)
                     return
                 }
             }
-           
-           
             
+        case ClientNotificationType.recommendation.rawValue:
+            
+            let vc = RecommendationVC()
+            vc.userNotification = notificationModel
+            vc.jobPostKeyPath = notificationModel.jobPostKeyPath ?? ""
+            present(UINavigationController(rootViewController: vc), animated: true)
+            
+        default:
+            break
         }
+        
+//        if notificationModel.type == ClientNotificationType.proposal.rawValue {
+//            
+//            guard !technicianModel.isEmpty,
+//                  !userPostModel.isEmpty
+//            else { return }
+//            
+//            for technican in  technicianModel {
+//                for userPost in  userPostModel {
+//                    userPost.proposals?.forEach { proposal in
+//                        if proposal.technicianEmail == technican.profileInfo.email {
+//                            //                        print("proposal: \(userPost.proposals), email: \(technican.profileInfo.email)")
+//                            let vc = CoverLetterVC()
+//                            vc.titleLabel.text = "\(technican.profileInfo.name) cover letter"
+//                            vc.coverLetterLabel.text = proposal.coverLetter
+//                            vc.technicianModel = technican
+//                            present(UINavigationController(rootViewController: vc), animated: true)
+//                        }
+//                    }
+//                }
+//            }
+//            
+//        } else if notificationModel.type == ClientNotificationType.review.rawValue {
+//            
+//            for post in userPostModel {
+//                if notificationModel.completedJobUID == post.id {
+//                    let vc = ReviewTechnicianVC()
+////                    vc.isModalInPresentation = true
+//                    vc.userPostModel = post
+//                    vc.notificationRow = indexPath.row
+//                    vc.dismissalDelegate = self
+//                    present(UINavigationController(rootViewController: vc), animated: true)
+//                    return
+//                }
+//            }
+//        }
+        
+        
     }
     
     
