@@ -204,7 +204,7 @@ class ProficiencyReviewCell: UITableViewCell {
         lbl.text = "90%"
         lbl.textAlignment = .center
 //        lbl.withHeight(25)
-        lbl.font = .systemFont(ofSize: 12)
+        lbl.font = .systemFont(ofSize: 13)
 //        lbl.backgroundColor = .brown
         lbl.numberOfLines = 0
         lbl.textColor = UIColor(named: "LabelPrimaryAppearance")
@@ -267,7 +267,7 @@ class ProficiencyReviewCell: UITableViewCell {
         let sv = UIStackView(arrangedSubviews: [workSpeedLabelPlaceHolder, workSpeedLabel])
         sv.translatesAutoresizingMaskIntoConstraints = false
         sv.axis = .vertical
-        sv.spacing = 0
+        sv.spacing = 2
         sv.distribution = .fillEqually
 //        sv.addBackground(color: .gray)
         return sv
@@ -277,7 +277,7 @@ class ProficiencyReviewCell: UITableViewCell {
         let sv = UIStackView(arrangedSubviews: [workQualityLabelPlaceHolder, workQualityLabel])
         sv.translatesAutoresizingMaskIntoConstraints = false
         sv.axis = .vertical
-        sv.spacing = 0
+        sv.spacing = 2
         sv.distribution = .fillEqually
 //        sv.addBackground(color: .gray)
         return sv
@@ -287,7 +287,7 @@ class ProficiencyReviewCell: UITableViewCell {
         let sv = UIStackView(arrangedSubviews: [responseTimeLabelPlaceHolder, responseTimeLabel])
         sv.translatesAutoresizingMaskIntoConstraints = false
         sv.axis = .vertical
-        sv.spacing = 0
+        sv.spacing = 2
         sv.distribution = .fillEqually
 //        sv.addBackground(color: .gray)
         return sv

@@ -8,12 +8,17 @@
 import UIKit
 
 class RankedTechnieVC: UIViewController {
+    
+    var technicianModel: TechnicianModel!
+    var userPostModel = [PostModel]()
+
     // MARK: - Properties
     lazy var technicianCoverPicture: UIImageView = {
         let iv = UIImageView()
         iv.translatesAutoresizingMaskIntoConstraints = false
         iv.contentMode = .scaleAspectFill
         iv.clipsToBounds = true
+        iv.backgroundColor = .systemGray6
         iv.image = UIImage(named: "technieDummyPhoto")
         return iv
     }()
@@ -268,8 +273,22 @@ class RankedTechnieVC: UIViewController {
     
     // MARK: - Selectors
     @objc fileprivate func checkProfileBtnPressed() {
+        guard let technicians = technicianModel else { return }
+
         let vc = TechnicianProfileDetailsVC()
         vc.isModalInPresentation = true
+        
+        vc.technicianModel = technicians
+        vc.userPostModel = userPostModel
+        vc.profileImageView.sd_setImage(with: URL(string: technicians.profileInfo.profileImage ?? ""))
+        vc.nameLabel.text = technicians.profileInfo.name
+        vc.locationLabel.text = "\(technicians.profileInfo.location), Philippines"
+        vc.technicianExperienceLabel.text = "• \(technicians.profileInfo.experience) Year of Exp."
+        
+        let delimiter = "at"
+        let slicedString = technicians.profileInfo.membershipDate.components(separatedBy: delimiter)[0]
+        vc.memberShipDateLabel.text = "• Member since " + slicedString
+        
 //        vc.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
         navigationController?.pushViewController(vc, animated: true)
     }
@@ -289,6 +308,11 @@ extension RankedTechnieVC: TableViewDataSourceAndDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: ProficiencyReviewCell.cellID, for: indexPath) as! ProficiencyReviewCell
         cell.setupViews()
+        if let technicianSatis = technicianModel {
+            cell.workSpeedLabel.text = "\(cell.items[Int(technicianSatis.clientsSatisfaction?.workSpeedAvrg.rounded(.toNearestOrAwayFromZero) ?? 0)])"
+            cell.workQualityLabel.text = "\(cell.items[Int(technicianSatis.clientsSatisfaction?.workQualityAvrg.rounded(.toNearestOrAwayFromZero) ?? 0)])"
+            cell.responseTimeLabel.text = "\(cell.items[Int(technicianSatis.clientsSatisfaction?.responseTimeAvrg.rounded(.toNearestOrAwayFromZero) ?? 0)])"
+        }
         return cell
     }
     

@@ -9,6 +9,8 @@ import UIKit
 
 class FullRankingVC: UIViewController {
 
+    var technieRank: [TechnicianModel] = []
+    var userPostModel: [PostModel] = []
     // MARK: - Properties
     lazy var tableView: UITableView = {
         let tv = UITableView(frame: .zero, style: .grouped)
@@ -36,7 +38,7 @@ class FullRankingVC: UIViewController {
     }()
     
     let rankArray = ["Valter A. Machado1", "Valter A. Machado2", "Valter A. Machado3", "Valter A. Machado4", "Valter A. Machado5", "Valter A. Machado", "Valter A. Machado", "Valter A. Machado", "Valter A. Machado"]
-    var sectionSetter = [SectionHandler]()
+//    var sectionSetter = [SectionHandler]()
     
     // MARK: - Inits
     override func viewDidLoad() {
@@ -60,14 +62,24 @@ class FullRankingVC: UIViewController {
         navigationItem.largeTitleDisplayMode = .never
     }
     
+    var sectionSetter = ["Top 5", "Remaining Rank"]
+    var topFiveRank: [TechnicianModel] = []
+    var remainingRank: [TechnicianModel] = []
+    let topFiveLimit = 1
+    
     fileprivate func populateSection() {
-        // Filtering the rank to have a different section for top 5 ranking from the rest
-        let topFiveRank = Array<String>(rankArray.prefix(5))
-        let remainingRank = rankArray.filter { topFiveRank.contains($0) == false }
-
-        sectionSetter.append(SectionHandler(title: "Top 5", detail: topFiveRank))
-        sectionSetter.append(SectionHandler(title: "Remaining Rank", detail: remainingRank))
+        topFiveRank = Array<TechnicianModel>(technieRank.prefix(5))
+        if technieRank.count == 5 {
+            remainingRank = Array<TechnicianModel>(technieRank.suffix(from: 6))
+        }
+        print("count: ", technieRank.count)
     }
+    
+    
+    let proficiencyInDecimal: [Double] = [0.25, 0.50, 0.75, 1.0]
+    var workSpeed = 0
+    var workQuality = 0
+    var responseTime = 0
     
     // MARK: - Selectors
 
@@ -81,30 +93,112 @@ extension FullRankingVC: TableViewDataSourceAndDelegate {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return sectionSetter[section].sectionDetail.count
+        if section == 0 {
+//            let topFiveRank = Array<TechnicianModel>(technieRank.prefix(topFiveLimit))
+            return topFiveRank.count
+        } else {
+            return remainingRank.count
+        }
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         var cell = tableView.dequeueReusableCell(withIdentifier: FullRankingCell.cellID, for: indexPath) as! FullRankingCell
         cell = FullRankingCell(style: .subtitle, reuseIdentifier: FullRankingCell.cellID)
         
-        let detailForRow = sectionSetter[indexPath.section].sectionDetail[indexPath.row]
-        
-        cell.detailTextLabel?.textColor = .systemGray
-        cell.textLabel?.text = indexPath.section == 0 ? ("#\(indexPath.row + 1) " + detailForRow) : ("#\(indexPath.row + 6) " + detailForRow)
-        cell.detailTextLabel?.text = "300 services | reviews (40)"
+//        let detailForRow = sectionSetter[indexPath.section].sectionDetail[indexPath.row]
+        switch indexPath.section {
+        case 0:
+            let topFiveRankModel = topFiveRank[indexPath.row]
+
+            cell.detailTextLabel?.textColor = .systemGray
+            cell.textLabel?.text = "#\(indexPath.row + 1) " + topFiveRankModel.profileInfo.name//indexPath.section == 0 ? () : ("#\(indexPath.row + 6) " + detailForRow)
+            
+            workSpeed = Int(topFiveRankModel.clientsSatisfaction?.workSpeedAvrg.rounded(.toNearestOrAwayFromZero) ?? 0)
+            workQuality = Int(topFiveRankModel.clientsSatisfaction?.workQualityAvrg.rounded(.toNearestOrAwayFromZero) ?? 0)
+            responseTime = Int(topFiveRankModel.clientsSatisfaction?.responseTimeAvrg.rounded(.toNearestOrAwayFromZero) ?? 0)
+            
+            let sum = proficiencyInDecimal[workSpeed] + proficiencyInDecimal[workQuality] + proficiencyInDecimal[responseTime]
+            let proficiencyInPercentage = "\(String(format:"%.0f", sum/3 * 100))%"
+            
+            let services = topFiveRankModel.numberOfServices
+            var serviceLabel = ""
+            services <= 1 ? (serviceLabel = "service") : (serviceLabel = "services")
+            cell.detailTextLabel?.text = "\(services) \(serviceLabel) | proficiency (\(proficiencyInPercentage))"
+        case 1:
+            let remainingRankModel = remainingRank[indexPath.row]
+
+            cell.detailTextLabel?.textColor = .systemGray
+            cell.textLabel?.text = "#\(technieRank.count + indexPath.row + 1) " + remainingRankModel.profileInfo.name//indexPath.section == 0 ? ("#\(indexPath.row + 1) " + detailForRow) : ("#\(indexPath.row + 6) " + detailForRow)
+            
+            workSpeed = Int(remainingRankModel.clientsSatisfaction?.workSpeedAvrg.rounded(.toNearestOrAwayFromZero) ?? 0)
+            workQuality = Int(remainingRankModel.clientsSatisfaction?.workQualityAvrg.rounded(.toNearestOrAwayFromZero) ?? 0)
+            responseTime = Int(remainingRankModel.clientsSatisfaction?.responseTimeAvrg.rounded(.toNearestOrAwayFromZero) ?? 0)
+            
+            let sum = proficiencyInDecimal[workSpeed] + proficiencyInDecimal[workQuality] + proficiencyInDecimal[responseTime]
+            let proficiencyInPercentage = "\(String(format:"%.0f", sum/3 * 100))%"
+            
+            let services = remainingRankModel.numberOfServices
+            var serviceLabel = ""
+            services <= 1 ? (serviceLabel = "service") : (serviceLabel = "services")
+            cell.detailTextLabel?.text = "\(services) \(serviceLabel) | proficiency (\(proficiencyInPercentage))"
+        default:
+            break
+        }
+       
         return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+
         let vc = TechnicianProfileDetailsVC()
-        navigationController?.pushViewController(vc, animated: true)
+        
+        switch indexPath.section {
+        case 0:
+            let technicians = topFiveRank[indexPath.item]
+
+            vc.technicianModel = technicians
+            vc.userPostModel = userPostModel
+            vc.profileImageView.sd_setImage(with: URL(string: technicians.profileInfo.profileImage ?? ""))
+            vc.nameLabel.text = technicians.profileInfo.name
+            vc.locationLabel.text = "\(technicians.profileInfo.location), Philippines"
+            vc.technicianExperienceLabel.text = "• \(technicians.profileInfo.experience) Year of Exp."
+            
+            let delimiter = "at"
+            let slicedString = technicians.profileInfo.membershipDate.components(separatedBy: delimiter)[0]
+            vc.memberShipDateLabel.text = "• Member since " + slicedString
+            
+            navigationController?.pushViewController(vc, animated: true)
+            
+        case 1:
+            let technicians = remainingRank[indexPath.item]
+
+            vc.technicianModel = technicians
+            vc.userPostModel = userPostModel
+            vc.profileImageView.sd_setImage(with: URL(string: technicians.profileInfo.profileImage ?? ""))
+            vc.nameLabel.text = technicians.profileInfo.name
+            vc.locationLabel.text = "\(technicians.profileInfo.location), Philippines"
+            vc.technicianExperienceLabel.text = "• \(technicians.profileInfo.experience) Year of Exp."
+            
+            let delimiter = "at"
+            let slicedString = technicians.profileInfo.membershipDate.components(separatedBy: delimiter)[0]
+            vc.memberShipDateLabel.text = "• Member since " + slicedString
+            
+            navigationController?.pushViewController(vc, animated: true)
+            
+        default:
+            break
+        }
+       
     }
     
     // Header layout
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return sectionSetter[section].sectionTitle
+        if section == 0 {
+            return topFiveRank.count == 0 ? (nil) : (sectionSetter[0])
+        } else {
+            return remainingRank.count == 0 ? (nil) : (sectionSetter[1])
+        }
     }
     
     func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {

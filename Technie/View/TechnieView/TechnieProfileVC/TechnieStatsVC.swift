@@ -203,7 +203,7 @@ extension TechnieStatsVC: TableViewDataSourceAndDelegate {
             cell.setupReliabilityStackView()
             
             var serviceText = ""
-            numberOfServices == 1 ? (serviceText = "service") : (serviceText = "services")
+            numberOfServices == 1 ? (serviceText = "Service") : (serviceText = "Services")
             cell.ratingAndReviewsLabel.text = " \(String(format:"%.1f", satisfactionAvrg?.ratingAvrg ?? 0)) | \(numberOfServices) " + serviceText
             return cell
         case 2:

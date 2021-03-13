@@ -27,7 +27,7 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         iv.layer.cornerRadius = 15
         //        iv.sizeToFit()
         iv.contentMode = .scaleAspectFill
-//        iv.backgroundColor = .red
+        iv.backgroundColor = .systemGray6
         return iv
     }()
     
@@ -392,45 +392,60 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
     
     fileprivate func fetchUserPosts() {
         for post in userPostModel {
-            if technicianModel.profileInfo.email != post.hiringStatus?.technicianToHireEmail && post.hiringStatus?.isHired == false  {
-                tempUserPosts.append(post)
-            } else if userPostModel.count == 1 && technicianModel.profileInfo.email == post.hiringStatus?.technicianToHireEmail {
-                UIView.animate(withDuration: 0.5) { [self] in
-                    post.hiringStatus?.isHired == false ? hireBtn.setTitle("Pending...", for: .normal) : hireBtn.setTitle("Hired", for: .normal)
-                    hireBtn.setTitleColor(.systemGray4, for: .normal)
-                    hireBtn.backgroundColor = UIColor.systemPink.withAlphaComponent(0.8)
+            if post.isCompleted != true {
+                if technicianModel.profileInfo.email != post.hiringStatus?.technicianToHireEmail && post.hiringStatus?.isHired == false  {
+                    tempUserPosts.append(post)
+                    print("first loop")
+                } else if userPostModel.count == 1 && technicianModel.profileInfo.email == post.hiringStatus?.technicianToHireEmail {
+                    UIView.animate(withDuration: 0.5) { [self] in
+                        post.hiringStatus?.isHired == false ? hireBtn.setTitle("Pending...", for: .normal) : hireBtn.setTitle("Hired", for: .normal)
+                        hireBtn.setTitleColor(.systemGray4, for: .normal)
+                        hireBtn.backgroundColor = UIColor.systemPink.withAlphaComponent(0.8)
+                    }
+                    print("second loop")
+                } else if userPostModel.count > 1 && technicianModel.profileInfo.email == post.hiringStatus?.technicianToHireEmail {
+                    hiredUserJobs.append(post)
+                    sureHires.append(post.hiringStatus!.isHired)
+                    
+                    UIView.animate(withDuration: 0.5) { [self] in
+                        let numberOfTrue = sureHires.filter{$0}.count
+                        let numberOfFalse = sureHires.filter{!$0}.count
+                        
+                        numberOfTrue == 1 ? (jobTrack = "one") : (jobTrack = "\(numberOfTrue)")
+                        numberOfFalse == 1 ? (jobPending = "one") : (jobPending = "\(numberOfFalse)")
+                        
+                        numberOfFalse == 0 ? hireBtn.setTitle("Currently hired in \(jobTrack) of my jobs", for: .normal) : hireBtn.setTitle("Currently hired with \(jobPending) offer pending...", for: .normal)
+                        hireBtn.setTitleColor(.systemGray4, for: .normal)
+                        hireBtn.backgroundColor = UIColor.systemPink.withAlphaComponent(0.8)
+                    }
+                    print("third loop")
+                } else {
+                    print("last loop")
+                    tempUserPosts.append(post)
                 }
-            } else if userPostModel.count > 1 && technicianModel.profileInfo.email == post.hiringStatus?.technicianToHireEmail {
-                hiredUserJobs.append(post)
-                sureHires.append(post.hiringStatus!.isHired)
-
-                UIView.animate(withDuration: 0.5) { [self] in
-                    let numberOfTrue = sureHires.filter{$0}.count
-                    let numberOfFalse = sureHires.filter{!$0}.count
-
-                    numberOfTrue == 1 ? (jobTrack = "one") : (jobTrack = "\(numberOfTrue)")
-                    numberOfFalse == 1 ? (jobPending = "one") : (jobPending = "\(numberOfFalse)")
-//                    switch numberOfFalse {
-//                    case 0:
-//                        hireBtn.setTitle("Currently hired in \(jobTrack) of my jobs", for: .normal)
-//                    case 1:
-//                        hireBtn.setTitle("Currently hired with \(one) offer pending...", for: .normal)
-//                    default:
-//                        break
-//                    }
-                    numberOfFalse == 0 ? hireBtn.setTitle("Currently hired in \(jobTrack) of my jobs", for: .normal) : hireBtn.setTitle("Currently hired with \(jobPending) offer pending...", for: .normal)
-                    hireBtn.setTitleColor(.systemGray4, for: .normal)
-                    hireBtn.backgroundColor = UIColor.systemPink.withAlphaComponent(0.8)
-                }
-                
-            } else {
-                tempUserPosts.append(post)
             }
 //            else if technicianModel.profileInfo.email == post.hiringStatus?.technicianToHireEmail {
 //                print("technicianToHireEmail")
 //            }
         }
-        
+    }
+    
+    fileprivate func listenToPostsChange() {
+        DispatchQueue.main.async {
+            DatabaseManager.shared.listenToClientPostChanges(completion: { result in
+                switch result {
+                case .success(let posts):
+                    // Remove existing items to avoid duplicated items
+                    self.userPostModel.removeAll()
+                    print("childChanged")
+//                    let sortedArray = posts.sorted(by: { PostFormVC.dateFormatter.date(from: $0.dateTime)?.compare(PostFormVC.dateFormatter.date(from: $1.dateTime) ?? Date()) == .orderedDescending })
+                    self.userPostModel = posts
+                    return
+                case .failure(let error):
+                    print("Failed to get posts: \(error.localizedDescription)")
+                }
+            })
+        }
     }
     
     func getClientSatisfaction() {
@@ -789,6 +804,7 @@ extension TechnicianProfileDetailsVC: MyJobsVCDismissalDelegate {
                 hireBtn.setTitle("Pending...", for: .normal)
                 hireBtn.setTitleColor(.systemGray4, for: .normal)
                 hireBtn.backgroundColor = UIColor.systemPink.withAlphaComponent(0.8)
+                listenToPostsChange()
             }
         }
     }
@@ -934,7 +950,7 @@ extension TechnicianProfileDetailsVC: TableViewDataSourceAndDelegate {
                 
                 let numberOfServices = technicianModel.numberOfServices
                 var serviceText = ""
-                numberOfServices == 1 ? (serviceText = "service") : (serviceText = "services")
+                numberOfServices == 1 ? (serviceText = "Service") : (serviceText = "Services")
                 cell.ratingAndReviewsLabel.text = " \(String(format:"%.1f", satisfactionAvrg!.ratingAvrg)) | \(numberOfServices) " + serviceText
                 return cell
             case 2:

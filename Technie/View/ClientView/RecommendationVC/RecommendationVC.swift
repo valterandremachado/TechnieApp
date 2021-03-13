@@ -40,28 +40,44 @@ class RecommendationVC: UIViewController {
         return tv
     }()
     
+    let proficiencyInDecimal: [Double] = [0.25, 0.50, 0.75, 1.0]
+    var workSpeed = 0
+    var workQuality = 0
+    var responseTime = 0
+    
+    private var indicator: ProgressIndicatorLarge!
+
     // MARK: - Inits
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
 //        view.backgroundColor = .cyan
-        DatabaseManager.shared.getRecommendedTechnicians(postChildPath: jobPostKeyPath) { result in
-            switch result {
-            case .success(let recommendedTechnicians):
-                self.recommendedTechniciansModel = recommendedTechnicians
-                print("recommendedTechnicians success")
-                self.tableView.reloadData()
-            case .failure(let error):
-                print(error)
-            }
+//        print("jobPostKeyPath: ", jobPostKeyPath)
+        
+        indicator = ProgressIndicatorLarge(inview: self.view, loadingViewColor: UIColor.clear, indicatorColor: UIColor.gray, msg: "")
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        
+        if recommendedTechniciansModel.count == 0 {
+            indicator.start()
         }
+        
+        fetchUserPosts()
+        fetchRecommendedTechnicians()
         setupViews()
     }
     
     // MARK: - Methods
     fileprivate func setupViews() {
-        [tableView].forEach {view.addSubview($0)}
+        [tableView, indicator].forEach {view.addSubview($0)}
         tableView.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor)
+        
+        NSLayoutConstraint.activate([
+            indicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            indicator.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 10),
+            indicator.heightAnchor.constraint(equalToConstant: 50),
+            indicator.widthAnchor.constraint(equalToConstant: 50),
+        ])
+        
         setupNavBar()
     }
     
@@ -75,6 +91,95 @@ class RecommendationVC: UIViewController {
 
         self.navigationItem.leftBarButtonItem = leftNavBarButton
 //        self.navigationItem.rightBarButtonItem = rightNavBarButton
+    }
+    
+    fileprivate func fetchRecommendedTechnicians() {
+        
+        DatabaseManager.shared.getRecommendedTechnicians(postChildPath: jobPostKeyPath) { [self] result in
+            switch result {
+            case .success(let recommendedTechnicians):
+//                self.recommendedTechniciansModel = recommendedTechnicians
+                
+//                let delay = 0.03 + 1.25
+//                Timer.scheduledTimer(withTimeInterval: delay, repeats: false) { _ in
+                    self.getRecommendedTechnicians(model: recommendedTechnicians)
+                    self.indicator.stop()
+                   
+//                }
+                
+               
+//                recommendedTechnicians.forEach { technician in
+//                    // append only technicians with review history and rating of 4 and above
+//                    workSpeed = Int(technician.clientsSatisfaction?.workSpeedAvrg.rounded(.toNearestOrAwayFromZero) ?? -1)
+//                    workQuality = Int(technician.clientsSatisfaction?.workQualityAvrg.rounded(.toNearestOrAwayFromZero) ?? -1)
+//                    responseTime = Int(technician.clientsSatisfaction?.responseTimeAvrg.rounded(.toNearestOrAwayFromZero) ?? -1)
+//                    if workSpeed != -1 && workSpeed != -1 && workSpeed != -1 {
+//                        // Avoid duplicated items
+//                        if self.recommendedTechniciansModel.count > 0 {
+//
+//                            self.recommendedTechniciansModel.forEach { technicians in
+//                                if technicians.profileInfo.email != technician.profileInfo.email {
+//                                    self.recommendedTechniciansModel.append(technician)
+//                                    self.tableView.reloadData()
+//                                }
+//                            }
+//
+//                        } else {
+//                            self.recommendedTechniciansModel.append(technician)
+//                            self.tableView.reloadData()
+//                        }
+//
+//                    }
+//                }
+                
+
+            case .failure(let error):
+                print(error)
+            }
+        }
+        
+    }
+    
+    func getRecommendedTechnicians(model: [TechnicianModel]) {
+//        Recommendation Engine
+//        Nearby = 1km and lesser
+//        Efficiency = 65% up ✅
+//        Rating = 4 stars up ✅
+        
+//        print("self.recommendedTechniciansModel: ", model)
+        for index in 0..<model.count {
+
+            let model = model[index]
+            // append only technicians with review history and rating of 4 and above
+            self.workSpeed = Int(model.clientsSatisfaction?.workSpeedAvrg.rounded(.toNearestOrAwayFromZero) ?? 0.0)
+            self.workQuality = Int(model.clientsSatisfaction?.workQualityAvrg.rounded(.toNearestOrAwayFromZero) ?? 0.0)
+            self.responseTime = Int(model.clientsSatisfaction?.responseTimeAvrg.rounded(.toNearestOrAwayFromZero) ?? 0.0)
+
+            let sum = proficiencyInDecimal[workSpeed] + proficiencyInDecimal[workQuality] + proficiencyInDecimal[responseTime]
+            let efficiency = sum/3 * 100
+            
+            if (efficiency >= 65 && model.clientsSatisfaction?.ratingAvrg ?? 0.0 >= 4) {
+
+                guard self.recommendedTechniciansModel.filter({ $0.profileInfo.id.contains(model.profileInfo.id) }).isEmpty else { return }
+                self.recommendedTechniciansModel.append(model)
+                self.tableView.reloadData()
+
+            }
+            print("filteredRanking2: ", self.recommendedTechniciansModel, ",count2: ", self.recommendedTechniciansModel.count,", ", index)
+
+
+        } // End of loop
+    }
+    
+    fileprivate func fetchUserPosts()  {
+        DatabaseManager.shared.getAllClientPosts(completion: { [self] result in
+            switch result {
+            case .success(let userPosts):
+                posts = userPosts
+            case .failure(let error):
+                print(error)
+            }
+        })
     }
     
     // MARK: - Selectors
@@ -95,13 +200,26 @@ extension RecommendationVC: TableViewDataSourceAndDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: RecommendationCell.cellID, for: indexPath) as! RecommendationCell
         let recommendedTechnicians = recommendedTechniciansModel[indexPath.row]
+        
         cell.recommendedTechniciansModel = recommendedTechnicians
         return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+        let recommendedTechnicians = recommendedTechniciansModel[indexPath.row]
+
         let vc = TechnicianProfileDetailsVC()
+        vc.technicianModel = recommendedTechnicians
+        vc.userPostModel = posts
+        vc.profileImageView.sd_setImage(with: URL(string: recommendedTechnicians.profileInfo.profileImage ?? "")) 
+        vc.nameLabel.text = recommendedTechnicians.profileInfo.name
+        vc.locationLabel.text = "\(recommendedTechnicians.profileInfo.location), Philippines"
+        vc.technicianExperienceLabel.text = "• \(recommendedTechnicians.profileInfo.experience) Year of Exp."
+        
+        let delimiter = "at"
+        let slicedString = recommendedTechnicians.profileInfo.membershipDate.components(separatedBy: delimiter)[0]
+        vc.memberShipDateLabel.text = "• Member since " + slicedString
         navigationController?.pushViewController(vc, animated: true)
     }
     

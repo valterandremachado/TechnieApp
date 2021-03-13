@@ -91,7 +91,7 @@ class ConversationVC: UIViewController {
                 // Populate messages array
                 self?.messages = messages
                 self?.updateSender(message: messages)
-                
+                print("messages: ", messages)
 //                self?.messageInfo.append(["senderEmail": lastMessage.flatMap {$0.sender_email} ?? "", "receiverName": lastMessage.flatMap {$0.name} ?? "", "contentType": lastMessage.flatMap {$0.type} ?? ""])
 //                print("Display: \(lastMessage?.sender_email)")
             case .failure(let error):
@@ -116,6 +116,8 @@ class ConversationVC: UIViewController {
         
         let messageType = lastMessage.kind.messageKindString
 
+        let lastestMessage = messages.suffix(conversations.count)
+
         if currentUserSafeEmail == lastMessage.sender_email {
 //            senderEmail = lastMessage.sender_email
 //            print("name: " + conversations.last!.name)
@@ -128,11 +130,11 @@ class ConversationVC: UIViewController {
             }
             UserDefaults.standard.setValue(latestMessage, forKey: "lastMessage")
         } else {
-//            guard let latestMessage = conversations.first?.latestMessage.message else { return }
+            guard let latestMessage = conversations.first?.latestMessage.message else { return }
 
-            guard let latestMessage = messages.last?.content else { return }
+//            guard let latestMessage = messages.last?.content else { return }
             let modifiedLatestMessage = messageType != "text" ? ("Sent a " + messageType) : (latestMessage)
-            latestMessage != lastUserDefaultsMessage ? (customDetailText = modifiedLatestMessage): (customDetailText = "...")
+            latestMessage != lastUserDefaultsMessage ? (customDetailText = modifiedLatestMessage) : (customDetailText = "...")
 //            print("latestMessage: \(latestMessage), lastUserDefaultsMessage: \(lastUserDefaultsMessage)")
             DispatchQueue.main.async {
                 self.tableView.reloadData()
@@ -346,29 +348,18 @@ extension ConversationVC: TableViewDataSourceAndDelegate {
         var cell = tableView.dequeueReusableCell(withIdentifier: ConversationsTVCell.cellID, for: indexPath) as! ConversationsTVCell
         // Enables detailTextLabel visibility
         cell = ConversationsTVCell(style: .subtitle, reuseIdentifier: ConversationsTVCell.cellID)
-        
-        cell.textLabel?.text =  conversations[indexPath.row].name//users[indexPath.row]["name"]
+        let conversationDetail = conversations[indexPath.row]
+        cell.textLabel?.text =  conversationDetail.name//users[indexPath.row]["name"]
 
       
         cell.detailTextLabel?.textColor = .systemGray
         cell.textLabel?.font = .boldSystemFont(ofSize: 16)
-//        senderEmail == currentUserSafeEmail ? (cell.detailTextLabel?.text = "You: " + conversations[indexPath.row].latestMessage.message) : (cell.detailTextLabel?.text = conversations[indexPath.row].latestMessage.message)
-//        let lastMessage = UserDefaults.standard.value(forKey: "lastMessage") as? String ?? ""
-//        UserDefaults.standard.removeObject(forKey: "lastMessage")
+
+//        let lastMessage = messages.suffix(conversations.count)[0]//[indexPath.row]
+//
+//        print(lastMessage.content)
         
-//        if senderEmail == currentUserSafeEmail {
-//            print("senderEmail1: \(senderEmail), userEmail: \(currentUserSafeEmail)")
-////            cell.detailTextLabel?.text = "You: " + conversations[indexPath.row].latestMessage.message
-//            cell.detailTextLabel?.text = customDetailText
-////            UserDefaults.standard.setValue(conversations[indexPath.row].latestMessage.message, forKey: "lastMessage")
-//        } else {
-////            cell.detailTextLabel?.text = customDetailText
-////            print("senderEmail2: \(senderEmail), userEmail: \(currentUserSafeEmail)")
-//            cell.detailTextLabel?.text = conversations[indexPath.row].latestMessage.message
-////            UserDefaults.standard.setValue(conversations[indexPath.row].latestMessage.message, forKey: "lastMessage")
-//        }
-        
-        cell.detailTextLabel?.text = customDetailText
+        cell.detailTextLabel?.text = conversationDetail.latestMessage.message
 
         cell.accessoryType = .disclosureIndicator
         return cell

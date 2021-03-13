@@ -9,6 +9,8 @@ import UIKit
 
 class TechnicianSearchResultsVC: UIViewController {
 
+    var technicianModel = [TechnicianModel]()
+    
     // MARK: - Properties
     lazy var tableView: UITableView = {
         let tv = UITableView(frame: .zero, style: .grouped)
@@ -33,13 +35,29 @@ class TechnicianSearchResultsVC: UIViewController {
         return tv
     }()
     
-    let stringArray = ["Lalala", "Lalala", "Lalala", "Lalala", "Lalala", "Lalala", "Lalala", "Lalala"]
-
+    lazy var warningLabel: UILabel = {
+        let lbl = UILabel()
+        lbl.translatesAutoresizingMaskIntoConstraints = false
+        lbl.textAlignment = .center
+        lbl.text = "No results found!"
+        return lbl
+    }()
+    
     // MARK: - Inits
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         view.backgroundColor = .systemBackground
+        
+        if technicianModel.count == 0 {
+            tableView.isHidden = true
+            view.addSubview(warningLabel)
+            NSLayoutConstraint.activate([
+                warningLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+                warningLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+            ])
+        }
+        
         setupViews()
     }
     
@@ -69,11 +87,13 @@ class TechnicianSearchResultsVC: UIViewController {
 extension TechnicianSearchResultsVC: TableViewDataSourceAndDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return stringArray.count
+        return technicianModel.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: TechnicianSearchResultsCell.cellID, for: indexPath) as! TechnicianSearchResultsCell
+        let model = technicianModel[indexPath.item]
+        cell.technicianModel = model
         return cell
     }
     

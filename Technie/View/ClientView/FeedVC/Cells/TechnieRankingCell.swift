@@ -10,6 +10,10 @@ import LBTATools
 class TechnieRankingCell: UICollectionViewCell {
     
     private let innerCellID = "innerCellID"
+    var allTechnicians = [TechnicianModel]()
+    var filteredRanking = [TechnicianModel]()
+    var sortedRanking = [TechnicianModel]()
+    var userPostModel: [PostModel] = []
     // MARK: - Properties
     lazy var technieRankingCollectionView: UICollectionView = {
         let collectionLayout = UICollectionViewFlowLayout()
@@ -33,6 +37,9 @@ class TechnieRankingCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: .zero)
         backgroundColor = .systemBackground
+        fetchAllTechnician()
+        listenToRankChanges()
+        print("TechnieRankingCell")
         setupViews()
     }
     
@@ -41,7 +48,81 @@ class TechnieRankingCell: UICollectionViewCell {
         [technieRankingCollectionView].forEach {self.addSubview($0)}
 
         technieRankingCollectionView.anchor(top: self.topAnchor, leading: self.leadingAnchor, bottom: self.bottomAnchor, trailing: self.trailingAnchor, padding: UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0))
+    }
+    
+    let proficiencyInDecimal: [Double] = [0.25, 0.50, 0.75, 1.0]
+    var workSpeed = 0
+    var workQuality = 0
+    var responseTime = 0
+    
+    fileprivate func fetchAllTechnician()  {
         
+        DatabaseManager.shared.getAllTechnicians(completion: {[weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let technician):
+                self.allTechnicians.append(technician)
+                print("allTechnicians")
+
+//                let delay = 0.03 + 1.25
+//                Timer.scheduledTimer(withTimeInterval: delay, repeats: false) { _ in
+                self.buildTechniciansRanking(technician: technician)
+//                }
+            case .failure(let error):
+                print("Failed to get technicians: \(error.localizedDescription)")
+            }
+        })
+    }
+    
+    fileprivate func buildTechniciansRanking(technician: TechnicianModel) {
+//        Efficiency = 65%(not lesser) “ranking standard” ✅
+//        Rating = 4 stars up ✅
+        
+        var allTechniciansModel: [TechnicianModel] = []
+        allTechniciansModel.append(technician)
+        for index in 0..<allTechniciansModel.count {
+
+            let model = allTechniciansModel[index]
+            // append only technicians with review history and rating of 4 and above
+            self.workSpeed = Int(model.clientsSatisfaction?.workSpeedAvrg.rounded(.toNearestOrAwayFromZero) ?? 0.0)
+            self.workQuality = Int(model.clientsSatisfaction?.workQualityAvrg.rounded(.toNearestOrAwayFromZero) ?? 0.0)
+            self.responseTime = Int(model.clientsSatisfaction?.responseTimeAvrg.rounded(.toNearestOrAwayFromZero) ?? 0.0)
+
+//            let proficiencyInPercentage = "\(String(format:"%.0f", sum/3 * 100))%"
+            let sum = proficiencyInDecimal[workSpeed] + proficiencyInDecimal[workQuality] + proficiencyInDecimal[responseTime]
+            let efficiency = sum/3 * 100
+            guard let technicianRatingAvrg = model.clientsSatisfaction?.ratingAvrg else { return }
+            
+            if (efficiency >= 65 && technicianRatingAvrg >= 4) {
+
+                guard self.filteredRanking.filter({ $0.profileInfo.id.contains(model.profileInfo.id) }).isEmpty else { return }
+                self.filteredRanking.append(model)
+                let sortedArray = self.filteredRanking.sorted(by: {
+                    let satisAvrOne = $0.clientsSatisfaction!.workSpeedAvrg + $0.clientsSatisfaction!.workQualityAvrg + $0.clientsSatisfaction!.responseTimeAvrg
+                    let satisAvrTwo = $1.clientsSatisfaction!.workSpeedAvrg + $1.clientsSatisfaction!.workQualityAvrg + $1.clientsSatisfaction!.responseTimeAvrg
+                    return satisAvrOne > satisAvrTwo
+                })
+                sortedRanking = sortedArray
+                self.technieRankingCollectionView.reloadData()
+                DatabaseManager.shared.insertTechnieRanking(withSortedRank: sortedRanking) { _ in
+                }
+
+            }
+
+        } // End of loop
+       
+    }
+    
+    fileprivate func listenToRankChanges() {
+        DatabaseManager.shared.listenToTechnieRankChanges { [self] succcess in
+            if succcess {
+                print("listenToRankChanges")
+                filteredRanking.removeAll()
+                sortedRanking.removeAll()
+                fetchAllTechnician()
+                self.technieRankingCollectionView.reloadData()
+            }
+        }
     }
     
     // MARK: - Selectors
@@ -57,12 +138,13 @@ class TechnieRankingCell: UICollectionViewCell {
 extension TechnieRankingCell: CollectionDataSourceAndDelegate {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 5
+        return sortedRanking.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: innerCellID, for: indexPath) as! TechnieRankingInnerCell
-
+        let technieRank = sortedRanking[indexPath.item]
+        cell.technieRankModel = technieRank
         return cell
     }
     
@@ -77,7 +159,22 @@ extension TechnieRankingCell: CollectionDataSourceAndDelegate {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         self.indexPath = indexPath
+        let model = sortedRanking[indexPath.item]
         let vc = RankedTechnieVC()
+        vc.technicianModel = model
+        vc.userPostModel = userPostModel
+        vc.technicianCoverPicture.sd_setImage(with: URL(string: model.profileInfo.profileImage ?? ""))
+        let nameDelimiter = " "
+        let nameSlicedString = model.profileInfo.name.components(separatedBy: nameDelimiter)
+
+        vc.technicianNameLabel.text = "\(nameSlicedString[0])\n\(nameSlicedString[1])"
+        vc.briefSummaryLabel.text = model.profileInfo.profileSummary
+        vc.rankingLabel.text = "• Technie Rank: \(indexPath.item + 1)/\(sortedRanking.count)"
+        vc.technicianExperienceLabel.text = "• \(model.profileInfo.experience) year of Exp."
+        
+        let delimiter = "at"
+        let slicedString = model.profileInfo.membershipDate.components(separatedBy: delimiter)[0]
+        vc.memberShipDateLabel.text = "• Member since " + slicedString
 //        vc.modalTransitionStyle = .crossDissolve
 //        vc.stringPrint = "\(indexPath.item)"
         
@@ -122,8 +219,8 @@ class TechnieRankingInnerCell: UICollectionViewCell {
         iv.layer.cornerRadius = iv.frame.size.width/2
         iv.layer.masksToBounds = false
         iv.clipsToBounds = true
-//        iv.backgroundColor = .brown
-        iv.image = UIImage(named: "technieDummyPhoto")
+        iv.backgroundColor = .systemGray6
+//        iv.image = UIImage(named: "technieDummyPhoto")
         return iv
     }()
     
@@ -133,7 +230,7 @@ class TechnieRankingInnerCell: UICollectionViewCell {
         lbl.text = "Valter A. Machado"
         lbl.textAlignment = .center
 //        lbl.withHeight(25)
-        lbl.font = .systemFont(ofSize: 15)
+        lbl.font = .boldSystemFont(ofSize: 12)
 //        lbl.backgroundColor = .brown
         lbl.numberOfLines = 0
         lbl.textColor = UIColor(named: "LabelPrimaryAppearance")
@@ -311,7 +408,19 @@ class TechnieRankingInnerCell: UICollectionViewCell {
         return sv
     }()
     
-    
+    var technieRankModel: TechnicianModel! {
+        didSet {
+            profileImageView.sd_setImage(with: URL(string: technieRankModel.profileInfo.profileImage ?? ""))
+            nameLabel.text = technieRankModel.profileInfo.name
+            detailLabel.text = "\(technieRankModel.profileInfo.skills.randomElement() ?? "")"
+            let services = technieRankModel.numberOfServices
+            var serviceLabel = ""
+            services == 1 ? (serviceLabel = "service") : (serviceLabel = "services")
+            numberOfServiceLabel.text = "\(services) \(serviceLabel)"
+            ratingLabel.text = "\(technieRankModel.clientsSatisfaction?.ratingAvrg ?? 0)"
+            reviewLabel.text = " \(services)"
+        }
+    }
     // MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: .zero)

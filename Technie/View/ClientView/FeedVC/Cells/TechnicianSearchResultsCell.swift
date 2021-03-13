@@ -18,7 +18,7 @@ class TechnicianSearchResultsCell: UITableViewCell {
         iv.layer.cornerRadius = iv.frame.size.height/2
         iv.layer.masksToBounds = false
         iv.clipsToBounds = true
-//        iv.backgroundColor = .blue
+        iv.backgroundColor = .systemGray6
         iv.image = UIImage(named: "technieDummyPhoto")
         return iv
     }()
@@ -37,7 +37,7 @@ class TechnicianSearchResultsCell: UITableViewCell {
         let lbl = UILabel()
         lbl.translatesAutoresizingMaskIntoConstraints = false
         lbl.text = "₱55 per hour                            "
-        lbl.textColor = UIColor(named: "LabelPrimaryAppearance")
+        lbl.textColor = .darkGray//UIColor(named: "LabelPrimaryAppearance")
 //        lbl.backgroundColor = .cyan
         return lbl
     }()
@@ -45,8 +45,8 @@ class TechnicianSearchResultsCell: UITableViewCell {
     lazy var ratingLabel: UILabel = {
         let lbl = UILabel()
         lbl.translatesAutoresizingMaskIntoConstraints = false
-        lbl.text = " 5 (40)"//★
-        lbl.textColor = UIColor(named: "LabelPrimaryAppearance")
+//        lbl.text = " 5 (40)"//★
+        lbl.textColor = .darkGray//UIColor(named: "LabelPrimaryAppearance")
 
         return lbl
     }()
@@ -55,7 +55,7 @@ class TechnicianSearchResultsCell: UITableViewCell {
         let lbl = UILabel()
         lbl.translatesAutoresizingMaskIntoConstraints = false
         lbl.text = "Baguio City"
-        lbl.textColor = UIColor(named: "LabelPrimaryAppearance")
+        lbl.textColor = .darkGray//UIColor(named: "LabelPrimaryAppearance")
 
         return lbl
     }()
@@ -64,24 +64,25 @@ class TechnicianSearchResultsCell: UITableViewCell {
         let lbl = UILabel()
         lbl.translatesAutoresizingMaskIntoConstraints = false
         lbl.text = "Electrician, Plumber, Handyman"
-        lbl.textColor = UIColor(named: "LabelPrimaryAppearance")
+        lbl.textColor = .darkGray//UIColor(named: "LabelPrimaryAppearance")
         return lbl
     }()
     
     lazy var locationStackView: UIStackView = {
-        let config = UIImage.SymbolConfiguration(pointSize: CGFloat(15))
-        var wiredProfileImage = UIImage(systemName: "location.fill", withConfiguration: config)?.withTintColor(.systemPink, renderingMode: .alwaysOriginal)
+        let config = UIImage.SymbolConfiguration(pointSize: 15, weight: .bold, scale: .small)
+        var wiredProfileImage = UIImage(systemName: "mappin.and.ellipse", withConfiguration: config)?.withTintColor(.systemPink, renderingMode: .alwaysOriginal)
         
         let iconIV = UIImageView()
         iconIV.contentMode = .scaleAspectFit
         iconIV.image = wiredProfileImage
-        
+        iconIV.withWidth(20)
+
         let sv = UIStackView(arrangedSubviews: [iconIV, locationLabel])
         sv.axis = .horizontal
-        sv.spacing = 2
+        sv.spacing = 5
 //        sv.alignment = .fill
-        sv.distribution = .fillProportionally
-//        sv.addBackground(color: .red)
+        sv.distribution = .fill
+//        sv.addBackground(color: .cyan)
         return sv
     }()
     
@@ -91,16 +92,28 @@ class TechnicianSearchResultsCell: UITableViewCell {
         
         let iconIV = UIImageView()
         iconIV.contentMode = .scaleAspectFit
-        iconIV.image = wiredProfileImage
+//        iconIV.image = wiredProfileImage
+        iconIV.withWidth(20)
+        iconIV.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: 20, right: 0)
+        iconIV.image = wiredProfileImage?.withInset(UIEdgeInsets(top: 0, left: 0, bottom: 0.5, right: 0))
         
         let sv = UIStackView(arrangedSubviews: [iconIV, ratingLabel])
         sv.axis = .horizontal
         sv.spacing = 2
-        sv.alignment = .leading
+        sv.alignment = .trailing
         sv.distribution = .fill
-//        sv.addBackground(color: .red)
+//        sv.addBackground(color: .brown)
+
         return sv
     }()
+    
+//    lazy var skillsStackView: UIStackView = {
+//        let sv = UIStackView(arrangedSubviews: [jobTitleLabel])
+//        sv.axis = .horizontal
+//        sv.alignment = .leading
+//        sv.distribution = .fill
+//        return sv
+//    }()
     
     lazy var skillsTagStackView: UIStackView = {
         let config = UIImage.SymbolConfiguration(pointSize: CGFloat(15))
@@ -109,31 +122,39 @@ class TechnicianSearchResultsCell: UITableViewCell {
         let iconIV = UIImageView()
         iconIV.contentMode = .scaleAspectFit
         iconIV.image = wiredProfileImage
-        
+        iconIV.withWidth(20)
         let sv = UIStackView(arrangedSubviews: [iconIV, jobTitleLabel])
         sv.axis = .horizontal
-        sv.spacing = 2
-//        sv.alignment = .fill
-        sv.distribution = .fillProportionally
-//        sv.addBackground(color: .red)
+        sv.spacing = 5
+        sv.alignment = .leading
+        sv.distribution = .fill
+//        sv.addBackground(color: .systemPurple)
         return sv
     }()
     
+//    lazy var pricePerHourStackView: UIStackView = {
+//        let sv = UIStackView(arrangedSubviews: [pricePerHourLabel])
+//        sv.axis = .horizontal
+//        sv.alignment = .leading
+//        sv.distribution = .fill
+//        return sv
+//    }()
+    
     lazy var priceStackView: UIStackView = {
         let config = UIImage.SymbolConfiguration(pointSize: CGFloat(15))
-        var wiredProfileImage = UIImage(systemName: "dollarsign.circle.fill", withConfiguration: config)?.withTintColor(.systemPink, renderingMode: .alwaysOriginal)
+        var wiredProfileImage = UIImage(systemName: "pesosign.circle.fill", withConfiguration: config)?.withTintColor(.systemPink, renderingMode: .alwaysOriginal)
         
         let iconIV = UIImageView()
         iconIV.contentMode = .scaleAspectFit
         iconIV.image = wiredProfileImage
-//        iconIV.withWidth(15)
+        iconIV.withWidth(20)
         
         let sv = UIStackView(arrangedSubviews: [iconIV, pricePerHourLabel])
         sv.axis = .horizontal
-        sv.spacing = 2
+        sv.spacing = 5
 //        sv.alignment = .leading
-        sv.distribution = .fillProportionally
-//        sv.addBackground(color: .red)
+        sv.distribution = .fill
+//        sv.addBackground(color: .lightGray)
         return sv
     }()
     
@@ -142,7 +163,7 @@ class TechnicianSearchResultsCell: UITableViewCell {
         sv.axis = .horizontal
         sv.spacing = 10
 //        sv.alignment = .leading
-        sv.distribution = .fillEqually
+        sv.distribution = .fill
 //        sv.addBackground(color: .cyan)
         return sv
     }()
@@ -161,36 +182,50 @@ class TechnicianSearchResultsCell: UITableViewCell {
         return sv
     }()
     
-    lazy var saveBtn: UIButton = {
-        let config = UIImage.SymbolConfiguration(pointSize: CGFloat(20))
-        var image = UIImage(systemName: "bookmark", withConfiguration: config)?.withTintColor(.blue, renderingMode: .alwaysOriginal)
-        
-        let btn = UIButton(type: .system)
-        btn.translatesAutoresizingMaskIntoConstraints = false
-//        btn.setTitle("Save", for: .normal)
-        btn.setImage(image, for: .normal)
-//        btn.backgroundColor = .red
-//        btn.withSize(CGSize(width: 50, height: 50))
-        return btn
-    }()
+    var rating = 0.0
+    var technicianModel: TechnicianModel! {
+        didSet {
+            rating = technicianModel.clientsSatisfaction?.ratingAvrg ?? 0.0
+            
+            profileImageView.sd_setImage(with: URL(string: technicianModel.profileInfo.profileImage ?? ""), completed: nil)
+            nameLabel.text = technicianModel.profileInfo.name
+            jobTitleLabel.text = technicianModel.profileInfo.name
+            locationLabel.text = technicianModel.profileInfo.location
+            pricePerHourLabel.text = "₱\(technicianModel.profileInfo.hourlyRate)"
+            if rating != 0 {
+                ratingStackView.alpha = 1
+                ratingLabel.text = "\(rating) (\(technicianModel.numberOfServices))"
+            } else {
+                ratingStackView.alpha = 0
+            }
+
+            
+            // Take all elements of the array then convert it into a plain string
+            let skills = technicianModel.profileInfo.skills
+            let flatStrings = skills.joined(separator: ", ")
+            jobTitleLabel.text = flatStrings
+        }
+    }
     
+    // MARK: - Init
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         selectionStyle = .none
         setupViews()
     }
     
-    fileprivate func setupViews() {
-        [mainStackView, profileImageView].forEach {self.addSubview($0)}
-                
-        profileImageView.anchor(top: self.topAnchor, leading: self.leadingAnchor, bottom: nil, trailing: nil, padding: UIEdgeInsets(top: 10, left: separatorInset.left, bottom: 0, right: 0))
-//        mainStackView.withHeight(160)
-        mainStackView.anchor(top: profileImageView.topAnchor, leading: profileImageView.trailingAnchor, bottom: self.bottomAnchor, trailing: self.trailingAnchor, padding: UIEdgeInsets(top: 5, left: 8, bottom: 10, right: 0))
-        
-    }
-    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: - Methods
+    fileprivate func setupViews() {
+        [mainStackView, profileImageView].forEach {self.addSubview($0)}
+        
+        profileImageView.anchor(top: self.topAnchor, leading: self.leadingAnchor, bottom: nil, trailing: nil, padding: UIEdgeInsets(top: 10, left: separatorInset.left, bottom: 0, right: 0))
+//        mainStackView.withHeight(160)
+        mainStackView.anchor(top: profileImageView.topAnchor, leading: profileImageView.trailingAnchor, bottom: self.bottomAnchor, trailing: self.trailingAnchor, padding: UIEdgeInsets(top: 5, left: 8, bottom: 10, right: 20))
+        
     }
     
 }

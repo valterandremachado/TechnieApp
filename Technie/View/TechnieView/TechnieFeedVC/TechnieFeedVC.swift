@@ -442,12 +442,15 @@ extension TechnieFeedVC: UISearchBarDelegate {
 //            collectionView.reloadData()
         }
         
-        filteredData = postModel
         if searchText.isEmpty == false {
-            filteredData = postModel.filter({ $0.field!.contains(searchText) })
-//            print(filteredData)
-//            isSearching = true
-//            collectionView.reloadData()
+            if searchText != "," {
+                guard !searchText.replacingOccurrences(of: " ", with: "").isEmpty else { return }
+                filteredData = postModel
+                filteredData = postModel.filter({ $0.field!.localizedCaseInsensitiveContains(searchText) })
+            }
+            //            print(filteredData)
+            //            isSearching = true
+            //            collectionView.reloadData()
         }
        
     }

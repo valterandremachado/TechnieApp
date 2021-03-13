@@ -52,7 +52,7 @@ class ClientFeedVC: UIViewController {
         cv.delegate = self
         cv.dataSource = self
         //        cv.collectionViewLayout.invalidateLayout()
-        
+        cv.isHidden = true
         // Registration of the cells
         cv.register(NearbyTechniesCell.self, forCellWithReuseIdentifier: feedCellOnSection1ID)
         cv.register(TechnieRankingCell.self, forCellWithReuseIdentifier: feedCellOnSection2ID)
@@ -112,17 +112,20 @@ class ClientFeedVC: UIViewController {
         return btn
     }()
     
-    var searchController: UISearchController {
+    lazy var searchController: UISearchController = {
         let search = UISearchController(searchResultsController: nil)
         search.obscuresBackgroundDuringPresentation = false
         
         // Setup SearchBar
         let searchBar = search.searchBar
-        searchBar.placeholder = "Search for technicians"
+        searchBar.placeholder = "Search for technicians (ex: name, profession)"
         searchBar.sizeToFit()
         searchBar.delegate = self
+        // changes searchbar placeholder appearance
+        let placeholderAppearance = UILabel.appearance(whenContainedInInstancesOf: [UISearchBar.self])
+        placeholderAppearance.font = .systemFont(ofSize: 15)
         return search
-    }
+    }()
     
     var isShowingSearchResultView = false
     
@@ -154,6 +157,15 @@ class ClientFeedVC: UIViewController {
     
     let professionArray = ["Handyman", "Electrician", "Repairer", "Others"]//Household Appliances Repairers
 
+    lazy var warningLabel: UILabel = {
+        let lbl = UILabel()
+        lbl.translatesAutoresizingMaskIntoConstraints = false
+        lbl.textAlignment = .center
+        lbl.text = "Our service is offline, please try again later."
+        return lbl
+    }()
+    
+    private var indicator: ProgressIndicatorLarge!
         
     // MARK: - Init
     override func loadView() {
@@ -165,6 +177,15 @@ class ClientFeedVC: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         view.backgroundColor = UIColor(named: "BackgroundAppearance")
+        
+        indicator = ProgressIndicatorLarge(inview: self.view, loadingViewColor: UIColor.clear, indicatorColor: UIColor.gray, msg: "")
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        
+        if technicianModel.count == 0 {
+            indicator.start()
+        }
+        
+        fetchRanking()
         fetchUserPosts()
         fetchData()
         setupViews()
@@ -197,16 +218,28 @@ class ClientFeedVC: UIViewController {
     
     // MARK: - Methods
     fileprivate func setupViews(){
-        [clientFeedCollectionView, searchResultView].forEach {view.addSubview($0)}
+        [clientFeedCollectionView, searchResultView, indicator].forEach {view.addSubview($0)}
         
         clientFeedCollectionView.anchor(top: view.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor)
-        
+
         guard let navBarHeight = navigationController?.navigationBar.frame.height else { return }
         
         searchResultView.anchor(top: view.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor, padding: UIEdgeInsets(top: navBarHeight , left: 0, bottom: 0, right: 0))
+        
+        NSLayoutConstraint.activate([
+            indicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            indicator.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 10),
+            indicator.heightAnchor.constraint(equalToConstant: 50),
+            indicator.widthAnchor.constraint(equalToConstant: 50),
+        ])
     }
     
     func setupNavBar(){
+//        ProgressHUD.colorAnimation = .systemBlue
+//        ProgressHUD.colorProgress = .systemBlue
+//        ProgressHUD.animationType = .circleStrokeSpin
+//        ProgressHUD.show("Posting...", interaction: false)
+
         guard let navBar = navigationController?.navigationBar else { return }
         navBar.topItem?.title = "Feeds"
         navBar.prefersLargeTitles = true
@@ -223,13 +256,43 @@ class ClientFeedVC: UIViewController {
     }
     
     fileprivate func fetchData()  {
+        view.isUserInteractionEnabled = false
+        searchController.searchBar.isUserInteractionEnabled = false
+        
         DatabaseManager.shared.getAllTechnicians(completion: {[weak self] result in
             guard let self = self else { return }
             switch result {
             case .success(let technicians):
                 self.technicianModel.append(technicians)
-                self.clientFeedCollectionView.reloadData()
+                
+                UIView.animate(withDuration: 0.5) {
+                    self.indicator.stop()
+//                    UIView.animate(withDuration: 0.5) {
+//                        ProgressHUD.showSucceed()
+//                    }
+                   
+                    self.indicator.removeFromSuperview()
+                    self.clientFeedCollectionView.isHidden = false
+                    self.view.isUserInteractionEnabled = true
+                    self.searchController.searchBar.isUserInteractionEnabled = true
+                    self.clientFeedCollectionView.reloadData()
+                }
+             
             case .failure(let error):
+                
+                if self.technicianModel.count == 0 {
+                    self.clientFeedCollectionView.isHidden = true
+                    self.view.addSubview(self.warningLabel)
+                    NSLayoutConstraint.activate([
+                        self.warningLabel.centerYAnchor.constraint(equalTo: self.view.centerYAnchor),
+                        self.warningLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor)
+                    ])
+                } else {
+                    self.clientFeedCollectionView.isHidden = false
+                }
+                
+                self.indicator.stop()
+                self.indicator.removeFromSuperview()
                 print("Failed to get technicians: \(error.localizedDescription)")
             }
         })
@@ -291,6 +354,18 @@ class ClientFeedVC: UIViewController {
         
     }
     
+    var technieRank = [TechnicianModel]()
+    fileprivate func fetchRanking() {
+        DatabaseManager.shared.getTechnieRank { result in
+            switch result {
+            case .success(let technieRank):
+                self.technieRank = technieRank
+            case .failure(let error):
+                print(error)
+            }
+        }
+    }
+    
     // MARK: - Selectors
     @objc fileprivate func leftBarItemPressed(){
         let userProfileVC = UserProfileVC()
@@ -300,6 +375,8 @@ class ClientFeedVC: UIViewController {
     
     @objc func seeAllBtnPressed() {
         let vc = FullRankingVC()
+        vc.technieRank = technieRank
+        vc.userPostModel = userPostModel
         navigationController?.pushViewController(vc, animated: true)
     }
     
@@ -310,6 +387,9 @@ class ClientFeedVC: UIViewController {
         formattre.locale = .current
         return formattre
     }()
+    
+    var filteredData: [TechnicianModel] = []
+
     
 }
 
@@ -327,17 +407,45 @@ extension ClientFeedVC: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         searchBar.searchTextField.autocapitalizationType = .none
         guard let searchedString = searchBar.text else { return }
-        presentSearchResults(searchedString)
+        presentSearchResults(searchedString, filteredData)
     }
 //    func presentSearchController(_ searchController: UISearchController) {
 //        searchController.searchBar.becomeFirstResponder()
 //    }
     
-    fileprivate func presentSearchResults(_ searchedString: String) {
+    fileprivate func presentSearchResults(_ searchedString: String,_ filteredTechnicians: [TechnicianModel]) {
         let vc = TechnicianSearchResultsVC()
         vc.title = "\(searchedString) results".lowercased()
+        vc.technicianModel = filteredTechnicians
         navigationController?.pushViewController(vc, animated: true)
     }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        //        searchBar.text = searchText.lowercased()
+        if searchBar.text!.trimmingCharacters(in: .whitespaces).isEmpty {
+            //            print("isEmpty")
+        } else {
+        }
+        
+        if searchText.isEmpty == false {
+//            let skills = technicianModel.profileInfo.skills
+//            let flatStrings = skills.joined(separator: ", ")
+            if searchText != "," {
+                guard !searchText.replacingOccurrences(of: " ", with: "").isEmpty else { return }
+                filteredData = technicianModel
+                let filteredArray = technicianModel.filter { (technician) -> Bool in
+                    return technician.profileInfo.name.localizedCaseInsensitiveContains(searchText) || technician.profileInfo.skills.joined(separator: ", ").localizedCaseInsensitiveContains(searchText) }
+                filteredData = filteredArray//technicianModel.filter({ $0.profileInfo.skills.joined(separator: ", ").localizedCaseInsensitiveContains(searchText) })
+                print(filteredArray)
+            }
+          
+           
+//            isSearching = true
+//            collectionView.reloadData()
+        }
+       
+    }
+    
     
   
 }
@@ -368,6 +476,7 @@ extension ClientFeedVC: CollectionDataSourceAndDelegate {
         case 0:
             // Technie Ranking cell
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: feedCellOnSection2ID, for: indexPath) as! TechnieRankingCell
+            cell.userPostModel = userPostModel
             return cell
             
         case 1:
@@ -392,21 +501,28 @@ extension ClientFeedVC: CollectionDataSourceAndDelegate {
         switch didShowSearchResultViewObservable.value {
         case true:
             print("resultView Showing now")
+            let profession = professionArray[indexPath.item]
+            let filteredByProfession = profession == "Others" ? (technicianModel) : (technicianModel.filter({ $0.profileInfo.skills.joined(separator: ", ").contains(profession)}))
+            
             let vc = TechnicianSearchResultsVC()
             vc.title = "\(professionArray[indexPath.item]) technician results".lowercased()
+            vc.technicianModel = filteredByProfession
+
             navigationItem.backBarButtonItem = UIBarButtonItem(title: "Search", style: .plain, target: self, action: nil)
             navigationController?.pushViewController(vc, animated: true)
         case false:
+            let technicians = technicianModel[indexPath.item]
             
             let vc = TechnicianProfileDetailsVC()
-            vc.technicianModel = technicianModel[indexPath.item]
+            vc.technicianModel = technicians
             vc.userPostModel = userPostModel
-            vc.nameLabel.text = technicianModel[indexPath.item].profileInfo.name
-            vc.locationLabel.text = "\(technicianModel[indexPath.item].profileInfo.location), Philippines"
-            vc.technicianExperienceLabel.text = "• \(technicianModel[indexPath.item].profileInfo.experience) Year of Exp."
+            vc.profileImageView.sd_setImage(with: URL(string: technicians.profileInfo.profileImage ?? ""))
+            vc.nameLabel.text = technicians.profileInfo.name
+            vc.locationLabel.text = "\(technicians.profileInfo.location), Philippines"
+            vc.technicianExperienceLabel.text = "• \(technicians.profileInfo.experience) Year of Exp."
             
             let delimiter = "at"
-            let slicedString = technicianModel[indexPath.item].profileInfo.membershipDate.components(separatedBy: delimiter)[0]
+            let slicedString = technicians.profileInfo.membershipDate.components(separatedBy: delimiter)[0]
             vc.memberShipDateLabel.text = "• Member since " + slicedString
             navigationItem.backBarButtonItem = UIBarButtonItem(title: "Feeds", style: .plain, target: self, action: nil)
             navigationController?.pushViewController(vc, animated: true)
@@ -490,7 +606,9 @@ extension ClientFeedVC: CollectionDataSourceAndDelegate {
                             String, at indexPath: IndexPath) -> UICollectionReusableView {
         
         let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: headerID, for: indexPath) as! HeaderView
-        
+        if technieRank.count == 0 {
+            header.seeAllBtn.isEnabled = false
+        }
         if didShowSearchResultViewObservable.value == true {
             header.sectionTitle.text = "Search by category".uppercased()
 //            header.backgroundColor = .systemBackground

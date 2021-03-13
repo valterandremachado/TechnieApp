@@ -797,7 +797,7 @@ extension DatabaseManager {
             completion(true)
         })
     }
-    
+
     public func insertClientSatisfaction(with clientsSatisfactionModel: ClientsSatisfaction, with reviewModel: Review, with technicianKeyPath: String, completion: @escaping (Bool) -> Void) {
         
         let reviewData = try! FirebaseEncoder().encode(reviewModel)
@@ -840,49 +840,22 @@ extension DatabaseManager {
         })
     }
     
-    public func getAllClientSatisfactionWithReviews(with technicianKeyPath: String, onClientSatisfactionCompletion: @escaping (Result<ClientsSatisfaction, Error>) -> Void, onReviewCompletion: @escaping (Result<[Review], Error>) -> Void) {
-      
-        var reviews = [Review]()
-        
-        let mainChildPath = "users/technicians/\(technicianKeyPath)/clientsSatisfaction"
+    public func insertTechnieRanking(withSortedRank technieRank: [TechnicianModel], completion: @escaping (Bool) -> Void) {
+        let data = try! FirebaseEncoder().encode(technieRank)
 
-        self.database.child(mainChildPath).observeSingleEvent(of: .value, with: { snapshot in
-            guard let value = snapshot.value as? [String: Any] else {
-                onClientSatisfactionCompletion(.failure(DatabaseError.failedToFetch))
+        let mainChildPath = "technieRank"
+        
+        let db = database.child(mainChildPath)
+        
+        db.setValue(data, withCompletionBlock: { error, _ in
+            guard error == nil else {
+                completion(false)
                 return
             }
-            
-            do {
-                let model = try FirebaseDecoder().decode(ClientsSatisfaction.self, from: value)
-                onClientSatisfactionCompletion(.success(model))
-            } catch let error {
-                print(error)
-            }
-            
+            completion(true)
         })
-        
-        let reviewChildPath = "users/technicians/\(technicianKeyPath)/clientsSatisfaction/reviews"
-            self.database.child(reviewChildPath).observeSingleEvent(of: .value, with: { snapshot in
-                guard let reviewCollection = snapshot.value as? [String: Any] else {
-                    onReviewCompletion(.failure(DatabaseError.failedToFetch))
-                    return
-                }
-                for (keyPath, _) in reviewCollection {
-                    self.database.child("\(reviewChildPath)/\(keyPath)").observeSingleEvent(of: .value, with: { snapshot in
-                        guard let value = snapshot.value else { return }
-                        do {
-                            let model = try FirebaseDecoder().decode(Review.self, from: value)
-                            reviews.append(model)
-                            onReviewCompletion(.success(reviews))
-                        } catch let error {
-                            print(error)
-                        }
-                    })
-                }
-                
-            })
     }
-    
+   
     /// Deletion
     public func deleteChildPath(withChildPath: String, completion: @escaping (Bool) -> Void) {
         database.child(withChildPath).removeValue { (error, _) in
@@ -1339,6 +1312,75 @@ extension DatabaseManager {
         })
     }
     
+    public func getAllClientSatisfactionWithReviews(with technicianKeyPath: String, onClientSatisfactionCompletion: @escaping (Result<ClientsSatisfaction, Error>) -> Void, onReviewCompletion: @escaping (Result<[Review], Error>) -> Void) {
+      
+        var reviews = [Review]()
+        
+        let mainChildPath = "users/technicians/\(technicianKeyPath)/clientsSatisfaction"
+
+        self.database.child(mainChildPath).observeSingleEvent(of: .value, with: { snapshot in
+            guard let value = snapshot.value as? [String: Any] else {
+                onClientSatisfactionCompletion(.failure(DatabaseError.failedToFetch))
+                return
+            }
+            
+            do {
+                let model = try FirebaseDecoder().decode(ClientsSatisfaction.self, from: value)
+                onClientSatisfactionCompletion(.success(model))
+            } catch let error {
+                print(error)
+            }
+            
+        })
+        
+        let reviewChildPath = "users/technicians/\(technicianKeyPath)/clientsSatisfaction/reviews"
+            self.database.child(reviewChildPath).observeSingleEvent(of: .value, with: { snapshot in
+                guard let reviewCollection = snapshot.value as? [String: Any] else {
+                    onReviewCompletion(.failure(DatabaseError.failedToFetch))
+                    return
+                }
+                for (keyPath, _) in reviewCollection {
+                    self.database.child("\(reviewChildPath)/\(keyPath)").observeSingleEvent(of: .value, with: { snapshot in
+                        guard let value = snapshot.value else { return }
+                        do {
+                            let model = try FirebaseDecoder().decode(Review.self, from: value)
+                            reviews.append(model)
+                            onReviewCompletion(.success(reviews))
+                        } catch let error {
+                            print(error)
+                        }
+                    })
+                }
+                
+            })
+    }
+    
+    public func getAllTechniciansReview(with technicianKeyPath: String, onReviewCompletion: @escaping (Result<[Review], Error>) -> Void) {
+        let reviewChildPath = "users/technicians/\(technicianKeyPath)/clientsSatisfaction/reviews"
+        self.database.child(reviewChildPath).observeSingleEvent(of: .value, with: { snapshot in
+            guard let reviewCollection = snapshot.value as? [String: Any] else {
+                onReviewCompletion(.failure(DatabaseError.failedToFetch))
+                return
+            }
+            
+            var reviews = [Review]()
+
+            for (keyPath, _) in reviewCollection {
+                self.database.child("\(reviewChildPath)/\(keyPath)").observeSingleEvent(of: .value, with: { snapshot in
+                    guard let value = snapshot.value else { return }
+                    do {
+                        let model = try FirebaseDecoder().decode(Review.self, from: value)
+                        reviews.append(model)
+                        onReviewCompletion(.success(reviews))
+                    } catch let error {
+                        print(error)
+                    }
+                })
+            }
+            
+        })
+    }
+    
     public func getAllActiveHiredJobs(techniciankeyPath: String, completion: @escaping (Result<[String], Error>) -> Void) {
                 var jobs = [String]()
             
@@ -1515,6 +1557,30 @@ extension DatabaseManager {
             }
         })
     }
+    
+    public func getTechnieRank(completion: @escaping (Result<[TechnicianModel], Error>) -> Void) {
+        
+        database.child("technieRank").observe(.value, with: { snapshot in
+            guard let rankCollection = snapshot.value as? [[String: Any]] else{
+                completion(.failure(DatabaseError.failedToFetch))
+                return
+            }
+            
+            var ranking = [TechnicianModel]()
+            for value in rankCollection {
+                do {
+                    let model = try FirebaseDecoder().decode(TechnicianModel.self, from: value)
+                    ranking.append(model)
+                    completion(.success(ranking))
+                } catch {
+                    
+                }
+            }
+            
+
+        })
+    }
+    
     
     // MARK: - Listeners
     public func listenToPostChanges(completion: @escaping (Result<[PostModel], Error>) -> Void) {
@@ -1698,6 +1764,17 @@ extension DatabaseManager {
                     
                 })
             })
+    }
+    
+    public func listenToTechnieRankChanges(completion: @escaping (Bool) -> Void) {
+        
+        Database.database().reference().child("users/technicians").observeSingleEvent(of: .childChanged, with: { snapshot in
+            guard let _ = snapshot.value as? [String: Any] else {
+                completion(false)
+                return
+            }
+            completion(true)
+        })
     }
     
     // MARK: - -----

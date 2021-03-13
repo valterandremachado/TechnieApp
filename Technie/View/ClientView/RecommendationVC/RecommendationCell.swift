@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Cosmos
 
 class RecommendationCell: UITableViewCell {
     
@@ -54,7 +55,7 @@ class RecommendationCell: UITableViewCell {
         let lbl = UILabel()
         lbl.translatesAutoresizingMaskIntoConstraints = false
         lbl.text = "4.5 (40) | 400 services"
-//        lbl.textAlignment = .center
+//        lbl.textAlignment = .right
 //        lbl.withHeight(25)
         lbl.font = .systemFont(ofSize: 13)
 //        lbl.backgroundColor = .brown
@@ -90,7 +91,7 @@ class RecommendationCell: UITableViewCell {
     
     lazy var distanceWithIconStackView: UIStackView = {
         let config = UIImage.SymbolConfiguration(pointSize: 13, weight: .bold, scale: .small)
-        var wiredProfileImage = UIImage(named: "distance", in: nil, with: config)?.withTintColor(.systemGray, renderingMode: .alwaysOriginal)
+        var wiredProfileImage = UIImage(named: "distance", in: nil, with: config)?.withTintColor(.systemPink, renderingMode: .alwaysOriginal)
         
         let iconIV = UIImageView()
         iconIV.contentMode = .scaleAspectFit
@@ -110,6 +111,29 @@ class RecommendationCell: UITableViewCell {
         return sv
     }()
     
+    lazy var ratingView: CosmosView = {
+        let view = CosmosView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+//        view.backgroundColor = .blue
+        view.settings.filledColor = .systemPink
+//        view.settings.emptyColor = .systemPink
+//        view.settings.emptyImage = UIImage(systemName: "star")?.withTintColor(.systemPink, renderingMode: .alwaysOriginal)
+//        view.settings.filledImage = UIImage(systemName: "star.fill")?.withTintColor(.systemPink, renderingMode: .alwaysOriginal)
+        view.settings.updateOnTouch = false
+        view.settings.starMargin = -1
+        view.settings.starSize = 16
+        view.settings.fillMode = .half
+        view.withWidth(75)
+//        view.rating = 5
+        view.bounds = view.frame.insetBy(dx: 0.0, dy: -2)
+
+//        view.frame = .init(x: 0, y: -2.5, width: 0, height: 0)
+//        view.didFinishTouchingCosmos = { rating in
+//            print("rating: \(rating)")
+//        }
+        return view
+    }()
+    
     lazy var ratingAndServicesWithIconStackView: UIStackView = {
         let config = UIImage.SymbolConfiguration(pointSize: 50, weight: .bold, scale: .large)
         var wiredProfileImage = UIImage(named: "rating4", in: nil, with: config)?.withTintColor(.systemGray, renderingMode: .alwaysOriginal)
@@ -120,21 +144,23 @@ class RecommendationCell: UITableViewCell {
 //        iconIV.backgroundColor = .brown
         iconIV.image = wiredProfileImage?.withAlignmentRectInsets(UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0))
 
-        let sv = UIStackView(arrangedSubviews: [iconIV, ratingAndServicesLabel])
+        let sv = UIStackView(arrangedSubviews: [ratingView, ratingAndServicesLabel])
         sv.translatesAutoresizingMaskIntoConstraints = false
         sv.axis = .horizontal
         sv.spacing = 5
 //        sv.alignment = .leading
-        sv.distribution = .fillProportionally
+        sv.distribution = .fill
 //        sv.addBackground(color: .cyan)
-        sv.withWidth(frame.width - frame.width/3)
+        sv.withWidth(frame.width - frame.width/4.5)
         sv.withHeight(20)
+        sv.subviews[0].layoutMargins = .init(top: 2.5, left: 0, bottom: 0, right: 0)
+
         return sv
     }()
     
     lazy var skillsWithIconStackView: UIStackView = {
         let config = UIImage.SymbolConfiguration(pointSize: 13, weight: .bold, scale: .small)
-        var wiredProfileImage = UIImage(systemName: "tag.fill", withConfiguration: config)?.withTintColor(.systemGray, renderingMode: .alwaysOriginal)
+        var wiredProfileImage = UIImage(systemName: "tag.fill", withConfiguration: config)?.withTintColor(.systemPink, renderingMode: .alwaysOriginal)
 
         let iconIV = UIImageView()
         iconIV.contentMode = .scaleAspectFit
@@ -156,7 +182,7 @@ class RecommendationCell: UITableViewCell {
     
     lazy var proficiencyWithIconStackView: UIStackView = {
         let config = UIImage.SymbolConfiguration(pointSize: 14, weight: .bold, scale: .large)
-        var wiredProfileImage = UIImage(named: "proficiency4", in: nil, with: config)?.withTintColor(.systemGray, renderingMode: .alwaysOriginal)
+        var wiredProfileImage = UIImage(named: "proficiency4", in: nil, with: config)?.withTintColor(.systemPink, renderingMode: .alwaysOriginal)
         
         let iconIV = UIImageView()
         iconIV.contentMode = .scaleAspectFit
@@ -188,10 +214,34 @@ class RecommendationCell: UITableViewCell {
         return sv
     }()
     
+    let proficiencyInDecimal: [Double] = [0.25, 0.50, 0.75, 1.0]
+    var workSpeed = 0
+    var workQuality = 0
+    var responseTime = 0
+    
     var recommendedTechniciansModel: TechnicianModel! {
         didSet {
-            nameLabel.text = recommendedTechniciansModel.profileInfo.name
+            workSpeed = Int(recommendedTechniciansModel.clientsSatisfaction?.workSpeedAvrg.rounded(.toNearestOrAwayFromZero) ?? 0)
+            workQuality = Int(recommendedTechniciansModel.clientsSatisfaction?.workQualityAvrg.rounded(.toNearestOrAwayFromZero) ?? 0)
+            responseTime = Int(recommendedTechniciansModel.clientsSatisfaction?.responseTimeAvrg.rounded(.toNearestOrAwayFromZero) ?? 0)
+            
+            let sum = proficiencyInDecimal[workSpeed] + proficiencyInDecimal[workQuality] + proficiencyInDecimal[responseTime]
+            let proficiencyInPercentage = "\(String(format:"%.0f", sum/3 * 100))%"
+            let numberOfServices = recommendedTechniciansModel.numberOfServices
+            var label = ""
+            numberOfServices == 1 ? (label = "Service") : (label = "Services")
+            
             profileImageView.sd_setImage(with: URL(string: recommendedTechniciansModel.profileInfo.profileImage ?? ""), completed: nil)
+            nameLabel.text = recommendedTechniciansModel.profileInfo.name
+            ratingView.rating = recommendedTechniciansModel.clientsSatisfaction?.ratingAvrg ?? 0.0
+
+            proficiencyLabel.text = "Proficiency: " + proficiencyInPercentage
+            ratingAndServicesLabel.text = "\(recommendedTechniciansModel.clientsSatisfaction?.ratingAvrg ?? 0.0) | \(numberOfServices) \(label)"
+            
+            // Take all elements of the array then convert it into a plain string
+            let skills = recommendedTechniciansModel.profileInfo.skills
+            let flatString = skills.joined(separator: ", ")
+            skillsLabel.text = flatString
         }
     }
     

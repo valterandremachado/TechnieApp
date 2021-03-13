@@ -401,6 +401,11 @@ class PostFormVC: UIViewController {
     var chosenItem: String = "Long Term"
     // MARK: - Selectors
     @objc fileprivate func rightNavBarItemPostBtnTapped() {
+        ProgressHUD.colorAnimation = .systemBlue
+        ProgressHUD.colorProgress = .systemBlue
+        ProgressHUD.animationType = .circleStrokeSpin
+        ProgressHUD.show("Posting...", interaction: false)
+        
         let dateString = PostFormVC.dateFormatter.string(from: postDateTime)
 
         postTitle = titleTextField.text
@@ -445,7 +450,7 @@ class PostFormVC: UIViewController {
 
                 if postsImageUrl.count == self.imageDataArray.count {
                     self.postAttachments = postsImageUrl
-                    print("download url returned: \(postsImageUrl), count: \(postsImageUrl.count)")
+//                    print("download url returned: \(postsImageUrl), count: \(postsImageUrl.count)")
 
                     let postOwnerInfo = PostOwnerInfo(name: clientName, email: clientEmail, location: clientLocation, keyPath: clientUID, profileImage: nil)
 
@@ -470,9 +475,21 @@ class PostFormVC: UIViewController {
 
                     DatabaseManager.shared.insertPost2(with: post, completion: { success in
                         if success {
-                            self.navigationController?.popToRootViewController(animated: true)
+                          
+                            ProgressHUD.colorAnimation = .systemBlue
+                            ProgressHUD.colorProgress = .systemBlue
+                            ProgressHUD.showSucceed()
+                            
+                            let delay = 0.03 + 1.25
+                            Timer.scheduledTimer(withTimeInterval: delay, repeats: false) { _ in
+                                self.navigationController?.popToRootViewController(animated: true)
+                            }
+                            
                             print("success")
                         } else {
+                            ProgressHUD.colorAnimation = .systemRed
+                            ProgressHUD.colorProgress = .systemRed
+                            ProgressHUD.showFailed("Something went wrong.")
                             print("failed")
                         }
                     }, completionOnPostID: { result in
@@ -515,17 +532,6 @@ class PostFormVC: UIViewController {
         guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
         let clientKeyPath = getUsersPersistedInfo.uid
         
-        let clientNotificationModel = ClientNotificationModel(id: "nil",
-                                                              type: ClientNotificationType.recommendation.rawValue,
-                                                              title: ClientNotificationType.recommendation.rawValue,
-                                                              description: "We think you might want to consider these technicians nearby you as hiring candidates for the job you just posted.",
-                                                              dateTime: PostFormVC.dateFormatter.string(from: Date()),
-                                                              wasAccepted: nil,
-                                                              jobPostKeyPath: jobPostKeyPath,
-                                                              technicianInfo: nil)
-        
-        DatabaseManager.shared.insertClientNotification(with: clientNotificationModel, with: clientKeyPath, completion: { _ in })
-        
         let updateElement = try! FirebaseEncoder().encode(recommendedTechniciansModel)
 
         let childPath = "\(jobPostKeyPath)/recommendedTechnicians"
@@ -553,24 +559,36 @@ class PostFormVC: UIViewController {
         banner.backgroundColor = UIColor.rgb(red: 237, green: 237, blue: 237)
         banner.subtitleLabel?.font = .systemFont(ofSize: 13)
         guard let tabHeight = tabBarController?.tabBar.frame.height else { return }
-//        DispatchQueue.global().asyncAfter(deadline: .now() + .seconds(Int(2))) { //[self] in
-//            DispatchQueue.main.async {
+        
+        let randomNumber = Int.random(in: Int(6)...10)
+        
+        DispatchQueue.global().asyncAfter(deadline: .now() + .seconds(randomNumber)) { //[self] in
+            DispatchQueue.main.async {
                 banner.show(queuePosition: .front,
                             bannerPosition: .bottom,
                             edgeInsets: UIEdgeInsets(top: 0, left: 10, bottom: tabHeight - 15, right: 10),
                             cornerRadius: 10)
-//            }
-//        }
-         
-        
+                // Add the recommendation to the user's notification list
+                let clientNotificationModel = ClientNotificationModel(id: "nil",
+                                                                      type: ClientNotificationType.recommendation.rawValue,
+                                                                      title: ClientNotificationType.recommendation.rawValue,
+                                                                      description: "We think you might want to consider these technicians nearby you as hiring candidates for the job you just posted.",
+                                                                      dateTime: PostFormVC.dateFormatter.string(from: Date()),
+                                                                      wasAccepted: nil,
+                                                                      jobPostKeyPath: jobPostKeyPath,
+                                                                      technicianInfo: nil)
+                
+                DatabaseManager.shared.insertClientNotification(with: clientNotificationModel, with: clientKeyPath, completion: { _ in })
+            }
+        }
         
         banner.onTap = {
             let vc = RecommendationVC()
             let vcEmbeddedToNavController = UINavigationController(rootViewController: vc)
+            vc.jobPostKeyPath = jobPostKeyPath
             guard let topViewController = UIApplication.shared.windows.filter({$0.isKeyWindow}).first?.rootViewController else { return }
 
             DispatchQueue.main.async {
-                
                 topViewController.present(vcEmbeddedToNavController, animated: true)
                 banner.dismiss()
             }

@@ -151,8 +151,10 @@ class MyJobsVC: UIViewController {
                     // create that array
                     let upadateElement = [ // pass the info to the technician and when he/she accepts the hiring update this element
                         "hiringStatus": [
-                            "isHired": false,
-                            "technicianToHireEmail": technicianModel.profileInfo.email
+                            "isHired": true,
+                            "technicianToHireEmail": technicianModel.profileInfo.email,
+                            "technicianKeyPath": technicianModel.profileInfo.id,
+                            "date": PostFormVC.dateFormatter.string(from: Date())
                         ]
                     ] as [String : Any]
                     
