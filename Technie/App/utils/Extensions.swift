@@ -386,7 +386,8 @@ func imageForUrl(urlString: String, completionHandler:@escaping (_ image: UIImag
             return
         }
 
-    let downloadTask: URLSessionDataTask = URLSession.shared.dataTask(with: URL.init(string: urlString)!) { (data, response, error) in
+    guard let url = URL(string: urlString) else { return }
+    let downloadTask: URLSessionDataTask = URLSession.shared.dataTask(with: url) { (data, response, error) in
         if error == nil {
             if data != nil {
                 let image = UIImage.init(data: data!)

@@ -8,9 +8,16 @@
 import UIKit
 import FirebaseDatabase
 
+// Singleton
+protocol ExpertiseVCDelegate: class {
+    func fetchSelectedSkills(skills: [String])
+}
+
 class ExpertiseVC: UIViewController {
 
     // MARK: - Properties
+    weak var expertiseVCDelegate: ExpertiseVCDelegate?
+
     let database = Database.database().reference()
     
     private var indicator: ProgressIndicatorLarge!
@@ -49,7 +56,11 @@ class ExpertiseVC: UIViewController {
         indicator = ProgressIndicatorLarge(inview: self.view, loadingViewColor: UIColor.clear, indicatorColor: UIColor.gray, msg: "")
         indicator.translatesAutoresizingMaskIntoConstraints = false
         
-        getTechnicianInfo()
+        if isComingFromSignupVC != true {
+            getTechnicianInfo()
+        } else {
+            populateSections()
+        }
         setupViews()
     }
     
@@ -72,17 +83,30 @@ class ExpertiseVC: UIViewController {
     
     private func setupNavBar() {
         navigationItem.title = "Expertise"
-        
         let leftNavBarButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(leftNavBarBtnTapped))
-        let rightNavBarButton = UIBarButtonItem(barButtonSystemItem: .save, target: self, action: #selector(rightNavBarBtnTapped))
-        
-        self.navigationItem.leftBarButtonItem = leftNavBarButton
-        self.navigationItem.rightBarButtonItem = rightNavBarButton
+
+        if isComingFromSignupVC != true {
+            let rightNavBarButton = UIBarButtonItem(barButtonSystemItem: .save, target: self, action: #selector(rightNavBarBtnTapped))
+            
+            self.navigationItem.leftBarButtonItem = leftNavBarButton
+            self.navigationItem.rightBarButtonItem = rightNavBarButton
+        } else {
+            let rightNavBarButton = UIBarButtonItem(barButtonSystemItem: .save, target: self, action: #selector(rightNavBarBtnForSignUpVCTapped))
+            
+            self.navigationItem.leftBarButtonItem = leftNavBarButton
+            self.navigationItem.rightBarButtonItem = rightNavBarButton
+        }
     }
     
+    var isComingFromSignupVC = false
     private func populateSections() {
-        sections.append(SectionHandler(title: "My Expertise", detail: expertise))
-        sections.append(SectionHandler(title: "Suggested Expertise", detail: ["Handyman", "Repairer", "Electrician", "Plumber", "Others"]))
+        if isComingFromSignupVC != true {
+            sections.append(SectionHandler(title: "My Expertise", detail: expertise))
+            sections.append(SectionHandler(title: "Suggested Expertise", detail: ["Handyman", "Repairer", "Electrician", "Plumber", "Others"]))
+        } else {
+            sections.append(SectionHandler(title: "My Expertise", detail: []))
+            sections.append(SectionHandler(title: "Suggested Expertise", detail: ["Handyman", "Repairer", "Electrician", "Plumber", "Others"]))
+        }
     }
     
     private func getTechnicianInfo() {
@@ -267,6 +291,19 @@ class ExpertiseVC: UIViewController {
         
         print(self.sections[0].sectionDetail)
         dismiss(animated: true, completion: nil)
+    }
+    
+    @objc fileprivate func rightNavBarBtnForSignUpVCTapped() {
+        let selectedSkills = self.sections[0].sectionDetail
+        if selectedSkills.isEmpty {
+            let alert = UIAlertController(title: "Oops!", message: "You have not selected any expertise.", preferredStyle: .alert)
+            let ok = UIAlertAction(title: "Ok", style: .cancel)
+            alert.addAction(ok)
+            present(alert, animated: true, completion: nil)
+        } else {
+            expertiseVCDelegate?.fetchSelectedSkills(skills: selectedSkills)
+            dismiss(animated: true, completion: nil)
+        }
     }
     
     @objc fileprivate func removeSkillBtnTapped(_ sender: UIButton) {

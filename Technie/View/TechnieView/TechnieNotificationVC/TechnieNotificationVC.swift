@@ -11,7 +11,8 @@ import FirebaseDatabase
 class TechnieNotificationVC: UIViewController {
 
     var userNotifications = [TechnicianNotificationModel]()
-    
+    var userPostModel: [PostModel] = []
+
     // MARK: - Properties
     lazy var refresher: UIRefreshControl = {
         let rc = UIRefreshControl()
@@ -65,6 +66,7 @@ class TechnieNotificationVC: UIViewController {
         indicator = ProgressIndicatorLarge(inview: self.view, loadingViewColor: UIColor.clear, indicatorColor: UIColor.gray, msg: "")
         indicator.translatesAutoresizingMaskIntoConstraints = false
         
+        fetchUserPosts()
         fetchData()
         notificationChangesListener()
         setupViews()
@@ -157,6 +159,21 @@ class TechnieNotificationVC: UIViewController {
         })
     }
     
+    fileprivate func fetchUserPosts()  {
+        DatabaseManager.shared.getAllPosts(completion: { result in
+            switch result {
+            case .success(let userPosts):
+                self.userPostModel = userPosts
+//                    print("userPosts: ", self.userPostModel)
+                                
+            case .failure(let error):
+                print("userPosts: ", error)
+
+                print(error)
+            }
+        })
+    }
+    
     // MARK: - Selectors
     @objc func declineBtnPressed(sender: UIButton) {
         let index = sender.tag
@@ -194,6 +211,7 @@ class TechnieNotificationVC: UIViewController {
         }
         
     }
+    
     
     @objc func startChatBtnPressed(sender: UIButton) {
         let indexedTag = sender.tag
@@ -266,11 +284,42 @@ extension TechnieNotificationVC: TableViewDataSourceAndDelegate {
             cell.setupViews()
             cell.userNotification = model
         }
+        
+        switch model.type {
+        case TechnicianNotificationType.hiringOffer.rawValue:
+            cell.titleLabel.text = "Hiring Offer"
+            cell.buttonsStackView.isHidden = false
+        case TechnicianNotificationType.jobInvitation.rawValue:
+            cell.titleLabel.text = "Invitation"
+            cell.buttonsStackView.isHidden = true
+        case TechnicianNotificationType.closedJob.rawValue:
+            cell.titleLabel.text = "Closing Job"
+            cell.buttonsStackView.isHidden = true
+        default:
+            cell.buttonsStackView.isHidden = true
+        }
+        
         return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         selectedIndex = indexPath
+        let notificationModel = userNotifications[indexPath.row]
+        
+        let delimiter = "posts/"
+        let postUID = notificationModel.postChildPath?.components(separatedBy: delimiter)[1]
+        if notificationModel.type == TechnicianNotificationType.jobInvitation.rawValue {
+            let vc = JobDetailsVC()
+            userPostModel.forEach { post in
+                if post.id == postUID {
+                    vc.isComingFromSavedJobsVC = true
+                    vc.postModel = post
+                    vc.navBarViewSubtitleLbl.text = "posted \(view.calculateTimeFrame(initialTime: post.dateTime))"
+                    self.navigationController?.pushViewController(vc, animated: true)
+                }
+            }
+           
+        }
     }
     
     

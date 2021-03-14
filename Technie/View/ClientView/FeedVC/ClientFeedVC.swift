@@ -23,7 +23,8 @@ class ClientFeedVC: UIViewController {
     
     var userPostModel = [PostModel]()
     var technicianModel = [TechnicianModel]()
-    
+    var technieRank = [TechnicianModel]()
+
     // MARK: - Properties
     var customindexPath = IndexPath(item: 0, section: 0)
     
@@ -354,7 +355,6 @@ class ClientFeedVC: UIViewController {
         
     }
     
-    var technieRank = [TechnicianModel]()
     fileprivate func fetchRanking() {
         DatabaseManager.shared.getTechnieRank { result in
             switch result {
@@ -371,13 +371,6 @@ class ClientFeedVC: UIViewController {
         let userProfileVC = UserProfileVC()
         //        userProfileVC.navigationController?.navigationBar.topItem?.backButtonTitle = ""
         navigationController?.pushViewController(userProfileVC, animated: true)
-    }
-    
-    @objc func seeAllBtnPressed() {
-        let vc = FullRankingVC()
-        vc.technieRank = technieRank
-        vc.userPostModel = userPostModel
-        navigationController?.pushViewController(vc, animated: true)
     }
     
     lazy var dateFormatter: DateFormatter = {
@@ -606,9 +599,7 @@ extension ClientFeedVC: CollectionDataSourceAndDelegate {
                             String, at indexPath: IndexPath) -> UICollectionReusableView {
         
         let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: headerID, for: indexPath) as! HeaderView
-        if technieRank.count == 0 {
-            header.seeAllBtn.isEnabled = false
-        }
+        
         if didShowSearchResultViewObservable.value == true {
             header.sectionTitle.text = "Search by category".uppercased()
 //            header.backgroundColor = .systemBackground
@@ -620,11 +611,12 @@ extension ClientFeedVC: CollectionDataSourceAndDelegate {
         
         switch indexPath.section {
         case 0:
+            header.rank = technieRank
+//            header.postModel = userPostModel
             header.sectionTitle.text = sections[indexPath.section].uppercased()
             //            header.backgroundColor = .red
             // Show seeAllBtn only for this section
             header.seeAllBtn.isHidden = false
-            header.seeAllBtn.addTarget(self, action: #selector(seeAllBtnPressed), for: .touchUpInside)
             header.backgroundColor = .systemBackground
             //            header.sectionTitle.backgroundColor = .brown
             header.addBorder(.bottom, color: .systemGray, thickness: 0.3)

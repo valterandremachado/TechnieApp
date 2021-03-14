@@ -20,23 +20,23 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // windowScene
         guard let windowScene = (scene as? UIWindowScene) else { return }
         
-        guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
+//        guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
         
 
                 // Window setup
                 window = UIWindow(frame: windowScene.coordinateSpace.bounds)
                 window?.windowScene = windowScene
                 //Main ViewController
-                if getUsersPersistedInfo.email == "client@hotmail.com" {
-                    let mainVC = ClientTabController()
-                    window?.rootViewController = mainVC//UINavigationController(rootViewController: mainVC)
-                    
-                } else if getUsersPersistedInfo.email  == "technician@gmail.com" {
-                    let mainVC = TechnieTabController()
-                    window?.rootViewController = mainVC//UINavigationController(rootViewController: mainVC)
-                }
+//                if getUsersPersistedInfo.email == "client@hotmail.com" {
+//                    let mainVC = ClientTabController()
+//                    window?.rootViewController = mainVC//UINavigationController(rootViewController: mainVC)
+//
+//                } else if getUsersPersistedInfo.email  == "technician@gmail.com" {
+//                    let mainVC = TechnieTabController()
+//                    window?.rootViewController = mainVC//UINavigationController(rootViewController: mainVC)
+//                }
 
-//        window?.rootViewController = UINavigationController(rootViewController: ChooseAccountTypeVC())
+        window?.rootViewController = UINavigationController(rootViewController: TechnicianSignUpVC())
         
         // Window visibility
         window?.makeKeyAndVisible()

@@ -104,7 +104,7 @@ class TechnieProfileVC: UIViewController {
             self.tempImage = UIImage().resizeImage(image: actualProfileImage, toTheSize: CGSize(width: 40, height: 40))
 //            self.tableView.reloadData()
             self.tableView.reloadRows(at: [IndexPath(row: 0, section: 0)], with: .fade)
-            print(url)
+//            print(url)
         }
     }
     

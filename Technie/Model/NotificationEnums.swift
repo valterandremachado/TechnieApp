@@ -18,4 +18,5 @@ enum TechnicianNotificationType: String {
     case proposalStatus = "Accepted/Rejected proposals Notification"
     case hiringOffer = "Hiring Offer Notification"
     case closedJob = "Closed Job Notification"
+    case jobInvitation = "Invite to Send a Proposal"
 }

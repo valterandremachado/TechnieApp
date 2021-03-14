@@ -264,7 +264,7 @@ class RankedTechnieVC: UIViewController {
         navBar.topItem?.title = ""
 //        navBar.prefersLargeTitles = true
 //        navigationItem.largeTitleDisplayMode = .automatic
-        let leftNavBarButton = UIBarButtonItem(image: UIImage(systemName: "xmark.circle.fill"), style: .plain, target: self, action: #selector(leftNavBarBtnTapped))
+        let leftNavBarButton = UIBarButtonItem(image: UIImage(systemName: "xmark.circle.fill")?.withTintColor(.systemPink, renderingMode: .alwaysOriginal), style: .plain, target: self, action: #selector(leftNavBarBtnTapped))
             //UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(leftNavBarBtnTapped))
 
         self.navigationItem.leftBarButtonItem = leftNavBarButton

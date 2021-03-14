@@ -708,8 +708,13 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
     fileprivate func presentActionSheetForMoreBtn() {
         let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
-        let inviteAction = UIAlertAction(title: "Send Invitation", style: .default) { (_) in
-           
+        let inviteAction = UIAlertAction(title: "Send Invitation", style: .default) { [self] (_) in
+            let vc = MyJobsVC()
+            vc.myJobsVCDismissalDelegate = self
+            vc.technicianModel = technicianModel
+            vc.userPostModel = tempUserPosts
+            vc.isSendingInvitation = true
+            present(UINavigationController(rootViewController: vc), animated: true)
         }
         
         let dmAction = UIAlertAction(title: "Direct Message", style: .default) { [self] (_) in

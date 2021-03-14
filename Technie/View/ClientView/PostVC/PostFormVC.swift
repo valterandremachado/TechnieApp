@@ -471,7 +471,8 @@ class PostFormVC: UIViewController {
                                          field: self.fieldOfService,
                                          postOwnerInfo: postOwnerInfo,
                                          hiringStatus: nil,
-                                         proposals: nil)
+                                         proposals: nil,
+                                         invitations: nil)
 
                     DatabaseManager.shared.insertPost2(with: post, completion: { success in
                         if success {

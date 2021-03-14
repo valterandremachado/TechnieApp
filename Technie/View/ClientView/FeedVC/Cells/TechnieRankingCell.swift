@@ -14,6 +14,7 @@ class TechnieRankingCell: UICollectionViewCell {
     var filteredRanking = [TechnicianModel]()
     var sortedRanking = [TechnicianModel]()
     var userPostModel: [PostModel] = []
+    
     // MARK: - Properties
     lazy var technieRankingCollectionView: UICollectionView = {
         let collectionLayout = UICollectionViewFlowLayout()
@@ -160,6 +161,7 @@ extension TechnieRankingCell: CollectionDataSourceAndDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         self.indexPath = indexPath
         let model = sortedRanking[indexPath.item]
+        
         let vc = RankedTechnieVC()
         vc.technicianModel = model
         vc.userPostModel = userPostModel
@@ -176,15 +178,10 @@ extension TechnieRankingCell: CollectionDataSourceAndDelegate {
         let slicedString = model.profileInfo.membershipDate.components(separatedBy: delimiter)[0]
         vc.memberShipDateLabel.text = "• Member since " + slicedString
 //        vc.modalTransitionStyle = .crossDissolve
-//        vc.stringPrint = "\(indexPath.item)"
         
         guard let presentVCFromCell = UIApplication.cellDidPresentViewController() else { return }
-//        presentVCFromCell.navigationController?.show(rankedTechnieVC, sender: nil)
-        
         let vcWithEmbeddedNav = UINavigationController(rootViewController: vc)
 //        vcWithEmbeddedNav.modalPresentationStyle = .fullScreen
-
-//        presentVCFromCell.navigationController?.pushViewController(vc, animated: true)
         presentVCFromCell.present(vcWithEmbeddedNav, animated: true)
 
 //        print("IndexPath: \(indexPath.item)")

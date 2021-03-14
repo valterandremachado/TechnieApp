@@ -72,7 +72,7 @@ class FullRankingVC: UIViewController {
         if technieRank.count == 5 {
             remainingRank = Array<TechnicianModel>(technieRank.suffix(from: 6))
         }
-        print("count: ", technieRank.count)
+//        print("count: ", technieRank.count)
     }
     
     

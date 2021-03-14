@@ -954,7 +954,7 @@ extension DatabaseManager {
                         do {
                             let model = try FirebaseDecoder().decode(TechnicianNotificationModel.self, from: value)
                             notifications.append(model)
-                            print("notifications: \(notifications)", notifications.count)
+//                            print("notifications: \(notifications)", notifications.count)
                             completion(.success(notifications))
                         } catch let error {
                             print("notifications error: \(error)")
@@ -2690,6 +2690,7 @@ struct PostModel: Codable {
     let postOwnerInfo: PostOwnerInfo?
     let hiringStatus: HiringStatus?
     let proposals: [Proposals]?
+    let invitations: [Invitation]?
     var recommendedTechnicians: [TechnicianModel]?
  
 }
@@ -2712,6 +2713,11 @@ struct HiringStatus: Codable {
 struct Proposals: Codable {
     var technicianEmail: String
     var coverLetter: String
+}
+
+struct Invitation: Codable {
+    var technicianUID: String
+    var technicianEmail: String
 }
 
 struct LocationModel: Codable {
