@@ -12,7 +12,8 @@ protocol EditProfileVCDismissalDelegate: class {
     func EditProfileVCDismissalSingleton(updatedPersistedData: UserPersistedInfo)
 }
 
-class EditProfileVC: UIViewController {
+class EditProfileVC: UIViewController, SelectedLocationDelegate {
+    
 
     // MARK: - Properties
     let database = Database.database().reference()
@@ -99,9 +100,9 @@ class EditProfileVC: UIViewController {
 
         guard let uid = updatedPersistedData?.uid,
               let email = updatedPersistedData?.email,
-              let location = updatedPersistedData?.location
-//              let locationInLongLat = updatedPersistedData?.first?.locationInLongLat,
-//              let profileImage = updatedPersistedData?.first?.profileImage,
+              let location = updatedPersistedData?.location,
+              let userType = updatedPersistedData?.userType,
+              let profileImage = updatedPersistedData?.profileImage
         else { return }
         
         let newData = UserPersistedInfo(uid: uid,
@@ -109,9 +110,9 @@ class EditProfileVC: UIViewController {
                                   email: email,
                                   location: location,
                                   accountType: nil,
-                                  locationInLongLat: nil,
-                                  profileImage: nil,
-                                  hourlyRate: nil)
+                                  profileImage: profileImage,
+                                  hourlyRate: nil,
+                                  userType: userType)
         
         let updateElement = [
             "name": name
@@ -126,7 +127,7 @@ class EditProfileVC: UIViewController {
         })
     }
     
-    private func changeUserLocation(location: String) {
+    private func changeUserLocation(location: UserPersistedLocation) {
         let updatedPersistedData = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo")
 
         guard let technicianKeyPath = updatedPersistedData?.uid else { return }
@@ -134,9 +135,9 @@ class EditProfileVC: UIViewController {
 
         guard let uid = updatedPersistedData?.uid,
               let name = updatedPersistedData?.name,
-              let email = updatedPersistedData?.email
-//              let locationInLongLat = updatedPersistedData?.first?.locationInLongLat,
-//              let profileImage = updatedPersistedData?.first?.profileImage,
+              let email = updatedPersistedData?.email,
+              let userType = updatedPersistedData?.userType,
+              let profileImage = updatedPersistedData?.profileImage
         else { return }
         
         let newData = UserPersistedInfo(uid: uid,
@@ -144,12 +145,12 @@ class EditProfileVC: UIViewController {
                                   email: email,
                                   location: location,
                                   accountType: nil,
-                                  locationInLongLat: nil,
-                                  profileImage: "https://firebasestorage.googleapis.com/v0/b/technie-39e49.appspot.com/o/message_images%2Fphoto_message_j568OKOf1Sbgrtxia72TFmC0yPG3-gmail-com_wRLcuiUx4JY6yTN9KpnmK0tA9tk1-gmail-com_Jan-20%2C-2021-at-11%3A16%3A18-PM-GMT%2B8.png?alt=media&token=04d40ea1-632c-4182-bb8c-620112edf15e",
-                                  hourlyRate: nil)
+                                  profileImage: profileImage,
+                                  hourlyRate: nil,
+                                  userType: userType)
         
         let updateElement = [
-            "location": location
+            "location": location.address
         ]
         
         database.child(childPath).updateChildValues(updateElement, withCompletionBlock: { error, _ in
@@ -169,8 +170,8 @@ class EditProfileVC: UIViewController {
         guard let uid = updatedPersistedData?.uid,
               let name = updatedPersistedData?.name,
               let email = updatedPersistedData?.email,
+              let userType = updatedPersistedData?.userType,
               let location = updatedPersistedData?.location
-//              let locationInLongLat = updatedPersistedData?.first?.locationInLongLat,
         else { return }
         
         let fileName = "\(email)_\(UUID().uuidString)_changedProfileImage"
@@ -183,9 +184,9 @@ class EditProfileVC: UIViewController {
                                           email: email,
                                           location: location,
                                           accountType: nil,
-                                          locationInLongLat: nil,
                                           profileImage: profileImageUrl,
-                                          hourlyRate: nil)
+                                          hourlyRate: nil,
+                                          userType: userType)
                 
                 let updateElement = [
                     "profileImage": profileImageUrl
@@ -208,7 +209,12 @@ class EditProfileVC: UIViewController {
     private func updatePersistedData(data: UserPersistedInfo) {
         updatePersistedData = data
         self.defaults.set(object: updatePersistedData, forKey: "persistUsersInfo")
-        print("newData: ", updatePersistedData)
+//        print("newData: ", updatePersistedData)
+    }
+    
+    func fetchSelectedAddress(address: String, lat: Double, long: Double) {
+        let location = UserPersistedLocation(address: address, lat: lat, long: long)
+        changeUserLocation(location: location)
     }
     
     // MARK: - Selectors
@@ -227,7 +233,8 @@ extension EditProfileVC: TableViewDataSourceAndDelegate {
         let cell = tableView.dequeueReusableCell(withIdentifier: EditProfileCell.cellID, for: indexPath) as! EditProfileCell
         
         let persistedUserName = getUsersPersistedInfo?.name ?? "username"
-        let persistedLocation = getUsersPersistedInfo?.location ?? "userlocation"
+        let persistedLocation = getUsersPersistedInfo?.location.address ?? "userlocation"
+        let persistedEmail = getUsersPersistedInfo?.email ?? "username@gmail.com"
         let userPersistedProfileImage = getUsersPersistedInfo?.profileImage ?? ""
         let profileImageUrl = URL(string: userPersistedProfileImage)
 
@@ -260,7 +267,7 @@ extension EditProfileVC: TableViewDataSourceAndDelegate {
             
         case 3:
             cell.titleLabel.text = "Account"
-            cell.descriptionLabel.text = "username@gmail.com"
+            cell.descriptionLabel.text = persistedEmail
             cell.accessoryType = .none
             cell.selectionStyle = .none
             
@@ -279,7 +286,9 @@ extension EditProfileVC: TableViewDataSourceAndDelegate {
         case 1:
             presentChangeDisplayNameAlertController()
         case 2:
-            presentChangeLocationAlertController()
+            let vc = SelectLocationVC()
+            vc.selectedLocationDelegate = self
+            present(UINavigationController(rootViewController: vc), animated: true)
         default:
             break
         }
@@ -309,27 +318,6 @@ extension EditProfileVC: TableViewDataSourceAndDelegate {
         
         alertController.addAction(camera)
         alertController.addAction(photoLibrary)
-        alertController.addAction(cancel)
-        alertController.fixActionSheetConstraintsError()
-        present(alertController, animated: true)
-    }
-    
-    fileprivate func presentChangeLocationAlertController() {
-        let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        
-        let enterLocation = UIAlertAction(title: "Enter Location", style: .default) { [self] (_) in
-            print("enterLocation")
-            presentEnterLocationAlertController()
-        }
-        
-        let phoneLocation = UIAlertAction(title: "Use Phone's Location", style: .default) { (_) in
-            print("phoneLocation")
-        }
-        
-        let cancel = UIAlertAction(title: "Cancel", style: .cancel)
-        
-        alertController.addAction(enterLocation)
-        alertController.addAction(phoneLocation)
         alertController.addAction(cancel)
         alertController.fixActionSheetConstraintsError()
         present(alertController, animated: true)
@@ -367,36 +355,6 @@ extension EditProfileVC: TableViewDataSourceAndDelegate {
             addTextField.placeholder = "Last Name"
             lastNameField = addTextField
         }
-        
-        alertController.addAction(save)
-        alertController.addAction(cancel)
-        present(alertController, animated: true, completion: nil)
-    }
-    
-    fileprivate func presentEnterLocationAlertController() {
-        var locationField = UITextField()
-        locationField.placeholder = "New Location"
-        
-        let alertController = UIAlertController(title: "Enter Location", message: nil, preferredStyle: .alert)
-        
-        let save = UIAlertAction(title: "Save", style: .default) { [self] (action) in
-            guard let locationInput = alertController.textFields?[0] else { return }
-            newLocation = locationInput.text!
-            changeUserLocation(location: newLocation)
-
-            self.tableView.beginUpdates()
-            self.tableView.reloadRows(at: [IndexPath(row: 2, section: 0)], with: .automatic)
-            self.tableView.endUpdates()
-        }
-        
-        let cancel = UIAlertAction(title: "Cancel", style: .cancel)
-        
-        alertController.addTextField { (addTextField) in
-            addTextField.clearButtonMode = .whileEditing
-            addTextField.placeholder = "New Location"
-            locationField = addTextField
-        }
-        
         
         alertController.addAction(save)
         alertController.addAction(cancel)

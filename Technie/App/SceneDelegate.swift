@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import FirebaseAuth
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
@@ -20,8 +21,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // windowScene
         guard let windowScene = (scene as? UIWindowScene) else { return }
         
-//        guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
         
+        let choosingScreen = ChooseAccountTypeVC()
+        let clientVC = ClientTabController()
+        let techniciantVC = TechnieTabController()
+
 
                 // Window setup
                 window = UIWindow(frame: windowScene.coordinateSpace.bounds)
@@ -35,8 +39,27 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 //                    let mainVC = TechnieTabController()
 //                    window?.rootViewController = mainVC//UINavigationController(rootViewController: mainVC)
 //                }
+        
+//        window?.rootViewController = UINavigationController(rootViewController: ClientLoginVC())
 
-        window?.rootViewController = UINavigationController(rootViewController: TechnicianSignUpVC())
+        
+        /// Checks if the user is logged in, in order to handle which view to show when the app is launched
+        if Auth.auth().currentUser == nil {
+            window?.rootViewController = UINavigationController(rootViewController: choosingScreen)
+        } else {
+            guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
+
+            switch getUsersPersistedInfo.userType {
+            case UserType.client.rawValue:
+                window?.rootViewController = clientVC
+
+            case UserType.technician.rawValue:
+                window?.rootViewController = techniciantVC
+
+            default:
+                window?.rootViewController = UINavigationController(rootViewController: choosingScreen)
+            }
+        }
         
         // Window visibility
         window?.makeKeyAndVisible()

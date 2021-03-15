@@ -449,7 +449,8 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
     }
     
     func getClientSatisfaction() {
-        let technicianKeyPath = technicianModel.profileInfo.id
+        guard let model = technicianModel else { return }
+        let technicianKeyPath = model.profileInfo.id 
 
         DatabaseManager.shared.getAllClientSatisfactionWithReviews(with: technicianKeyPath) { result in
             

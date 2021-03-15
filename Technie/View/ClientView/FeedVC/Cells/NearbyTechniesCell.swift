@@ -193,7 +193,9 @@ class NearbyTechniesCell: UICollectionViewCell {
             profileImageView.sd_setImage(with: URL(string: technicianModel.profileInfo.profileImage ?? ""), completed: nil)
             nameLabel.text = technicianModel.profileInfo.name
             jobTitleLabel.text = technicianModel.profileInfo.name
-            locationLabel.text = technicianModel.profileInfo.location
+            let delimiter = ", "
+            let slicedString = technicianModel.profileInfo.location?.address.components(separatedBy: delimiter)[1]
+            locationLabel.text = slicedString
             pricePerHourLabel.text = "₱\(technicianModel.profileInfo.hourlyRate)"
             if rating != 0 {
                 ratingStackView.alpha = 1

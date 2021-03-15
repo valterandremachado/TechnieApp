@@ -48,9 +48,6 @@
 		8A630B1825E52B5200733475 /* TechnieStatsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A630B1725E52B5200733475 /* TechnieStatsVC.swift */; };
 		8A630B2025E52FCA00733475 /* TechnieStatsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A630B1F25E52FCA00733475 /* TechnieStatsCell.swift */; };
 		8A64899525E117B70019A6DC /* ChooseAccountTypeVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A64899425E117B70019A6DC /* ChooseAccountTypeVC.swift */; };
-		8A64899B25E11BA30019A6DC /* SignupVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A64899925E11BA20019A6DC /* SignupVC.swift */; };
-		8A64899C25E11BA30019A6DC /* LoginVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A64899A25E11BA30019A6DC /* LoginVC.swift */; };
-		8A6489A125E11C7D0019A6DC /* LoginOrSignupVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A6489A025E11C7D0019A6DC /* LoginOrSignupVC.swift */; };
 		8A68A56625B705BA000D988F /* StorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A68A56425B705B9000D988F /* StorageManager.swift */; };
 		8A68A56725B705BA000D988F /* DatabaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A68A56525B705BA000D988F /* DatabaseManager.swift */; };
 		8A6A32752598C73A001FE408 /* PostSectionVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A6A32742598C73A001FE408 /* PostSectionVC.swift */; };
@@ -138,6 +135,24 @@
 		8AE4098125AF011200A29453 /* TechnieServiceVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AE4098025AF011200A29453 /* TechnieServiceVC.swift */; };
 		8AE4098625AF013800A29453 /* TechnieProfileVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AE4098525AF013800A29453 /* TechnieProfileVC.swift */; };
 		8AE4098B25AF015200A29453 /* TechnieNotificationVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AE4098A25AF015200A29453 /* TechnieNotificationVC.swift */; };
+		8AEEEAE425FF9DBD00CEB815 /* ForgotPasswordVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AEEEAE325FF9DBD00CEB815 /* ForgotPasswordVC.swift */; };
+		8AEEEAED25FFAAC900CEB815 /* UserTypeEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AEEEAEC25FFAAC900CEB815 /* UserTypeEnum.swift */; };
+		8AEEEAF725FFD39300CEB815 /* Fontspring-DEMO-blue_vinyl_regular_ps_ot.otf in Resources */ = {isa = PBXBuildFile; fileRef = 8AEEEAF525FFD39200CEB815 /* Fontspring-DEMO-blue_vinyl_regular_ps_ot.otf */; };
+		8AEEEAF825FFD39300CEB815 /* Fontspring-DEMO-blue_vinyl_bold_ps_ot.otf in Resources */ = {isa = PBXBuildFile; fileRef = 8AEEEAF625FFD39300CEB815 /* Fontspring-DEMO-blue_vinyl_bold_ps_ot.otf */; };
+		8AEEEAFE25FFD3AB00CEB815 /* PlayfairDisplay-Italic-VariableFont_wght.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8AEEEAFC25FFD3A900CEB815 /* PlayfairDisplay-Italic-VariableFont_wght.ttf */; };
+		8AEEEAFF25FFD3AB00CEB815 /* PlayfairDisplay-VariableFont_wght.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8AEEEAFD25FFD3AB00CEB815 /* PlayfairDisplay-VariableFont_wght.ttf */; };
+		8AEEEB0F25FFD3D200CEB815 /* Roboto-ThinItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8AEEEB0325FFD3C500CEB815 /* Roboto-ThinItalic.ttf */; };
+		8AEEEB1025FFD3D200CEB815 /* Roboto-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8AEEEB0425FFD3C600CEB815 /* Roboto-Italic.ttf */; };
+		8AEEEB1125FFD3D200CEB815 /* Roboto-BlackItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8AEEEB0525FFD3C700CEB815 /* Roboto-BlackItalic.ttf */; };
+		8AEEEB1225FFD3D200CEB815 /* Roboto-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8AEEEB0625FFD3C900CEB815 /* Roboto-Bold.ttf */; };
+		8AEEEB1325FFD3D200CEB815 /* Roboto-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8AEEEB0725FFD3CA00CEB815 /* Roboto-Black.ttf */; };
+		8AEEEB1425FFD3D200CEB815 /* Roboto-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8AEEEB0825FFD3CB00CEB815 /* Roboto-Regular.ttf */; };
+		8AEEEB1525FFD3D200CEB815 /* Roboto-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8AEEEB0925FFD3CC00CEB815 /* Roboto-LightItalic.ttf */; };
+		8AEEEB1625FFD3D200CEB815 /* Roboto-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8AEEEB0A25FFD3CD00CEB815 /* Roboto-Light.ttf */; };
+		8AEEEB1725FFD3D200CEB815 /* Roboto-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8AEEEB0B25FFD3CF00CEB815 /* Roboto-Medium.ttf */; };
+		8AEEEB1825FFD3D200CEB815 /* Roboto-MediumItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8AEEEB0C25FFD3D000CEB815 /* Roboto-MediumItalic.ttf */; };
+		8AEEEB1925FFD3D200CEB815 /* Roboto-Thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8AEEEB0D25FFD3D100CEB815 /* Roboto-Thin.ttf */; };
+		8AEEEB1A25FFD3D200CEB815 /* Roboto-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8AEEEB0E25FFD3D200CEB815 /* Roboto-BoldItalic.ttf */; };
 		8AF2D97F25F0B622004A2219 /* CoverLetterVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AF2D97E25F0B622004A2219 /* CoverLetterVC.swift */; };
 		8AF2D98725F0E33F004A2219 /* NotificationEnums.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AF2D98625F0E33F004A2219 /* NotificationEnums.swift */; };
 		8AF2D98C25F1018F004A2219 /* ReviewTechnicianVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AF2D98B25F1018E004A2219 /* ReviewTechnicianVC.swift */; };
@@ -225,9 +240,6 @@
 		8A630B1725E52B5200733475 /* TechnieStatsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnieStatsVC.swift; sourceTree = "<group>"; };
 		8A630B1F25E52FCA00733475 /* TechnieStatsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnieStatsCell.swift; sourceTree = "<group>"; };
 		8A64899425E117B70019A6DC /* ChooseAccountTypeVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChooseAccountTypeVC.swift; sourceTree = "<group>"; };
-		8A64899925E11BA20019A6DC /* SignupVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignupVC.swift; sourceTree = "<group>"; };
-		8A64899A25E11BA30019A6DC /* LoginVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginVC.swift; sourceTree = "<group>"; };
-		8A6489A025E11C7D0019A6DC /* LoginOrSignupVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginOrSignupVC.swift; sourceTree = "<group>"; };
 		8A68A56425B705B9000D988F /* StorageManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StorageManager.swift; sourceTree = "<group>"; };
 		8A68A56525B705BA000D988F /* DatabaseManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DatabaseManager.swift; sourceTree = "<group>"; };
 		8A6A32742598C73A001FE408 /* PostSectionVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostSectionVC.swift; sourceTree = "<group>"; };
@@ -302,6 +314,24 @@
 		8AE4098025AF011200A29453 /* TechnieServiceVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnieServiceVC.swift; sourceTree = "<group>"; };
 		8AE4098525AF013800A29453 /* TechnieProfileVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnieProfileVC.swift; sourceTree = "<group>"; };
 		8AE4098A25AF015200A29453 /* TechnieNotificationVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnieNotificationVC.swift; sourceTree = "<group>"; };
+		8AEEEAE325FF9DBD00CEB815 /* ForgotPasswordVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForgotPasswordVC.swift; sourceTree = "<group>"; };
+		8AEEEAEC25FFAAC900CEB815 /* UserTypeEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserTypeEnum.swift; sourceTree = "<group>"; };
+		8AEEEAF525FFD39200CEB815 /* Fontspring-DEMO-blue_vinyl_regular_ps_ot.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Fontspring-DEMO-blue_vinyl_regular_ps_ot.otf"; sourceTree = "<group>"; };
+		8AEEEAF625FFD39300CEB815 /* Fontspring-DEMO-blue_vinyl_bold_ps_ot.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Fontspring-DEMO-blue_vinyl_bold_ps_ot.otf"; sourceTree = "<group>"; };
+		8AEEEAFC25FFD3A900CEB815 /* PlayfairDisplay-Italic-VariableFont_wght.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "PlayfairDisplay-Italic-VariableFont_wght.ttf"; sourceTree = "<group>"; };
+		8AEEEAFD25FFD3AB00CEB815 /* PlayfairDisplay-VariableFont_wght.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "PlayfairDisplay-VariableFont_wght.ttf"; sourceTree = "<group>"; };
+		8AEEEB0325FFD3C500CEB815 /* Roboto-ThinItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Roboto-ThinItalic.ttf"; sourceTree = "<group>"; };
+		8AEEEB0425FFD3C600CEB815 /* Roboto-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Roboto-Italic.ttf"; sourceTree = "<group>"; };
+		8AEEEB0525FFD3C700CEB815 /* Roboto-BlackItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Roboto-BlackItalic.ttf"; sourceTree = "<group>"; };
+		8AEEEB0625FFD3C900CEB815 /* Roboto-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Roboto-Bold.ttf"; sourceTree = "<group>"; };
+		8AEEEB0725FFD3CA00CEB815 /* Roboto-Black.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Roboto-Black.ttf"; sourceTree = "<group>"; };
+		8AEEEB0825FFD3CB00CEB815 /* Roboto-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Roboto-Regular.ttf"; sourceTree = "<group>"; };
+		8AEEEB0925FFD3CC00CEB815 /* Roboto-LightItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Roboto-LightItalic.ttf"; sourceTree = "<group>"; };
+		8AEEEB0A25FFD3CD00CEB815 /* Roboto-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Roboto-Light.ttf"; sourceTree = "<group>"; };
+		8AEEEB0B25FFD3CF00CEB815 /* Roboto-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Roboto-Medium.ttf"; sourceTree = "<group>"; };
+		8AEEEB0C25FFD3D000CEB815 /* Roboto-MediumItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Roboto-MediumItalic.ttf"; sourceTree = "<group>"; };
+		8AEEEB0D25FFD3D100CEB815 /* Roboto-Thin.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Roboto-Thin.ttf"; sourceTree = "<group>"; };
+		8AEEEB0E25FFD3D200CEB815 /* Roboto-BoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Roboto-BoldItalic.ttf"; sourceTree = "<group>"; };
 		8AF2D97E25F0B622004A2219 /* CoverLetterVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoverLetterVC.swift; sourceTree = "<group>"; };
 		8AF2D98625F0E33F004A2219 /* NotificationEnums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationEnums.swift; sourceTree = "<group>"; };
 		8AF2D98B25F1018E004A2219 /* ReviewTechnicianVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewTechnicianVC.swift; sourceTree = "<group>"; };
@@ -389,8 +419,10 @@
 		8A2B93DF25FE3ED6007756F7 /* Auth */ = {
 			isa = PBXGroup;
 			children = (
+				8A64899425E117B70019A6DC /* ChooseAccountTypeVC.swift */,
 				8A2B93ED25FE4065007756F7 /* SignUp */,
 				8A2B93EE25FE4073007756F7 /* Login */,
+				8AEEEAE825FF9E1100CEB815 /* ForgotPassword */,
 				8A2B93F925FE4105007756F7 /* Cell */,
 			);
 			path = Auth;
@@ -465,17 +497,6 @@
 				8AB5316E25E92AD9001D7CCD /* MyJobsVC.swift */,
 			);
 			path = TechnicianProfileDetailsVC;
-			sourceTree = "<group>";
-		};
-		8A64899325E1178D0019A6DC /* Test */ = {
-			isa = PBXGroup;
-			children = (
-				8A64899A25E11BA30019A6DC /* LoginVC.swift */,
-				8A64899925E11BA20019A6DC /* SignupVC.swift */,
-				8A64899425E117B70019A6DC /* ChooseAccountTypeVC.swift */,
-				8A6489A025E11C7D0019A6DC /* LoginOrSignupVC.swift */,
-			);
-			path = Test;
 			sourceTree = "<group>";
 		};
 		8A68A56325B7058B000D988F /* DB Managers */ = {
@@ -667,6 +688,7 @@
 		8AC1B155258A2DAB000F2569 /* App */ = {
 			isa = PBXGroup;
 			children = (
+				8AEEEAF425FFD36200CEB815 /* Fonts */,
 				8AF76A6E258B440D00ED14C2 /* utils */,
 				8AC1B122258A2D8D000F2569 /* AppDelegate.swift */,
 				8AC1B124258A2D8D000F2569 /* SceneDelegate.swift */,
@@ -685,6 +707,7 @@
 				8AE2589D258A3074004EDB26 /* ClientModel */,
 				8A4288C625E7F1FF00091020 /* UsersDefaults */,
 				8AF2D98625F0E33F004A2219 /* NotificationEnums.swift */,
+				8AEEEAEC25FFAAC900CEB815 /* UserTypeEnum.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -692,7 +715,6 @@
 		8AC1B15D258A2E18000F2569 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				8A64899325E1178D0019A6DC /* Test */,
 				8A2B93DF25FE3ED6007756F7 /* Auth */,
 				8AC93A8525B6EC8100663BE3 /* ChatVC */,
 				8AFC383125AEFECD004ECDF3 /* TechnieView */,
@@ -841,6 +863,37 @@
 				8A41E7B525B07D5600265D5C /* Cells */,
 			);
 			path = TechnieProfileVC;
+			sourceTree = "<group>";
+		};
+		8AEEEAE825FF9E1100CEB815 /* ForgotPassword */ = {
+			isa = PBXGroup;
+			children = (
+				8AEEEAE325FF9DBD00CEB815 /* ForgotPasswordVC.swift */,
+			);
+			path = ForgotPassword;
+			sourceTree = "<group>";
+		};
+		8AEEEAF425FFD36200CEB815 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				8AEEEB0725FFD3CA00CEB815 /* Roboto-Black.ttf */,
+				8AEEEB0525FFD3C700CEB815 /* Roboto-BlackItalic.ttf */,
+				8AEEEB0625FFD3C900CEB815 /* Roboto-Bold.ttf */,
+				8AEEEB0E25FFD3D200CEB815 /* Roboto-BoldItalic.ttf */,
+				8AEEEB0425FFD3C600CEB815 /* Roboto-Italic.ttf */,
+				8AEEEB0A25FFD3CD00CEB815 /* Roboto-Light.ttf */,
+				8AEEEB0925FFD3CC00CEB815 /* Roboto-LightItalic.ttf */,
+				8AEEEB0B25FFD3CF00CEB815 /* Roboto-Medium.ttf */,
+				8AEEEB0C25FFD3D000CEB815 /* Roboto-MediumItalic.ttf */,
+				8AEEEB0825FFD3CB00CEB815 /* Roboto-Regular.ttf */,
+				8AEEEB0D25FFD3D100CEB815 /* Roboto-Thin.ttf */,
+				8AEEEB0325FFD3C500CEB815 /* Roboto-ThinItalic.ttf */,
+				8AEEEAFC25FFD3A900CEB815 /* PlayfairDisplay-Italic-VariableFont_wght.ttf */,
+				8AEEEAFD25FFD3AB00CEB815 /* PlayfairDisplay-VariableFont_wght.ttf */,
+				8AEEEAF625FFD39300CEB815 /* Fontspring-DEMO-blue_vinyl_bold_ps_ot.otf */,
+				8AEEEAF525FFD39200CEB815 /* Fontspring-DEMO-blue_vinyl_regular_ps_ot.otf */,
+			);
+			path = Fonts;
 			sourceTree = "<group>";
 		};
 		8AF76A4B258B0AC800ED14C2 /* ClientProfile */ = {
@@ -1018,9 +1071,25 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8AEEEB1825FFD3D200CEB815 /* Roboto-MediumItalic.ttf in Resources */,
+				8AEEEB1725FFD3D200CEB815 /* Roboto-Medium.ttf in Resources */,
+				8AEEEAFF25FFD3AB00CEB815 /* PlayfairDisplay-VariableFont_wght.ttf in Resources */,
+				8AEEEB1025FFD3D200CEB815 /* Roboto-Italic.ttf in Resources */,
+				8AEEEB1625FFD3D200CEB815 /* Roboto-Light.ttf in Resources */,
+				8AEEEB1525FFD3D200CEB815 /* Roboto-LightItalic.ttf in Resources */,
+				8AEEEAFE25FFD3AB00CEB815 /* PlayfairDisplay-Italic-VariableFont_wght.ttf in Resources */,
 				8AC1B12F258A2D8F000F2569 /* LaunchScreen.storyboard in Resources */,
+				8AEEEB1925FFD3D200CEB815 /* Roboto-Thin.ttf in Resources */,
+				8AEEEB1225FFD3D200CEB815 /* Roboto-Bold.ttf in Resources */,
 				8AC1B12C258A2D8F000F2569 /* Assets.xcassets in Resources */,
+				8AEEEB0F25FFD3D200CEB815 /* Roboto-ThinItalic.ttf in Resources */,
+				8AEEEB1A25FFD3D200CEB815 /* Roboto-BoldItalic.ttf in Resources */,
+				8AEEEAF725FFD39300CEB815 /* Fontspring-DEMO-blue_vinyl_regular_ps_ot.otf in Resources */,
+				8AEEEB1125FFD3D200CEB815 /* Roboto-BlackItalic.ttf in Resources */,
+				8AEEEAF825FFD39300CEB815 /* Fontspring-DEMO-blue_vinyl_bold_ps_ot.otf in Resources */,
+				8AEEEB1425FFD3D200CEB815 /* Roboto-Regular.ttf in Resources */,
 				8AADFB6425B5834000D3A5CC /* GoogleService-Info.plist in Resources */,
+				8AEEEB1325FFD3D200CEB815 /* Roboto-Black.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1185,6 +1254,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8A159E0225B316CC00D45C60 /* JobDetailTVCell.swift in Sources */,
+				8AEEEAED25FFAAC900CEB815 /* UserTypeEnum.swift in Sources */,
 				8AAE556B25DC0CC9003AB202 /* EditProfileVC.swift in Sources */,
 				8A54D1AA25CBFAEE00045D37 /* AboutCell.swift in Sources */,
 				8AE4098B25AF015200A29453 /* TechnieNotificationVC.swift in Sources */,
@@ -1197,7 +1267,6 @@
 				8AADFB7D25B58A2E00D3A5CC /* Chat.swift in Sources */,
 				8AC1B123258A2D8D000F2569 /* AppDelegate.swift in Sources */,
 				8AC93A9425B6EF3A00663BE3 /* ConversationsModels.swift in Sources */,
-				8A6489A125E11C7D0019A6DC /* LoginOrSignupVC.swift in Sources */,
 				8A05766125CD9E0A0071FDD1 /* FullRankingCell.swift in Sources */,
 				8AF76A7A258B440D00ED14C2 /* MyActivityIndicator.swift in Sources */,
 				8A54D1A525CBEBA800045D37 /* ReviewsVC.swift in Sources */,
@@ -1226,7 +1295,6 @@
 				8A0C0B4825D11ACB0072729D /* TechnicianSearchResultsCell.swift in Sources */,
 				8AC93A8725B6ECB200663BE3 /* ChatVC.swift in Sources */,
 				8AF76A86258B64FC00ED14C2 /* TechnieRankingCell.swift in Sources */,
-				8A64899C25E11BA30019A6DC /* LoginVC.swift in Sources */,
 				8A60EEBB258CDB2E0061A830 /* LivePreview.swift in Sources */,
 				8A8D1BC925DD33CD0076C56E /* SettingsCell.swift in Sources */,
 				8A13FDE625DE3DB30034945D /* TechnieAccountVC.swift in Sources */,
@@ -1282,7 +1350,6 @@
 				8A630B1825E52B5200733475 /* TechnieStatsVC.swift in Sources */,
 				8AAE555425DC093D003AB202 /* ClientPostHistoryCell.swift in Sources */,
 				8A05765C25CD77390071FDD1 /* ReviewsCell.swift in Sources */,
-				8A64899B25E11BA30019A6DC /* SignupVC.swift in Sources */,
 				8A76FA5F258DF2F40094C524 /* NearbyDetailVC.swift in Sources */,
 				8A2B943825FE7FD1007756F7 /* SelectLocationVC.swift in Sources */,
 				8A2B93F025FE408D007756F7 /* ClientLoginVC.swift in Sources */,
@@ -1303,6 +1370,7 @@
 				8AF76A53258B23BF00ED14C2 /* ProfileTableViewCell.swift in Sources */,
 				8A8F854E258A3D0500C4CEF9 /* NearbyTechniesCell.swift in Sources */,
 				8AE4098625AF013800A29453 /* TechnieProfileVC.swift in Sources */,
+				8AEEEAE425FF9DBD00CEB815 /* ForgotPasswordVC.swift in Sources */,
 				8A41E7AB25B07AD900265D5C /* PreviousJobsCell.swift in Sources */,
 				8AE4096A25AEFF0F00A29453 /* TechnieTabController.swift in Sources */,
 				8AAE557325DC0CF2003AB202 /* ClientHelpCenterVC.swift in Sources */,

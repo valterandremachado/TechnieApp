@@ -183,12 +183,8 @@ class ChatVC: MessagesViewController {
         
         let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo")
 
-        var userPersistedEmail = ""
-        if let info = getUsersPersistedInfo {
-            userPersistedEmail = info.email
-        }
         messageInputBar.setLeftStackViewWidthConstant(to: 70, animated: false)
-        messageInputBar.setStackViewItems(userPersistedEmail == "client@hotmail.com" ? ([photoMessageBarBtn, locationMessageBarBtn]) : ([photoMessageBarBtn]), forStack: .left, animated: false)
+        messageInputBar.setStackViewItems(getUsersPersistedInfo?.userType == UserType.client.rawValue ? ([photoMessageBarBtn, locationMessageBarBtn]) : ([photoMessageBarBtn]), forStack: .left, animated: false)
         //        messageInputBar.leftStackView.addBackground(color: .red)
         
         messageInputBar.setRightStackViewWidthConstant(to: 30, animated: false)

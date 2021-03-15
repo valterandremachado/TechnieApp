@@ -19,7 +19,7 @@ class ClientFeedVC: UIViewController {
     
     private let searchResultHeaderID = "searchViewHeaderID"
     
-    let sections = ["Technician's Ranking", "Nearby Technicians"]
+    var sections = ["Technician's Ranking", "Nearby Technicians"]
     
     var userPostModel = [PostModel]()
     var technicianModel = [TechnicianModel]()
@@ -361,6 +361,7 @@ class ClientFeedVC: UIViewController {
             case .success(let technieRank):
                 self.technieRank = technieRank
             case .failure(let error):
+                self.removeSectionOne()
                 print(error)
             }
         }
@@ -439,8 +440,12 @@ extension ClientFeedVC: UISearchBarDelegate {
        
     }
     
-    
-  
+    func removeSectionOne() {
+        sections.remove(at: 0)
+        clientFeedCollectionView.deleteSections(IndexSet(integer: 0))
+//        clientFeedCollectionView.reloadSections(IndexSet(integer: 0))
+        // At this point the collection view will ask again for the number of sections and it will be updated
+    }
 }
 
 // MARK: - CollectionViewDelegateAndDataSource Extension
@@ -511,8 +516,11 @@ extension ClientFeedVC: CollectionDataSourceAndDelegate {
             vc.userPostModel = userPostModel
             vc.profileImageView.sd_setImage(with: URL(string: technicians.profileInfo.profileImage ?? ""))
             vc.nameLabel.text = technicians.profileInfo.name
-            vc.locationLabel.text = "\(technicians.profileInfo.location), Philippines"
-            vc.technicianExperienceLabel.text = "• \(technicians.profileInfo.experience) Year of Exp."
+            vc.locationLabel.text = technicians.profileInfo.location?.address ?? ""
+            var yearLabel = ""
+            let convertedYear = Int(technicians.profileInfo.experience)
+            convertedYear == 1 ? (yearLabel = "Year") : (yearLabel = "Years")
+            vc.technicianExperienceLabel.text = "• \(technicians.profileInfo.experience) \(yearLabel) of Exp."
             
             let delimiter = "at"
             let slicedString = technicians.profileInfo.membershipDate.components(separatedBy: delimiter)[0]

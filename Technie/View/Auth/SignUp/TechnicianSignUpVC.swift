@@ -31,9 +31,7 @@ class TechnicianSignUpVC: UIViewController {
         cv.register(AuthCell.self, forCellWithReuseIdentifier: AuthCell.cellID)
         return cv
     }()
-    
-    var selectedImage: UIImage?
-    
+        
     lazy var profileImageViewPicker: UIImageView = {
         var iv = UIImageView(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
         iv.translatesAutoresizingMaskIntoConstraints = false
@@ -73,6 +71,9 @@ class TechnicianSignUpVC: UIViewController {
         tf.translatesAutoresizingMaskIntoConstraints = false
         tf.placeholder = "Email"
         tf.placeholderFontScale = 0.85
+        tf.autocorrectionType = .no
+        tf.autocapitalizationType = .none
+        tf.spellCheckingType = .no
         
         tf.borderActiveColor = .systemPink
         tf.borderInactiveColor = .gray
@@ -84,6 +85,9 @@ class TechnicianSignUpVC: UIViewController {
         tf.translatesAutoresizingMaskIntoConstraints = false
         tf.placeholder = "First name"
         tf.placeholderFontScale = 0.85
+        tf.autocorrectionType = .no
+        tf.autocapitalizationType = .none
+        tf.spellCheckingType = .no
         
         tf.borderActiveColor = .systemPink
         tf.borderInactiveColor = .gray
@@ -95,6 +99,9 @@ class TechnicianSignUpVC: UIViewController {
         tf.translatesAutoresizingMaskIntoConstraints = false
         tf.placeholder = "Last name"
         tf.placeholderFontScale = 0.85
+        tf.autocorrectionType = .no
+        tf.autocapitalizationType = .none
+        tf.spellCheckingType = .no
         
         tf.borderActiveColor = .systemPink
         tf.borderInactiveColor = .gray
@@ -107,6 +114,9 @@ class TechnicianSignUpVC: UIViewController {
         
         tf.placeholder = "Password"
         tf.placeholderFontScale = 0.85
+        tf.autocorrectionType = .no
+        tf.autocapitalizationType = .none
+        tf.spellCheckingType = .no
         
         tf.isSecureTextEntry = true
         tf.autocorrectionType = .no
@@ -122,6 +132,10 @@ class TechnicianSignUpVC: UIViewController {
         tf.translatesAutoresizingMaskIntoConstraints = false
         tf.placeholder = "City"
         tf.placeholderFontScale = 0.85
+        
+        tf.autocorrectionType = .no
+        tf.autocapitalizationType = .none
+        tf.spellCheckingType = .no
         
         tf.borderActiveColor = .systemPink
         tf.borderInactiveColor = .gray
@@ -153,19 +167,39 @@ class TechnicianSignUpVC: UIViewController {
         sv.spacing = 10
         return sv
     }()
+        
+    var selectedImage: UIImage?
+    var selectedImagData: Data?
+    var lat: Double = 0.0
+    var long: Double = 0.0
     
     // MARK: - Inits
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         view.backgroundColor = .systemBackground
+        
+        continueBtn.isEnabled = false
+        
         setupViews()
+        handleSignupBtnUX()
         self.hideKeyboardWhenTappedAround()
     }
     
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
         profileImageViewPicker.roundedImage()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+//        handleSignupBtnUX()
+//
+//        listenToTextFieldsChanges()
+//        indicator?.isHidden = true
+//        continueBtn.isEnabled = false
+//        view.isUserInteractionEnabled = true
+//        continueBtn.setTitle("Continue", for: .normal)
     }
     
     // MARK: - Methods
@@ -178,29 +212,157 @@ class TechnicianSignUpVC: UIViewController {
     fileprivate func setupNavBar() {
         guard let navbar = navigationController?.navigationBar else { return }
         navigationItem.title = "Create an account"
-        navbar.prefersLargeTitles = false
+        navbar.prefersLargeTitles = true
     }
     
+    private func continueTotheNextScreen() {
+//        indicator?.isHidden = false
+//        view.endEditing(true)
+//        view.isUserInteractionEnabled = false
+//        // validate text fields
+//        continueBtn.setTitle("", for: .normal)
+//        indicator!.start()
+        
+        if selectedImage == nil
+        {
+            print("No Selected Image")
+            
+            let alertController = UIAlertController(title: "Missing Profile Photo.", message: "Please choose a profile photo.", preferredStyle: .alert)
+            let tryAgainAction = UIAlertAction(title: "OK", style: .cancel) { UIAlertAction in }
+            // enable UX
+            self.continueBtn.setTitle("Continue", for: .normal)
+            self.view.isUserInteractionEnabled = true
+            self.continueBtn.isEnabled = true
+            // presenting alertController
+            alertController.view.tintColor = .systemPink
+            alertController.addAction(tryAgainAction)
+            self.present(alertController, animated: true, completion: nil)
+            
+        }
+        else
+        {
+            print("An image was selected")
+            
+            let error = validateFields()
+            
+            if error != nil {
+                // can also check password validation
+                print("Please fill in all fields.")
+                
+                let alertController = UIAlertController(title: "Please fill in all fields.", message: "", preferredStyle: .alert)
+                let tryAgainAction = UIAlertAction(title: "OK", style: .cancel) { UIAlertAction in }
+                // enable UX
+                self.continueBtn.setTitle("Continue", for: .normal)
+                self.view.isUserInteractionEnabled = true
+                self.continueBtn.isEnabled = true
+                // presenting alertController
+                alertController.view.tintColor = .systemPink
+                alertController.addAction(tryAgainAction)
+                self.present(alertController, animated: true, completion: nil)
+                
+            }
+            else
+            {
+                // Convert selectedImage into Data type
+                guard let selectedImage = self.selectedImage?.jpegData(compressionQuality: 0.4) else { return }
+                selectedImagData = selectedImage
+                
+            }
+            
+        }
+        
+    }
     
     // MARK: - Selectors
+    @objc fileprivate func continueBtnPressed() {
+        continueTotheNextScreen()
+        
+        if selectedImagData != nil {
+            let vc = TechnicianContinueSignUpVC()
+            vc.imageData = selectedImagData
+            vc.email = emailTextField.text
+            vc.password = passwordTextField.text
+            vc.firstName = firstNameTextField.text
+            vc.lastName = lastNameTextField.text
+            vc.address = locationTextField.text
+            vc.lat = lat
+            vc.long = long
+            navigationController?.pushViewController(vc, animated: true)
+        }
+    }
+    
     @objc func handleSelectedProfileIV() {
         let imagePicker = UIImagePickerController()
         imagePicker.delegate = self
         imagePicker.sourceType = .photoLibrary
         present(imagePicker, animated: true, completion: nil)
     }
-    
-    @objc func continueBtnPressed() {
-        let vc = TechnicianContinueSignUpVC()
-        navigationController?.pushViewController(vc, animated: true)
-    }
-    
+
     @objc func locationTextFieldTapped() {
         let vc = SelectLocationVC()
+        vc.selectedLocationDelegate = self
         present(UINavigationController(rootViewController: vc), animated: true)
     }
     
+    @objc fileprivate func textFldDidChange(textField: UITextField){
+        listenToTextFieldsChanges()
+    }
     
+}
+// MARK: - UX Handler Extension
+extension TechnicianSignUpVC {
+    
+    fileprivate func listenToTextFieldsChanges() {
+        guard
+            let email = emailTextField.text, !email.isEmpty,
+            let firstName = firstNameTextField.text, !firstName.isEmpty,
+            let lastName = lastNameTextField.text, !lastName.isEmpty,
+            let password = passwordTextField.text, !password.isEmpty,
+            let location = locationTextField.text, !location.isEmpty
+        else {
+            
+            self.continueBtn.titleColor(for: .disabled)
+            self.continueBtn.isEnabled = false
+            return
+        }
+        
+        continueBtn.titleColor(for: .normal)
+        continueBtn.setTitleColor(.white, for: .normal)
+        continueBtn.isEnabled = true
+    }
+    
+    fileprivate func handleSignupBtnUX(){
+        /// Handles accessibility to the SingUp button
+        emailTextField.addTarget(self, action: #selector(textFldDidChange), for: .editingChanged)
+        firstNameTextField.addTarget(self, action: #selector(textFldDidChange), for: .editingChanged)
+        lastNameTextField.addTarget(self, action: #selector(textFldDidChange), for: .editingChanged)
+        passwordTextField.addTarget(self, action: #selector(textFldDidChange), for: .editingChanged)
+        locationTextField.addTarget(self, action: #selector(textFldDidChange), for: .editingChanged)
+        
+    }
+    
+    fileprivate func validateFields() -> String? {
+        // check that all fields are filled in
+        if emailTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) == "" ||
+            firstNameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) == "" || lastNameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) == "" || passwordTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) == "" || locationTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) == "" {
+            return "Please fill in all fields."
+        }
+        
+        return nil
+    }
+}
+
+// MARK: - SelectedLocationDelegate Extension
+extension TechnicianSignUpVC: SelectedLocationDelegate{
+    
+    func fetchSelectedAddress(address: String, lat: Double, long: Double) {
+        guard !address.isEmpty else { return }
+        locationTextField.text = address
+        self.lat = lat
+        self.long = long
+        listenToTextFieldsChanges()
+        print("address: ", address, ", lat: \(lat) long: \(long)")
+    }
     
 }
 
@@ -242,7 +404,7 @@ extension TechnicianSignUpVC: CollectionDataSourceAndDelegate {
             profileImageViewPicker.centerYAnchor.constraint(equalTo: customView.centerYAnchor),
         ])
         
-        textFieldsStackView.anchor(top: pickerStackView.bottomAnchor, leading: cell.leadingAnchor, bottom: nil, trailing: cell.trailingAnchor, padding: UIEdgeInsets(top: 10, left: 20, bottom: 0, right: 20), size: CGSize(width: 0, height: 260))
+        textFieldsStackView.anchor(top: pickerStackView.bottomAnchor, leading: cell.leadingAnchor, bottom: nil, trailing: cell.trailingAnchor, padding: UIEdgeInsets(top: 10, left: 20, bottom: 0, right: 20), size: CGSize(width: 0, height: 280))
         
         continueBtn.anchor(top: textFieldsStackView.bottomAnchor, leading: textFieldsStackView.leadingAnchor, bottom: nil, trailing: textFieldsStackView.trailingAnchor, padding: UIEdgeInsets(top: 20, left: 0, bottom: 0, right: 0), size: CGSize(width: 0, height: 40))
         

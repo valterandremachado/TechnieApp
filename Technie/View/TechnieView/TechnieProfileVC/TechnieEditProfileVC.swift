@@ -12,7 +12,7 @@ protocol TechnieEditProfileVCDismissalDelegate: class {
     func TechnieEditProfileVCDismissalSingleton(updatedPersistedData: UserPersistedInfo)
 }
 
-class TechnieEditProfileVC: UIViewController {
+class TechnieEditProfileVC: UIViewController, SelectedLocationDelegate {
 
     // MARK: - Properties
     let database = Database.database().reference()
@@ -107,7 +107,7 @@ extension TechnieEditProfileVC: TableViewDataSourceAndDelegate {
         let cell = tableView.dequeueReusableCell(withIdentifier: TechnieEditProfileCell.cellID, for: indexPath) as! TechnieEditProfileCell
 //        let persistedProfileImage = getUsersPersistedInfo?.first?.profileImage
         let persistedUserName = getUsersPersistedInfo?.name ?? "username"
-        let persistedLocation = getUsersPersistedInfo?.location ?? "userlocation"
+        let persistedLocation = getUsersPersistedInfo?.location.address ?? "userlocation"
         let userPersistedProfileImage = getUsersPersistedInfo?.profileImage ?? ""
         let profileImageUrl = URL(string: userPersistedProfileImage)
         
@@ -160,7 +160,9 @@ extension TechnieEditProfileVC: TableViewDataSourceAndDelegate {
         case 1:
             presentChangeDisplayNameAlertController()
         case 2:
-            presentChangeLocationAlertController()
+            let vc = SelectLocationVC()
+            vc.selectedLocationDelegate = self
+            present(UINavigationController(rootViewController: vc), animated: true)
             
         case 3:
             let vc = SummaryVC()
@@ -223,27 +225,6 @@ extension TechnieEditProfileVC: TableViewDataSourceAndDelegate {
         present(alertController, animated: true)
     }
     
-    fileprivate func presentChangeLocationAlertController() {
-        let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        
-        let enterLocation = UIAlertAction(title: "Enter Location", style: .default) { [self] (_) in
-//            print("enterLocation")
-            presentEnterLocationAlertController()
-        }
-        
-        let phoneLocation = UIAlertAction(title: "Use Phone's Location", style: .default) { (_) in
-            print("phoneLocation")
-        }
-        
-        let cancel = UIAlertAction(title: "Cancel", style: .cancel)
-        
-        alertController.addAction(enterLocation)
-        alertController.addAction(phoneLocation)
-        alertController.addAction(cancel)
-        alertController.fixActionSheetConstraintsError()
-        present(alertController, animated: true)
-    }
-    
     fileprivate func presentChangeDisplayNameAlertController() {
         var firstNameField = UITextField()
         firstNameField.placeholder = "First Name"
@@ -282,36 +263,6 @@ extension TechnieEditProfileVC: TableViewDataSourceAndDelegate {
         present(alertController, animated: true, completion: nil)
     }
     
-    fileprivate func presentEnterLocationAlertController() {
-        var locationField = UITextField()
-        locationField.placeholder = "New Location"
-
-        let alertController = UIAlertController(title: "Enter Location", message: nil, preferredStyle: .alert)
-        
-        let save = UIAlertAction(title: "Save", style: .default) { [self] (action) in
-            guard let locationInput = alertController.textFields?[0] else { return }
-            newLocation = locationInput.text!
-            changeUserLocation(location: newLocation)
-            
-            self.tableView.beginUpdates()
-            self.tableView.reloadRows(at: [IndexPath(row: 2, section: 0)], with: .automatic)
-            self.tableView.endUpdates()
-        }
-        
-        let cancel = UIAlertAction(title: "Cancel", style: .cancel)
-        
-        alertController.addTextField { (addTextField) in
-            addTextField.clearButtonMode = .whileEditing
-            addTextField.placeholder = "New Location"
-            locationField = addTextField
-        }
-        
-        
-        alertController.addAction(save)
-        alertController.addAction(cancel)
-        present(alertController, animated: true, completion: nil)
-    }
-    
     // Database updates
     private func changeUserName(name: String) {
         let updatedPersistedData = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo")
@@ -321,21 +272,21 @@ extension TechnieEditProfileVC: TableViewDataSourceAndDelegate {
 
         guard let uid = updatedPersistedData?.uid,
               let email = updatedPersistedData?.email,
-              let location = updatedPersistedData?.location
-//              let accountType = updatedPersistedData?.first?.accountType,
-//              let locationInLongLat = updatedPersistedData?.first?.locationInLongLat,
-//              let profileImage = updatedPersistedData?.first?.profileImage,
-//              let hourlyRate = updatedPersistedData?.first?.hourlyRate
+              let location = updatedPersistedData?.location,
+              let accountType = updatedPersistedData?.accountType,
+              let profileImage = updatedPersistedData?.profileImage,
+              let userType = updatedPersistedData?.userType,
+              let hourlyRate = updatedPersistedData?.hourlyRate
         else { return }
         
         let newData = UserPersistedInfo(uid: uid,
                                   name: name,
                                   email: email,
                                   location: location,
-                                  accountType: nil,
-                                  locationInLongLat: nil,
-                                  profileImage: nil,
-                                  hourlyRate: nil)
+                                  accountType: accountType,
+                                  profileImage: profileImage,
+                                  hourlyRate: hourlyRate,
+                                  userType: userType)
         
         let updateElement = [
             "name": name
@@ -350,7 +301,7 @@ extension TechnieEditProfileVC: TableViewDataSourceAndDelegate {
         })
     }
     
-    private func changeUserLocation(location: String) {
+    private func changeUserLocation(location: UserPersistedLocation) {
         let updatedPersistedData = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo")
 
         guard let technicianKeyPath = updatedPersistedData?.uid else { return }
@@ -358,21 +309,21 @@ extension TechnieEditProfileVC: TableViewDataSourceAndDelegate {
 
         guard let uid = updatedPersistedData?.uid,
               let name = updatedPersistedData?.name,
-              let email = updatedPersistedData?.email
-//              let accountType = updatedPersistedData?.first?.accountType,
-//              let locationInLongLat = updatedPersistedData?.first?.locationInLongLat,
-//              let profileImage = updatedPersistedData?.first?.profileImage,
-//              let hourlyRate = updatedPersistedData?.first?.hourlyRate
+              let email = updatedPersistedData?.email,
+              let accountType = updatedPersistedData?.accountType,
+              let profileImage = updatedPersistedData?.profileImage,
+              let userType = updatedPersistedData?.userType,
+              let hourlyRate = updatedPersistedData?.hourlyRate
         else { return }
         
         let newData = UserPersistedInfo(uid: uid,
                                   name: name,
                                   email: email,
                                   location: location,
-                                  accountType: nil,
-                                  locationInLongLat: nil,
-                                  profileImage: nil,
-                                  hourlyRate: nil)
+                                  accountType: accountType,
+                                  profileImage: profileImage,
+                                  hourlyRate: hourlyRate,
+                                  userType: userType)
         
         let updateElement = [
             "location": location
@@ -396,10 +347,10 @@ extension TechnieEditProfileVC: TableViewDataSourceAndDelegate {
         guard let uid = updatedPersistedData?.uid,
               let name = updatedPersistedData?.name,
               let email = updatedPersistedData?.email,
-              let location = updatedPersistedData?.location
-        //              let accountType = updatedPersistedData?.first?.accountType,
-        //              let locationInLongLat = updatedPersistedData?.first?.locationInLongLat,
-        //              let hourlyRate = updatedPersistedData?.first?.hourlyRate
+              let location = updatedPersistedData?.location,
+              let accountType = updatedPersistedData?.accountType,
+              let userType = updatedPersistedData?.userType,
+              let hourlyRate = updatedPersistedData?.hourlyRate
         else { return }
         
         let fileName = "\(email)_\(UUID().uuidString)_changedProfileImage"
@@ -411,10 +362,10 @@ extension TechnieEditProfileVC: TableViewDataSourceAndDelegate {
                                                 name: name,
                                                 email: email,
                                                 location: location,
-                                                accountType: nil,
-                                                locationInLongLat: nil,
+                                                accountType: accountType,
                                                 profileImage: profileImageUrl,
-                                                hourlyRate: nil)
+                                                hourlyRate: hourlyRate,
+                                                userType: userType)
                 
                 let updateElement = [
                     "profileImage": profileImageUrl
@@ -437,6 +388,11 @@ extension TechnieEditProfileVC: TableViewDataSourceAndDelegate {
         updatePersistedData = data
         self.defaults.set(object: updatePersistedData, forKey: "persistUsersInfo")
         print("newData: ", updatePersistedData)
+    }
+    
+    func fetchSelectedAddress(address: String, lat: Double, long: Double) {
+        let location = UserPersistedLocation(address: address, lat: lat, long: long)
+        changeUserLocation(location: location)
     }
 
 }

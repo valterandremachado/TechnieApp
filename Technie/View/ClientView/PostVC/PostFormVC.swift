@@ -438,7 +438,7 @@ class PostFormVC: UIViewController {
         guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
         let clientEmail = getUsersPersistedInfo.email
         let clientName = getUsersPersistedInfo.name
-        let clientLocation = getUsersPersistedInfo.location
+        let clientLocation = getUsersPersistedInfo.location.address
         let clientUID = getUsersPersistedInfo.uid
 
         var postsImageUrl = [String]()

@@ -190,7 +190,7 @@ class TechnicianSearchResultsCell: UITableViewCell {
             profileImageView.sd_setImage(with: URL(string: technicianModel.profileInfo.profileImage ?? ""), completed: nil)
             nameLabel.text = technicianModel.profileInfo.name
             jobTitleLabel.text = technicianModel.profileInfo.name
-            locationLabel.text = technicianModel.profileInfo.location
+            locationLabel.text = technicianModel.profileInfo.location?.address
             pricePerHourLabel.text = "₱\(technicianModel.profileInfo.hourlyRate)"
             if rating != 0 {
                 ratingStackView.alpha = 1

@@ -78,7 +78,7 @@ class TechnieAccountVC: UIViewController {
     
     let accountTypes = ["Personal", "Enterprise"]
     var newAccountType = ""
-    var newHourlyRate = -1
+    var newHourlyRate = ""
     
     lazy var accountTypeDrowDown: DropDown = {
         let dropDown = DropDown(frame: CGRect(x: 0, y: 0, width: 110, height: 0))
@@ -114,7 +114,7 @@ extension TechnieAccountVC: TableViewDataSourceAndDelegate {
         let persistedUserName = getUsersPersistedInfo?.name ?? "username"
         let persistedEmail = getUsersPersistedInfo?.email ?? "username@gmail.com"
         let persistedAccountType = getUsersPersistedInfo?.accountType ?? "Not Specified"
-        let persistedHourlyRate = getUsersPersistedInfo?.hourlyRate ?? -2
+        let persistedHourlyRate = getUsersPersistedInfo?.hourlyRate ?? "0"
 
         switch indexPath.row {
         case 0:
@@ -142,8 +142,8 @@ extension TechnieAccountVC: TableViewDataSourceAndDelegate {
             accountTypeDrowDown.bottomOffset = CGPoint(x: -40, y: cell.descriptionLabel.intrinsicContentSize.height + 8)
         
         case 3:
-            var userHourlyRate = 0
-            newHourlyRate == -1 ? (userHourlyRate = persistedHourlyRate) : (userHourlyRate = newHourlyRate)
+            var userHourlyRate = ""
+            newHourlyRate == "" ? (userHourlyRate = persistedHourlyRate) : (userHourlyRate = newHourlyRate)
             cell.titleLabel.text = "Hourly Rate"
             cell.descriptionLabel.text = "₱\(userHourlyRate)"
             cell.accessoryType = .disclosureIndicator
@@ -201,8 +201,8 @@ extension TechnieAccountVC: TableViewDataSourceAndDelegate {
             guard let rateInput = alertController.textFields?[0] else { return }
 
             if containsOnlyLetters(input: rateInput.text!) == false {
-                guard let rate = Int(rateInput.text!) else { return }
-                newHourlyRate = rate
+//                guard let rate = rateInput.text! else { return }
+                newHourlyRate = rateInput.text!
                 changeUserHourlyRate(hourlyRate: newHourlyRate)
                 
                 self.tableView.beginUpdates()
@@ -235,28 +235,27 @@ extension TechnieAccountVC: TableViewDataSourceAndDelegate {
     }
     
     // Database updates
-    private func changeUserHourlyRate(hourlyRate: Int) {
+    private func changeUserHourlyRate(hourlyRate: String) {
         guard let technicianKeyPath = getUsersPersistedInfo?.uid else { return }
         let childPath = "users/technicians/\(technicianKeyPath)/profileInfo"
 
         guard let uid = getUsersPersistedInfo?.uid,
               let name = getUsersPersistedInfo?.name,
               let email = getUsersPersistedInfo?.email,
-              let location = getUsersPersistedInfo?.location
-//              let accountType = getUsersPersistedInfo?.accountType,
-//              let locationInLongLat = getUsersPersistedInfo?.locationInLongLat,
-//              let profileImage = getUsersPersistedInfo?.profileImage,
-//              let hourlyRate = getUsersPersistedInfo?.hourlyRate
+              let location = getUsersPersistedInfo?.location,
+              let accountType = getUsersPersistedInfo?.accountType,
+              let profileImage = getUsersPersistedInfo?.profileImage,
+              let userType = getUsersPersistedInfo?.userType
         else { return }
         
         let newData = UserPersistedInfo(uid: uid,
                                   name: name,
                                   email: email,
                                   location: location,
-                                  accountType: nil,
-                                  locationInLongLat: nil,
-                                  profileImage: nil,
-                                  hourlyRate: hourlyRate)
+                                  accountType: accountType,
+                                  profileImage: profileImage,
+                                  hourlyRate: hourlyRate,
+                                  userType: userType)
         
         let updateElement = [
             "hourlyRate": hourlyRate
@@ -279,8 +278,8 @@ extension TechnieAccountVC: TableViewDataSourceAndDelegate {
               let name = getUsersPersistedInfo?.name,
               let email = getUsersPersistedInfo?.email,
               let location = getUsersPersistedInfo?.location,
-//              let locationInLongLat = getUsersPersistedInfo?.first?.locationInLongLat,
-//              let profileImage = getUsersPersistedInfo?.first?.profileImage,
+              let profileImage = getUsersPersistedInfo?.profileImage,
+              let userType = getUsersPersistedInfo?.userType,
               let hourlyRate = getUsersPersistedInfo?.hourlyRate
         else { return }
         
@@ -289,9 +288,9 @@ extension TechnieAccountVC: TableViewDataSourceAndDelegate {
                                   email: email,
                                   location: location,
                                   accountType: accountType,
-                                  locationInLongLat: nil,
-                                  profileImage: nil,
-                                  hourlyRate: hourlyRate)
+                                  profileImage: profileImage,
+                                  hourlyRate: hourlyRate,
+                                  userType: userType)
         
         let updateElement = [
             "accountType": accountType

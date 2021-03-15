@@ -2560,10 +2560,16 @@ struct ClientProfileInfo: Codable {
     let id: String
     let email: String
     let profileImage: String?
-//    let coverImage: String
-    let location: String
+    let userType: String
+    let location: UserLocation?
     let name: String
     let membershipDate: String
+}
+
+struct UserLocation: Codable {
+    var address: String
+    var lat: Double
+    var long: Double
 }
 
 struct ServicePosts: Codable {
@@ -2607,12 +2613,12 @@ struct TechnicianProfileInfo: Codable {
     let name: String
     let email: String
     let profileImage: String?
-//    let coverImage: String
-    let location: String
+    let userType: String
+    let location: UserLocation?
     let profileSummary: String
     let experience: String //Int?
     let accountType: String
-    let hourlyRate: Int
+    let hourlyRate: String
     let skills: [String]
     let membershipDate: String
 }

@@ -7,6 +7,7 @@
 
 import UIKit
 import MessageUI
+import FirebaseAuth
 
 class UserProfileVC: UIViewController {
         
@@ -135,12 +136,12 @@ class UserProfileVC: UIViewController {
     
     fileprivate func fetchUserInfo() {
         let userPersistedName = getUsersPersistedInfo?.name ?? "username"
-        let userPersistedLocation = getUsersPersistedInfo?.location ?? "userlocation"
+        let userPersistedLocation = getUsersPersistedInfo?.location.address ?? "userlocation"
         let userPersistedProfileImage = getUsersPersistedInfo?.profileImage ?? "image"
         let profileImageUrl = URL(string: userPersistedProfileImage)
         
         nameLabel.text = userPersistedName
-        locationLabel.text = userPersistedLocation + ", Philippines"
+        locationLabel.text = userPersistedLocation
         profileImageView.sd_setImage(with: profileImageUrl, completed: nil)
         
         //        UrlImageLoader.sharedInstance.imageForUrl(urlString: userPersistedProfileImage) { (image, url) in
@@ -164,7 +165,7 @@ extension UserProfileVC: EditProfileVCDismissalDelegate {
         let profileImageUrl = URL(string: userPersistedProfileImage)
         
         nameLabel.text = userPersistedName
-        locationLabel.text = userPersistedLocation + ", Philippines"
+        locationLabel.text = userPersistedLocation.address
         profileImageView.sd_setImage(with: profileImageUrl, completed: nil)
         getUsersPersistedInfo = updatedPersistedData
     }
@@ -212,8 +213,8 @@ extension UserProfileVC: TableViewDataSourceAndDelegate {
         case 1:
             let vc = ClientPostHistoryVC()
             navigationController?.pushViewController(vc, animated: true)
-//            let vc = TechnieTabController()
-//            (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootViewController(vc)
+        //            let vc = TechnieTabController()
+        //            (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootViewController(vc)
         case 2:
             print("help")
             showMailComposer()
@@ -225,6 +226,15 @@ extension UserProfileVC: TableViewDataSourceAndDelegate {
             navigationController?.pushViewController(vc, animated: true)
         case 5:
             print("log out")
+            let firebaseAuth = Auth.auth()
+            do {
+                try firebaseAuth.signOut()
+                let mainVC = ChooseAccountTypeVC()
+                (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootViewController(mainVC)
+            } catch let signOutError as NSError {
+                print ("Error signing out: ", signOutError)
+            }
+            
         default:
             break
         }

@@ -158,13 +158,13 @@ extension TechnieProfileVC: TableViewDataSourceAndDelegate {
         case 0:
 //            let userName = UserDefaults.standard.value(forKey: "email") as? String ?? ""
             let userPersistedName = getUsersPersistedInfo?.name ?? "username"
-            let userPersistedLocation = getUsersPersistedInfo?.location ?? "userlocation"
+            let userPersistedLocation = getUsersPersistedInfo?.location.address ?? "userlocation"
             let userPersistedProfileImage = getUsersPersistedInfo?.profileImage ?? ""
             let profileImageUrl = URL(string: userPersistedProfileImage)
             
             cell.textLabel?.font = .boldSystemFont(ofSize: 16)
             cell.textLabel?.text = userPersistedName 
-            cell.detailTextLabel?.text = userPersistedLocation + ", Philippines"
+            cell.detailTextLabel?.text = userPersistedLocation
 //            let newImage = UIImage().resizeImage(image: UIImage(named: "technie")!, toTheSize: CGSize(width: 40, height: 40))
 //            var actualImage = UIImage()
             cell.imageView?.clipsToBounds = true
@@ -234,16 +234,19 @@ extension TechnieProfileVC: TableViewDataSourceAndDelegate {
                 navigationController?.pushViewController(vc, animated: true)
             } else if indexPath.row == 1 {
                 showMailComposer()
-//                let vc = ClientTabController()
-//                (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootViewController(vc)
             } else {
                 presentShareSheet()
             }
          
         case 3:
-            if indexPath.row == 0 {
-                try! Auth.auth().signOut()
-                print("Logged Out")
+            print("log out")
+            let firebaseAuth = Auth.auth()
+            do {
+                try firebaseAuth.signOut()
+                let mainVC = ChooseAccountTypeVC()
+                (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootViewController(mainVC)
+            } catch let signOutError as NSError {
+                print ("Error signing out: ", signOutError)
             }
         
         default:

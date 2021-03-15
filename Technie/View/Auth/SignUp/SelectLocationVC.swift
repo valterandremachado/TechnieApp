@@ -6,10 +6,18 @@
 //
 
 import UIKit
+import MapKit
+
+// Singleton
+protocol SelectedLocationDelegate: class {
+    func fetchSelectedAddress(address: String, lat: Double, long: Double)
+}
 
 class SelectLocationVC: UIViewController {
 
     // MARK: - Properties
+    weak var selectedLocationDelegate: SelectedLocationDelegate?
+    
     lazy var tableView: UITableView = {
         let tv = UITableView()
         tv.translatesAutoresizingMaskIntoConstraints = false
@@ -47,12 +55,21 @@ class SelectLocationVC: UIViewController {
         return search
     }()
     
+    var matchingItems:[MKMapItem] = []
+    let locationManager = CLLocationManager()
+
+    
     // MARK: - Inits
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         view.backgroundColor = .white
         setupViews()
+        
+        locationManager.delegate = self
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        locationManager.requestWhenInUseAuthorization()
+        locationManager.requestLocation()
     }
     
     // MARK: - Methods
@@ -69,58 +86,69 @@ class SelectLocationVC: UIViewController {
         navigationItem.hidesSearchBarWhenScrolling = false
         navigationItem.title = "Location"
     }
+
+    func performSearchRequest(searchedLocation: String) {
+        let request = MKLocalSearch.Request()
+        guard let coordinate = locationManager.location?.coordinate else { return }
+        
+        request.naturalLanguageQuery = "\(searchedLocation)"
+        request.region = MKCoordinateRegion(center: coordinate, latitudinalMeters: 3200, longitudinalMeters: 3200)
+        // about a couple miles around you
+        
+        print(request.region)
+        
+        MKLocalSearch(request: request).start { (response, error) in
+            guard error == nil else { return }
+            guard let response = response else { return }
+            guard response.mapItems.count > 0 else { return }
+            
+            self.matchingItems = response.mapItems
+            self.tableView.reloadData()
+
+        }
+    }
     
     // MARK: - Selectors
 
 }
 
+extension SelectLocationVC : CLLocationManagerDelegate {
+    
+    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        if status == .authorizedWhenInUse {
+            locationManager.requestLocation()
+        }
+    }
+
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        if locations.first != nil {
+            locationManager.stopUpdatingLocation()
+        }
+    }
+
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Swift.Error) {
+        print("error:: \(error.localizedDescription)")
+    }
+}
+
 // MARK: - UISearchBarDelegate Extension
 extension SelectLocationVC: UISearchBarDelegate {
     
-//    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
-//    }
-//
-//    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-//    }
-//
-//    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-//        searchBar.searchTextField.autocapitalizationType = .none
-//        guard let searchedString = searchBar.text else { return }
-//        presentSearchResults(searchedString, filteredData)
-//    }
-////    func presentSearchController(_ searchController: UISearchController) {
-////        searchController.searchBar.becomeFirstResponder()
-////    }
-//
-//    fileprivate func presentSearchResults(_ searchedString: String,_ filteredTechnicians: [TechnicianModel]) {
-//        let vc = TechnicianSearchResultsVC()
-//        vc.title = "\(searchedString) results".lowercased()
-//        vc.technicianModel = filteredTechnicians
-//        navigationController?.pushViewController(vc, animated: true)
-//    }
-//
-//    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-//        //        searchBar.text = searchText.lowercased()
-//        if searchBar.text!.trimmingCharacters(in: .whitespaces).isEmpty {
-//            //            print("isEmpty")
-//        } else {
-//        }
-//
-//        if searchText.isEmpty == false {
-////            let skills = technicianModel.profileInfo.skills
-////            let flatStrings = skills.joined(separator: ", ")
-//            if searchText != "," {
-//                guard !searchText.replacingOccurrences(of: " ", with: "").isEmpty else { return }
-//                filteredData = technicianModel
-//                let filteredArray = technicianModel.filter { (technician) -> Bool in
-//                    return technician.profileInfo.name.localizedCaseInsensitiveContains(searchText) || technician.profileInfo.skills.joined(separator: ", ").localizedCaseInsensitiveContains(searchText) }
-//                filteredData = filteredArray//technicianModel.filter({ $0.profileInfo.skills.joined(separator: ", ").localizedCaseInsensitiveContains(searchText) })
-//                print(filteredArray)
-//            }
-//
-//        }
-//
-//    }
+    func presentSearchController(_ searchController: UISearchController) {
+        searchController.searchBar.becomeFirstResponder()
+    }
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        //        searchBar.text = searchText.lowercased()
+        if searchBar.text!.trimmingCharacters(in: .whitespaces).isEmpty {
+            //            print("isEmpty")
+        } else {
+        }
+
+        if searchText.isEmpty == false {
+            performSearchRequest(searchedLocation: searchText)
+        }
+
+    }
     
   
 }
@@ -130,13 +158,47 @@ extension SelectLocationVC: UISearchBarDelegate {
 extension SelectLocationVC: TableViewDataSourceAndDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 2
+        return matchingItems.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: SelectLocationCell.cellID, for: indexPath) as! SelectLocationCell
-        cell.textLabel?.text = "test"
+        var cell = tableView.dequeueReusableCell(withIdentifier: SelectLocationCell.cellID, for: indexPath) as! SelectLocationCell
+        cell = SelectLocationCell(style: .subtitle, reuseIdentifier: SelectLocationCell.cellID)
+        
+        let selectedItem = matchingItems[indexPath.row].placemark
+
+        let name = selectedItem.name
+//                let streetNumber = selectedItem.subThoroughfare ?? ""
+//                let streetName = selectedItem.thoroughfare ?? ""
+        let locality = selectedItem.locality ?? ""  //Brgy or neighborhood
+        let subLocality = selectedItem.subLocality ?? ""  //Brgy or neighborhood
+        
+        let subLocalityWithComma = !subLocality.isEmpty ? ("\(subLocality),") : ("")
+        let localityWithComma = !locality.isEmpty ? ("\(locality)") : ("")
+        
+        cell.detailTextLabel?.textColor = .systemGray
+        cell.detailTextLabel?.text = "\(subLocalityWithComma) \(localityWithComma)"
+        cell.textLabel?.text = name
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        
+        let selectedItem = matchingItems[indexPath.row].placemark
+        let locality = selectedItem.locality ?? ""
+        let subLocality = selectedItem.subLocality ?? ""  //Brgy or neighborhood
+        let subLocalityWithComma = !subLocality.isEmpty ? ("\(subLocality),") : ("")
+        let localityWithComma = !locality.isEmpty ? ("\(locality)") : ("")
+//        print("coordinates: " ,selectedItem.coordinate, ", name: ", selectedItem.name)
+        
+        let lat = selectedItem.coordinate.latitude
+        let long = selectedItem.coordinate.longitude
+        let address = "\(subLocalityWithComma) \(localityWithComma)"
+        
+        selectedLocationDelegate?.fetchSelectedAddress(address: address, lat: lat, long: long)
+        searchController.dismiss(animated: true, completion: nil)
+        dismiss(animated: true, completion: nil)
     }
     
     

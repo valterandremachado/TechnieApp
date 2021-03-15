@@ -11,33 +11,34 @@ struct UserPersistedInfo: Codable {
     let uid: String
     let name: String
     let email: String
-    let location: String
+    let location: UserPersistedLocation
     let accountType: String?
-    let locationInLongLat: LocationInLongAndLat?
-    let profileImage: String?
-    let hourlyRate: Int?
+    let profileImage: String
+    let hourlyRate: String?
+    let userType: String
     
     init(uid: String,
          name: String,
          email: String,
-         location: String,
+         location: UserPersistedLocation,
          accountType: String?,
-         locationInLongLat: LocationInLongAndLat?,
-         profileImage: String?,
-         hourlyRate: Int?) {
+         profileImage: String,
+         hourlyRate: String?,
+         userType: String) {
         
         self.uid = uid
         self.name = name
         self.email = email
         self.location = location
         self.accountType = accountType
-        self.locationInLongLat = locationInLongLat
         self.profileImage = profileImage
         self.hourlyRate = hourlyRate
+        self.userType = userType
     }
 }
 
-struct LocationInLongAndLat: Codable {
-    let lat: String
-    let long: String
+struct UserPersistedLocation: Codable {
+    let address: String
+    let lat: Double
+    let long: Double
 }

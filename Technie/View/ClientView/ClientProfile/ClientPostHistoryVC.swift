@@ -76,7 +76,6 @@ class ClientPostHistoryVC: UIViewController {
     // MARK: - Methods
     fileprivate func setupViews() {
         [tableView, indicator].forEach { view.addSubview($0)}
-        indicator.start()
 
         tableView.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.leadingAnchor, bottom: view.safeAreaLayoutGuide.bottomAnchor, trailing: view.trailingAnchor, padding: UIEdgeInsets(top: 5, left: 0, bottom: 0, right: 0))
         
@@ -102,6 +101,8 @@ class ClientPostHistoryVC: UIViewController {
     var previousPosts = [PostModel]()
     
     fileprivate func fetchData() {
+        indicator.start()
+
         DatabaseManager.shared.getClientActiveAndPreviousPosts { result in
             switch result {
             case .success(let activePosts):
@@ -130,6 +131,7 @@ class ClientPostHistoryVC: UIViewController {
                 } else {
                     self.tableView.isHidden = false
                 }
+                self.indicator.stop()
                 print(error)
             }
         } completionOnPreviousPosts: { result in
