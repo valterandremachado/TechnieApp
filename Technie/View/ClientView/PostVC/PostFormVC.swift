@@ -9,6 +9,7 @@ import UIKit
 import NotificationBannerSwift
 import FirebaseDatabase
 import CodableFirebase
+import MapKit
 
 struct Keys {
     static let pickerStoredIndex = "pickerIndex"
@@ -497,7 +498,11 @@ class PostFormVC: UIViewController {
                         switch result {
                         case .success(let postUID):
                             if self.userDefaults.bool(forKey: "recommendationEngineOnOff") == true {
-                                self.showRecommendationBanner(jobPostKeyPath: postUID)
+//                                self.showRecommendationBanner(jobPostKeyPath: postUID)
+//                                let delay = 1.3
+//                                Timer.scheduledTimer(withTimeInterval: delay, repeats: false) { _ in
+                                    self.potentialTechnciansToRecommend(with: postUID)
+//                                }
                             }
                         case .failure(let error):
                             print(error)
@@ -516,24 +521,64 @@ class PostFormVC: UIViewController {
     var recommendedTechniciansModel = [TechnicianModel]()
     
     fileprivate func fetchData()  {
+        guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
+        let proficiencyInDecimal: [Double] = [0.25, 0.50, 0.75, 1.0]
+        var workSpeed = 0
+        var workQuality = 0
+        var responseTime = 0
+        
         DatabaseManager.shared.getAllTechnicians(completion: {[weak self] result in
             guard let self = self else { return }
             switch result {
             case .success(let technicians):
-                self.recommendedTechniciansModel.append(technicians)
+//                self.recommendedTechniciansModel.append(technicians)
+                
+                let model = technicians
+
+                /// Recommendation Algorithm
+                // append only technicians with review history and rating of 4 and above
+                workSpeed = Int(model.clientsSatisfaction?.workSpeedAvrg.rounded(.toNearestOrAwayFromZero) ?? 0.0)
+                workQuality = Int(model.clientsSatisfaction?.workQualityAvrg.rounded(.toNearestOrAwayFromZero) ?? 0.0)
+                responseTime = Int(model.clientsSatisfaction?.responseTimeAvrg.rounded(.toNearestOrAwayFromZero) ?? 0.0)
+
+                let sum = proficiencyInDecimal[workSpeed] + proficiencyInDecimal[workQuality] + proficiencyInDecimal[responseTime]
+                let efficiency = sum/3 * 100
+                
+                let clientLat = getUsersPersistedInfo.location.lat
+                let clientLong = getUsersPersistedInfo.location.long
+                let technicianLat = model.profileInfo.location?.lat ?? 0.0
+                let technicianLong = model.profileInfo.location?.long ?? 0.0
+
+                // Client location
+                let clientLocation = CLLocation(latitude: clientLat, longitude: clientLong) //baguio
+                //  Technician location
+                let technicianLocation = CLLocation(latitude: technicianLat, longitude: technicianLong) //la trinidad
+                //Finding my distance to my next destination (in km)
+                let distance = clientLocation.distance(from: technicianLocation) / 1000
+                
+                if (efficiency >= 65 && model.clientsSatisfaction?.ratingAvrg ?? 0.0 >= 4 && distance <= 7) {
+                    guard self.potentialRecommendedTechnies.filter({ $0.profileInfo.id.contains(model.profileInfo.id) }).isEmpty else { return }
+                    self.potentialRecommendedTechnies.append(model)
+                } else {
+                    print("there is no technician near you")
+                }
+                
             case .failure(let error):
                 print("Failed to get technicians: \(error.localizedDescription)")
             }
         })
     }
+    
+    var potentialRecommendedTechnies = [TechnicianModel]()
+    
+    fileprivate func potentialTechnciansToRecommend(with jobPostKeyPath: String) {
         
-    fileprivate func showRecommendationBanner(jobPostKeyPath: String) {
-        print("jobPostKeyPath: \(jobPostKeyPath)")
-        guard !recommendedTechniciansModel.isEmpty else { return }
+        guard !potentialRecommendedTechnies.isEmpty else { return }
+
         guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
         let clientKeyPath = getUsersPersistedInfo.uid
         
-        let updateElement = try! FirebaseEncoder().encode(recommendedTechniciansModel)
+        let updateElement = try! FirebaseEncoder().encode(potentialRecommendedTechnies)
 
         let childPath = "\(jobPostKeyPath)/recommendedTechnicians"
         database.child(childPath).setValue(updateElement, withCompletionBlock: { error, _ in
@@ -552,8 +597,6 @@ class PostFormVC: UIViewController {
                                                 rightView: imageView,
                                                 style: .info)
         
-//        banner.autoDismiss = false
-//        banner.autoDismiss = true
         banner.titleLabel?.textColor = .black
         banner.subtitleLabel?.textColor = .systemGray
 
@@ -594,7 +637,6 @@ class PostFormVC: UIViewController {
                 banner.dismiss()
             }
         }
-        
     }
     
     @objc func addSkillsBtnTapped() {

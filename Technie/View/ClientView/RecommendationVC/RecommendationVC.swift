@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import MapKit
 
 class RecommendationVC: UIViewController {
 
@@ -141,12 +142,13 @@ class RecommendationVC: UIViewController {
     }
     
     func getRecommendedTechnicians(model: [TechnicianModel]) {
-//        Recommendation Engine
-//        Nearby = 1km and lesser
+        guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
+
+//        Recommendation Engine ✅
+//        Nearby = 7km and lesser ✅
 //        Efficiency = 65% up ✅
 //        Rating = 4 stars up ✅
-        
-//        print("self.recommendedTechniciansModel: ", model)
+      
         for index in 0..<model.count {
 
             let model = model[index]
@@ -158,15 +160,24 @@ class RecommendationVC: UIViewController {
             let sum = proficiencyInDecimal[workSpeed] + proficiencyInDecimal[workQuality] + proficiencyInDecimal[responseTime]
             let efficiency = sum/3 * 100
             
-            if (efficiency >= 65 && model.clientsSatisfaction?.ratingAvrg ?? 0.0 >= 4) {
+            let clientLat = getUsersPersistedInfo.location.lat
+            let clientLong = getUsersPersistedInfo.location.long
+            let technicianLat = model.profileInfo.location?.lat ?? 0.0
+            let technicianLong = model.profileInfo.location?.long ?? 0.0
 
-                guard self.recommendedTechniciansModel.filter({ $0.profileInfo.id.contains(model.profileInfo.id) }).isEmpty else { return }
-                self.recommendedTechniciansModel.append(model)
-                self.tableView.reloadData()
-
+            // Client location
+            let clientLocation = CLLocation(latitude: clientLat, longitude: clientLong) //baguio
+            //  Technician location
+            let technicianLocation = CLLocation(latitude: technicianLat, longitude: technicianLong) //la trinidad
+            //Finding my distance to my next destination (in km)
+            let distance = clientLocation.distance(from: technicianLocation) / 1000
+            
+            if (efficiency >= 65 && model.clientsSatisfaction?.ratingAvrg ?? 0.0 >= 4 && distance <= 7) {
+                if self.recommendedTechniciansModel.filter({ $0.profileInfo.id.contains(model.profileInfo.id) }).isEmpty {
+                    self.recommendedTechniciansModel.append(model)
+                    self.tableView.reloadData()
+                }
             }
-            print("filteredRanking2: ", self.recommendedTechniciansModel, ",count2: ", self.recommendedTechniciansModel.count,", ", index)
-
 
         } // End of loop
     }
@@ -200,7 +211,6 @@ extension RecommendationVC: TableViewDataSourceAndDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: RecommendationCell.cellID, for: indexPath) as! RecommendationCell
         let recommendedTechnicians = recommendedTechniciansModel[indexPath.row]
-        
         cell.recommendedTechniciansModel = recommendedTechnicians
         return cell
     }
@@ -214,7 +224,7 @@ extension RecommendationVC: TableViewDataSourceAndDelegate {
         vc.userPostModel = posts
         vc.profileImageView.sd_setImage(with: URL(string: recommendedTechnicians.profileInfo.profileImage ?? "")) 
         vc.nameLabel.text = recommendedTechnicians.profileInfo.name
-        vc.locationLabel.text = "\(recommendedTechnicians.profileInfo.location), Philippines"
+        vc.locationLabel.text = recommendedTechnicians.profileInfo.location?.address
         vc.technicianExperienceLabel.text = "• \(recommendedTechnicians.profileInfo.experience) Year of Exp."
         
         let delimiter = "at"

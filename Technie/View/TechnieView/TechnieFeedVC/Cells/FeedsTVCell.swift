@@ -35,17 +35,10 @@ class FeedsTVCell: UITableViewCell {
         let lbl = UILabel()
 //        lbl.translatesAutoresizingMaskIntoConstraints = false
         lbl.text = "jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel jobDescriptionLabel"
-        
       
         lbl.numberOfLines = 4
-//        var trunc = NSMutableAttributedString(string: "...See More")
-//        trunc.addAttribute(NSAttributedString.Key.font, value: UIFont.boldSystemFont(ofSize: 15), range: NSMakeRange(0, 11))
-//        trunc.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.systemBlue, range: NSMakeRange(0, 11))
-//        trunc.addAttribute(NSAttributedString.Key.foregroundColor, value: UIColor.black, range: NSMakeRange(0, 3))
-//        lbl.attributedTruncationToken = trunc
-
         lbl.textAlignment = .justified
-
+        lbl.textColor = .systemGray
         return lbl
     }()
     
@@ -216,7 +209,11 @@ class FeedsTVCell: UITableViewCell {
             labelDynamicHeight = LabelDynamicHeight.height(text: postModel.description, font: UIFont.systemFont(ofSize: 17), width: self.frame.width - self.separatorInset.left + 6)
             
             jobBudget.text = postModel.budget
-            jobLocation.text = postModel.postOwnerInfo?.location
+            
+            let delimiter = ", "
+            let slicedString = postModel.postOwnerInfo?.location.components(separatedBy: delimiter)[1]
+            jobLocation.text = slicedString
+            
             dataArray = postModel.requiredSkills
             jobPostTimeTrackerLabel.text = calculateTimeFrame(initialTime: postModel.dateTime)
             

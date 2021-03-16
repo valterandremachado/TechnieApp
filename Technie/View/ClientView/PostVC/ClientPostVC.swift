@@ -80,7 +80,7 @@ extension ClientPostVC: CollectionDataSourceAndDelegate {
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellID, for: indexPath) as! ClientPostCell
-        cell.backgroundColor = .gray
+        cell.backgroundColor = .systemGray4
         cell.title.text = professionArray[indexPath.item]
         return cell
     }

@@ -42,6 +42,7 @@ class TechnieNotificationVC: UIViewController {
         tv.delegate = self
         tv.dataSource = self
         tv.register(TechnieNotificationsCell.self, forCellReuseIdentifier: TechnieNotificationsCell.cellID)
+        tv.register(TechnieNotificationsCellForBtns.self, forCellReuseIdentifier: TechnieNotificationsCellForBtns.cellID)
         return tv
     }()
     
@@ -97,6 +98,7 @@ class TechnieNotificationVC: UIViewController {
     }
     
     fileprivate func fetchData() {
+        
         DatabaseManager.shared.getAllTechnicianNotifications(completion: {[weak self] result in
             guard let self = self else { return }
             switch result {
@@ -108,14 +110,14 @@ class TechnieNotificationVC: UIViewController {
                 self.tableView.reloadData()
             case .failure(let error):
                 if self.userNotifications.count == 0 {
-                    self.tableView.isHidden = true
+//                    self.tableView.isHidden = true
                     self.view.addSubview(self.warningLabel)
                     NSLayoutConstraint.activate([
                         self.warningLabel.centerYAnchor.constraint(equalTo: self.view.centerYAnchor),
                         self.warningLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor)
                     ])
                 } else {
-                    self.tableView.isHidden = false
+//                    self.tableView.isHidden = false
                 }
 
                 self.indicator.stop()
@@ -151,7 +153,7 @@ class TechnieNotificationVC: UIViewController {
                 let sortedArray = notifications.sorted(by: { PostFormVC.dateFormatter.date(from: $0.dateTime)?.compare(PostFormVC.dateFormatter.date(from: $1.dateTime) ?? Date()) == .orderedDescending })
                 self.userNotifications = sortedArray
                 self.tableView.reloadData()
-                self.refresher.endRefreshing()
+//                self.refresher.endRefreshing()
                 print("success")
             case .failure(let error):
                 print("Failed to get technicians: \(error.localizedDescription)")
@@ -204,10 +206,13 @@ class TechnieNotificationVC: UIViewController {
     }
     
     @objc func refreshData(_ refreshController: UIRefreshControl){
-//        let refreshDeadline = DispatchTime.now() + .seconds(Int(1.5))
+
         DispatchQueue.main.async {
             self.refreshNotificationData()
-//            refreshController.endRefreshing()
+            let refreshDeadline = DispatchTime.now() + .seconds(Int(2))
+            DispatchQueue.main.asyncAfter(deadline: refreshDeadline) {
+                refreshController.endRefreshing()
+            }
         }
         
     }
@@ -265,11 +270,11 @@ extension TechnieNotificationVC: TableViewDataSourceAndDelegate {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: TechnieNotificationsCell.cellID, for: indexPath) as! TechnieNotificationsCell
         
         let model = userNotifications[indexPath.row]
         if model.type == TechnicianNotificationType.hiringOffer.rawValue {
-//            postChildPath = model?.postChildPath ?? ""
+            let cell = tableView.dequeueReusableCell(withIdentifier: TechnieNotificationsCellForBtns.cellID, for: indexPath) as! TechnieNotificationsCellForBtns
+
             cell.postChildPath = model.postChildPath ?? ""
 
             cell.acceptBtn.tag = indexPath.row
@@ -277,29 +282,45 @@ extension TechnieNotificationVC: TableViewDataSourceAndDelegate {
             cell.startChatBtn.tag = indexPath.row
             cell.declineBtn.addTarget(self, action: #selector(declineBtnPressed), for: .touchUpInside)
             cell.startChatBtn.addTarget(self, action: #selector(startChatBtnPressed), for: .touchUpInside)
-            cell.setupViews2()
             cell.userNotification = model
             
+            switch model.type {
+            case TechnicianNotificationType.hiringOffer.rawValue:
+                cell.titleLabel.text = "Hiring Offer"
+
+            case TechnicianNotificationType.jobInvitation.rawValue:
+                cell.titleLabel.text = "Invitation"
+
+            case TechnicianNotificationType.closedJob.rawValue:
+                cell.titleLabel.text = "Closing Job"
+            default:
+                break
+            }
+            
+            return cell
         } else {
-            cell.setupViews()
+            let cell = tableView.dequeueReusableCell(withIdentifier: TechnieNotificationsCell.cellID, for: indexPath) as! TechnieNotificationsCell
+
             cell.userNotification = model
+            
+            switch model.type {
+            case TechnicianNotificationType.hiringOffer.rawValue:
+                cell.titleLabel.text = "Hiring Offer"
+
+            case TechnicianNotificationType.jobInvitation.rawValue:
+                cell.titleLabel.text = "Invitation"
+
+            case TechnicianNotificationType.closedJob.rawValue:
+                cell.titleLabel.text = "Closing Job"
+            default:
+                break
+            }
+        
+            return cell
         }
         
-        switch model.type {
-        case TechnicianNotificationType.hiringOffer.rawValue:
-            cell.titleLabel.text = "Hiring Offer"
-            cell.buttonsStackView.isHidden = false
-        case TechnicianNotificationType.jobInvitation.rawValue:
-            cell.titleLabel.text = "Invitation"
-            cell.buttonsStackView.isHidden = true
-        case TechnicianNotificationType.closedJob.rawValue:
-            cell.titleLabel.text = "Closing Job"
-            cell.buttonsStackView.isHidden = true
-        default:
-            cell.buttonsStackView.isHidden = true
-        }
         
-        return cell
+//        return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

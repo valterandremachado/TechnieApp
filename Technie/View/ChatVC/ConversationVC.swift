@@ -52,8 +52,6 @@ class ConversationVC: UIViewController {
         return label
     }()
     
-    private var messages = [Message]()
-
     // MARK: - Inits
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -61,87 +59,6 @@ class ConversationVC: UIViewController {
         view.backgroundColor = .systemBackground
         setupViews()
         fetchConvo()
-//        UserDefaults.standard.removeObject(forKey: "email")
-//        UserDefaults.standard.removeObject(forKey: "name")
-    }
-    
-//    override func viewWillDisappear(_ animated: Bool) {
-//        super.viewWillDisappear(animated)
-//        // Do any additional setup after loading the view.
-//        self.tabBarController?.setTabBar(hidden: true, animated: true, along: nil)
-//    }
-//
-//    override func viewWillAppear(_ animated: Bool) {
-//        super.viewWillAppear(animated)
-//        // Do any additional setup after loading the view.
-//        self.tabBarController?.setTabBar(hidden: false, animated: true, along: nil)
-//    }
-    var messageInfo = [[String: Any]]()
-    var senderEmail = ""
-    var customDetailText = ""
-    private func listenForMessages(id: String) {
-        DatabaseManager.shared.getAllMessagesForConversation(with: id, completion: { [weak self] result in
-            switch result {
-            case .success(let messages):
-                print("success in getting messages: ")//\(messages)
-                guard !messages.isEmpty else {
-                    print("messages are empty")
-                    return
-                }
-                // Populate messages array
-                self?.messages = messages
-                self?.updateSender(message: messages)
-                print("messages: ", messages)
-//                self?.messageInfo.append(["senderEmail": lastMessage.flatMap {$0.sender_email} ?? "", "receiverName": lastMessage.flatMap {$0.name} ?? "", "contentType": lastMessage.flatMap {$0.type} ?? ""])
-//                print("Display: \(lastMessage?.sender_email)")
-            case .failure(let error):
-                print("failed to get messages: \(error)")
-            }
-        })
-    }
-    
-    func updateSender(message: [Message]) {
-        guard let lastMessage = messages.last else { return }
-        let lastUserDefaultsMessage = UserDefaults.standard.value(forKey: "lastMessage") as? String ?? ""
-
-        let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo")
-//        print("messages: \(messages.last)")
-        var userPersistedEmail = ""
-        if let info = getUsersPersistedInfo {
-            userPersistedEmail = info.email
-        }
-        
-//        let userEmail = UserDefaults.standard.value(forKey: "email") as? String ?? ""
-        let currentUserSafeEmail = DatabaseManager.safeEmail(emailAddress: userPersistedEmail)
-        
-        let messageType = lastMessage.kind.messageKindString
-
-        let lastestMessage = messages.suffix(conversations.count)
-
-        if currentUserSafeEmail == lastMessage.sender_email {
-//            senderEmail = lastMessage.sender_email
-//            print("name: " + conversations.last!.name)
-
-            guard let latestMessage = conversations.first?.latestMessage.message else { return }
-            let modifiedLatestMessage = messageType != "text" ? ("You sent a " + messageType) : ("You: " + latestMessage)
-            customDetailText = modifiedLatestMessage
-            DispatchQueue.main.async {
-                self.tableView.reloadData()
-            }
-            UserDefaults.standard.setValue(latestMessage, forKey: "lastMessage")
-        } else {
-            guard let latestMessage = conversations.first?.latestMessage.message else { return }
-
-//            guard let latestMessage = messages.last?.content else { return }
-            let modifiedLatestMessage = messageType != "text" ? ("Sent a " + messageType) : (latestMessage)
-            latestMessage != lastUserDefaultsMessage ? (customDetailText = modifiedLatestMessage) : (customDetailText = "...")
-//            print("latestMessage: \(latestMessage), lastUserDefaultsMessage: \(lastUserDefaultsMessage)")
-            DispatchQueue.main.async {
-                self.tableView.reloadData()
-            }
-            print("they're different")
-        }
-
     }
     
     // MARK: - Methods
@@ -161,51 +78,21 @@ class ConversationVC: UIViewController {
     
     func fetchConvo() {
         tableView.isHidden = false
-        if Auth.auth().currentUser?.uid != nil {
-            //user is logged in
-            print("user is logged in")
-//            getAllUsers()
-            startListeningForConversations()
-        } else {
-            //user is not logged in
-            print("user is not signed in")
-//            insertUser()
-//            getAllUsers()
-        }
+        startListeningForConversations()
     }
-    
-    func createNewConvo() {
-//        let vc = ChatVC(with: email)
-//        vc.title = "Valter Machado"
-//        vc.navigationItem.largeTitleDisplayMode = .never
-//        navigationController?.pushViewController(vc, animated: true)
-    }
-    
+        
     /// Fetches currentUser's convos (get's currentUser email from userDefaullts in order to differ between sender and receiver)
     private func startListeningForConversations() {
-        let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo")
-
-        var userPersistedEmail = ""
-//        var userPersistedName = ""
-        if let info = getUsersPersistedInfo {
-            userPersistedEmail = info.email
-//            userPersistedName = info.first!.name
-        }
+        guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
         
-      print("userPersistedEmail: "+userPersistedEmail)
-
-//        guard let email = UserDefaults.standard.value(forKey: "email") as? String else {
-//            return
-//        }
-
-//        if let observer = loginObserver {
-//            NotificationCenter.default.removeObserver(observer)
-//        }
-
+        let userPersistedEmail = getUsersPersistedInfo.email
+        
+        print("userPersistedEmail: " + userPersistedEmail)
+        
         print("starting conversation fetch...")
-
+        
         let safeEmail = DatabaseManager.safeEmail(emailAddress: userPersistedEmail)
-
+        
         DatabaseManager.shared.getAllConversations(for: safeEmail, completion: { [weak self] result in
             switch result {
             case .success(let conversations):
@@ -217,16 +104,11 @@ class ConversationVC: UIViewController {
                 }
                 
                 self?.conversations = conversations
-                guard let id =  self?.conversations.first?.id else { return }
-
+                
                 self?.noConversationsLabel.isHidden = true
                 self?.tableView.isHidden = false
-                self?.listenForMessages(id: id)
-
-//                DispatchQueue.main.async {
-//                    self?.tableView.reloadData()
-//                }
-                
+                self?.tableView.reloadData()
+            
             case .failure(let error):
                 self?.tableView.isHidden = true
                 self?.noConversationsLabel.isHidden = false
@@ -265,76 +147,6 @@ class ConversationVC: UIViewController {
         })
     }
     
-    func getAllUsers() {
-        DatabaseManager.shared.getAllUsers(completion: { [weak self] result in
-            switch result {
-            case .success(let usersCollection):
-//                self?.hasFetched = true
-//                self?.users = usersCollection
-//                guard let currentUserUID = Auth.auth().currentUser?.uid else { return }
-//                self?.users.forEach { userDic in
-//                    guard let user = userDic["name"] else { return }
-//                    if user == currentUserUID {
-//                        print("the same: "+user+" ,"+currentUserUID)
-//                    } else {
-//                        print("different: "+user+" ,"+currentUserUID)
-//                    }
-//
-//                }
-//                print("users: \(usersCollection)")
-//                self?.filterUsers(with: query)
-                self?.tableView.reloadData()
-            case .failure(let error):
-                print("Failed to get usres: \(error)")
-            }
-        })
-    }
-    
-    func insertUser() {
-        Auth.auth().signInAnonymously { (result, error) in
-            if let error = error {
-                print("error sign in: "+error.localizedDescription)
-                return
-            }
-            
-            print("signed In")
-            guard let userUID = result?.user.uid else { return }
-            let firstName = userUID
-            let lastName = userUID
-            let email = userUID+"@gmail.com"
-
-            let chatUser = ChatAppUser(firstName: firstName,
-                                      lastName: lastName,
-                                      emailAddress: email)
-            
-//            let safeEmail = DatabaseManager.safeEmail(emailAddress: email)
-
-            UserDefaults.standard.set(email, forKey: "email")
-            UserDefaults.standard.set(firstName, forKey: "name")
-
-            let name = UserDefaults.standard.value(forKey: "name") as? String ?? "NA"
-            print("defaults name: "+name)
-            
-            DatabaseManager.shared.insertUser(with: chatUser, completion: { success in
-                if success {
-                    // upload image
-//                    guard let image = strongSelf.imageView.image,
-//                          let data = image.pngData()
-//                    else { return }
-//                    let filename = chatUser.profilePictureFileName
-//                    StorageManager.shared.uploadProfilePicture(with: data, fileName: filename, completion: { result in
-//                        switch result {
-//                        case .success(let downloadUrl):
-//                            UserDefaults.standard.set(downloadUrl, forKey: "profile_picture_url")
-//                            print(downloadUrl)
-//                        case .failure(let error):
-//                            print("Storage maanger error: \(error)")
-//                        }
-//                    })
-                }
-            })
-        }
-    }
 }
 
 // MARK: - TableViewDataSourceAndDelegate
@@ -354,14 +166,29 @@ extension ConversationVC: TableViewDataSourceAndDelegate {
       
         cell.detailTextLabel?.textColor = .systemGray
         cell.textLabel?.font = .boldSystemFont(ofSize: 16)
-
-//        let lastMessage = messages.suffix(conversations.count)[0]//[indexPath.row]
-//
-//        print(lastMessage.content)
-        
-        cell.detailTextLabel?.text = conversationDetail.latestMessage.message
-
         cell.accessoryType = .disclosureIndicator
+
+        let messageType = conversationDetail.latestMessage.messageType
+        let sender = conversationDetail.latestMessage.sender
+        let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo")
+        let currentUserSafeEmail = getUsersPersistedInfo?.email
+        
+        if currentUserSafeEmail == sender {
+
+            let latestMessage = conversationDetail.latestMessage.message
+            let modifiedLatestMessage = messageType != "text" ? ("You sent a " + messageType) : ("You: " + latestMessage)
+//            customDetailText = modifiedLatestMessage
+            cell.detailTextLabel?.text = modifiedLatestMessage
+
+        } else {
+            let latestMessage = conversationDetail.latestMessage.message
+
+            let modifiedLatestMessage = messageType != "text" ? ("Sent a " + messageType) : (latestMessage)
+            cell.detailTextLabel?.text = modifiedLatestMessage
+
+ 
+        }
+
         return cell
     }
     
@@ -373,6 +200,7 @@ extension ConversationVC: TableViewDataSourceAndDelegate {
         let convosModel = conversations[indexPath.row]
         let userName = convosModel.name
         let userEmail = convosModel.otherUserEmail
+       
 //        let vc = ChatVC(with: userEmail, id: UUID().uuidString)
 //        vc.isNewConvo = true
 //        vc.title = userName
@@ -387,6 +215,7 @@ extension ConversationVC: TableViewDataSourceAndDelegate {
         }) {
             let vc = ChatVC(with: targetConversation.otherUserEmail, id: targetConversation.id)
             vc.isNewConvo = false
+            vc.otherUserEmail2 = DatabaseManager.unsafeEmail(emailAddress: userEmail) 
             vc.title = targetConversation.name
             vc.conversations = conversations
             vc.navigationItem.largeTitleDisplayMode = .never

@@ -31,6 +31,8 @@
 		8A2B943325FE62EB007756F7 /* TechnicianContinueCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A2B943225FE62EB007756F7 /* TechnicianContinueCell.swift */; };
 		8A2B943825FE7FD1007756F7 /* SelectLocationVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A2B943725FE7FD1007756F7 /* SelectLocationVC.swift */; };
 		8A2B943D25FE808A007756F7 /* SelectLocationCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A2B943C25FE808A007756F7 /* SelectLocationCell.swift */; };
+		8A2D77182600822E00FFE693 /* JobsFromSameClientVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A2D77172600822E00FFE693 /* JobsFromSameClientVC.swift */; };
+		8A2D77202600826E00FFE693 /* JobsFromSameClientCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A2D771F2600826E00FFE693 /* JobsFromSameClientCell.swift */; };
 		8A41E7A625B07AB500265D5C /* ActiveJobsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A41E7A525B07AB500265D5C /* ActiveJobsCell.swift */; };
 		8A41E7AB25B07AD900265D5C /* PreviousJobsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A41E7AA25B07AD900265D5C /* PreviousJobsCell.swift */; };
 		8A41E7B725B07D6C00265D5C /* TechineProfileTVCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A41E7B625B07D6C00265D5C /* TechineProfileTVCell.swift */; };
@@ -224,6 +226,8 @@
 		8A2B943225FE62EB007756F7 /* TechnicianContinueCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnicianContinueCell.swift; sourceTree = "<group>"; };
 		8A2B943725FE7FD1007756F7 /* SelectLocationVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectLocationVC.swift; sourceTree = "<group>"; };
 		8A2B943C25FE808A007756F7 /* SelectLocationCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectLocationCell.swift; sourceTree = "<group>"; };
+		8A2D77172600822E00FFE693 /* JobsFromSameClientVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobsFromSameClientVC.swift; sourceTree = "<group>"; };
+		8A2D771F2600826E00FFE693 /* JobsFromSameClientCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobsFromSameClientCell.swift; sourceTree = "<group>"; };
 		8A41E7A525B07AB500265D5C /* ActiveJobsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveJobsCell.swift; sourceTree = "<group>"; };
 		8A41E7AA25B07AD900265D5C /* PreviousJobsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviousJobsCell.swift; sourceTree = "<group>"; };
 		8A41E7B625B07D6C00265D5C /* TechineProfileTVCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechineProfileTVCell.swift; sourceTree = "<group>"; };
@@ -542,6 +546,7 @@
 				8A8F72A625C29E4B00F4ABFF /* ChatInfoCells.swift */,
 				8ACD6AF225C438B200CC057D /* PhotoCollectionViewerCell.swift */,
 				8ACD6B0225C4547500CC057D /* LocationCollectionViewerCell.swift */,
+				8A2D771F2600826E00FFE693 /* JobsFromSameClientCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -742,6 +747,7 @@
 				8ADA18AD25C0557B0040D3C6 /* ChatInfoVC.swift */,
 				8ACD6AED25C4384000CC057D /* PhotoCollectionViewerVC.swift */,
 				8ACD6AFD25C4534200CC057D /* LocationCollectionViewerVC.swift */,
+				8A2D77172600822E00FFE693 /* JobsFromSameClientVC.swift */,
 				8A8F72A525C29DFE00F4ABFF /* Cells */,
 			);
 			path = ChatVC;
@@ -1282,6 +1288,7 @@
 				8ADA18AE25C0557C0040D3C6 /* ChatInfoVC.swift in Sources */,
 				8AAB8829259B625E00BCBD33 /* PostFormCell.swift in Sources */,
 				8A2B93FB25FE415A007756F7 /* AuthCell.swift in Sources */,
+				8A2D77202600826E00FFE693 /* JobsFromSameClientCell.swift in Sources */,
 				8A8F852E258A357200C4CEF9 /* ClientChatVC.swift in Sources */,
 				8A4B746A25C6DBAB0051619C /* SubmitProposalCell.swift in Sources */,
 				8ACD6B0325C4547500CC057D /* LocationCollectionViewerCell.swift in Sources */,
@@ -1290,6 +1297,7 @@
 				8A2B93F525FE40A4007756F7 /* TechnicianLoginVC.swift in Sources */,
 				8AE2B0FA25C9905600479C49 /* JobSearchResultsVC.swift in Sources */,
 				8A2B943D25FE808A007756F7 /* SelectLocationCell.swift in Sources */,
+				8A2D77182600822E00FFE693 /* JobsFromSameClientVC.swift in Sources */,
 				8A79718D2595CAA000648A3C /* ProfileEnum.swift in Sources */,
 				8A8F8533258A358400C4CEF9 /* ClientNotificationVC.swift in Sources */,
 				8A0C0B4825D11ACB0072729D /* TechnicianSearchResultsCell.swift in Sources */,

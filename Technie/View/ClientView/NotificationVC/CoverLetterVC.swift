@@ -44,7 +44,8 @@ class CoverLetterVC: UIViewController {
         let btn = UIButton(type: .system)
         btn.translatesAutoresizingMaskIntoConstraints = false
         btn.setTitle("View Profile", for: .normal)
-        btn.backgroundColor = .cyan
+        btn.tintColor = .white
+        btn.backgroundColor = .systemPink
         btn.clipsToBounds = true
         btn.layer.cornerRadius = 5
 //        btn.withWidth(view.frame.width - 45)

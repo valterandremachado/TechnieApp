@@ -39,7 +39,10 @@ class TechnicianLoginVC: UIViewController {
         tf.translatesAutoresizingMaskIntoConstraints = false
         tf.placeholder = "Email"
         tf.placeholderFontScale = 0.85
-    
+
+        tf.autocorrectionType = .no
+        tf.autocapitalizationType = .none
+        
         tf.borderActiveColor = .systemPink
         tf.borderInactiveColor = .gray
         return tf

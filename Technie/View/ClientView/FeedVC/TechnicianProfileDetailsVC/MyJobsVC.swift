@@ -59,6 +59,7 @@ class MyJobsVC: UIViewController {
     var postWithInvitation = [PostModel]()
     var postWithNOInvitation = [PostModel]()
 
+    var tempUserPosts = [PostModel]()
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
@@ -81,7 +82,16 @@ class MyJobsVC: UIViewController {
             }
             
         } else {
-            posts = userPostModel
+            userPostModel.forEach { post in
+                
+                if post.availabilityStatus == true && post.hiringStatus?.technicianToHireEmail != technicianModel.profileInfo.email {
+                    self.tempUserPosts.append(post)
+                    posts = tempUserPosts
+                } else if post.hiringStatus?.technicianToHireEmail == technicianModel.profileInfo.email && (post.availabilityStatus == false || post.availabilityStatus == true) {
+                    posts = userPostModel
+                }
+
+            }
         }
         
         setupViews()
@@ -308,7 +318,6 @@ class MyJobsVC: UIViewController {
         if selectedIndexes.count == 0 {
             presentAlertSheetForSelectionOfJobs()
         } else {
-            sendInvitation(with: selectedIndexes)
             updatePost(with: selectedIndexes)
             dismiss(animated: true, completion: nil)
             myJobsVCDismissalDelegate?.jobsVCDismissalSingleton(isDismissed: true)

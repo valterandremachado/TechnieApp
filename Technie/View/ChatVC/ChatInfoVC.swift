@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import MessageUI
 
 class ChatInfoVC: UIViewController {
 
@@ -47,7 +48,8 @@ class ChatInfoVC: UIViewController {
     }()
     
     var sections = [SectionHandler]()
-    
+    let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo")
+
     // MARK: - Inits
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -57,12 +59,27 @@ class ChatInfoVC: UIViewController {
         sections.append(SectionHandler(title: "User Info", detail: [""]))
         sections.append(SectionHandler(title: "Job Details", detail: ["Job Post", "Shared Photos", "Shared Location"]))
         sections.append(SectionHandler(title: "Other", detail: ["Report", "Delete conversation"]))
+        
+        switch getUsersPersistedInfo?.userType {
+        case UserType.client.rawValue:
+            fetchUserPostsClientSide()
+            print("UserType.client")
+            fetchAllTechnicians()
+        case UserType.technician.rawValue:
+            fetchUserPostsTechnieSide()
+            print("UserType.technician")
+            fetchAllClients()
+        default:
+            break
+        }
+        
         setupViews()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         tabBarController?.setTabBar(hidden: true, animated: true, along: nil)
+        
     }
     
     // MARK: - Methods
@@ -107,6 +124,89 @@ class ChatInfoVC: UIViewController {
         present(actionController, animated: true)
     }
     
+    var userPostModel = [PostModel]()
+    var tempUserPostModel = [PostModel]()
+    var technicianInfoModel: TechnicianModel?
+    var clientInfoModel: ClientModel?
+    var otherUserEmail = ""
+    
+    fileprivate func fetchUserPostsClientSide()  {
+        DatabaseManager.shared.getAllPostsWithNoRestriction(completion: { [self] result in
+            switch result {
+            case .success(let userPosts):
+                tempUserPostModel = userPosts
+                tempUserPostModel.forEach { post in
+                    if getUsersPersistedInfo?.email == post.postOwnerInfo?.email {
+                        if post.availabilityStatus == false && otherUserEmail == post.hiringStatus?.technicianToHireEmail {
+                            self.userPostModel.append(post)
+                        }
+                    }
+                }
+//                tableView.reloadData()
+            case .failure(let error):
+                print(error)
+            }
+        })
+    }
+    
+    fileprivate func fetchUserPostsTechnieSide()  {
+        DatabaseManager.shared.getAllPostsWithNoRestriction(completion: { [self] result in
+            switch result {
+            case .success(let userPosts):
+                tempUserPostModel = userPosts
+                tempUserPostModel.forEach { post in
+                    if otherUserEmail == post.postOwnerInfo?.email {
+                        if post.availabilityStatus == false && getUsersPersistedInfo?.email == post.hiringStatus?.technicianToHireEmail {
+                            self.userPostModel.append(post)
+                        }
+                    }
+                }
+//                tableView.reloadData()
+            case .failure(let error):
+                print(error)
+            }
+        })
+    }
+    
+    var otherUserImageUrl = ""
+    var otherUserFetchedEmail = ""
+    var otherUserName = ""
+
+    fileprivate func fetchAllTechnicians()  {
+        DatabaseManager.shared.getAllTechnicians(completion: {[weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let technicians):
+                if technicians.profileInfo.email == self.otherUserEmail {
+                    self.technicianInfoModel = technicians
+                    self.otherUserImageUrl = technicians.profileInfo.profileImage ?? ""
+                    self.otherUserFetchedEmail = technicians.profileInfo.email
+                    self.otherUserName = technicians.profileInfo.name
+                    self.tableView.reloadData()
+                }
+            case .failure(let error):
+                print("Failed to get technicians: \(error.localizedDescription)")
+            }
+        })
+    }
+    
+    fileprivate func fetchAllClients()  {
+        DatabaseManager.shared.getAllClients(completion: {[weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let clients):
+                if clients.profileInfo.email == self.otherUserEmail {
+                    self.clientInfoModel = clients
+                    self.otherUserImageUrl = clients.profileInfo.profileImage ?? ""
+                    self.otherUserFetchedEmail = clients.profileInfo.email
+                    self.otherUserName = clients.profileInfo.name
+                    self.tableView.reloadData()
+                }
+            case .failure(let error):
+                print("Failed to get technicians: \(error.localizedDescription)")
+            }
+        })
+    }
     
     // MARK: - Selectors
 
@@ -125,6 +225,7 @@ extension ChatInfoVC: TableViewDataSourceAndDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         // Enables detailTextLabel visibility
         let sectionDetail = sections[indexPath.section].sectionDetail
+
         switch indexPath.section {
         case 0:
             let cell = tableView.dequeueReusableCell(withIdentifier: ChatInfoSectionOneCell.cellID, for: indexPath) as! ChatInfoSectionOneCell
@@ -133,6 +234,11 @@ extension ChatInfoVC: TableViewDataSourceAndDelegate {
 //            cell = ChatInfoSectionOneCell(style: .subtitle, reuseIdentifier: TechineProfileTVCell.cellID)
             cell.selectionStyle = .none
             cell.setupViewsForCell()
+            
+            cell.emailLabel.text = otherUserFetchedEmail
+            cell.nameLabel.text = otherUserName
+            cell.profileImageView.sd_setImage(with: URL(string: otherUserImageUrl), completed: nil)
+                     
             return cell
         case 1:
             let cell = tableView.dequeueReusableCell(withIdentifier: ChatInfoSectionTwoCell.cellID, for: indexPath) as! ChatInfoSectionTwoCell
@@ -156,7 +262,22 @@ extension ChatInfoVC: TableViewDataSourceAndDelegate {
         tableView.deselectRow(at: indexPath, animated: true)
         switch indexPath.section {
         case 1:
-            if indexPath.row == 1 {
+            if indexPath.row == 0 {
+                if userPostModel.count == 1 {
+                    guard let model = userPostModel.first else { return }
+                    let vc = JobDetailsVC()
+                    vc.postModel = model
+                    vc.navBarViewSubtitleLbl.text = "posted \(view.calculateTimeFrame(initialTime: model.dateTime))"
+                    vc.isComingFromServiceVC = true
+                    self.navigationController?.pushViewController(vc, animated: true)
+                } else {
+                    print("its not 1: ", userPostModel.count)
+                    let vc = JobsFromSameClientVC()
+                    vc.userPostModel = userPostModel
+                    self.navigationController?.pushViewController(vc, animated: true)
+                    
+                }
+            } else if indexPath.row == 1 {
                 let vc = PhotoCollectionViewerVC()
                 vc.convoSharedPhotoArray = convoSharedPhotoArray
                 vc.navigationItem.title = "Shared Photos"
@@ -169,6 +290,8 @@ extension ChatInfoVC: TableViewDataSourceAndDelegate {
         case 2:
             if indexPath.row == 1 {
                 presentDeleteConvoAlertSheet()
+            } else {
+                showMailComposer()
             }
         default:
             break
@@ -219,3 +342,49 @@ extension ChatInfoVC: TableViewDataSourceAndDelegate {
     }
     
 }
+
+// MARK: - MFMailComposeViewControllerDelegate Extension
+extension ChatInfoVC: MFMailComposeViewControllerDelegate {
+    
+    func showMailComposer() {
+        
+        guard MFMailComposeViewController.canSendMail() else {
+            //Show alert informing the user
+            return
+        }
+        
+        let composer = MFMailComposeViewController()
+        composer.mailComposeDelegate = self
+        composer.setToRecipients(["report@technie.com"])
+        composer.setSubject("Reporting technican (\(technicianInfoModel?.profileInfo.email ?? ""))!")
+        composer.setMessageBody("", isHTML: false)
+        
+        present(composer, animated: true)
+    }
+    
+    func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
+        
+        if let _ = error {
+            //Show error alert
+            controller.dismiss(animated: true)
+            return
+        }
+        
+        switch result {
+        case .cancelled:
+            print("Cancelled")
+        case .failed:
+            print("Failed to send")
+        case .saved:
+            print("Saved")
+        case .sent:
+            print("Email Sent")
+        @unknown default:
+            break
+        }
+        
+        controller.dismiss(animated: true)
+    }
+}
+
+

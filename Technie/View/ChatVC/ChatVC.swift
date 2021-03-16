@@ -23,7 +23,7 @@ class ChatVC: MessagesViewController {
     var conversations = [Conversation]()
     public var isNewConvo = false
     private var convoId: String?
-    public let otherUserEmail: String
+    public var otherUserEmail: String
     
     private var senderPhotoURL: URL?
     private var otherUserPhotoURL: URL?
@@ -244,6 +244,9 @@ class ChatVC: MessagesViewController {
         vc.navigationItem.largeTitleDisplayMode = .never
         vc.completion = { [weak self] selectedCoorindates in
             
+            guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
+            let sender = getUsersPersistedInfo.email
+            
             guard let strongSelf = self else {
                 return
             }
@@ -270,7 +273,7 @@ class ChatVC: MessagesViewController {
 //                                  sender_email: self?.otherUserEmail ?? "nil",
                                   kind: .location(location))
             
-            DatabaseManager.shared.sendMessage(to: conversationId, otherUserEmail: strongSelf.otherUserEmail, name: name, newMessage: message, completion: { success in
+            DatabaseManager.shared.sendMessage(to: conversationId, otherUserEmail: strongSelf.otherUserEmail, sender: sender, name: name, newMessage: message, completion: { success in
                 if success {
                     print("sent location message")
                 }
@@ -342,12 +345,14 @@ class ChatVC: MessagesViewController {
     }
     
     // MARK: - Selectors
+    var otherUserEmail2 = ""
     @objc func rightNavBarBtnTapped() {
         let vc = ChatInfoVC()
         vc.convoSharedPhotoArray = convoSharedPhotoArray
         vc.convoSharedLocationArray = convoSharedLocationArray
         vc.conversations = conversations
         vc.convoID = convoId
+        vc.otherUserEmail = otherUserEmail2
         navigationController?.pushViewController(vc, animated: true)
     }
     
@@ -415,6 +420,9 @@ extension ChatVC: UIImagePickerControllerDelegate, UINavigationControllerDelegat
             // Upload image
             
             StorageManager.shared.uploadMessagePhoto(with: imageData, fileName: fileName, completion: { [weak self] result in
+                guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
+                let sender = getUsersPersistedInfo.email
+                
                 guard let strongSelf = self else {
                     return
                 }
@@ -440,7 +448,7 @@ extension ChatVC: UIImagePickerControllerDelegate, UINavigationControllerDelegat
 //                                          sender_email: self?.otherUserEmail ?? "nil",
                                           kind: .photo(media))
                     
-                    DatabaseManager.shared.sendMessage(to: conversationId, otherUserEmail: strongSelf.otherUserEmail, name: name, newMessage: message, completion: { success in
+                    DatabaseManager.shared.sendMessage(to: conversationId, otherUserEmail: strongSelf.otherUserEmail, sender: sender, name: name, newMessage: message, completion: { success in
                         
                         if success {
                             print("sent photo message")
@@ -462,6 +470,9 @@ extension ChatVC: UIImagePickerControllerDelegate, UINavigationControllerDelegat
             // Upload Video
             
             StorageManager.shared.uploadMessageVideo(with: videoUrl, fileName: fileName, completion: { [weak self] result in
+                guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
+                let sender = getUsersPersistedInfo.email
+                
                 guard let strongSelf = self else {
                     return
                 }
@@ -487,7 +498,7 @@ extension ChatVC: UIImagePickerControllerDelegate, UINavigationControllerDelegat
 //                                          sender_email: self?.otherUserEmail ?? "nil",
                                           kind: .video(media))
                     
-                    DatabaseManager.shared.sendMessage(to: conversationId, otherUserEmail: strongSelf.otherUserEmail, name: name, newMessage: message, completion: { success in
+                    DatabaseManager.shared.sendMessage(to: conversationId, otherUserEmail: strongSelf.otherUserEmail, sender: sender, name: name, newMessage: message, completion: { success in
                         
                         if success {
                             print("sent photo message")
@@ -521,6 +532,8 @@ extension ChatVC: InputBarAccessoryViewDelegate {
     }
     
     func inputBar(_ inputBar: InputBarAccessoryView, didPressSendButtonWith text: String) {
+        guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
+        let sender = getUsersPersistedInfo.email
         
         if !text.replacingOccurrences(of: " ", with: "").isEmpty {
             messageInputBar.inputTextView.placeholder = "Sending..."
@@ -544,7 +557,7 @@ extension ChatVC: InputBarAccessoryViewDelegate {
         if isNewConvo {
             print("isNewConvo")
             // Create the convo in databse
-            DatabaseManager.shared.createNewConversation(with: otherUserEmail, name: navigationItem.title ?? "User", firstMessage: message, completion: { [weak self] success in
+            DatabaseManager.shared.createNewConversation(with: otherUserEmail, sender: sender, name: navigationItem.title ?? "User", firstMessage: message, completion: { [weak self] success in
                 if success {
                     print("message sent")
                     self?.isNewConvo = false
@@ -565,9 +578,8 @@ extension ChatVC: InputBarAccessoryViewDelegate {
             guard let conversationId = convoId, let name = self.title else {
                 return
             }
-            
             // append to existing convo
-            DatabaseManager.shared.sendMessage(to: conversationId, otherUserEmail: otherUserEmail, name: name, newMessage: message, completion: { [weak self] success in
+            DatabaseManager.shared.sendMessage(to: conversationId, otherUserEmail: otherUserEmail, sender: sender, name: name, newMessage: message, completion: { [weak self] success in
                 if success {
                     self?.messageInputBar.inputTextView.text = nil
                     print("message sent")

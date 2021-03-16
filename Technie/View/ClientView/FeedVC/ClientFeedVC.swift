@@ -39,6 +39,13 @@ class ClientFeedVC: UIViewController {
         return collectionLayout
     }()
     
+    lazy var refresher: UIRefreshControl = {
+        let rc = UIRefreshControl()
+//        rc.isEnabled = false
+        rc.addTarget(self, action: #selector(refreshData), for: .valueChanged)
+        return rc
+    }()
+    
     lazy var clientFeedCollectionView: UICollectionView = {
         let collectionLayout = UICollectionViewFlowLayout()
         collectionLayout.scrollDirection = .vertical
@@ -49,7 +56,7 @@ class ClientFeedVC: UIViewController {
         cv.translatesAutoresizingMaskIntoConstraints = false
         cv.backgroundColor = .clear 
         cv.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        
+        cv.refreshControl = refresher
         cv.delegate = self
         cv.dataSource = self
         //        cv.collectionViewLayout.invalidateLayout()
@@ -186,7 +193,6 @@ class ClientFeedVC: UIViewController {
             indicator.start()
         }
         
-        fetchRanking()
         fetchUserPosts()
         fetchData()
         setupViews()
@@ -278,18 +284,23 @@ class ClientFeedVC: UIViewController {
                     self.searchController.searchBar.isUserInteractionEnabled = true
                     self.clientFeedCollectionView.reloadData()
                 }
+                
+                let refreshDeadline = DispatchTime.now() + .milliseconds(100)
+                DispatchQueue.main.asyncAfter(deadline: refreshDeadline) {
+                    self.fetchRanking()
+                }
              
             case .failure(let error):
                 
                 if self.technicianModel.count == 0 {
-                    self.clientFeedCollectionView.isHidden = true
+//                    self.clientFeedCollectionView.isHidden = true
                     self.view.addSubview(self.warningLabel)
                     NSLayoutConstraint.activate([
                         self.warningLabel.centerYAnchor.constraint(equalTo: self.view.centerYAnchor),
                         self.warningLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor)
                     ])
                 } else {
-                    self.clientFeedCollectionView.isHidden = false
+//                    self.clientFeedCollectionView.isHidden = false
                 }
                 
                 self.indicator.stop()
@@ -367,7 +378,37 @@ class ClientFeedVC: UIViewController {
         }
     }
     
+    fileprivate func refreshTechniciansData() {
+        self.technicianModel.removeAll()
+
+        DatabaseManager.shared.getAllTechnicians(completion: {[weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let technicians):
+                self.technicianModel.append(technicians)
+                self.clientFeedCollectionView.reloadData()
+//                self.refresher.endRefreshing()
+            case .failure(let error):
+                print("Failed to get technicians: \(error.localizedDescription)")
+            }
+        })
+    
+    }
+    
     // MARK: - Selectors
+    
+    @objc func refreshData(_ refreshController: UIRefreshControl){
+        DispatchQueue.main.async {
+            self.refreshTechniciansData()
+            let refreshDeadline = DispatchTime.now() + .seconds(Int(2))
+            DispatchQueue.main.asyncAfter(deadline: refreshDeadline) {
+                refreshController.endRefreshing()
+            }
+        }
+    }
+       
+        
+    
     @objc fileprivate func leftBarItemPressed(){
         let userProfileVC = UserProfileVC()
         //        userProfileVC.navigationController?.navigationBar.topItem?.backButtonTitle = ""
@@ -383,7 +424,9 @@ class ClientFeedVC: UIViewController {
     }()
     
     var filteredData: [TechnicianModel] = []
-
+    let hasLaunchedKey = "HasLaunched"
+    let defaults = UserDefaults.standard
+   
     
 }
 
@@ -440,9 +483,15 @@ extension ClientFeedVC: UISearchBarDelegate {
        
     }
     
+   
     func removeSectionOne() {
-        sections.remove(at: 0)
-        clientFeedCollectionView.deleteSections(IndexSet(integer: 0))
+//        let hasLaunched = defaults.bool(forKey: hasLaunchedKey)
+//
+//            if !hasLaunched {
+//                defaults.set(true, forKey: hasLaunchedKey)
+//            }
+//        sections.remove(at: 0)
+//        clientFeedCollectionView.deleteSections(IndexSet(integer: 0))
 //        clientFeedCollectionView.reloadSections(IndexSet(integer: 0))
         // At this point the collection view will ask again for the number of sections and it will be updated
     }
@@ -470,27 +519,39 @@ extension ClientFeedVC: CollectionDataSourceAndDelegate {
             return cell
         }
         
-        switch indexPath.section {
-        case 0:
-            // Technie Ranking cell
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: feedCellOnSection2ID, for: indexPath) as! TechnieRankingCell
-            cell.userPostModel = userPostModel
-            return cell
-            
-        case 1:
+        if sections.count == 1 {
             // Nearby Technie cell
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: feedCellOnSection1ID, for: indexPath) as! NearbyTechniesCell
             let model = technicianModel[indexPath.item]
             cell.technicianModel = model
-            let lastItemIndex = collectionView.numberOfItems(inSection: collectionView.numberOfSections-1)
-//            let lastIndex = lastItemIndex - 1
-//            if indexPath.item == lastIndex {
-//                cell.separatorView.isHidden = true
-//            }
+//            let lastItemIndex = collectionView.numberOfItems(inSection: collectionView.numberOfSections-1)
+
             return cell
-        default:
-            break
+        } else {
+            switch indexPath.section {
+            case 0:
+                // Technie Ranking cell
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: feedCellOnSection2ID, for: indexPath) as! TechnieRankingCell
+                cell.userPostModel = userPostModel
+                return cell
+                
+            case 1:
+                // Nearby Technie cell
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: feedCellOnSection1ID, for: indexPath) as! NearbyTechniesCell
+                let model = technicianModel[indexPath.item]
+                cell.technicianModel = model
+//                let lastItemIndex = collectionView.numberOfItems(inSection: collectionView.numberOfSections-1)
+    //            let lastIndex = lastItemIndex - 1
+    //            if indexPath.item == lastIndex {
+    //                cell.separatorView.isHidden = true
+    //            }
+                return cell
+            default:
+                break
+            }
         }
+        
+      
         return UICollectionViewCell()
     }
     
@@ -617,27 +678,35 @@ extension ClientFeedVC: CollectionDataSourceAndDelegate {
             return header
         }
         
-        switch indexPath.section {
-        case 0:
-            header.rank = technieRank
-//            header.postModel = userPostModel
-            header.sectionTitle.text = sections[indexPath.section].uppercased()
-            //            header.backgroundColor = .red
-            // Show seeAllBtn only for this section
-            header.seeAllBtn.isHidden = false
-            header.backgroundColor = .systemBackground
-            //            header.sectionTitle.backgroundColor = .brown
-            header.addBorder(.bottom, color: .systemGray, thickness: 0.3)
-            return header
-        case 1:
+        if sections.count == 1 {
             header.sectionTitle.text = sections[indexPath.section].uppercased()
             header.backgroundColor = .systemBackground
             header.addBorder(.bottom, color: .systemGray, thickness: 0.3)
             header.seeAllBtn.isHidden = true
-            return header
-        default:
-            break
+        } else {
+            switch indexPath.section {
+            case 0:
+                header.rank = technieRank
+    //            header.postModel = userPostModel
+                header.sectionTitle.text = sections[indexPath.section].uppercased()
+                //            header.backgroundColor = .red
+                // Show seeAllBtn only for this section
+                header.seeAllBtn.isHidden = false
+                header.backgroundColor = .systemBackground
+                //            header.sectionTitle.backgroundColor = .brown
+                header.addBorder(.bottom, color: .systemGray, thickness: 0.3)
+                return header
+            case 1:
+                header.sectionTitle.text = sections[indexPath.section].uppercased()
+                header.backgroundColor = .systemBackground
+                header.addBorder(.bottom, color: .systemGray, thickness: 0.3)
+                header.seeAllBtn.isHidden = true
+                return header
+            default:
+                break
+            }
         }
+       
         
         return header
     }

@@ -141,6 +141,7 @@ class JobDetailsVC: UIViewController {
         view.backgroundColor = .white
 //        tableView.estimatedRowHeight = 100
 //        tableView.rowHeight = UITableView.automaticDimension
+        getUserInfo()
         handleBtnTitle()
     }
 
@@ -278,6 +279,49 @@ class JobDetailsVC: UIViewController {
         }
     }
     
+    var clientInfo: ClientModel?
+    var numberOfOpenedJobs: [PostModel] = []
+    
+    fileprivate func getUserInfo() {
+        guard let clientKeyPath = postModel.postOwnerInfo?.keyPath else { return }
+        DatabaseManager.shared.getSpecificClient(clientKeyPath: clientKeyPath) { result in
+            
+            switch result {
+            case .success(let client):
+                self.clientInfo = client
+                
+                self.getNumberOfOpenedJobs(services: self.clientInfo?.servicePosts ?? [])
+                self.tableView.reloadData()
+                case .failure(let error):
+                print(error)
+            }
+        }
+    }
+    
+    fileprivate func getNumberOfOpenedJobs(services: [ServicePosts]) {
+       
+        DatabaseManager.shared.getAllPostsWithNoRestriction { result in
+            switch result {
+            case .success(let posts):
+                
+                posts.forEach { post in
+                    if post.availabilityStatus == true {
+                        services.forEach { service in
+                            if post.id == service.postID {
+                                guard self.numberOfOpenedJobs.filter({ $0.id!.contains(service.postID) }).isEmpty else { return }
+                                self.numberOfOpenedJobs.append(post)
+                                print("numberOfOpenedJobs: ", self.numberOfOpenedJobs.count)
+                                self.tableView.reloadData()
+                            }
+                        }
+                    }
+                }
+               
+            case .failure(let error):
+                print(error)
+            }
+        }
+    }
     // MARK: - Selectors
     @objc fileprivate func proposalBtnPressed(sender: UIButton) {
         
@@ -371,10 +415,10 @@ extension JobDetailsVC: TableViewDataSourceAndDelegate {
             let cell = tableView.dequeueReusableCell(withIdentifier: JobDetailTVCell5.cellID, for: indexPath) as! JobDetailTVCell5
             cell.setupViews()
             cell.proposals.text = "\(postModel.numberOfProposals)"
-            cell.invitesSent.text = "\(postModel.numberOfInvitesSent)"
+            cell.invitesSent.text = "\(postModel.invitations?.count ?? 0)"
             cell.unansweredInvitesStack.isHidden = true//text = "\(postModel.numberOfUnansweredInvites)"
             cell.jobStatus.text = postModel.availabilityStatus == false ? ("Closed") : ("Active")
-
+            
             cell.activityHeaderLabel.font = .boldSystemFont(ofSize: 16)
             return cell
         case 7:
@@ -389,6 +433,16 @@ extension JobDetailsVC: TableViewDataSourceAndDelegate {
             let slicedString = postModel.dateTime.components(separatedBy: delimiter)[0]
             cell.dateOfMembershipLabel.text = "Member since " + slicedString
             cell.aboutTheClientHeaderLabel.font = .boldSystemFont(ofSize: 16)
+            
+            let numberOfPostedJobs = clientInfo?.servicePosts?.count ?? 0
+            var numberOfPostedJobsLabel = ""
+            numberOfPostedJobs <= 1 ? (numberOfPostedJobsLabel = "job") : (numberOfPostedJobsLabel = "jobs")
+            cell.numberOfPostedJobsLabel.text = "\(numberOfPostedJobs) \(numberOfPostedJobsLabel) posted"
+            
+            let numberOfOpenJobs = numberOfOpenedJobs.count
+            var numberOfOpenPostsLabel = ""
+            numberOfOpenJobs <= 1 ? (numberOfOpenPostsLabel = "job") : (numberOfOpenPostsLabel = "jobs")
+            cell.numberOfOpenJobsLabel.text = "\(numberOfOpenJobs) \(numberOfOpenPostsLabel) opened"
             return cell
         default:
             return UITableViewCell()

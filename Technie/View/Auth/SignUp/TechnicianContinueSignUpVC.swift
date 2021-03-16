@@ -465,7 +465,9 @@ extension TechnicianContinueSignUpVC: TableViewDataSourceAndDelegate {
             accountTypeDrowDown.bottomOffset = CGPoint(x: -40, y: cell.detailTextLabel?.intrinsicContentSize.height ?? 0 + 8)
         case 4:
             cell.textLabel?.text = rowTitle[3]
-            cell.detailTextLabel?.text = "₱\(hourlyRate ?? "Choose")" 
+            var label = ""
+            hourlyRate == nil ? (label = "Choose") : (label = "₱\(hourlyRate ?? "")")
+            cell.detailTextLabel?.text = label
             cell.accessoryType = .disclosureIndicator
             cell.selectionStyle = .default
         case 5:

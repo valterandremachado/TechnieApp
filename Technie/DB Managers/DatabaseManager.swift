@@ -24,6 +24,15 @@ final class DatabaseManager {
         safeEmail = safeEmail.replacingOccurrences(of: "@", with: "-")
         return safeEmail
     }
+    
+    static func unsafeEmail(emailAddress: String) -> String {
+        var safeEmail = emailAddress
+        let delimiter = "-"
+        let slicedEmail = safeEmail.components(separatedBy: delimiter)
+
+        safeEmail = slicedEmail[0] + "@" + slicedEmail[1] + ".com"
+        return safeEmail
+    }
 }
 
 extension DatabaseManager {
@@ -632,6 +641,8 @@ extension DatabaseManager {
     }
     
     public func insertPostToUserDB(with postID: String, completion: @escaping (Bool) -> Void) {
+        guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
+        let clientKeyPath = getUsersPersistedInfo.uid
         database.child("users/clients").observeSingleEvent(of: .value, with: { [weak self] snapshot in
             guard let strongSelf = self else { return }
             
@@ -640,15 +651,15 @@ extension DatabaseManager {
                 return
             }
             
-            let uidKeys = ["PNayVUR9AyTwQqqHn0T9oanJwd72", "RNVQZwqbXIcakB1LJjUwNEO1BG22", "SEQ0IMTLF4YZMXtjwR7AkiuypSg1", "nSOieQCUcWQZQlTMRk6LKYGYyO02"]
-            let randoUIDkey = uidKeys.randomElement() ?? "nil"
+//            let uidKeys = ["PNayVUR9AyTwQqqHn0T9oanJwd72", "RNVQZwqbXIcakB1LJjUwNEO1BG22", "SEQ0IMTLF4YZMXtjwR7AkiuypSg1", "nSOieQCUcWQZQlTMRk6LKYGYyO02"]
+//            let randoUIDkey = uidKeys.randomElement() ?? "nil"
             
-            for (key, _) in postsCollection {
-                print("randomKey: \(randoUIDkey), key: \(key)")
-                if key == "SEQ0IMTLF4YZMXtjwR7AkiuypSg1" {
-                    print("InsideRandomKey: \(randoUIDkey), insideKey: \(key)")
+//            for (key, _) in postsCollection {
+//                print("randomKey: \(randoUIDkey), key: \(key)")
+//                if key == "SEQ0IMTLF4YZMXtjwR7AkiuypSg1" {
+//                    print("InsideRandomKey: \(randoUIDkey), insideKey: \(key)")
                     
-                    strongSelf.database.child("users/clients/\(key)/servicePosts").observeSingleEvent(of: .value, with: { snapshot in
+                    strongSelf.database.child("users/clients/\(clientKeyPath)/servicePosts").observeSingleEvent(of: .value, with: { snapshot in
                         
                         if var usersCollection = snapshot.value as? [[String: Any]] {
                             // append to user dictionary
@@ -657,7 +668,7 @@ extension DatabaseManager {
                             ]
                             
                             usersCollection.append(newElement)
-                            strongSelf.database.child("users/clients/\(key)/servicePosts").setValue(usersCollection, withCompletionBlock: { error, _ in
+                            strongSelf.database.child("users/clients/\(clientKeyPath)/servicePosts").setValue(usersCollection, withCompletionBlock: { error, _ in
                                 guard error == nil else {
                                     completion(false)
                                     return
@@ -673,7 +684,7 @@ extension DatabaseManager {
                                 ]
                             ]
                             
-                            strongSelf.database.child("users/clients/\(key)/servicePosts").setValue(newCollection, withCompletionBlock: { error, _ in
+                            strongSelf.database.child("users/clients/\(clientKeyPath)/servicePosts").setValue(newCollection, withCompletionBlock: { error, _ in
                                 guard error == nil else {
                                     completion(false)
                                     return
@@ -683,8 +694,8 @@ extension DatabaseManager {
                             })
                         }
                     })
-                }
-            }
+//                }
+//            }
         })
     }
     
@@ -1014,6 +1025,36 @@ extension DatabaseManager {
 //                            print("NOTsortedArray: \(posts)")
                             completion(.success(posts))
                         }
+                       
+                    } catch let error {
+                        print(error)
+                    }
+                })
+            }
+        })
+    }
+    
+    public func getAllPostsWithNoRestriction(completion: @escaping (Result<[PostModel], Error>) -> Void) {
+        database.child("posts").observeSingleEvent(of: .value, with: { snapshot in
+            guard let postsCollection = snapshot.value as? [String: Any] else {
+                completion(.failure(DatabaseError.failedToFetch))
+                return
+            }
+            
+            var posts = [PostModel]()
+
+            for (key, _) in postsCollection {
+                Database.database().reference().child("posts/\(key)").observeSingleEvent(of: .value, with: { snapshot in
+                    guard let value = snapshot.value else { return }
+                    do {
+                        let model = try FirebaseDecoder().decode(PostModel.self, from: value)
+//                        if model.availabilityStatus != false {
+                            posts.append(model)
+
+//                            print("sortedArray: \(sortedArray)")
+//                            print("NOTsortedArray: \(posts)")
+                            completion(.success(posts))
+//                        }
                        
                     } catch let error {
                         print(error)
@@ -1908,12 +1949,12 @@ extension DatabaseManager {
            */
 
     /// Creates a new conversation with target user emamil and first message sent
-    public func createNewConversation(with otherUserEmail: String, name: String, firstMessage: Message, completion: @escaping (Bool) -> Void) {
+    public func createNewConversation(with otherUserEmail: String, sender: String, name: String, firstMessage: Message, completion: @escaping (Bool) -> Void) {
         
         let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo")
 
         let userPersistedEmail = getUsersPersistedInfo?.email ?? ""
-        let userPersistedName = getUsersPersistedInfo?.name
+        let userPersistedName = getUsersPersistedInfo?.name ?? ""
         
 //        guard let currentEmail = UserDefaults.standard.value(forKey: "email") as? String,
 //        let currentNamme = UserDefaults.standard.value(forKey: "name") as? String else {
@@ -1971,7 +2012,9 @@ extension DatabaseManager {
                 "latest_message": [
                     "date": dateString,
                     "message": message,
-                    "is_read": false
+                    "is_read": false,
+                    "messageType": firstMessage.kind.messageKindString,
+                    "sender": sender
                 ]
             ]
 
@@ -1982,7 +2025,9 @@ extension DatabaseManager {
                 "latest_message": [
                     "date": dateString,
                     "message": message,
-                    "is_read": false
+                    "is_read": false,
+                    "messageType": firstMessage.kind.messageKindString,
+                    "sender": sender
                 ]
             ]
             // Update recipient conversaiton entry
@@ -2132,13 +2177,17 @@ extension DatabaseManager {
                     let latestMessage = dictionary["latest_message"] as? [String: Any],
                     let date = latestMessage["date"] as? String,
                     let message = latestMessage["message"] as? String,
+                    let messageType = latestMessage["messageType"] as? String,
+                    let sender = latestMessage["sender"] as? String,
                     let isRead = latestMessage["is_read"] as? Bool else {
                         return nil
                 }
 
                 let latestMmessageObject = LatestMessage(date: date,
                                                          message: message,
-                                                         isRead: isRead)
+                                                         isRead: isRead,
+                                                         messageType: messageType,
+                                                         sender: sender)
                 return Conversation(id: conversationId,
                                     name: name,
                                     otherUserEmail: otherUserEmail,
@@ -2230,7 +2279,7 @@ extension DatabaseManager {
     }
 
     /// Sends a message with target conversation and message
-    public func sendMessage(to conversation: String, otherUserEmail: String, name: String, newMessage: Message, completion: @escaping (Bool) -> Void) {
+    public func sendMessage(to conversation: String, otherUserEmail: String, sender: String, name: String, newMessage: Message, completion: @escaping (Bool) -> Void) {
         // add new message to messages
         // update sender latest message
         // update recipient latest message
@@ -2241,7 +2290,6 @@ extension DatabaseManager {
 //        var userPersistedName = ""
         if let info = getUsersPersistedInfo {
             myEmail = info.email
-//            userPersistedName = info.first!.name
         }
         
 //        guard let myEmail = UserDefaults.standard.value(forKey: "email") as? String else {
@@ -2333,7 +2381,9 @@ extension DatabaseManager {
                     let updatedValue: [String: Any] = [
                         "date": dateString,
                         "is_read": false,
-                        "message": message
+                        "message": message,
+                        "sender": sender,
+                        "messageType": newMessage.kind.messageKindString
                     ]
 
                     if var currentUserConversations = snapshot.value as? [[String: Any]] {
@@ -2389,13 +2439,18 @@ extension DatabaseManager {
                             let updatedValue: [String: Any] = [
                                 "date": dateString,
                                 "is_read": false,
-                                "message": message
+                                "message": message,
+                                "sender": sender,
+                                "messageType": newMessage.kind.messageKindString
                             ]
                             var databaseEntryConversations = [[String: Any]]()
 
-                            guard let currentName = UserDefaults.standard.value(forKey: "name") as? String else {
-                                return
-                            }
+                            guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
+
+                            let currentName = getUsersPersistedInfo.name
+//                                    UserDefaults.standard.value(forKey: "name") as? String else {
+//                                return
+//                            }
 
                             if var otherUserConversations = snapshot.value as? [[String: Any]] {
                                 var targetConversation: [String: Any]?

@@ -7,6 +7,7 @@
 
 import UIKit
 import Cosmos
+import MapKit
 
 class RecommendationCell: UITableViewCell {
     
@@ -221,6 +222,8 @@ class RecommendationCell: UITableViewCell {
     
     var recommendedTechniciansModel: TechnicianModel! {
         didSet {
+            guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
+
             workSpeed = Int(recommendedTechniciansModel.clientsSatisfaction?.workSpeedAvrg.rounded(.toNearestOrAwayFromZero) ?? 0)
             workQuality = Int(recommendedTechniciansModel.clientsSatisfaction?.workQualityAvrg.rounded(.toNearestOrAwayFromZero) ?? 0)
             responseTime = Int(recommendedTechniciansModel.clientsSatisfaction?.responseTimeAvrg.rounded(.toNearestOrAwayFromZero) ?? 0)
@@ -242,6 +245,19 @@ class RecommendationCell: UITableViewCell {
             let skills = recommendedTechniciansModel.profileInfo.skills
             let flatString = skills.joined(separator: ", ")
             skillsLabel.text = flatString
+            
+            let clientLat = getUsersPersistedInfo.location.lat
+            let clientLong = getUsersPersistedInfo.location.long
+            let technicianLat = recommendedTechniciansModel.profileInfo.location?.lat ?? 0.0
+            let technicianLong = recommendedTechniciansModel.profileInfo.location?.long ?? 0.0
+            
+            // Client location
+            let clientLocation = CLLocation(latitude: clientLat, longitude: clientLong)
+            //  Technician location
+            let technicianLocation = CLLocation(latitude: technicianLat, longitude: technicianLong)
+            //Finding my distance to my next destination (in km)
+            let distance = clientLocation.distance(from: technicianLocation) / 1000
+            distanceLabel.text = "\(String(format: "%.01f km", distance)) away from your place"
         }
     }
     

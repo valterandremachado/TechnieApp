@@ -41,6 +41,7 @@ class ClientNotificationVC: UIViewController {
         tv.delegate = self
         tv.dataSource = self
         tv.register(ClientNotificationCell.self, forCellReuseIdentifier: ClientNotificationCell.cellID)
+        tv.register(ClientNotificationCellForChatBtn.self, forCellReuseIdentifier: ClientNotificationCellForChatBtn.cellID)
         return tv
     }()
     
@@ -176,7 +177,7 @@ class ClientNotificationVC: UIViewController {
                 let sortedArray = notifications.sorted(by: { PostFormVC.dateFormatter.date(from: $0.dateTime)?.compare(PostFormVC.dateFormatter.date(from: $1.dateTime) ?? Date()) == .orderedDescending })
                 self.userNotifications = sortedArray
                 self.tableView.reloadData()
-                self.refresher.endRefreshing()
+//                self.refresher.endRefreshing()
                 print("success")
             case .failure(let error):
                 print("Failed to get technicians: \(error.localizedDescription)")
@@ -186,10 +187,13 @@ class ClientNotificationVC: UIViewController {
     
     // MARK: - Selectors
     @objc func refreshData(_ refreshController: UIRefreshControl){
-//        let refreshDeadline = DispatchTime.now() + .seconds(Int(1.5))
+
         DispatchQueue.main.async {
             self.refreshNotificationData()
-//            refreshController.endRefreshing()
+            let refreshDeadline = DispatchTime.now() + .seconds(Int(2))
+            DispatchQueue.main.asyncAfter(deadline: refreshDeadline) {
+                refreshController.endRefreshing()
+            }
         }
         
     }
@@ -276,35 +280,45 @@ extension ClientNotificationVC: TableViewDataSourceAndDelegate {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: ClientNotificationCell.cellID, for: indexPath) as! ClientNotificationCell
+//        let cell = tableView.dequeueReusableCell(withIdentifier: ClientNotificationCell.cellID, for: indexPath) as! ClientNotificationCell
         let model = userNotifications[indexPath.row]
-        cell.userNotification = model
-        cell.startChatBtn.tag = indexPath.row
+
         if model.wasAccepted == true {
-            cell.setupViews2()
-            cell.buttonsStackView.isHidden = false
+            let cell = tableView.dequeueReusableCell(withIdentifier: ClientNotificationCellForChatBtn.cellID, for: indexPath) as! ClientNotificationCellForChatBtn
+
+            cell.startChatBtn.tag = indexPath.row
+
+            cell.userNotification = model
             cell.startChatBtn.addTarget(self, action: #selector(startChatBtnPressed), for: .touchUpInside)
+            return cell
         } else {
-            cell.buttonsStackView.isHidden = true
-            cell.setupViews()
+            let cell = tableView.dequeueReusableCell(withIdentifier: ClientNotificationCell.cellID, for: indexPath) as! ClientNotificationCell
+            cell.userNotification = model
+
+//            cell.buttonsStackView.isHidden = true
+            switch model.type {
+            case ClientNotificationType.recommendation.rawValue:
+                cell.titleLabel.text = "Recommendation"
+                
+            case ClientNotificationType.proposal.rawValue:
+                cell.titleLabel.text = "Proposal"
+
+            case ClientNotificationType.review.rawValue:
+                cell.titleLabel.text = "Review"
+            default:
+                cell.titleLabel.isHidden = true
+            }
+            
+            return cell
         }
         
-        if model.type == ClientNotificationType.recommendation.rawValue {
-            cell.titleLabel.text = "Recommendation"
-        }
+//        if model.type == ClientNotificationType.recommendation.rawValue {
+//            cell.titleLabel.text = "Recommendation"
+//        }
         
-        switch model.type {
-        case ClientNotificationType.recommendation.rawValue:
-            cell.titleLabel.text = "Recommendation"
-        case ClientNotificationType.proposal.rawValue:
-            cell.titleLabel.text = "Proposal"
-        case ClientNotificationType.review.rawValue:
-            cell.titleLabel.text = "Review"
-        default:
-            break
-        }
+ 
         
-        return cell
+//        return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

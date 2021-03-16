@@ -15,7 +15,7 @@ class MyJobsCell: UITableViewCell {
     var userPostModel: PostModel! {
         didSet {
             textLabel?.text = userPostModel.title
-            detailTextLabel?.text = calculateTimeFrame(initialTime: userPostModel.dateTime)
+            detailTextLabel?.text = "Posted \(calculateTimeFrame(initialTime: userPostModel.dateTime))"
         }
     }
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {

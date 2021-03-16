@@ -16,6 +16,13 @@ class TechnieServiceVC: UIViewController {
     var previousJobsModel = [PostModel]()
     var hiredJobsPostUID = [String]()
     
+    lazy var refresher: UIRefreshControl = {
+        let rc = UIRefreshControl()
+//        rc.isEnabled = false
+        rc.addTarget(self, action: #selector(refreshData), for: .valueChanged)
+        return rc
+    }()
+    
     lazy var tableView: UITableView = {
         let tv = UITableView(frame: .zero, style: .grouped)
         tv.translatesAutoresizingMaskIntoConstraints = false
@@ -26,7 +33,7 @@ class TechnieServiceVC: UIViewController {
         tv.estimatedRowHeight = UITableView.automaticDimension
         tv.delegate = self
         tv.dataSource = self
-        
+        tv.refreshControl = refresher
         /// Fix extra padding space at the top of the section of grouped tableView
         var frame = CGRect.zero
         frame.size.height = .leastNormalMagnitude
@@ -102,9 +109,8 @@ class TechnieServiceVC: UIViewController {
     fileprivate func setupNavBar() {
         guard let navBar = navigationController?.navigationBar else { return }
         navBar.topItem?.title = "Contracts"
-        navBar.prefersLargeTitles = true
-        navigationItem.largeTitleDisplayMode = .automatic
-        
+        navBar.prefersLargeTitles = false
+        navigationItem.largeTitleDisplayMode = .never
     }
     
     private func getTechnicianInfo() {
@@ -181,14 +187,14 @@ class TechnieServiceVC: UIViewController {
                         
                     case .failure(let error):
                         if self.activeJobsModel.count == 0 {
-                            self.tableView.isHidden = true
+//                            self.tableView.isHidden = true
                             self.view.addSubview(self.warningLabel)
                             NSLayoutConstraint.activate([
                                 self.warningLabel.centerYAnchor.constraint(equalTo: self.view.centerYAnchor),
                                 self.warningLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor)
                             ])
                         } else {
-                            self.tableView.isHidden = false
+//                            self.tableView.isHidden = false
                         }
                         self.indicator.stop()
                         print("Failed to get posts: \(error.localizedDescription)")
@@ -197,14 +203,14 @@ class TechnieServiceVC: UIViewController {
                 
             case .failure(let error):
                 if self.activeJobsModel.count == 0 {
-                    self.tableView.isHidden = true
+//                    self.tableView.isHidden = true
                     self.view.addSubview(self.warningLabel)
                     NSLayoutConstraint.activate([
                         self.warningLabel.centerYAnchor.constraint(equalTo: self.view.centerYAnchor),
                         self.warningLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor)
                     ])
                 } else {
-                    self.tableView.isHidden = false
+//                    self.tableView.isHidden = false
                 }
                 self.indicator.stop()
                 print("Failed to get technicians: \(error.localizedDescription)")
@@ -251,8 +257,24 @@ class TechnieServiceVC: UIViewController {
         })
     }
     
-    // MARK: - Selectors
+    fileprivate func refreshContractsData() {
+        activeJobsModel.removeAll()
+        previousJobsModel.removeAll()
+        fetchData()
+    }
     
+    // MARK: - Selectors
+    @objc func refreshData(_ refreshController: UIRefreshControl){
+        
+        DispatchQueue.main.async {
+            self.refreshContractsData()
+            let refreshDeadline = DispatchTime.now() + .seconds(Int(2))
+            DispatchQueue.main.asyncAfter(deadline: refreshDeadline) {
+                refreshController.endRefreshing()
+            }
+        }
+        
+    }
     
 }
 

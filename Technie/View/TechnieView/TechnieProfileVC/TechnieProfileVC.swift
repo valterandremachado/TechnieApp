@@ -91,9 +91,8 @@ class TechnieProfileVC: UIViewController {
     fileprivate func setupNavBar() {
         guard let navBar = navigationController?.navigationBar else { return }
         navBar.topItem?.title = "Settings"
-        navBar.prefersLargeTitles = true
-        navigationItem.largeTitleDisplayMode = .automatic
-       
+        navBar.prefersLargeTitles = false
+        navigationItem.largeTitleDisplayMode = .never
     }
     
     fileprivate func updateProfileImage() {
@@ -244,7 +243,7 @@ extension TechnieProfileVC: TableViewDataSourceAndDelegate {
             do {
                 try firebaseAuth.signOut()
                 let mainVC = ChooseAccountTypeVC()
-                (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootViewController(mainVC)
+                (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootViewController(UINavigationController(rootViewController: mainVC))
             } catch let signOutError as NSError {
                 print ("Error signing out: ", signOutError)
             }

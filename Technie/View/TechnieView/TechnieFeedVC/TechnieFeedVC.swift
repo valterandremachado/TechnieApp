@@ -40,6 +40,13 @@ class TechnieFeedVC: UIViewController, TechnieFeedVCDelegate {
         return collectionLayout
     }()
     
+    lazy var refresher: UIRefreshControl = {
+        let rc = UIRefreshControl()
+//        rc.isEnabled = false
+        rc.addTarget(self, action: #selector(refreshData), for: .valueChanged)
+        return rc
+    }()
+    
     lazy var searchResultCollectionView: UICollectionView = {
         let collectionLayout = UICollectionViewFlowLayout()
         collectionLayout.scrollDirection = .vertical
@@ -73,7 +80,8 @@ class TechnieFeedVC: UIViewController, TechnieFeedVCDelegate {
         // Set automatic dimensions for row height
         tv.rowHeight = UITableView.automaticDimension
         tv.estimatedRowHeight = UITableView.automaticDimension
-        
+        tv.refreshControl = refresher
+
         /// Fix extra padding space at the top of the section of grouped tableView
         var frame = CGRect.zero
         frame.size.height = .leastNormalMagnitude
@@ -255,6 +263,9 @@ class TechnieFeedVC: UIViewController, TechnieFeedVCDelegate {
     var savedJobs = [PostModel]()
 
     fileprivate func fetchData()  {
+        view.isUserInteractionEnabled = false
+        searchController.searchBar.isUserInteractionEnabled = false
+        
         guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
         let technicianKeyPath = getUsersPersistedInfo.uid
         
@@ -299,13 +310,26 @@ class TechnieFeedVC: UIViewController, TechnieFeedVCDelegate {
                             
                         }
                     }
-                    
 
                 case .failure(let error):
-                    print(error)
+                    self.view.isUserInteractionEnabled = true
+
+                    print("failed to get saved jobs: ", error)
+                    if self.savedJobs.count == 0 || self.postModel.count == 0 {
+//                        self.tableView.isHidden = true
+                        self.view.addSubview(self.warningLabel)
+                        NSLayoutConstraint.activate([
+                            self.warningLabel.centerYAnchor.constraint(equalTo: self.view.centerYAnchor),
+                            self.warningLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor)
+                        ])
+                    } else {
+                        self.tableView.isHidden = false
+                    }
+                    
+                    self.indicator.stop()
                 }
             }
-            
+
             DatabaseManager.shared.getAllPosts(completion: {[weak self] result in
                 guard let self = self else { return }
                 switch result {
@@ -316,15 +340,19 @@ class TechnieFeedVC: UIViewController, TechnieFeedVCDelegate {
                     for _ in 0..<(sortedArray.count) {
                         self.buttonStates.append(false)
                         // in my case, all buttons are off, but be sure to implement logic here
+                        self.tableView.reloadData()
                     }
-                    
+                    self.view.isUserInteractionEnabled = true
+                    self.searchController.searchBar.isUserInteractionEnabled = true
+                    self.warningLabel.isHidden = true
                     self.indicator.stop()
                     self.tableView.reloadData()
-        
+
                     return
                 case .failure(let error):
-                    if self.savedJobs.count == 0 {
-                        self.tableView.isHidden = true
+                    self.view.isUserInteractionEnabled = true
+                    if self.savedJobs.count == 0 || self.postModel.count == 0 {
+//                        self.tableView.isHidden = true
                         self.view.addSubview(self.warningLabel)
                         NSLayoutConstraint.activate([
                             self.warningLabel.centerYAnchor.constraint(equalTo: self.view.centerYAnchor),
@@ -351,6 +379,13 @@ class TechnieFeedVC: UIViewController, TechnieFeedVCDelegate {
                     print("childChanged")
                     let sortedArray = posts.sorted(by: { PostFormVC.dateFormatter.date(from: $0.dateTime)?.compare(PostFormVC.dateFormatter.date(from: $1.dateTime) ?? Date()) == .orderedDescending })
                     self.postModel = sortedArray
+                    
+                    for _ in 0..<(sortedArray.count) {
+                        self.buttonStates.append(false)
+                        // in my case, all buttons are off, but be sure to implement logic here
+                        self.tableView.reloadData()
+                    }
+                    
                     self.tableView.reloadData()
                     return
                 case .failure(let error):
@@ -360,7 +395,62 @@ class TechnieFeedVC: UIViewController, TechnieFeedVCDelegate {
         }
     }
     
+    fileprivate func refreshPostsData() {
+        self.postModel.removeAll()
+
+        DatabaseManager.shared.getAllPosts(completion: {[weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let posts):
+                
+                let sortedArray = posts.sorted(by: { PostFormVC.dateFormatter.date(from: $0.dateTime)?.compare(PostFormVC.dateFormatter.date(from: $1.dateTime) ?? Date()) == .orderedDescending })
+                self.postModel = sortedArray
+                
+                for _ in 0..<(sortedArray.count) {
+                    self.buttonStates.append(false)
+                    // in my case, all buttons are off, but be sure to implement logic here
+                    self.tableView.reloadData()
+                    self.tableView.reloadData()
+                    self.refresher.endRefreshing()
+                }
+                
+                self.indicator.stop()
+                self.tableView.reloadData()
+                print("refreshed")
+                return
+            case .failure(let error):
+                if self.savedJobs.count == 0 {
+                    self.tableView.isHidden = true
+                    self.view.addSubview(self.warningLabel)
+                    NSLayoutConstraint.activate([
+                        self.warningLabel.centerYAnchor.constraint(equalTo: self.view.centerYAnchor),
+                        self.warningLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor)
+                    ])
+                } else {
+                    self.tableView.isHidden = false
+                }
+                
+                self.indicator.stop()
+                print("Failed to get posts: \(error.localizedDescription)")
+            }
+        })
+        
+    }
+    
     // MARK: - Selectors
+    @objc func refreshData(_ refreshController: UIRefreshControl){
+        
+        DispatchQueue.main.async {
+            self.refreshPostsData()
+            let refreshDeadline = DispatchTime.now() + .seconds(Int(2))
+            DispatchQueue.main.asyncAfter(deadline: refreshDeadline) {
+                refreshController.endRefreshing()
+            }
+//
+        }
+        
+    }
+    
     @objc fileprivate func leftBarItemPressed(){
         let userProfileVC = UserProfileVC()
         //        userProfileVC.navigationController?.navigationBar.topItem?.backButtonTitle = ""

@@ -326,7 +326,11 @@ extension TechnieEditProfileVC: TableViewDataSourceAndDelegate {
                                   userType: userType)
         
         let updateElement = [
-            "location": location
+            "location": [
+                "address": location.address,
+                "lat": location.lat,
+                "long": location.long
+            ]
         ]
         
         database.child(childPath).updateChildValues(updateElement, withCompletionBlock: { error, _ in

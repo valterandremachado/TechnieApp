@@ -20,7 +20,7 @@ class ChatInfoSectionOneCell: UITableViewCell {
         iv.clipsToBounds = true
         //        iv.sizeToFit()
         iv.contentMode = .scaleAspectFill
-        iv.backgroundColor = .red
+        iv.backgroundColor = .systemGray6
         return iv
     }()
     
