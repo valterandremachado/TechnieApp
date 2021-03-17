@@ -239,6 +239,18 @@ extension TechnieProfileVC: TableViewDataSourceAndDelegate {
          
         case 3:
             print("log out")
+            presentAlertSheetForLogBtn()
+        default:
+            break
+        }
+    }
+    
+    fileprivate func presentAlertSheetForLogBtn() {
+        guard let currentUserName = getUsersPersistedInfo?.name else { return }
+        
+        let alertController = UIAlertController(title: "Log out of \(currentUserName)?", message: nil, preferredStyle: .alert)
+        
+        let logOutAction = UIAlertAction(title: "Log Out", style: .destructive) { (_) in
             let firebaseAuth = Auth.auth()
             do {
                 try firebaseAuth.signOut()
@@ -247,10 +259,12 @@ extension TechnieProfileVC: TableViewDataSourceAndDelegate {
             } catch let signOutError as NSError {
                 print ("Error signing out: ", signOutError)
             }
-        
-        default:
-            break
         }
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
+        alertController.addAction(logOutAction)
+        alertController.addAction(cancelAction)
+        present(alertController, animated: true)
     }
     
     fileprivate func presentShareSheet() {

@@ -111,14 +111,14 @@ class ClientNotificationVC: UIViewController {
                 print("success")
             case .failure(let error):
                 if self.userNotifications.count == 0 {
-                    self.tableView.isHidden = true
+//                    self.tableView.isHidden = true
                     self.view.addSubview(self.warningLabel)
                     NSLayoutConstraint.activate([
                         self.warningLabel.centerYAnchor.constraint(equalTo: self.view.centerYAnchor),
                         self.warningLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor)
                     ])
                 } else {
-                    self.tableView.isHidden = false
+//                    self.tableView.isHidden = false
                 }
 
                 self.indicator.stop()
@@ -137,6 +137,7 @@ class ClientNotificationVC: UIViewController {
                 print("childChanged")
                 let sortedArray = notifications.sorted(by: { PostFormVC.dateFormatter.date(from: $0.dateTime)?.compare(PostFormVC.dateFormatter.date(from: $1.dateTime) ?? Date()) == .orderedDescending })
                 self.userNotifications = sortedArray
+                self.warningLabel.isHidden = true
                 self.tableView.reloadData()
                 return
             case .failure(let error):
@@ -177,7 +178,6 @@ class ClientNotificationVC: UIViewController {
                 let sortedArray = notifications.sorted(by: { PostFormVC.dateFormatter.date(from: $0.dateTime)?.compare(PostFormVC.dateFormatter.date(from: $1.dateTime) ?? Date()) == .orderedDescending })
                 self.userNotifications = sortedArray
                 self.tableView.reloadData()
-//                self.refresher.endRefreshing()
                 print("success")
             case .failure(let error):
                 print("Failed to get technicians: \(error.localizedDescription)")
@@ -287,7 +287,6 @@ extension ClientNotificationVC: TableViewDataSourceAndDelegate {
             let cell = tableView.dequeueReusableCell(withIdentifier: ClientNotificationCellForChatBtn.cellID, for: indexPath) as! ClientNotificationCellForChatBtn
 
             cell.startChatBtn.tag = indexPath.row
-
             cell.userNotification = model
             cell.startChatBtn.addTarget(self, action: #selector(startChatBtnPressed), for: .touchUpInside)
             return cell
@@ -299,14 +298,19 @@ extension ClientNotificationVC: TableViewDataSourceAndDelegate {
             switch model.type {
             case ClientNotificationType.recommendation.rawValue:
                 cell.titleLabel.text = "Recommendation"
-                
+                cell.titleLabel.isHidden = false
+
             case ClientNotificationType.proposal.rawValue:
                 cell.titleLabel.text = "Proposal"
+                cell.titleLabel.isHidden = false
 
             case ClientNotificationType.review.rawValue:
                 cell.titleLabel.text = "Review"
+                cell.titleLabel.isHidden = false
+                
             default:
                 cell.titleLabel.isHidden = true
+                break
             }
             
             return cell

@@ -85,7 +85,8 @@ class RecommendationCell: UITableViewCell {
         iv.layer.cornerRadius = 15//iv.frame.size.height/2
         iv.layer.masksToBounds = false
         iv.clipsToBounds = true
-//        iv.backgroundColor = .blue
+        iv.contentMode = .scaleAspectFill
+        iv.backgroundColor = .systemGray6
         iv.image = UIImage(named: "technieDummyPhoto")
         return iv
     }()

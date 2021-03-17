@@ -27,7 +27,7 @@ class TechnieTabController: UITabBarController {
     fileprivate func setupTabController() {
         // Tabs
         viewControllers = [
-            createTabController(unselectedImage: "homepod", selectedImage: "homepod.fill", vc: feedVC),
+            createTabControllerForCustomIcons(unselectedImage: "home", selectedImage: "home.fill", vc: feedVC),
             createTabController(unselectedImage: "message", selectedImage: "message.fill", vc: chatVC),
             createTabController(unselectedImage: "doc.text", selectedImage: "doc.text.fill", vc: serviceVC),
             createTabController(unselectedImage: "bell", selectedImage: "bell.fill", vc: notificationVC),
@@ -42,6 +42,16 @@ class TechnieTabController: UITabBarController {
 //        currentVC.tabBarItem.title = title
         currentVC.tabBarItem.image = UIImage(systemName: unselectedImage)
         currentVC.tabBarItem.selectedImage = UIImage(systemName: selectedImage)
+        
+        return currentVC
+    }
+    
+    fileprivate func createTabControllerForCustomIcons(unselectedImage: String, selectedImage: String, vc: UIViewController) -> UINavigationController {
+        
+        let currentVC = UINavigationController(rootViewController: vc)
+//        currentVC.tabBarItem.title = title
+        currentVC.tabBarItem.image = UIImage(named: unselectedImage)?.imageResize(sizeChange: CGSize(width: 22, height: 22))
+        currentVC.tabBarItem.selectedImage = UIImage(named: selectedImage)?.imageResize(sizeChange: CGSize(width: 22, height: 22))
         
         return currentVC
     }

@@ -217,6 +217,7 @@ class TechnieRankingInnerCell: UICollectionViewCell {
         iv.layer.masksToBounds = false
         iv.clipsToBounds = true
         iv.backgroundColor = .systemGray6
+        iv.contentMode = .scaleAspectFill
 //        iv.image = UIImage(named: "technieDummyPhoto")
         return iv
     }()
@@ -414,8 +415,9 @@ class TechnieRankingInnerCell: UICollectionViewCell {
             var serviceLabel = ""
             services == 1 ? (serviceLabel = "service") : (serviceLabel = "services")
             numberOfServiceLabel.text = "\(services) \(serviceLabel)"
-            ratingLabel.text = "\(technieRankModel.clientsSatisfaction?.ratingAvrg ?? 0)"
-            reviewLabel.text = " \(services)"
+            ratingLabel.text = (String(format: "%.1f", technieRankModel.clientsSatisfaction?.ratingAvrg ?? 0))
+            let reviewCount = String(technieRankModel.clientsSatisfaction?.numberOfReview ?? 0)
+            reviewLabel.text = " \(reviewCount)"
         }
     }
     // MARK: - Init

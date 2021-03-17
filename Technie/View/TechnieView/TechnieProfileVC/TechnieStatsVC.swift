@@ -116,7 +116,9 @@ class TechnieStatsVC: UIViewController {
             
             switch result {
             case .success(let reviews):
-                self.reviews = reviews
+                let sortedArray = reviews.sorted(by: { PostFormVC.dateFormatter.date(from: $0.dateOfReview)?.compare(PostFormVC.dateFormatter.date(from: $1.dateOfReview) ?? Date()) == .orderedDescending })
+
+                self.reviews = sortedArray
                 
                 UIView.animate(withDuration: 0.5) {
                     self.tableView.isHidden = false

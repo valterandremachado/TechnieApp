@@ -18,6 +18,7 @@ class ClientNotificationCell: UITableViewCell {
         lbl.translatesAutoresizingMaskIntoConstraints = false
         lbl.text = "Notification Title"
         lbl.font = .boldSystemFont(ofSize: 16)
+        lbl.isHidden = true
         return lbl
     }()
     

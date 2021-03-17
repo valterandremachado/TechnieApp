@@ -25,6 +25,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let choosingScreen = ChooseAccountTypeVC()
         let clientVC = ClientTabController()
         let techniciantVC = TechnieTabController()
+//        guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
 
 
                 // Window setup

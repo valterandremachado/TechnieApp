@@ -500,7 +500,8 @@ extension DatabaseManager {
                                 
                                 let updateElement = [
                                     "id": slicedString,
-                                ]
+                                    "isHiringAccepted": false
+                                ] as [String : Any]
                                 let childPath = "users/technicians/\(key)/notifications/\(slicedString)"
                                 strongSelf.database.child(childPath).updateChildValues(updateElement, withCompletionBlock: { error, _ in
                                 })
@@ -794,7 +795,7 @@ extension DatabaseManager {
         let mainChildPath = "users/technicians/\(technicianKeyPath)/savedJobs"
         
         let db = database.child(mainChildPath)
-        let dbPostID = db.childByAutoId()
+        let dbPostID = db.child(postUID)
         
         let updateElement = [
             "postUID": postUID,
@@ -808,7 +809,7 @@ extension DatabaseManager {
             completion(true)
         })
     }
-
+    
     public func insertClientSatisfaction(with clientsSatisfactionModel: ClientsSatisfaction, with reviewModel: Review, with technicianKeyPath: String, completion: @escaping (Bool) -> Void) {
         
         let reviewData = try! FirebaseEncoder().encode(reviewModel)
@@ -827,8 +828,9 @@ extension DatabaseManager {
                 "workSpeedAvrg":  clientsSatisfactionModel.workSpeedAvrg,
                 "workQualityAvrg": clientsSatisfactionModel.workQualityAvrg,
                 "responseTimeAvrg": clientsSatisfactionModel.responseTimeAvrg,
-                "ratingAvrg": clientsSatisfactionModel.ratingAvrg
-            ]
+                "ratingAvrg": clientsSatisfactionModel.ratingAvrg,
+                "numberOfReview": clientsSatisfactionModel.numberOfReview
+            ] as [String : Any]
             
             strongSelf.database.child(mainChildPath).updateChildValues(updateElement, withCompletionBlock: { error, _ in
                 guard error == nil else {
@@ -930,7 +932,7 @@ extension DatabaseManager {
                 let clientNotificationModel = ClientNotificationModel(id: "nil",
                                                                       type: ClientNotificationType.review.rawValue,
                                                                       title: ClientNotificationType.review.rawValue,
-                                                                      description: "'\(technicianName)' has mark your job has completed. Please give your honest review on this technician.",
+                                                                      description: "'\(technicianName)' has marked your job has completed. Please give your honest review on this technician.",
                                                                       dateTime: PostFormVC.dateFormatter.string(from: Date()),
                                                                       completedJobUID: completedJobUID)
                 self.insertClientNotification(with: clientNotificationModel, with: clientKeyPath, completion: { success in
@@ -1127,31 +1129,6 @@ extension DatabaseManager {
             } catch let error {
                 print(error)
             }
-        })
-    }
-    
-    public func listenToSpecificTechnicianChanges(technicianKeyPath: String, completion: @escaping (Result<TechnicianModel, Error>) -> Void) {
-        
-        self.database.child("users/technicians/\(technicianKeyPath)").observeSingleEvent(of: .childChanged, with: { snapshot in
-            guard let _ = snapshot.value as? [String: Any] else {
-                completion(.failure(DatabaseError.failedToFetch))
-                return
-            }
-            
-            self.database.child("users/technicians/\(technicianKeyPath)").observeSingleEvent(of: .value, with: { snapshot in
-                guard let value = snapshot.value else {
-                    completion(.failure(DatabaseError.failedToFetch))
-                    return
-                }
-                
-                do {
-                    let model = try FirebaseDecoder().decode(TechnicianModel.self, from: value)
-                    //print("email: \(model)")
-                    completion(.success(model))
-                } catch let error {
-                    print(error)
-                }
-            })
         })
     }
     
@@ -1624,6 +1601,31 @@ extension DatabaseManager {
     
     
     // MARK: - Listeners
+    public func listenToSpecificTechnicianChanges(technicianKeyPath: String, completion: @escaping (Result<TechnicianModel, Error>) -> Void) {
+        
+        self.database.child("users/technicians/\(technicianKeyPath)").observeSingleEvent(of: .childChanged, with: { snapshot in
+            guard let _ = snapshot.value as? [String: Any] else {
+                completion(.failure(DatabaseError.failedToFetch))
+                return
+            }
+            
+            self.database.child("users/technicians/\(technicianKeyPath)").observeSingleEvent(of: .value, with: { snapshot in
+                guard let value = snapshot.value else {
+                    completion(.failure(DatabaseError.failedToFetch))
+                    return
+                }
+                
+                do {
+                    let model = try FirebaseDecoder().decode(TechnicianModel.self, from: value)
+                    //print("email: \(model)")
+                    completion(.success(model))
+                } catch let error {
+                    print(error)
+                }
+            })
+        })
+    }
+    
     public func listenToPostChanges(completion: @escaping (Result<[PostModel], Error>) -> Void) {
         Database.database().reference().child("posts").observeSingleEvent(of: .childChanged, with: { [self] snapshot in
             guard let postsCollection = snapshot.value as? [String: Any] else {
@@ -2702,7 +2704,7 @@ struct ClientsSatisfaction: Codable {
     var workQualityAvrg: Double
     var responseTimeAvrg: Double
     var ratingAvrg: Double
-    
+    var numberOfReview: Int
 //    var reviews: [Review]?
 }
 

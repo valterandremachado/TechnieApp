@@ -180,6 +180,7 @@ class TechnieServiceVC: UIViewController {
                         let sortedArray = posts.sorted(by: { PostFormVC.dateFormatter.date(from: $0.dateTime)?.compare(PostFormVC.dateFormatter.date(from: $1.dateTime) ?? Date()) == .orderedDescending })
                         self.activeJobsModel = sortedArray
                         
+                        self.warningLabel.isHidden = true
                         self.indicator.stop()
                         self.tableView.reloadData()
                         //                                    print("jobs: \(self.postModel)")
@@ -231,6 +232,7 @@ class TechnieServiceVC: UIViewController {
                         let sortedArray = posts.sorted(by: { PostFormVC.dateFormatter.date(from: $0.dateTime)?.compare(PostFormVC.dateFormatter.date(from: $1.dateTime) ?? Date()) == .orderedDescending })
                         self.previousJobsModel = sortedArray
                         
+                        self.warningLabel.isHidden = true
                         self.indicator.stop()
                         self.tableView.reloadData()
                         return
@@ -242,14 +244,14 @@ class TechnieServiceVC: UIViewController {
                 
             case .failure(let error):
                 if self.activeJobsModel.count == 0 && self.previousJobsModel.count == 0 {
-                    self.tableView.isHidden = true
+//                    self.tableView.isHidden = true
                     self.view.addSubview(self.warningLabel)
                     NSLayoutConstraint.activate([
                         self.warningLabel.centerYAnchor.constraint(equalTo: self.view.centerYAnchor),
                         self.warningLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor)
                     ])
                 } else {
-                    self.tableView.isHidden = false
+//                    self.tableView.isHidden = false
                 }
                 self.indicator.stop()
                 print("Failed to get technicians: \(error.localizedDescription)")
@@ -300,26 +302,30 @@ extension TechnieServiceVC: TableViewDataSourceAndDelegate {
 
         switch indexPath.section {
         case 0:
-            let model = activeJobsModel[indexPath.row]
-
             var cell = tableView.dequeueReusableCell(withIdentifier: ActiveJobsTVCell.cellID, for: indexPath) as! ActiveJobsTVCell
             cell = ActiveJobsTVCell(style: .subtitle, reuseIdentifier: ActiveJobsTVCell.cellID)
-//            cell.selectionStyle = .none
-            cell.textLabel?.text = model.title
-            cell.detailTextLabel?.textColor = .systemGray
-            cell.detailTextLabel?.text = "Hired \(view.calculateTimeFrame(initialTime: model.dateTime))"
-            cell.accessoryType = .detailButton
+            
+            if activeJobsModel.count != 0 {
+                let model = activeJobsModel[indexPath.row]
+                //            cell.selectionStyle = .none
+                cell.textLabel?.text = model.title
+                cell.detailTextLabel?.textColor = .systemGray
+                cell.detailTextLabel?.text = "Hired \(view.calculateTimeFrame(initialTime: model.dateTime))"
+                cell.accessoryType = .detailButton
+            }
             return cell
         case 1:
-            let modelTwo = previousJobsModel[indexPath.row]
 
             var cell = tableView.dequeueReusableCell(withIdentifier: PreviousJobsTVCell.cellID, for: indexPath) as! PreviousJobsTVCell
             cell = PreviousJobsTVCell(style: .subtitle, reuseIdentifier: PreviousJobsTVCell.cellID)
 
-            cell.selectionStyle = .none
-            cell.detailTextLabel?.textColor = .systemGray
-            cell.detailTextLabel?.text = "Hired \(view.calculateTimeFrame(initialTime: modelTwo.dateTime))"
-            cell.textLabel?.text = modelTwo.title
+            if previousJobsModel.count != 0 {
+                let modelTwo = previousJobsModel[indexPath.row]
+                cell.selectionStyle = .none
+                cell.detailTextLabel?.textColor = .systemGray
+                cell.detailTextLabel?.text = "Hired \(view.calculateTimeFrame(initialTime: modelTwo.dateTime))"
+                cell.textLabel?.text = modelTwo.title
+            }
             return cell
         default:
             return UITableViewCell()
@@ -368,7 +374,12 @@ extension TechnieServiceVC: TableViewDataSourceAndDelegate {
         let technicanName = getUsersPersistedInfo.name
         let technicianKeyPath = getUsersPersistedInfo.uid
 
-
+        
+        self.activeJobsModel.remove(at: indexPath.row)
+        self.tableView.beginUpdates()
+        self.tableView.deleteRows(at: [IndexPath(row: indexPath.row, section: 0)], with: .left)
+        self.tableView.endUpdates()
+        
         DatabaseManager.shared.getHiredJobs(techniciankeyPath: technicianKeyPath) { success in
             switch success {
             case .success(let hiredJobs):
@@ -381,13 +392,9 @@ extension TechnieServiceVC: TableViewDataSourceAndDelegate {
                             if success {
                                 guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
                                 let technicianKeyPath = getUsersPersistedInfo.uid
-                                
+//                                print("row: ", indexPath.row, "itemName: ", model.title)
                                 self.getPreviousHiredJobs(technicianKeyPath: technicianKeyPath)
                                 
-                                self.activeJobsModel.remove(at: indexPath.row)
-                                self.tableView.beginUpdates()
-                                self.tableView.deleteRows(at: [IndexPath(row: indexPath.row, section: 0)], with: .left)
-                                self.tableView.endUpdates()
                                 return
                             }
                         }

@@ -39,6 +39,7 @@ class FeedsTVCell: UITableViewCell {
         lbl.numberOfLines = 4
         lbl.textAlignment = .justified
         lbl.textColor = .systemGray
+        lbl.font = .systemFont(ofSize: 15)
         return lbl
     }()
     
@@ -48,6 +49,7 @@ class FeedsTVCell: UITableViewCell {
         lbl.translatesAutoresizingMaskIntoConstraints = false
         lbl.text = "Baguio City"
         lbl.textAlignment = .right
+        lbl.font = .systemFont(ofSize: 15)
         return lbl
     }()
     
@@ -55,6 +57,7 @@ class FeedsTVCell: UITableViewCell {
         let lbl = UILabel()
         lbl.translatesAutoresizingMaskIntoConstraints = false
         lbl.text = "$200"
+        lbl.font = .systemFont(ofSize: 15)
         return lbl
     }()
     
@@ -64,6 +67,7 @@ class FeedsTVCell: UITableViewCell {
         lbl.text = "Location"
         lbl.textAlignment = .right
         lbl.textColor = .systemGray
+        lbl.font = .systemFont(ofSize: 16)
         return lbl
     }()
     
@@ -72,6 +76,8 @@ class FeedsTVCell: UITableViewCell {
         lbl.translatesAutoresizingMaskIntoConstraints = false
         lbl.text = "Budget"
         lbl.textColor = .systemGray
+        lbl.font = .systemFont(ofSize: 16)
+
         return lbl
     }()
     
@@ -224,9 +230,9 @@ class FeedsTVCell: UITableViewCell {
                 config.textColor = .black
                 config.borderWidth = 0.5
                 config.borderColor = .lightGray
-                config.cornerRadius = 15
-                config.exactHeight = 25
-                config.textFont = .systemFont(ofSize: 13.5)
+                config.cornerRadius = 3
+                config.exactHeight = 17
+                config.textFont = .systemFont(ofSize: 12)
                 skillTagsCollectionView.numberOfLines = 2
 
                 skillTagsCollectionView.addTags(dataArray, with: config)

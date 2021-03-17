@@ -466,7 +466,9 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
             
             switch result {
             case .success(let reviews):
-                self.reviews = reviews
+                let sortedArray = reviews.sorted(by: { PostFormVC.dateFormatter.date(from: $0.dateOfReview)?.compare(PostFormVC.dateFormatter.date(from: $1.dateOfReview) ?? Date()) == .orderedDescending })
+                self.reviews = sortedArray
+                
                 self.reviewsTableView.reloadData()
             case .failure(let error):
                 print(error)
@@ -525,7 +527,7 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
     fileprivate func populateSections() {
         
         aboutSectionSetter.append(SectionHandler(title: "Summary", detail: [technicianModel.profileInfo.profileSummary]))
-        aboutSectionSetter.append(SectionHandler(title: "Skills", detail: technicianModel.profileInfo.skills))
+        aboutSectionSetter.append(SectionHandler(title: "Expertise", detail: technicianModel.profileInfo.skills))
         
         reviewsSectionSetter.append(SectionHandler(title: "Proficience", detail: [""]))
         reviewsSectionSetter.append(SectionHandler(title: "Reliability", detail: [""]))
@@ -673,11 +675,11 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
             present(UINavigationController(rootViewController: vc), animated: true)
             
         case "Pending...":
-            presentAlertSheetForHireBtn()
-            
+//            presentAlertSheetForHireBtn()
+            print("pending")
         case "Hired":
-            presentAlertSheetForHireBtn()
-            
+//            presentAlertSheetForHireBtn()
+            print("Hired")
         case "Currently hired in \(jobTrack) of my jobs":
             presentActionSheetForHireBtn()
             
@@ -690,11 +692,14 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
     }
     
     fileprivate func presentAlertSheetForHireBtn() {
+        let delimiter = " "
+        let technicianFirstName = technicianModel.profileInfo.name.components(separatedBy: delimiter)[0]
+        
         let alertController = UIAlertController(title: "Hiring", message: "Are you sure you want to pullback from this hire?", preferredStyle: .alert)
         
         let yesAction = UIAlertAction(title: "Yes", style: .default) { (_) in
             UIView.animate(withDuration: 0.5) { [self] in
-                hireBtn.setTitle("Hire Valter", for: .normal)
+                hireBtn.setTitle("Hire \(technicianFirstName.uppercased())", for: .normal)
                 hireBtn.setTitleColor(.white, for: .normal)
                 hireBtn.backgroundColor = .systemPink
             }

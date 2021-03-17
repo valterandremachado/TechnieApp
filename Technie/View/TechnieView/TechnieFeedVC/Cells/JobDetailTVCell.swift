@@ -338,9 +338,9 @@ class JobDetailTVCell4: UITableViewCell {
                 config.textColor = .black
                 config.borderWidth = 0.5
                 config.borderColor = .lightGray
-                config.cornerRadius = 15
-                config.exactHeight = 25
-                config.textFont = .systemFont(ofSize: 13.5)
+                config.cornerRadius = 3
+                config.exactHeight = 17
+                config.textFont = .systemFont(ofSize: 12)
                 
                 skillTagsCollectionView.numberOfLines = 2
                 skillTagsCollectionView.addTags(dataArray, with: config)

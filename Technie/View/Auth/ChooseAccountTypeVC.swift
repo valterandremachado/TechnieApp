@@ -41,7 +41,7 @@ class ChooseAccountTypeVC: UIViewController {
     lazy var titleLabel: UILabel = {
         let lbl = UILabel()
         lbl.translatesAutoresizingMaskIntoConstraints = false
-        lbl.text = "Best way to look for nearby technician!"
+        lbl.text = "Best way to look for nearby technicians!"
         lbl.font = .boldSystemFont(ofSize: 18)
         lbl.textAlignment = .center
 //        lbl.backgroundColor = .brown
@@ -121,7 +121,7 @@ class ChooseAccountTypeVC: UIViewController {
         customView.addSubview(illustrationView)
         illustrationView.anchor(top: customView.topAnchor, leading: customView.leadingAnchor, bottom: customView.bottomAnchor, trailing: customView.trailingAnchor, padding: UIEdgeInsets(top: 20, left: 20, bottom: 20, right: 20), size: CGSize(width: 0, height: 0))
   
-        titleLabel.anchor(top: nil, leading: view.leadingAnchor, bottom: nil, trailing: view.trailingAnchor, padding: UIEdgeInsets(top: 20, left: 30, bottom: 0, right:  30), size: CGSize(width: 0, height: 30))
+        titleLabel.anchor(top: nil, leading: view.leadingAnchor, bottom: nil, trailing: view.trailingAnchor, padding: UIEdgeInsets(top: 20, left: 25, bottom: 0, right:  25), size: CGSize(width: 0, height: 30))
         
         mainStackView.anchor(top: titleLabel.bottomAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor, padding: UIEdgeInsets(top: 40, left: 20, bottom: 80, right:  20), size: CGSize(width: 0, height: 105))
 

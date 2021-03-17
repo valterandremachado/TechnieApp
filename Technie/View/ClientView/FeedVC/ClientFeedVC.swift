@@ -7,7 +7,7 @@
 
 import UIKit
 import LBTATools
-
+import MapKit
 
 class ClientFeedVC: UIViewController {
     
@@ -178,6 +178,7 @@ class ClientFeedVC: UIViewController {
     // MARK: - Init
     override func loadView() {
         super.loadView()
+        createTechnieRank()
         setupNavBar()
     }
     
@@ -195,6 +196,7 @@ class ClientFeedVC: UIViewController {
         
         fetchUserPosts()
         fetchData()
+        fetchRanking()
         setupViews()
         print("viewDidLoadFeed: \(didShowSearchResultViewObservable.value)")
 //        guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
@@ -242,10 +244,6 @@ class ClientFeedVC: UIViewController {
     }
     
     func setupNavBar(){
-//        ProgressHUD.colorAnimation = .systemBlue
-//        ProgressHUD.colorProgress = .systemBlue
-//        ProgressHUD.animationType = .circleStrokeSpin
-//        ProgressHUD.show("Posting...", interaction: false)
 
         guard let navBar = navigationController?.navigationBar else { return }
         navBar.topItem?.title = "Feeds"
@@ -262,33 +260,56 @@ class ClientFeedVC: UIViewController {
 //        searchController.searchBar.becomeFirstResponder()
     }
     
+    var tempTechnicianModel = [TechnicianModel]()
     fileprivate func fetchData()  {
+//        self.fetchRanking()
+        technicianModel.removeAll()
         view.isUserInteractionEnabled = false
         searchController.searchBar.isUserInteractionEnabled = false
-        
+//        guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
+
         DatabaseManager.shared.getAllTechnicians(completion: {[weak self] result in
             guard let self = self else { return }
             switch result {
             case .success(let technicians):
                 self.technicianModel.append(technicians)
+
+//                let clientLat = getUsersPersistedInfo.location.lat
+//                let clientLong = getUsersPersistedInfo.location.long
+               
+                
+//                let sortedArray = self.tempTechnicianModel.sorted(by: {
+//
+//                    let technicianLatOne = $0.profileInfo.location?.lat ?? 0.0
+//                    let technicianLongOne = $0.profileInfo.location?.long ?? 0.0
+//
+//                    let technicianLatTwo = $1.profileInfo.location?.lat ?? 0.0
+//                    let technicianLongTwo = $1.profileInfo.location?.long ?? 0.0
+//
+//                    // Client location
+//                    let clientLocation = CLLocation(latitude: clientLat, longitude: clientLong)
+//                    //  Technician location
+//                    let technicianLocationOne = CLLocation(latitude: technicianLatOne, longitude: technicianLongOne)
+//                    let technicianLocationtwo = CLLocation(latitude: technicianLatTwo, longitude: technicianLongTwo)
+//
+//                    //Finding my distance to my next destination (in km)
+//                    let distanceOne = clientLocation.distance(from: technicianLocationOne) / 1000
+//                    let distanceTwo = clientLocation.distance(from: technicianLocationtwo) / 1000
+//
+//
+//                    return distanceOne > distanceTwo
+//                })
                 
                 UIView.animate(withDuration: 0.5) {
                     self.indicator.stop()
-//                    UIView.animate(withDuration: 0.5) {
-//                        ProgressHUD.showSucceed()
-//                    }
-                   
                     self.indicator.removeFromSuperview()
                     self.clientFeedCollectionView.isHidden = false
                     self.view.isUserInteractionEnabled = true
                     self.searchController.searchBar.isUserInteractionEnabled = true
-                    self.clientFeedCollectionView.reloadData()
                 }
                 
-                let refreshDeadline = DispatchTime.now() + .milliseconds(100)
-                DispatchQueue.main.asyncAfter(deadline: refreshDeadline) {
-                    self.fetchRanking()
-                }
+
+                self.clientFeedCollectionView.reloadData()
              
             case .failure(let error):
                 
@@ -333,6 +354,15 @@ class ClientFeedVC: UIViewController {
                     self.userPostModel = posts
                     return
                 case .failure(let error):
+                    
+                    if self.technicianModel.count == 0 {
+                        self.view.addSubview(self.warningLabel)
+                        NSLayoutConstraint.activate([
+                            self.warningLabel.centerYAnchor.constraint(equalTo: self.view.centerYAnchor),
+                            self.warningLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor)
+                        ])
+                    } else {
+                    }
                     print("Failed to get posts: \(error.localizedDescription)")
                 }
             })
@@ -367,11 +397,25 @@ class ClientFeedVC: UIViewController {
     }
     
     fileprivate func fetchRanking() {
+
+        view.isUserInteractionEnabled = false
+        searchController.searchBar.isUserInteractionEnabled = false
+        
         DatabaseManager.shared.getTechnieRank { result in
             switch result {
             case .success(let technieRank):
                 self.technieRank = technieRank
+
+                print("technieRank")
+                if technieRank.count == 0 {
+                    self.countSection = 1
+                } else {
+                    self.countSection = 2
+                }
+                self.clientFeedCollectionView.reloadData()
             case .failure(let error):
+                print("technieRank failure")
+                self.createTechnieRank()
                 self.removeSectionOne()
                 print(error)
             }
@@ -380,19 +424,10 @@ class ClientFeedVC: UIViewController {
     
     fileprivate func refreshTechniciansData() {
         self.technicianModel.removeAll()
-
-        DatabaseManager.shared.getAllTechnicians(completion: {[weak self] result in
-            guard let self = self else { return }
-            switch result {
-            case .success(let technicians):
-                self.technicianModel.append(technicians)
-                self.clientFeedCollectionView.reloadData()
-//                self.refresher.endRefreshing()
-            case .failure(let error):
-                print("Failed to get technicians: \(error.localizedDescription)")
-            }
-        })
-    
+        self.fetchUserPosts()
+        self.fetchData()
+        self.fetchRanking()
+        self.createTechnieRank()
     }
     
     // MARK: - Selectors
@@ -424,9 +459,8 @@ class ClientFeedVC: UIViewController {
     }()
     
     var filteredData: [TechnicianModel] = []
-    let hasLaunchedKey = "HasLaunched"
-    let defaults = UserDefaults.standard
-   
+    var countSection = 1
+
     
 }
 
@@ -475,25 +509,18 @@ extension ClientFeedVC: UISearchBarDelegate {
                 filteredData = filteredArray//technicianModel.filter({ $0.profileInfo.skills.joined(separator: ", ").localizedCaseInsensitiveContains(searchText) })
                 print(filteredArray)
             }
-          
-           
-//            isSearching = true
-//            collectionView.reloadData()
         }
        
     }
     
    
     func removeSectionOne() {
-//        let hasLaunched = defaults.bool(forKey: hasLaunchedKey)
-//
-//            if !hasLaunched {
-//                defaults.set(true, forKey: hasLaunchedKey)
-//            }
-//        sections.remove(at: 0)
-//        clientFeedCollectionView.deleteSections(IndexSet(integer: 0))
-//        clientFeedCollectionView.reloadSections(IndexSet(integer: 0))
-        // At this point the collection view will ask again for the number of sections and it will be updated
+
+        if technieRank.count == 0 {
+            countSection = 1
+        } else {
+            countSection = 2
+        }
     }
 }
 
@@ -501,15 +528,18 @@ extension ClientFeedVC: UISearchBarDelegate {
 extension ClientFeedVC: CollectionDataSourceAndDelegate {
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return didShowSearchResultViewObservable.value == true ? (1) : (sections.count) //sections.count
+        return didShowSearchResultViewObservable.value == true ? (1) : (countSection) //sections.count
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return didShowSearchResultViewObservable.value == true ? (professionArray.count) : (section == 0 ? (1) : (technicianModel.count)) //section == 0 ? (1) : (5)
+        var sectionItemCount = 1
+        countSection == 1 ? (sectionItemCount = technicianModel.count) : (sectionItemCount = 1)
+        return didShowSearchResultViewObservable.value == true ? (professionArray.count) : (section == 0 ? (sectionItemCount) : (technicianModel.count)) //section == 0 ? (1) : (5)
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        
+        print("sectionCount1: ", technicianModel.count)
+
         // this cell is only showed when this condition is true
         if didShowSearchResultViewObservable.value == true && indexPath.section == 0 {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: searchResultCellID, for: indexPath) as! SearchResultCell
@@ -519,12 +549,14 @@ extension ClientFeedVC: CollectionDataSourceAndDelegate {
             return cell
         }
         
-        if sections.count == 1 {
+        if countSection == 1 {
             // Nearby Technie cell
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: feedCellOnSection1ID, for: indexPath) as! NearbyTechniesCell
-            let model = technicianModel[indexPath.item]
-            cell.technicianModel = model
-//            let lastItemIndex = collectionView.numberOfItems(inSection: collectionView.numberOfSections-1)
+            if technicianModel.count != 0 {
+                let model = technicianModel[indexPath.item]
+                cell.technicianModel = model
+            }
+          
 
             return cell
         } else {
@@ -627,17 +659,21 @@ extension ClientFeedVC: CollectionDataSourceAndDelegate {
             }
             
         } else {
-            
-            switch indexPath.section {
-            case 0:
-                let screenSize = UIScreen.main.bounds
-                collectionViewSize = CGSize(width: viewSize.width, height: screenSize.width/1.72)
-                return collectionViewSize
-            case 1:
+            if countSection != 1 {
+                switch indexPath.section {
+                case 0:
+                    let screenSize = UIScreen.main.bounds
+                    collectionViewSize = CGSize(width: viewSize.width, height: screenSize.width/1.72)
+                    return collectionViewSize
+                case 1:
+                    collectionViewSize = CGSize(width: viewSize.width - 10, height: 150)
+                    return collectionViewSize
+                default:
+                    break
+                }
+            } else {
                 collectionViewSize = CGSize(width: viewSize.width - 10, height: 150)
                 return collectionViewSize
-            default:
-                break
             }
         }
         
@@ -653,10 +689,12 @@ extension ClientFeedVC: CollectionDataSourceAndDelegate {
             return collectionViewEdgeInsets
         }
         
-        if section != 0 {
-            // Section 1 EdgeInsets
-            collectionViewEdgeInsets = UIEdgeInsets(top: 6, left: 0, bottom: 10, right: 0)
-            return collectionViewEdgeInsets
+        if countSection != 1 {
+            if section != 0 {
+                // Section 1 EdgeInsets
+                collectionViewEdgeInsets = UIEdgeInsets(top: 6, left: 0, bottom: 10, right: 0)
+                return collectionViewEdgeInsets
+            }
         }
         
         // Returns section 0 Inserts to if the section is equal to 0
@@ -678,26 +716,39 @@ extension ClientFeedVC: CollectionDataSourceAndDelegate {
             return header
         }
         
-        if sections.count == 1 {
-            header.sectionTitle.text = sections[indexPath.section].uppercased()
-            header.backgroundColor = .systemBackground
-            header.addBorder(.bottom, color: .systemGray, thickness: 0.3)
-            header.seeAllBtn.isHidden = true
+        if countSection != 1 {
+            if sections.count == 1 {
+                header.sectionTitle.text = sections[indexPath.section].uppercased()
+                header.backgroundColor = .systemBackground
+                header.addBorder(.bottom, color: .systemGray, thickness: 0.3)
+                header.seeAllBtn.isHidden = true
+            } else {
+                switch indexPath.section {
+                case 0:
+                    header.rank = technieRank
+                    //            header.postModel = userPostModel
+                    header.sectionTitle.text = sections[indexPath.section].uppercased()
+                    //            header.backgroundColor = .red
+                    // Show seeAllBtn only for this section
+                    header.seeAllBtn.isHidden = false
+                    header.backgroundColor = .systemBackground
+                    //            header.sectionTitle.backgroundColor = .brown
+                    header.addBorder(.bottom, color: .systemGray, thickness: 0.3)
+                    return header
+                case 1:
+                    header.sectionTitle.text = sections[indexPath.section].uppercased()
+                    header.backgroundColor = .systemBackground
+                    header.addBorder(.bottom, color: .systemGray, thickness: 0.3)
+                    header.seeAllBtn.isHidden = true
+                    return header
+                default:
+                    break
+                }
+            }
         } else {
             switch indexPath.section {
             case 0:
-                header.rank = technieRank
-    //            header.postModel = userPostModel
-                header.sectionTitle.text = sections[indexPath.section].uppercased()
-                //            header.backgroundColor = .red
-                // Show seeAllBtn only for this section
-                header.seeAllBtn.isHidden = false
-                header.backgroundColor = .systemBackground
-                //            header.sectionTitle.backgroundColor = .brown
-                header.addBorder(.bottom, color: .systemGray, thickness: 0.3)
-                return header
-            case 1:
-                header.sectionTitle.text = sections[indexPath.section].uppercased()
+                header.sectionTitle.text = sections[1].uppercased()
                 header.backgroundColor = .systemBackground
                 header.addBorder(.bottom, color: .systemGray, thickness: 0.3)
                 header.seeAllBtn.isHidden = true
@@ -706,7 +757,7 @@ extension ClientFeedVC: CollectionDataSourceAndDelegate {
                 break
             }
         }
-       
+        
         
         return header
     }
@@ -736,6 +787,75 @@ extension ClientFeedVC: CollectionDataSourceAndDelegate {
     }
 }
 
+// MARK: - TechnieRank Creation Extension
+extension ClientFeedVC {
+    
+    fileprivate func createTechnieRank() {
+        print("createTechnieRank")
+        fetchAllTechnician()
+    }
+    
+    fileprivate func fetchAllTechnician()  {
+        var allTechnicians = [TechnicianModel]()
+        
+        DatabaseManager.shared.getAllTechnicians(completion: {[weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let technician):
+                allTechnicians.append(technician)
+                self.buildTechniciansRanking(technician: technician)
+            case .failure(let error):
+                print("Failed to get technicians: \(error.localizedDescription)")
+            }
+        })
+    }
+    
+    fileprivate func buildTechniciansRanking(technician: TechnicianModel) {
+        
+        var filteredRanking = [TechnicianModel]()
+        var sortedRanking = [TechnicianModel]()
+        
+        let proficiencyInDecimal: [Double] = [0.25, 0.50, 0.75, 1.0]
+        var workSpeed = 0
+        var workQuality = 0
+        var responseTime = 0
+        
+        //        Efficiency = 65%(not lesser) “ranking standard” ✅
+        //        Rating = 4 stars up ✅
+        
+        var allTechniciansModel: [TechnicianModel] = []
+        allTechniciansModel.append(technician)
+        for index in 0..<allTechniciansModel.count {
+            
+            let model = allTechniciansModel[index]
+            // append only technicians with review history and rating of 4 and above
+            workSpeed = Int(model.clientsSatisfaction?.workSpeedAvrg.rounded(.toNearestOrAwayFromZero) ?? 0.0)
+            workQuality = Int(model.clientsSatisfaction?.workQualityAvrg.rounded(.toNearestOrAwayFromZero) ?? 0.0)
+            responseTime = Int(model.clientsSatisfaction?.responseTimeAvrg.rounded(.toNearestOrAwayFromZero) ?? 0.0)
+            
+            let sum = proficiencyInDecimal[workSpeed] + proficiencyInDecimal[workQuality] + proficiencyInDecimal[responseTime]
+            let efficiency = sum/3 * 100
+            guard let technicianRatingAvrg = model.clientsSatisfaction?.ratingAvrg else { return }
+            
+            if (efficiency >= 65 && technicianRatingAvrg >= 4) {
+
+                guard filteredRanking.filter({ $0.profileInfo.id.contains(model.profileInfo.id) }).isEmpty else { return }
+                filteredRanking.append(model)
+                let sortedArray = filteredRanking.sorted(by: {
+                    let satisAvrOne = $0.clientsSatisfaction!.workSpeedAvrg + $0.clientsSatisfaction!.workQualityAvrg + $0.clientsSatisfaction!.responseTimeAvrg
+                    let satisAvrTwo = $1.clientsSatisfaction!.workSpeedAvrg + $1.clientsSatisfaction!.workQualityAvrg + $1.clientsSatisfaction!.responseTimeAvrg
+                    return satisAvrOne > satisAvrTwo
+                })
+                sortedRanking = sortedArray
+                DatabaseManager.shared.insertTechnieRanking(withSortedRank: sortedRanking) { _ in
+                }
+                
+            }
+            
+        } // End of loop
+        
+    }
+}
 
 
 // MARK: - ClientFeedPreviews

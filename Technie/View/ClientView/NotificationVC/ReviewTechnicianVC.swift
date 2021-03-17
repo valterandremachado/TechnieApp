@@ -22,6 +22,7 @@ class ReviewTechnicianVC: UIViewController, UITextViewDelegate {
     
     weak var dismissalDelegate: ReviewTechnicianVCDismissalDelegate?
     
+    // MARK: - Properties
     lazy var tableView: UITableView = {
         let tv = UITableView(frame: .zero, style: .grouped)
         tv.translatesAutoresizingMaskIntoConstraints = false
@@ -70,6 +71,8 @@ class ReviewTechnicianVC: UIViewController, UITextViewDelegate {
         txtView.layer.cornerRadius = 10
         txtView.isEditable = true
         txtView.isScrollEnabled = false
+        txtView.font = .systemFont(ofSize: 15)
+        txtView.textAlignment = .natural
         return txtView
     }()
     
@@ -84,6 +87,7 @@ class ReviewTechnicianVC: UIViewController, UITextViewDelegate {
     
     var sectionSetter = [SectionHandler]()
     
+    // MARK: - Inits
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
@@ -100,6 +104,7 @@ class ReviewTechnicianVC: UIViewController, UITextViewDelegate {
 //        print("print that post: \(userPostModel)")
     }
     
+    // MARK: - Methods
     func setupViews() {
         [tableView].forEach {view.addSubview($0)}
         tableView.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor)
@@ -145,19 +150,25 @@ class ReviewTechnicianVC: UIViewController, UITextViewDelegate {
         guard let technicianKeyPath = userPostModel.hiringStatus?.technicianKeyPath else { return }
 
         guard let reviewComment = reviewCommentTextField.text else { return }
+        guard !reviewComment.isEmpty else {
+            print("empty comment section")
+            return
+        }
         
         if reviews.count >= 1 {
 //            print("reviews > 1")
-            let divisor = Double(reviews.count + 1)
-            let workSpeedAvrg = calculateMeanAverage(dividend: satisfactionAvrg!.workSpeedAvrg + Double(workReview[0]), divisor: divisor)
-            let workQualityAvrg = calculateMeanAverage(dividend: satisfactionAvrg!.workQualityAvrg + Double(workReview[1]), divisor: divisor)
-            let responseTimeAvrg = calculateMeanAverage(dividend: satisfactionAvrg!.responseTimeAvrg + Double(workReview[2]), divisor: divisor)
-            let ratingAvrg = calculateMeanAverage(dividend: satisfactionAvrg!.ratingAvrg + rating, divisor: divisor)
+            let numberOfReview = reviews.count + 1
+            let divisor = Double(numberOfReview)
+            let workSpeedAvrg = calculateMeanAverage(dividend: (satisfactionAvrg!.workSpeedAvrg + Double(workReview[0])), divisor: divisor)
+            let workQualityAvrg = calculateMeanAverage(dividend: (satisfactionAvrg!.workQualityAvrg + Double(workReview[1])), divisor: divisor)
+            let responseTimeAvrg = calculateMeanAverage(dividend: (satisfactionAvrg!.responseTimeAvrg + Double(workReview[2])), divisor: divisor)
+            let ratingAvrg = calculateMeanAverage(dividend: (satisfactionAvrg!.ratingAvrg + rating), divisor: divisor)
 
             let clientsSatisfaction = ClientsSatisfaction(workSpeedAvrg: workSpeedAvrg,
                                                           workQualityAvrg: workQualityAvrg,
                                                           responseTimeAvrg: responseTimeAvrg,
-                                                          ratingAvrg: ratingAvrg)
+                                                          ratingAvrg: ratingAvrg,
+                                                          numberOfReview: numberOfReview)
 
             let clientReview = Review(jobTitle: jobTitle,
                                       reviewComment: reviewComment,
@@ -181,7 +192,8 @@ class ReviewTechnicianVC: UIViewController, UITextViewDelegate {
             let clientsSatisfaction = ClientsSatisfaction(workSpeedAvrg: Double(workReview[0]),
                                                           workQualityAvrg: Double(workReview[1]),
                                                           responseTimeAvrg: Double(workReview[2]),
-                                                          ratingAvrg: rating)
+                                                          ratingAvrg: rating,
+                                                          numberOfReview: 1)
 
             let clientReview = Review(jobTitle: jobTitle,
                                       reviewComment: reviewComment,

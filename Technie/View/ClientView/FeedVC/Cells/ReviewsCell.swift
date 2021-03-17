@@ -153,7 +153,7 @@ class ReviewsCell: UITableViewCell {
             let delimiter = "at"
             let slicedString = reviews.dateOfHiring.components(separatedBy: delimiter)[0]
             serviceNameLabel.text = reviews.jobTitle
-            ratingLabel.text = "\(reviews.rating)"
+            ratingLabel.text = String(format:"%.1f", reviews.rating)
             reviewCommentLabel.text = reviews.reviewComment
             serviceDateLabel.text = slicedString
             clientNameLabel.text = "\(reviews.clientName) - \(calculateTimeFrame(initialTime: reviews.dateOfReview))".lowercased()

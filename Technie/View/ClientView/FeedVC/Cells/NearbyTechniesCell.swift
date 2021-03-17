@@ -18,6 +18,7 @@ class NearbyTechniesCell: UICollectionViewCell {
         iv.layer.cornerRadius = iv.frame.size.height/2
         iv.layer.masksToBounds = false
         iv.clipsToBounds = true
+        iv.contentMode = .scaleAspectFill
         iv.backgroundColor = .systemGray6
         iv.image = UIImage(named: "technieDummyPhoto")
         return iv
@@ -193,13 +194,22 @@ class NearbyTechniesCell: UICollectionViewCell {
             profileImageView.sd_setImage(with: URL(string: technicianModel.profileInfo.profileImage ?? ""), completed: nil)
             nameLabel.text = technicianModel.profileInfo.name
             jobTitleLabel.text = technicianModel.profileInfo.name
-            let delimiter = ", "
-            let slicedString = technicianModel.profileInfo.location?.address.components(separatedBy: delimiter)[1]
-            locationLabel.text = slicedString
+            
+            let address = technicianModel.profileInfo.location?.address ?? ""
+            let characterToSearch: Character = ","
+            if address.contains(characterToSearch) {
+                let delimiter = ", "
+                let slicedString = technicianModel.profileInfo.location?.address.components(separatedBy: delimiter)[1]
+                locationLabel.text = slicedString
+            } else {
+                locationLabel.text = technicianModel.profileInfo.location?.address ?? ""
+            }
+
             pricePerHourLabel.text = "₱\(technicianModel.profileInfo.hourlyRate)"
             if rating != 0 {
                 ratingStackView.alpha = 1
-                ratingLabel.text = "\(rating) (\(technicianModel.numberOfServices))"
+                let reviewCount = String(technicianModel.clientsSatisfaction?.numberOfReview ?? 0)
+                ratingLabel.text = "\(String(format: "%.01f", rating)) (\(reviewCount))"
             } else {
                 ratingStackView.alpha = 0
             }
@@ -224,9 +234,9 @@ class NearbyTechniesCell: UICollectionViewCell {
         [mainStackView, profileImageView, separatorView].forEach {self.addSubview($0)}
         
 //        saveBtn.anchor(top: self.topAnchor, leading: nil, bottom: nil, trailing: self.trailingAnchor, padding: UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 5))
-        separatorView.anchor(top: self.topAnchor, leading: self.leadingAnchor, bottom: nil, trailing: self.trailingAnchor, padding: UIEdgeInsets(top: -16, left: 5, bottom: 0, right: 5))
+        separatorView.anchor(top: self.topAnchor, leading: self.leadingAnchor, bottom: nil, trailing: self.trailingAnchor, padding: UIEdgeInsets(top: -8, left: 5, bottom: 0, right: 5))
         
-        profileImageView.anchor(top: separatorView.bottomAnchor, leading: self.leadingAnchor, bottom: nil, trailing: nil, padding: UIEdgeInsets(top: 20, left: 15, bottom: 0, right: 0))
+        profileImageView.anchor(top: separatorView.bottomAnchor, leading: self.leadingAnchor, bottom: nil, trailing: nil, padding: UIEdgeInsets(top: 15, left: 15, bottom: 0, right: 0))
 //        mainStackView.withHeight(160)
         mainStackView.anchor(top: profileImageView.topAnchor, leading: profileImageView.trailingAnchor, bottom: nil, trailing: self.trailingAnchor, padding: UIEdgeInsets(top: 5, left: 8, bottom: 0, right: 20))
 

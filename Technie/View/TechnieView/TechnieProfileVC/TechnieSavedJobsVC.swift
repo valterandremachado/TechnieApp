@@ -148,15 +148,54 @@ extension TechnieSavedJobsVC: TableViewDataSourceAndDelegate {
         cell.detailTextLabel?.textColor = .systemGray
         cell.detailTextLabel?.text = "Posted \(view.calculateTimeFrame(initialTime: model.dateTime))"
         cell.textLabel?.text = model.title
-        cell.accessoryType = .disclosureIndicator
+        cell.accessoryType = .detailDisclosureButton
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
+        presentAlertForSavedJobsRemoval(indexPath: indexPath)
+    }
+    
+    fileprivate func presentAlertForSavedJobsRemoval(indexPath: IndexPath){
+        guard let userPersistedData = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
+
+        let model = savedJobs[indexPath.row]
+        let technicianKeyPath = userPersistedData.uid
+        let savedJobKeyPath = model.id ?? ""
+        let childPathToDelete = "users/technicians/\(technicianKeyPath)/savedJobs/\(savedJobKeyPath)"
+
+        let alertController = UIAlertController(title: "Remove saved job post?", message: nil, preferredStyle: .alert)
+        
+        let removeAction = UIAlertAction(title: "Remove", style: .destructive) { (_) in
+            DatabaseManager.shared.deleteChildPath(withChildPath: childPathToDelete) { success in
+                if success {
+                    self.savedJobs.remove(at: indexPath.row)
+                    self.tableView.beginUpdates()
+                    self.tableView.deleteRows(at: [IndexPath(row: indexPath.row, section: 0)], with: .fade)
+                    self.tableView.endUpdates()
+                }
+            }
+        }
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
+        alertController.addAction(removeAction)
+        alertController.addAction(cancelAction)
+        present(alertController, animated: true)
+        
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
+        let model = savedJobs[indexPath.row]
+
         let vc = JobDetailsVC()
-        vc.isComingFromSavedJobsVC = true
+        if model.availabilityStatus != true {
+            vc.isComingFromServiceVC = true
+        } else {
+            vc.isComingFromSavedJobsVC = true
+        }
+
         vc.postModel = savedJobs[indexPath.row]
         vc.navBarViewSubtitleLbl.text = "posted \(view.calculateTimeFrame(initialTime: savedJobs[indexPath.row].dateTime))"
         self.navigationController?.pushViewController(vc, animated: true)

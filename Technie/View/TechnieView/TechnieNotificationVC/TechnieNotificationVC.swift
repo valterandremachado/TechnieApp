@@ -136,6 +136,7 @@ class TechnieNotificationVC: UIViewController {
                 print("childChanged")
                 let sortedArray = notifications.sorted(by: { PostFormVC.dateFormatter.date(from: $0.dateTime)?.compare(PostFormVC.dateFormatter.date(from: $1.dateTime) ?? Date()) == .orderedDescending })
                 self.userNotifications = sortedArray
+                self.warningLabel.isHidden = true
                 self.tableView.reloadData()
                 return
             case .failure(let error):
@@ -152,6 +153,7 @@ class TechnieNotificationVC: UIViewController {
                 self.userNotifications.removeAll()
                 let sortedArray = notifications.sorted(by: { PostFormVC.dateFormatter.date(from: $0.dateTime)?.compare(PostFormVC.dateFormatter.date(from: $1.dateTime) ?? Date()) == .orderedDescending })
                 self.userNotifications = sortedArray
+                self.warningLabel.isHidden = true
                 self.tableView.reloadData()
 //                self.refresher.endRefreshing()
                 print("success")

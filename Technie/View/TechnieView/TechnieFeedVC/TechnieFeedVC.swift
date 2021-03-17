@@ -385,7 +385,8 @@ class TechnieFeedVC: UIViewController, TechnieFeedVCDelegate {
                         // in my case, all buttons are off, but be sure to implement logic here
                         self.tableView.reloadData()
                     }
-                    
+                    self.warningLabel.isHidden = true
+
                     self.tableView.reloadData()
                     return
                 case .failure(let error):
@@ -397,43 +398,42 @@ class TechnieFeedVC: UIViewController, TechnieFeedVCDelegate {
     
     fileprivate func refreshPostsData() {
         self.postModel.removeAll()
-
-        DatabaseManager.shared.getAllPosts(completion: {[weak self] result in
-            guard let self = self else { return }
-            switch result {
-            case .success(let posts):
-                
-                let sortedArray = posts.sorted(by: { PostFormVC.dateFormatter.date(from: $0.dateTime)?.compare(PostFormVC.dateFormatter.date(from: $1.dateTime) ?? Date()) == .orderedDescending })
-                self.postModel = sortedArray
-                
-                for _ in 0..<(sortedArray.count) {
-                    self.buttonStates.append(false)
-                    // in my case, all buttons are off, but be sure to implement logic here
-                    self.tableView.reloadData()
-                    self.tableView.reloadData()
-                    self.refresher.endRefreshing()
-                }
-                
-                self.indicator.stop()
-                self.tableView.reloadData()
-                print("refreshed")
-                return
-            case .failure(let error):
-                if self.savedJobs.count == 0 {
-                    self.tableView.isHidden = true
-                    self.view.addSubview(self.warningLabel)
-                    NSLayoutConstraint.activate([
-                        self.warningLabel.centerYAnchor.constraint(equalTo: self.view.centerYAnchor),
-                        self.warningLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor)
-                    ])
-                } else {
-                    self.tableView.isHidden = false
-                }
-                
-                self.indicator.stop()
-                print("Failed to get posts: \(error.localizedDescription)")
-            }
-        })
+        fetchData()
+//        DatabaseManager.shared.getAllPosts(completion: {[weak self] result in
+//            guard let self = self else { return }
+//            switch result {
+//            case .success(let posts):
+//
+//                let sortedArray = posts.sorted(by: { PostFormVC.dateFormatter.date(from: $0.dateTime)?.compare(PostFormVC.dateFormatter.date(from: $1.dateTime) ?? Date()) == .orderedDescending })
+//                self.postModel = sortedArray
+//
+//                for _ in 0..<(sortedArray.count) {
+//                    self.buttonStates.append(false)
+//                    // in my case, all buttons are off, but be sure to implement logic here
+//                }
+//
+//                self.warningLabel.isHidden = true
+//
+//                self.indicator.stop()
+//                self.tableView.reloadData()
+//                print("refreshed")
+//                return
+//            case .failure(let error):
+//                if self.savedJobs.count == 0 {
+//                    self.tableView.isHidden = true
+//                    self.view.addSubview(self.warningLabel)
+//                    NSLayoutConstraint.activate([
+//                        self.warningLabel.centerYAnchor.constraint(equalTo: self.view.centerYAnchor),
+//                        self.warningLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor)
+//                    ])
+//                } else {
+//                    self.tableView.isHidden = false
+//                }
+//
+//                self.indicator.stop()
+//                print("Failed to get posts: \(error.localizedDescription)")
+//            }
+//        })
         
     }
     
@@ -485,8 +485,16 @@ class TechnieFeedVC: UIViewController, TechnieFeedVCDelegate {
             }
             
         } else {
-//            buttonStates[tappedIndexPath.item] = false
+            buttonStates[tappedIndexPath.item] = false
             button.setImage(imageUnsaved, for: .normal)
+            
+            let model = postModel[tappedIndexPath.row]
+            let savedJobKeyPath = model.id ?? ""
+            let childPathToDelete = "users/technicians/\(technicianKeyPath)/savedJobs/\(savedJobKeyPath)"
+            
+            DatabaseManager.shared.deleteChildPath(withChildPath: childPathToDelete) { _ in
+            }
+            
 
         }
         

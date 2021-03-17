@@ -282,7 +282,7 @@ class RankedTechnieVC: UIViewController {
         vc.userPostModel = userPostModel
         vc.profileImageView.sd_setImage(with: URL(string: technicians.profileInfo.profileImage ?? ""))
         vc.nameLabel.text = technicians.profileInfo.name
-        vc.locationLabel.text = "\(technicians.profileInfo.location), Philippines"
+        vc.locationLabel.text = technicians.profileInfo.location?.address
         vc.technicianExperienceLabel.text = "• \(technicians.profileInfo.experience) Year of Exp."
         
         let delimiter = "at"

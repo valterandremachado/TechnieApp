@@ -19,6 +19,7 @@ class TechnicianSearchResultsCell: UITableViewCell {
         iv.layer.masksToBounds = false
         iv.clipsToBounds = true
         iv.backgroundColor = .systemGray6
+        iv.contentMode = .scaleAspectFill
         iv.image = UIImage(named: "technieDummyPhoto")
         return iv
     }()
@@ -190,7 +191,17 @@ class TechnicianSearchResultsCell: UITableViewCell {
             profileImageView.sd_setImage(with: URL(string: technicianModel.profileInfo.profileImage ?? ""), completed: nil)
             nameLabel.text = technicianModel.profileInfo.name
             jobTitleLabel.text = technicianModel.profileInfo.name
-            locationLabel.text = technicianModel.profileInfo.location?.address
+            
+            let address = technicianModel.profileInfo.location?.address ?? ""
+            let characterToSearch: Character = ","
+            if address.contains(characterToSearch) {
+                let delimiter = ", "
+                let slicedString = technicianModel.profileInfo.location?.address.components(separatedBy: delimiter)[1]
+                locationLabel.text = slicedString
+            } else {
+                locationLabel.text = technicianModel.profileInfo.location?.address ?? ""
+            }
+            
             pricePerHourLabel.text = "₱\(technicianModel.profileInfo.hourlyRate)"
             if rating != 0 {
                 ratingStackView.alpha = 1
