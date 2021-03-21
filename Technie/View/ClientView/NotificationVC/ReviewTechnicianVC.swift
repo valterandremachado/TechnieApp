@@ -16,6 +16,7 @@ protocol ReviewTechnicianVCDismissalDelegate: class {
 class ReviewTechnicianVC: UIViewController, UITextViewDelegate {
 
     var userPostModel: PostModel!
+    var completedJobUID = ""
     var satisfactionAvrg: ClientsSatisfaction?
     var reviews = [Review]()
     var notificationRow = -1
@@ -86,19 +87,24 @@ class ReviewTechnicianVC: UIViewController, UITextViewDelegate {
     }()
     
     var sectionSetter = [SectionHandler]()
-    
+    private var indicator: ProgressIndicatorLarge!
+
     // MARK: - Inits
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         view.backgroundColor = .systemBackground
+        indicator = ProgressIndicatorLarge(inview: self.view, loadingViewColor: UIColor.clear, indicatorColor: UIColor.gray, msg: "")
+        indicator.translatesAutoresizingMaskIntoConstraints = false
         self.tableView.separatorColor = .clear
+        self.tableView.isHidden = true
+        
         sectionSetter.append(SectionHandler(title: "Work Speed", detail: [""]))
         sectionSetter.append(SectionHandler(title: "Work Quality", detail: [""]))
         sectionSetter.append(SectionHandler(title: "Response Time", detail: [""]))
         sectionSetter.append(SectionHandler(title: "Rating", detail: [""]))
 
-        getClientSatisfaction()
+        fetchUserPosts()
         setupViews()
         
 //        print("print that post: \(userPostModel)")
@@ -106,8 +112,17 @@ class ReviewTechnicianVC: UIViewController, UITextViewDelegate {
     
     // MARK: - Methods
     func setupViews() {
-        [tableView].forEach {view.addSubview($0)}
+        [tableView, indicator].forEach {view.addSubview($0)}
+        indicator.start()
+
         tableView.anchor(top: view.safeAreaLayoutGuide.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor)
+        
+        NSLayoutConstraint.activate([
+            indicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            indicator.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 10),
+            indicator.heightAnchor.constraint(equalToConstant: 50),
+            indicator.widthAnchor.constraint(equalToConstant: 50),
+        ])
         
         setupNavBar()
     }
@@ -123,6 +138,29 @@ class ReviewTechnicianVC: UIViewController, UITextViewDelegate {
         self.navigationItem.leftBarButtonItem = leftNavBarButton
     }
 
+    fileprivate func fetchUserPosts()  {
+        DatabaseManager.shared.getAllClientPosts(completion: { [self] result in
+            switch result {
+            case .success(let userPosts):
+                for post in userPosts {
+                    if completedJobUID == post.id {
+                        userPostModel = post
+                        getClientSatisfaction()
+//                        print("completedJobUID: ", completedJobUID)
+//                        print("post.id: ", post.id)
+                        self.indicator.stop()
+                        self.tableView.isHidden = false
+                        return
+                    }
+                }
+            case .failure(let error):
+                self.indicator.stop()
+                self.tableView.isHidden = false
+                print("cant getAllClientPosts: ", error)
+            }
+        })
+    }
+    
     func textViewDidChange(_ textView: UITextView) {
         
         tableView.beginUpdates()
@@ -141,15 +179,21 @@ class ReviewTechnicianVC: UIViewController, UITextViewDelegate {
     
     @objc fileprivate func leftNavBarBtnTapped() {
 //        print("rating2: \(ratingView.rating)")
+        print("left tapped 1")
         let rating = ratingView.rating
         let jobTitle = userPostModel.title
         let dateOfReview = PostFormVC.dateFormatter.string(from: Date())
         
+        print("left tapped 2: \(userPostModel.hiringStatus?.date)")
         guard let dateOfHiring = userPostModel.hiringStatus?.date else { return }
         guard let clientName = userPostModel.postOwnerInfo?.name else { return }
+        print("left tapped 3: \(userPostModel.title)")
+
         guard let technicianKeyPath = userPostModel.hiringStatus?.technicianKeyPath else { return }
+        print("left tapped 4: \(userPostModel.title)")
 
         guard let reviewComment = reviewCommentTextField.text else { return }
+        print("left tapped 3")
         guard !reviewComment.isEmpty else {
             print("empty comment section")
             return
@@ -237,6 +281,8 @@ class ReviewTechnicianVC: UIViewController, UITextViewDelegate {
             switch result {
             case .success(let reviews):
                 self.reviews = reviews
+                self.indicator.stop()
+                self.tableView.isHidden = false
             case .failure(let error):
                 print(error)
             }

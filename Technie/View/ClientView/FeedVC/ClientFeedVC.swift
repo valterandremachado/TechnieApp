@@ -61,6 +61,7 @@ class ClientFeedVC: UIViewController {
         cv.dataSource = self
         //        cv.collectionViewLayout.invalidateLayout()
         cv.isHidden = true
+        cv.showsVerticalScrollIndicator = false
         // Registration of the cells
         cv.register(NearbyTechniesCell.self, forCellWithReuseIdentifier: feedCellOnSection1ID)
         cv.register(TechnieRankingCell.self, forCellWithReuseIdentifier: feedCellOnSection2ID)
@@ -82,7 +83,8 @@ class ClientFeedVC: UIViewController {
         cv.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         // Avoid collectionView to self adjust its size
         //        cv.contentInsetAdjustmentBehavior = .never
-        
+        cv.showsVerticalScrollIndicator = false
+
         cv.delegate = self
         cv.dataSource = self
         //        cv.collectionViewLayout.invalidateLayout()
@@ -263,42 +265,40 @@ class ClientFeedVC: UIViewController {
     var tempTechnicianModel = [TechnicianModel]()
     fileprivate func fetchData()  {
 //        self.fetchRanking()
-        technicianModel.removeAll()
+//        technicianModel.removeAll()
         view.isUserInteractionEnabled = false
         searchController.searchBar.isUserInteractionEnabled = false
-//        guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
+        guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
 
         DatabaseManager.shared.getAllTechnicians(completion: {[weak self] result in
             guard let self = self else { return }
             switch result {
             case .success(let technicians):
                 self.technicianModel.append(technicians)
+                let sortedArray = self.technicianModel.sorted(by: {
+                    
+                    let clientLat = getUsersPersistedInfo.location.lat
+                    let clientLong = getUsersPersistedInfo.location.long
+                    let technicianLat0 = $0.profileInfo.location?.lat ?? 0.0
+                    let technicianLong0 = $0.profileInfo.location?.long ?? 0.0
 
-//                let clientLat = getUsersPersistedInfo.location.lat
-//                let clientLong = getUsersPersistedInfo.location.long
-               
+                    let technicianLat1 = $1.profileInfo.location?.lat ?? 0.0
+                    let technicianLong1 = $1.profileInfo.location?.long ?? 0.0
+                    
+                    // Client location
+                    let clientLocation = CLLocation(latitude: clientLat, longitude: clientLong)
+                    //  Technician location
+                    let technicianLocation0 = CLLocation(latitude: technicianLat0, longitude: technicianLong0)
+                    let technicianLocation1 = CLLocation(latitude: technicianLat1, longitude: technicianLong1)
+
+                    //Finding my distance to my next destination (in km)
+                    let distance0 = clientLocation.distance(from: technicianLocation0) / 1000
+                    let distance1 = clientLocation.distance(from: technicianLocation1) / 1000
+
+                    return String(distance0).compare(String(distance1), options: .numeric) == .orderedAscending//distance0 < distance1
+                })
                 
-//                let sortedArray = self.tempTechnicianModel.sorted(by: {
-//
-//                    let technicianLatOne = $0.profileInfo.location?.lat ?? 0.0
-//                    let technicianLongOne = $0.profileInfo.location?.long ?? 0.0
-//
-//                    let technicianLatTwo = $1.profileInfo.location?.lat ?? 0.0
-//                    let technicianLongTwo = $1.profileInfo.location?.long ?? 0.0
-//
-//                    // Client location
-//                    let clientLocation = CLLocation(latitude: clientLat, longitude: clientLong)
-//                    //  Technician location
-//                    let technicianLocationOne = CLLocation(latitude: technicianLatOne, longitude: technicianLongOne)
-//                    let technicianLocationtwo = CLLocation(latitude: technicianLatTwo, longitude: technicianLongTwo)
-//
-//                    //Finding my distance to my next destination (in km)
-//                    let distanceOne = clientLocation.distance(from: technicianLocationOne) / 1000
-//                    let distanceTwo = clientLocation.distance(from: technicianLocationtwo) / 1000
-//
-//
-//                    return distanceOne > distanceTwo
-//                })
+                self.technicianModel = sortedArray
                 
                 UIView.animate(withDuration: 0.5) {
                     self.indicator.stop()
@@ -398,8 +398,8 @@ class ClientFeedVC: UIViewController {
     
     fileprivate func fetchRanking() {
 
-        view.isUserInteractionEnabled = false
-        searchController.searchBar.isUserInteractionEnabled = false
+//        view.isUserInteractionEnabled = false
+//        searchController.searchBar.isUserInteractionEnabled = false
         
         DatabaseManager.shared.getTechnieRank { result in
             switch result {
@@ -426,18 +426,19 @@ class ClientFeedVC: UIViewController {
         self.technicianModel.removeAll()
         self.fetchUserPosts()
         self.fetchData()
-        self.fetchRanking()
         self.createTechnieRank()
     }
     
     // MARK: - Selectors
-    
+    var isRefreshing = false
     @objc func refreshData(_ refreshController: UIRefreshControl){
+        isRefreshing = true
         DispatchQueue.main.async {
             self.refreshTechniciansData()
             let refreshDeadline = DispatchTime.now() + .seconds(Int(2))
             DispatchQueue.main.asyncAfter(deadline: refreshDeadline) {
                 refreshController.endRefreshing()
+                self.isRefreshing = false
             }
         }
     }
@@ -570,8 +571,10 @@ extension ClientFeedVC: CollectionDataSourceAndDelegate {
             case 1:
                 // Nearby Technie cell
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: feedCellOnSection1ID, for: indexPath) as! NearbyTechniesCell
-                let model = technicianModel[indexPath.item]
-                cell.technicianModel = model
+                if technicianModel.count != 0 {
+                    let model = technicianModel[indexPath.item]
+                    cell.technicianModel = model
+                }
 //                let lastItemIndex = collectionView.numberOfItems(inSection: collectionView.numberOfSections-1)
     //            let lastIndex = lastItemIndex - 1
     //            if indexPath.item == lastIndex {
@@ -847,7 +850,11 @@ extension ClientFeedVC {
                     return satisAvrOne > satisAvrTwo
                 })
                 sortedRanking = sortedArray
-                DatabaseManager.shared.insertTechnieRanking(withSortedRank: sortedRanking) { _ in
+                DatabaseManager.shared.insertTechnieRanking(withSortedRank: sortedRanking) { success in
+                    if success && self.isRefreshing == true {
+                        self.fetchRanking()
+//                        self.clientFeedCollectionView.reloadData()
+                    }
                 }
                 
             }

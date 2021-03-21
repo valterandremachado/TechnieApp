@@ -175,6 +175,31 @@ class RecommendationVC: UIViewController {
             if (efficiency >= 65 && model.clientsSatisfaction?.ratingAvrg ?? 0.0 >= 4 && distance <= 7) {
                 if self.recommendedTechniciansModel.filter({ $0.profileInfo.id.contains(model.profileInfo.id) }).isEmpty {
                     self.recommendedTechniciansModel.append(model)
+                    
+                    let sortedArray = self.recommendedTechniciansModel.sorted(by: {
+
+                        let technicianLat0 = $0.profileInfo.location?.lat ?? 0.0
+                        let technicianLong0 = $0.profileInfo.location?.long ?? 0.0
+
+                        let technicianLat1 = $1.profileInfo.location?.lat ?? 0.0
+                        let technicianLong1 = $1.profileInfo.location?.long ?? 0.0
+                        
+                        // Client location
+                        let clientLocation = CLLocation(latitude: clientLat, longitude: clientLong)
+                        //  Technician location
+                        let technicianLocation0 = CLLocation(latitude: technicianLat0, longitude: technicianLong0)
+                        let technicianLocation1 = CLLocation(latitude: technicianLat1, longitude: technicianLong1)
+
+                        //Finding my distance to my next destination (in km)
+                        let distance0 = clientLocation.distance(from: technicianLocation0) / 1000
+                        let distance1 = clientLocation.distance(from: technicianLocation1) / 1000
+
+                        
+                        return String(distance0).compare(String(distance1), options: .numeric) == .orderedAscending//distance0 > distance1
+                    })
+                    
+                    self.recommendedTechniciansModel = sortedArray
+                    
                     self.tableView.reloadData()
                 }
             }

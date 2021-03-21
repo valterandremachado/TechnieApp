@@ -64,7 +64,7 @@ class PostFormVC: UIViewController {
         btn.translatesAutoresizingMaskIntoConstraints = false
         //        btn.backgroundColor = UIColor(displayP3Red: 235/255, green: 51/255, blue: 72/255, alpha: 0.2)
         //        btn.backgroundColor = .brown
-        btn.setTitle("₱200 - ₱800 / hour", for: .normal)
+        btn.setTitle("₱200 - ₱300 / hour", for: .normal)
         //        btn.titleLabel?.font = .boldSystemFont(ofSize: 20)
         //        btn.tintColor = .systemPink
         btn.contentHorizontalAlignment = .left
@@ -132,10 +132,10 @@ class PostFormVC: UIViewController {
     
     var isPicking = false
     
-    var customArray: [String] = ["₱200 - ₱300 / hour", "₱300 - ₱400 / hour", "₱400 - ₱500 / hour"]
+    var customArray: [String] = ["₱200 - ₱300 / hour", "₱300 - ₱400 / hour", "₱400 - ₱500 / hour", "₱500 - ₱800 / hour"]
     let handymanSectionArray = ["Plumbing Installation/Leaking Plumbing", "Drywall Installation", "Fixture Replacement", "Painting for the Interior and Exterior", "Power Washing", "Tile Installation", "Deck/Door/Window Repair", "Carpenter", "Cabinetmaker", "Others"]
     
-    var finalPick = ""
+    var finalPick = "₱200 - ₱300 / hour"
     var pickerIndex = 0
     let userDefaults = UserDefaults.standard
     //    lazy var pickerStoredIndex = userDefaults.integer(forKey: Keys.pickerStoredIndex)
@@ -1190,12 +1190,12 @@ extension PostFormVC: UIImagePickerControllerDelegate, UINavigationControllerDel
         if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
             guard let fileUrl = info[UIImagePickerController.InfoKey.imageURL] as? URL else { return }
             let fileName = fileUrl.lastPathComponent
-            let fileType = fileUrl.pathExtension
+//            let fileType = fileUrl.pathExtension
             
             var selectedImage = Data()
             // Convert selectedImage into Data type
-            fileType == "jpeg" ? (selectedImage = image.jpegData(compressionQuality: 0.4)!) : (selectedImage = image.pngData()!)
-
+//            fileType == "jpeg" ? (selectedImage = image.jpegData(compressionQuality: 0.4)!) : (selectedImage = image.pngData()!)
+            selectedImage = image.jpegData(compressionQuality: 0.4)!
             imageDataArray.insert(selectedImage, at: 0)
             imageNameArray.insert(fileName, at: 0)
             attachedFileArray["imageData"] = imageDataArray

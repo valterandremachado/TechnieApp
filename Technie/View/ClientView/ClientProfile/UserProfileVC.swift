@@ -124,17 +124,19 @@ class UserProfileVC: UIViewController {
     }
     
     fileprivate func setupNavBar() {
+        let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo")
 //        guard let navBar = navigationController?.navigationBar else { return }
         let userPersistedName = getUsersPersistedInfo?.name ?? "username"
         
         let delimiter = " "
         let slicedString = userPersistedName.components(separatedBy: delimiter)[1]
-        navigationItem.title = "@\(slicedString)"
+        navigationItem.title = "@\(slicedString.lowercased())"
         
         fetchUserInfo()
     }
     
     fileprivate func fetchUserInfo() {
+        let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo")
         let userPersistedName = getUsersPersistedInfo?.name ?? "username"
         let userPersistedLocation = getUsersPersistedInfo?.location.address ?? "userlocation"
         let userPersistedProfileImage = getUsersPersistedInfo?.profileImage ?? "image"
@@ -158,6 +160,7 @@ class UserProfileVC: UIViewController {
 extension UserProfileVC: EditProfileVCDismissalDelegate {
     
     func EditProfileVCDismissalSingleton(updatedPersistedData: UserPersistedInfo) {
+        
         guard !updatedPersistedData.uid.isEmpty else { return }
         let userPersistedName = updatedPersistedData.name
         let userPersistedLocation = updatedPersistedData.location
@@ -236,6 +239,7 @@ extension UserProfileVC: TableViewDataSourceAndDelegate {
     
     
     fileprivate func presentAlertSheetForLogBtn() {
+        let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo")
         guard let currentUserName = getUsersPersistedInfo?.name else { return }
         
         let alertController = UIAlertController(title: "Log out of \(currentUserName)?", message: nil, preferredStyle: .alert)

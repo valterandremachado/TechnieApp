@@ -101,7 +101,7 @@ class TechnieRankingCell: UICollectionViewCell {
                 let sortedArray = self.filteredRanking.sorted(by: {
                     let satisAvrOne = $0.clientsSatisfaction!.workSpeedAvrg + $0.clientsSatisfaction!.workQualityAvrg + $0.clientsSatisfaction!.responseTimeAvrg
                     let satisAvrTwo = $1.clientsSatisfaction!.workSpeedAvrg + $1.clientsSatisfaction!.workQualityAvrg + $1.clientsSatisfaction!.responseTimeAvrg
-                    return satisAvrOne > satisAvrTwo
+                    return String(satisAvrOne).compare(String(satisAvrTwo), options: .numeric) == .orderedDescending//satisAvrOne > satisAvrTwo
                 })
                 sortedRanking = sortedArray
                 self.technieRankingCollectionView.reloadData()

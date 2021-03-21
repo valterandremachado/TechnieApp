@@ -177,9 +177,11 @@ class ClientNotificationVC: UIViewController {
                 self.userNotifications.removeAll()
                 let sortedArray = notifications.sorted(by: { PostFormVC.dateFormatter.date(from: $0.dateTime)?.compare(PostFormVC.dateFormatter.date(from: $1.dateTime) ?? Date()) == .orderedDescending })
                 self.userNotifications = sortedArray
+                self.warningLabel.isHidden = true
                 self.tableView.reloadData()
                 print("success")
             case .failure(let error):
+                self.warningLabel.isHidden = false
                 print("Failed to get technicians: \(error.localizedDescription)")
             }
         })
@@ -353,17 +355,18 @@ extension ClientNotificationVC: TableViewDataSourceAndDelegate {
             }
             
         case ClientNotificationType.review.rawValue:
-            for post in userPostModel {
-                if notificationModel.completedJobUID == post.id {
+//            for post in userPostModel {
+//                if notificationModel.completedJobUID == post.id {
                     let vc = ReviewTechnicianVC()
-//                    vc.isModalInPresentation = true
-                    vc.userPostModel = post
+                    vc.isModalInPresentation = true
+//                    vc.userPostModel = post
+            vc.completedJobUID = notificationModel.completedJobUID ?? ""
                     vc.notificationRow = indexPath.row
                     vc.dismissalDelegate = self
                     present(UINavigationController(rootViewController: vc), animated: true)
                     return
-                }
-            }
+//                }
+//            }
             
         case ClientNotificationType.recommendation.rawValue:
             

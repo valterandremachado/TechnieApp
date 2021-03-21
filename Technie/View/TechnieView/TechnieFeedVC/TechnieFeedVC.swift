@@ -567,9 +567,10 @@ extension TechnieFeedVC: TableViewDataSourceAndDelegate {
         let cell = tableView.dequeueReusableCell(withIdentifier: FeedsTVCell.cellID, for: indexPath) as! FeedsTVCell
         
         cell.linkedDelegate = self
-        let posts = postModel[indexPath.row]
-        cell.postModel = posts
-        
+        if postModel.count != 0 {
+            let posts = postModel[indexPath.row]
+            cell.postModel = posts
+        }
         // buttonStates switcher
         if self.buttonStates[indexPath.item] == true {
             cell.likeBtn.setImage(self.imageSaved, for: .normal)

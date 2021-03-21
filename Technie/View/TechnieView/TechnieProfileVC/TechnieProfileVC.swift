@@ -96,6 +96,7 @@ class TechnieProfileVC: UIViewController {
     }
     
     fileprivate func updateProfileImage() {
+        let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo")
         let userPersistedProfileImage = getUsersPersistedInfo?.profileImage ?? ""
 
         UrlImageLoader.sharedInstance.imageForUrl(urlString: userPersistedProfileImage) { (image, url) in
@@ -155,11 +156,13 @@ extension TechnieProfileVC: TableViewDataSourceAndDelegate {
 //        let tableViewOptions = TechnieProfileTVOptions(rawValue: indexPath.row)
         switch indexPath.section {
         case 0:
+            var getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo")
+
 //            let userName = UserDefaults.standard.value(forKey: "email") as? String ?? ""
             let userPersistedName = getUsersPersistedInfo?.name ?? "username"
             let userPersistedLocation = getUsersPersistedInfo?.location.address ?? "userlocation"
             let userPersistedProfileImage = getUsersPersistedInfo?.profileImage ?? ""
-            let profileImageUrl = URL(string: userPersistedProfileImage)
+//            let profileImageUrl = URL(string: userPersistedProfileImage)
             
             cell.textLabel?.font = .boldSystemFont(ofSize: 16)
             cell.textLabel?.text = userPersistedName 
@@ -246,6 +249,7 @@ extension TechnieProfileVC: TableViewDataSourceAndDelegate {
     }
     
     fileprivate func presentAlertSheetForLogBtn() {
+        let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo")
         guard let currentUserName = getUsersPersistedInfo?.name else { return }
         
         let alertController = UIAlertController(title: "Log out of \(currentUserName)?", message: nil, preferredStyle: .alert)

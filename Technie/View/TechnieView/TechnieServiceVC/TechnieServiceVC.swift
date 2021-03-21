@@ -380,11 +380,13 @@ extension TechnieServiceVC: TableViewDataSourceAndDelegate {
         self.tableView.deleteRows(at: [IndexPath(row: indexPath.row, section: 0)], with: .left)
         self.tableView.endUpdates()
         
+        var isCompleted = false
+        
         DatabaseManager.shared.getHiredJobs(techniciankeyPath: technicianKeyPath) { success in
             switch success {
             case .success(let hiredJobs):
-                for job in hiredJobs {
-                    if job.postChildPath == postChildPath {
+                for job in hiredJobs { 
+                    if job.postChildPath == postChildPath && isCompleted == false {
                         let hiredJobKeyPath = job.id
                         let technieHiredJobsChildPath = "users/technicians/\(technicianKeyPath)/hiredJobs/\(hiredJobKeyPath ?? "")"
                         
@@ -392,14 +394,15 @@ extension TechnieServiceVC: TableViewDataSourceAndDelegate {
                             if success {
                                 guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
                                 let technicianKeyPath = getUsersPersistedInfo.uid
-//                                print("row: ", indexPath.row, "itemName: ", model.title)
                                 self.getPreviousHiredJobs(technicianKeyPath: technicianKeyPath)
-                                
-                                return
                             }
                         }
+                        
+                        isCompleted = true
+                        
                     }
                 }
+                
             case .failure(let error):
                 print(error)
             }

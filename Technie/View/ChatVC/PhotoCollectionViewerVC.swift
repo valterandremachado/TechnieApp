@@ -70,7 +70,7 @@ extension PhotoCollectionViewerVC: CollectionDataSourceAndDelegate {
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PhotoCollectionViewerCell.cellID, for: indexPath) as! PhotoCollectionViewerCell
-        cell.backgroundColor = .red
+        cell.backgroundColor = .systemGray6
         
         let photosUrl = URL(string: convoSharedPhotoArray[indexPath.item])
         cell.imageView.sd_setImage(with: photosUrl, completed: nil)

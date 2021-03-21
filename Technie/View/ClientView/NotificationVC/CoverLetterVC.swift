@@ -99,9 +99,9 @@ class CoverLetterVC: UIViewController {
         let vc = TechnicianProfileDetailsVC()
         vc.technicianModel = technicianModel
         vc.nameLabel.text = technicianModel.profileInfo.name
-        vc.locationLabel.text = "\(technicianModel.profileInfo.location), Philippines"
+        vc.locationLabel.text = technicianModel.profileInfo.location?.address
         vc.technicianExperienceLabel.text = "• \(technicianModel.profileInfo.experience) Year of Exp."
-        
+        vc.profileImageView.sd_setImage(with: URL(string: technicianModel.profileInfo.profileImage ?? ""), completed: nil)
         let delimiter = "at"
         let slicedString = technicianModel.profileInfo.membershipDate.components(separatedBy: delimiter)[0]
         vc.memberShipDateLabel.text = "• Member since " + slicedString

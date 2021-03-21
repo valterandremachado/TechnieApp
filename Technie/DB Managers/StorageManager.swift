@@ -76,33 +76,39 @@ final class StorageManager {
     }
 
     public func uploadPostImages(with imageArray: [Data], with fileNameArray: [String], completion: @escaping UploadPictureCompletion) {
-        for data in imageArray {
-            for fileName in fileNameArray {
-                let storagePath = storage.child("post_images").child("technician2@hotmail.com/\(fileName)")
-                storagePath.putData(data, metadata: nil, completion: { metadata, error in
-//                    guard let strongSelf = self else { return }
-                    
-                    guard error == nil else {
-                        // failed
-                        print("failed to upload data to firebase for picture")
-                        completion(.failure(StorageErrors.failedToUpload))
-                        return
-                    }
-                    
-                    storagePath.downloadURL(completion: { url, error in
-                        guard let url = url else {
-                            print("Failed to get download url")
-                            completion(.failure(StorageErrors.failedToGetDownloadUrl))
+        DispatchQueue.global(qos: .userInitiated).async {[self] in
+            
+            guard let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo") else { return }
+            let email = getUsersPersistedInfo.email
+            for data in imageArray {
+                for fileName in fileNameArray {
+                    let storagePath = storage.child("post_images").child("\(email)/\(fileName)")
+                    storagePath.putData(data, metadata: nil, completion: { metadata, error in
+                        //                    guard let strongSelf = self else { return }
+                        
+                        guard error == nil else {
+                            // failed
+                            print("failed to upload data to firebase for picture")
+                            completion(.failure(StorageErrors.failedToUpload))
                             return
                         }
-
-                        let urlString = url.absoluteString
-                         print("download url: \(urlString)")
-                        completion(.success(urlString))
+                        
+                        storagePath.downloadURL(completion: { url, error in
+                            guard let url = url else {
+                                print("Failed to get download url")
+                                completion(.failure(StorageErrors.failedToGetDownloadUrl))
+                                return
+                            }
+                            
+                            let urlString = url.absoluteString
+                            print("download url: \(urlString)")
+                            completion(.success(urlString))
+                        })
                     })
-                })
+                }
             }
         }
+        
     }
     
 //    public func getPostImages(with data: [Data], fileName: [String], completion: @escaping UploadPictureCompletion) {

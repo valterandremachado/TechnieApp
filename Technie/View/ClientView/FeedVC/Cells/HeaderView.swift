@@ -81,7 +81,9 @@ class HeaderView: UICollectionReusableView {
             switch result {
             case .success(let userPosts):
                 userPostModel = userPosts
-                self.seeAllBtn.isEnabled = true
+                if userPostModel.count > 5 {
+                    self.seeAllBtn.isEnabled = true
+                }
             case .failure(let error):
                 print(error)
             }
