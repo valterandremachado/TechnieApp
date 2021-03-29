@@ -13,7 +13,7 @@ class TechnieAccountVC: UIViewController {
 
     fileprivate var defaults = UserDefaults.standard
     var updatePersistedData: UserPersistedInfo?
-    let getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo")
+    var getUsersPersistedInfo = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo")
     let database = Database.database().reference()
    
     // MARK: - Properties
@@ -308,6 +308,7 @@ extension TechnieAccountVC: TableViewDataSourceAndDelegate {
     private func updatePersistedData(data: UserPersistedInfo) {
         updatePersistedData = data
         self.defaults.set(object: updatePersistedData, forKey: "persistUsersInfo")
+        self.getUsersPersistedInfo = data
         self.tableView.reloadData()
     }
     

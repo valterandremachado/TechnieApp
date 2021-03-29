@@ -392,6 +392,8 @@ extension TechnieEditProfileVC: TableViewDataSourceAndDelegate {
         updatePersistedData = data
         self.defaults.set(object: updatePersistedData, forKey: "persistUsersInfo")
         print("newData: ", updatePersistedData)
+        self.getUsersPersistedInfo = data
+        self.tableView.reloadData()
     }
     
     func fetchSelectedAddress(address: String, lat: Double, long: Double) {
