@@ -12,6 +12,7 @@
 		8A05766125CD9E0A0071FDD1 /* FullRankingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A05766025CD9E0A0071FDD1 /* FullRankingCell.swift */; };
 		8A0C0B3D25D119C30072729D /* TechnicianSearchResultsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A0C0B3C25D119C30072729D /* TechnicianSearchResultsVC.swift */; };
 		8A0C0B4825D11ACB0072729D /* TechnicianSearchResultsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A0C0B4725D11ACB0072729D /* TechnicianSearchResultsCell.swift */; };
+		8A138FB9263B133A00E2FFFE /* ProofOfExpertiseVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A138FB8263B133A00E2FFFE /* ProofOfExpertiseVC.swift */; };
 		8A13FDDE25DE3AD20034945D /* TechnieGeneralVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A13FDDD25DE3AD20034945D /* TechnieGeneralVC.swift */; };
 		8A13FDE625DE3DB30034945D /* TechnieAccountVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A13FDE525DE3DB30034945D /* TechnieAccountVC.swift */; };
 		8A13FDF425DE3E050034945D /* TechnieEditProfileVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A13FDF325DE3E050034945D /* TechnieEditProfileVC.swift */; };
@@ -207,6 +208,8 @@
 		8A05766025CD9E0A0071FDD1 /* FullRankingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullRankingCell.swift; sourceTree = "<group>"; };
 		8A0C0B3C25D119C30072729D /* TechnicianSearchResultsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnicianSearchResultsVC.swift; sourceTree = "<group>"; };
 		8A0C0B4725D11ACB0072729D /* TechnicianSearchResultsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnicianSearchResultsCell.swift; sourceTree = "<group>"; };
+		8A138FB8263B133A00E2FFFE /* ProofOfExpertiseVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProofOfExpertiseVC.swift; sourceTree = "<group>"; };
+		8A138FBD263B177A00E2FFFE /* Technie.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Technie.entitlements; sourceTree = "<group>"; };
 		8A13FDDD25DE3AD20034945D /* TechnieGeneralVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnieGeneralVC.swift; sourceTree = "<group>"; };
 		8A13FDE525DE3DB30034945D /* TechnieAccountVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnieAccountVC.swift; sourceTree = "<group>"; };
 		8A13FDF325DE3E050034945D /* TechnieEditProfileVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechnieEditProfileVC.swift; sourceTree = "<group>"; };
@@ -499,6 +502,7 @@
 				8A54D19C25CBEB7400045D37 /* AboutVC.swift */,
 				8A54D1A425CBEBA800045D37 /* ReviewsVC.swift */,
 				8AB5316E25E92AD9001D7CCD /* MyJobsVC.swift */,
+				8A138FB8263B133A00E2FFFE /* ProofOfExpertiseVC.swift */,
 			);
 			path = TechnicianProfileDetailsVC;
 			sourceTree = "<group>";
@@ -661,6 +665,7 @@
 		8AC1B121258A2D8D000F2569 /* Technie */ = {
 			isa = PBXGroup;
 			children = (
+				8A138FBD263B177A00E2FFFE /* Technie.entitlements */,
 				8AC1B130258A2D8F000F2569 /* Info.plist */,
 				8AADFB6325B5834000D3A5CC /* GoogleService-Info.plist */,
 				8AC1B155258A2DAB000F2569 /* App */,
@@ -1349,6 +1354,7 @@
 				8A467E9B25ED364500E92D67 /* ClientNotificationCell.swift in Sources */,
 				8A54D19425CBE19100045D37 /* CustomSegmentedControl.swift in Sources */,
 				8AC93A9B25B6F04600663BE3 /* ConversationVC.swift in Sources */,
+				8A138FB9263B133A00E2FFFE /* ProofOfExpertiseVC.swift in Sources */,
 				8A159DFD25B307D900D45C60 /* JobDetailCVCell.swift in Sources */,
 				8A00AB2925B981D000C250C4 /* LocationPickerVC.swift in Sources */,
 				8ACD6AEE25C4384000CC057D /* PhotoCollectionViewerVC.swift in Sources */,
@@ -1564,6 +1570,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Technie/Technie.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = P2QGR75A2K;
 				INFOPLIST_FILE = Technie/Info.plist;
@@ -1584,6 +1591,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Technie/Technie.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = P2QGR75A2K;
 				INFOPLIST_FILE = Technie/Info.plist;

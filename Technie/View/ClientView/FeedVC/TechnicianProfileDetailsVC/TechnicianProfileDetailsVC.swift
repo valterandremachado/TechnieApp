@@ -528,7 +528,8 @@ class TechnicianProfileDetailsVC: UIViewController, CustomSegmentedControlDelega
         
         aboutSectionSetter.append(SectionHandler(title: "Summary", detail: [technicianModel.profileInfo.profileSummary]))
         aboutSectionSetter.append(SectionHandler(title: "Expertise", detail: technicianModel.profileInfo.skills))
-        
+        aboutSectionSetter.append(SectionHandler(title: "Legitimacy", detail: ["Proof of Expertise"]))
+
         reviewsSectionSetter.append(SectionHandler(title: "Proficience", detail: [""]))
         reviewsSectionSetter.append(SectionHandler(title: "Reliability", detail: [""]))
         reviewsSectionSetter.append(SectionHandler(title: "Reviews", detail: ["Reviews", "Reviews", "Reviews", "Reviews", "Reviews", "Reviews", "Reviews", "Reviews", "Reviews"]))
@@ -848,8 +849,8 @@ extension TechnicianProfileDetailsVC: CollectionDataSourceAndDelegate {
             return cell
         case 1:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ReviewCollectionViewBottomCell.cellID, for: indexPath) as! ReviewCollectionViewBottomCell
-            [switchableContainerView].forEach{cell.addSubview($0)}
-            switchableContainerView.anchor(top: cell.topAnchor, leading: cell.leadingAnchor, bottom: cell.contentView.bottomAnchor, trailing: cell.trailingAnchor, padding: UIEdgeInsets(top: 10, left: 0, bottom: 0, right: 0), size: CGSize(width: 0, height: 0))
+            [switchableContainerView].forEach{cell.contentView.addSubview($0)}
+            switchableContainerView.anchor(top: cell.contentView.topAnchor, leading: cell.contentView.leadingAnchor, bottom: cell.contentView.bottomAnchor, trailing: cell.contentView.trailingAnchor, padding: UIEdgeInsets(top: 10, left: 0, bottom: 0, right: 0), size: CGSize(width: 0, height: 0))
 //            switchableContainerView.heightAnchor.constraint(equalToConstant: view.frame.height).isActive = true
             return cell
         default:
@@ -944,6 +945,10 @@ extension TechnicianProfileDetailsVC: TableViewDataSourceAndDelegate {
             let detailText = aboutSectionSetter[indexPath.section].sectionDetail[indexPath.row]
             cell.textLabel?.numberOfLines = 0
             cell.textLabel?.text = detailText
+            if indexPath.section == 2 {
+                cell.selectionStyle = .default
+                cell.accessoryType = .detailDisclosureButton
+            }
             return cell
         case 1:
 
@@ -997,6 +1002,35 @@ extension TechnicianProfileDetailsVC: TableViewDataSourceAndDelegate {
         }
     }
 
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        switch currentSegmentIndex {
+        case 0:
+            if indexPath.section == 2 {
+                tableView.deselectRow(at: indexPath, animated: true)
+                let vc = ProofOfExpertiseVC()
+                navigationController?.pushViewController(vc, animated: true)
+            }
+        case 1:
+            print("case 1")
+        default:
+            return
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
+        if indexPath.section == 2 {
+            presentProofOfExprtiseAlert()
+        }
+    }
+    
+    func presentProofOfExprtiseAlert() {
+        let alertController = UIAlertController(title: nil, message: "Proof of authentication of the provider services.", preferredStyle: .alert)
+        let tryAgainAction = UIAlertAction(title: "OK", style: .cancel) { UIAlertAction in }
+      
+        alertController.addAction(tryAgainAction)
+        self.present(alertController, animated: true, completion: nil)
+    }
+    
     func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
         // remove bottom extra 20px space.
         return UIView(frame: CGRect(x: 0, y: 0, width: 0, height: CGFloat.leastNormalMagnitude))

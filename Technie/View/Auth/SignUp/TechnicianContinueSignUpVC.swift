@@ -10,6 +10,9 @@ import DropDown
 import FirebaseAuth
 import FirebaseDatabase
 
+import MobileCoreServices
+import UniformTypeIdentifiers
+
 class TechnicianContinueSignUpVC: UIViewController, UITextViewDelegate {
 
     var imageData: Data?
@@ -418,14 +421,14 @@ extension TechnicianContinueSignUpVC: TableViewDataSourceAndDelegate {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 6
+        return 7
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         var cell = tableView.dequeueReusableCell(withIdentifier: TechnicianContinueCell.cellID, for: indexPath) as! TechnicianContinueCell
         cell = TechnicianContinueCell(style: .value1, reuseIdentifier: TechnicianContinueCell.cellID)
         cell.detailTextLabel?.font = .systemFont(ofSize: 12.5)
-        let rowTitle = ["Years of Experience", "Expertise", "Account Type", "Hourly Rate"]
+        let rowTitle = ["Years of Experience", "Expertise", "Proof of Expertise", "Account Type", "Hourly Rate"]
 
         switch indexPath.row {
         case 0:
@@ -448,8 +451,16 @@ extension TechnicianContinueSignUpVC: TableViewDataSourceAndDelegate {
             cell.detailTextLabel?.text = flatStrings ?? "Choose"
             cell.accessoryType = .disclosureIndicator
             cell.selectionStyle = .default
+        
         case 3:
+            let flatStrings = expertise?.joined(separator: ", ")
             cell.textLabel?.text = rowTitle[2]
+            cell.detailTextLabel?.text = flatStrings ?? "Choose"
+            cell.accessoryType = .detailDisclosureButton
+            cell.selectionStyle = .default
+            
+        case 4:
+            cell.textLabel?.text = rowTitle[3]
             cell.detailTextLabel?.text = accountType ?? "Choose"
             cell.accessoryType = .disclosureIndicator
             cell.selectionStyle = .default
@@ -463,14 +474,15 @@ extension TechnicianContinueSignUpVC: TableViewDataSourceAndDelegate {
 
             accountTypeDrowDown.anchorView =  cell.detailTextLabel
             accountTypeDrowDown.bottomOffset = CGPoint(x: -40, y: cell.detailTextLabel?.intrinsicContentSize.height ?? 0 + 8)
-        case 4:
-            cell.textLabel?.text = rowTitle[3]
+        case 5:
+            cell.textLabel?.text = rowTitle[4]
             var label = ""
             hourlyRate == nil ? (label = "Choose") : (label = "₱\(hourlyRate ?? "")")
             cell.detailTextLabel?.text = label
             cell.accessoryType = .disclosureIndicator
             cell.selectionStyle = .default
-        case 5:
+            
+        case 6:
             [signupBtn, indicator!].forEach { cell.contentView.addSubview($0) }
             signupBtn.anchor(top: nil, leading: cell.contentView.leadingAnchor, bottom: cell.contentView.bottomAnchor, trailing: cell.contentView.trailingAnchor, padding: UIEdgeInsets(top: 20, left: cell.separatorInset.left + 5, bottom: 0, right: cell.separatorInset.left + 5), size: CGSize(width: 0, height: 40))
             
@@ -490,6 +502,20 @@ extension TechnicianContinueSignUpVC: TableViewDataSourceAndDelegate {
         return cell
     }
     
+    func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
+        if indexPath.row == 3 {
+            presentProofOfExprtiseAlert()
+        }
+    }
+    
+    func presentProofOfExprtiseAlert() {
+        let alertController = UIAlertController(title: nil, message: "Submit a document that proves your skillset/services.", preferredStyle: .alert)
+        let tryAgainAction = UIAlertAction(title: "OK", style: .cancel) { UIAlertAction in }
+      
+        alertController.addAction(tryAgainAction)
+        self.present(alertController, animated: true, completion: nil)
+    }
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
@@ -501,9 +527,14 @@ extension TechnicianContinueSignUpVC: TableViewDataSourceAndDelegate {
             vc.isComingFromSignupVC = true
             vc.expertiseVCDelegate = self
             present(UINavigationController(rootViewController: vc), animated: true)
+            
         case 3:
-            accountTypeDrowDown.show()
+            print("proof of expertise")
+//            clickFunction()
         case 4:
+            accountTypeDrowDown.show()
+            
+        case 5:
             presentEnterHourlyRateAlertController()
         default:
             break
@@ -576,4 +607,45 @@ extension TechnicianContinueSignUpVC: TableViewDataSourceAndDelegate {
         present(alertController, animated: true, completion: nil)
     }
     
+}
+
+// MARK: - File Picker Handler Extension
+extension TechnicianContinueSignUpVC: UIDocumentMenuDelegate, UIDocumentPickerDelegate, UINavigationControllerDelegate {
+    
+    func selectFiles() {
+        let types = UTType.types(tag: "json",
+                                 tagClass: UTTagClass.filenameExtension,
+                                 conformingTo: nil)
+        let documentPickerController = UIDocumentPickerViewController(
+                forOpeningContentTypes: types)
+        documentPickerController.delegate = self
+        self.present(documentPickerController, animated: true, completion: nil)
+    }
+    
+    
+    public func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+        guard let myURL = urls.first else {
+            return
+        }
+        print("import result : \(myURL)")
+    }
+          
+
+    public func documentMenu(_ documentMenu:UIDocumentMenuViewController, didPickDocumentPicker documentPicker: UIDocumentPickerViewController) {
+        documentPicker.delegate = self
+        present(documentPicker, animated: true, completion: nil)
+    }
+
+
+    func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
+        print("view was cancelled")
+        dismiss(animated: true, completion: nil)
+    }
+    
+    func clickFunction(){
+        let importMenu = UIDocumentMenuViewController(documentTypes: [String(kUTTypePDF)], in: .import)
+        importMenu.delegate = self
+        importMenu.modalPresentationStyle = .formSheet
+        self.present(importMenu, animated: true, completion: nil)
+    }
 }
