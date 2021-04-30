@@ -49,6 +49,9 @@ class TechnieEditProfileVC: UIViewController, SelectedLocationDelegate {
         return tv
     }()
     
+    var isProofOfExpertiseFileSelected = false
+    var isProofOfExpertiseTapped = false
+    
     // MARK: - Inits
     override func loadView() {
         super.loadView()
@@ -100,7 +103,7 @@ class TechnieEditProfileVC: UIViewController, SelectedLocationDelegate {
 extension TechnieEditProfileVC: TableViewDataSourceAndDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 5
+        return 6
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -145,6 +148,11 @@ extension TechnieEditProfileVC: TableViewDataSourceAndDelegate {
         case 4:
             cell.titleLabel.text = "Expertise"
 
+        case 5:
+            cell.titleLabel.text = "Proof of Expertise"
+            var detailText = ""
+            isProofOfExpertiseFileSelected == false ? (detailText = "") : (detailText = "File Selected")
+            cell.descriptionLabel.text = detailText
         default:
             break
         }
@@ -172,6 +180,8 @@ extension TechnieEditProfileVC: TableViewDataSourceAndDelegate {
             let vc = ExpertiseVC()
             present(UINavigationController(rootViewController: vc), animated: true)
 
+        case 5:
+            presentPhotoInputActionsheet()
         default:
             break
         }
@@ -196,6 +206,38 @@ extension TechnieEditProfileVC: TableViewDataSourceAndDelegate {
     }
     
     // AlertControllers
+    private func presentPhotoInputActionsheet() {
+        let actionSheet = UIAlertController(title: nil,
+                                            message: "Select .pdf .docx .png .jpeg",
+                                            preferredStyle: .actionSheet)
+        actionSheet.addAction(UIAlertAction(title: "Camera", style: .default, handler: { [weak self] _ in
+            
+            let picker = UIImagePickerController()
+            picker.sourceType = .camera
+            picker.delegate = self
+//            picker.allowsEditing = true
+            self?.present(picker, animated: true)
+            self?.isProofOfExpertiseTapped = true
+        }))
+        
+        actionSheet.addAction(UIAlertAction(title: "Photo Library", style: .default, handler: { [weak self] _ in
+            
+            let picker = UIImagePickerController()
+            picker.sourceType = .photoLibrary
+            picker.delegate = self
+//            picker.allowsEditing = true
+            self?.present(picker, animated: true)
+            self?.isProofOfExpertiseTapped = true
+        }))
+        
+        actionSheet.addAction(UIAlertAction(title: "File", style: .default, handler: nil))
+        actionSheet.actions[2].isEnabled = false
+        
+        actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        actionSheet.fixActionSheetConstraintsError()
+        present(actionSheet, animated: true)
+    }
+    
     fileprivate func presentChangePhotoAlertController() {
         let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
@@ -388,6 +430,36 @@ extension TechnieEditProfileVC: TableViewDataSourceAndDelegate {
         }
     }
     
+    private func changeUserProofOfExpertise(image: Data) {
+        let updatedPersistedData = UserDefaults.standard.object(UserPersistedInfo.self, with: "persistUsersInfo")
+        
+        guard let technicianKeyPath = updatedPersistedData?.uid else { return }
+        guard let email = updatedPersistedData?.email else { return }
+        let childPath = "users/technicians/\(technicianKeyPath)/profileInfo"
+        
+        let fileName = "\(email)_\(UUID().uuidString)_changedProofOfExpertise"
+        StorageManager.shared.uploadProofOfExpertise(with: image, fileName: fileName) { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let proofOfExpertiseUrl):
+                
+                let updateElement = [
+                    "proofOfExpertise": proofOfExpertiseUrl
+                ]
+                
+                self.database.child(childPath).updateChildValues(updateElement, withCompletionBlock: { error, _ in
+                    guard error == nil else {
+                        print("error changing database")
+                        return
+                    }
+                })
+                
+            case .failure(let error):
+                print(error)
+            }
+        }
+    }
+    
     private func updatePersistedData(data: UserPersistedInfo) {
         updatePersistedData = data
         self.defaults.set(object: updatePersistedData, forKey: "persistUsersInfo")
@@ -408,15 +480,35 @@ extension TechnieEditProfileVC: UIImagePickerControllerDelegate, UINavigationCon
     
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         picker.dismiss(animated: true, completion: nil)
+        isProofOfExpertiseTapped = false
+        isProofOfExpertiseFileSelected = false
     }
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         picker.dismiss(animated: true, completion: nil)
-        
-        if let image = info[.editedImage] as? UIImage, let imageData =  image.jpegData(compressionQuality: 0.8) {
-            newProfileImage = imageData
-            changeUserProfileImage(image: imageData)
-            self.tableView.reloadData()
+                
+        if isProofOfExpertiseTapped == true {
+            
+            if let image = info[.originalImage] as? UIImage {
+                // Convert selectedImage into Data type
+                if let selectedImage = image.jpegData(compressionQuality: 0.5) {//image.pngData()
+                    changeUserProofOfExpertise(image: selectedImage)
+                    self.isProofOfExpertiseFileSelected = true
+                    self.tableView.reloadData()
+                }
+            }
+            
+            isProofOfExpertiseTapped = false
+
+        } else {
+            
+            if let image = info[.editedImage] as? UIImage, let imageData =  image.jpegData(compressionQuality: 0.8) {
+                newProfileImage = imageData
+                changeUserProfileImage(image: imageData)
+                self.tableView.reloadData()
+            }
+            
         }
+        
     }
 }

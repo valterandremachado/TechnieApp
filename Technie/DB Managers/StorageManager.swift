@@ -22,6 +22,7 @@ final class StorageManager {
      */
 
     public typealias UploadPictureCompletion = (Result<String, Error>) -> Void
+    public typealias UploadCertificatePictureCompletion = (Result<String, Error>) -> Void
 
     /// Uploads picture to firebase storage and returns completion with url string to download
     public func uploadProfilePicture(with data: Data, fileName: String, completion: @escaping UploadPictureCompletion) {
@@ -47,6 +48,77 @@ final class StorageManager {
                 let urlString = url.absoluteString
                 print("download url returned: \(urlString)")
                 completion(.success(urlString))
+            })
+        })
+    }
+    
+    public func uploadProofOfExpertise(with data: Data, fileName: String, completion: @escaping UploadCertificatePictureCompletion) {
+        storage.child("proofOfService_images/\(fileName)").putData(data, metadata: nil, completion: { [weak self] metadata, error in
+            guard let strongSelf = self else {
+                return
+            }
+
+            guard error == nil else {
+                // failed
+                print("failed to upload data to firebase for picture")
+                completion(.failure(StorageErrors.failedToUpload))
+                return
+            }
+
+            strongSelf.storage.child("proofOfService_images/\(fileName)").downloadURL(completion: { url, error in
+                guard let url = url else {
+                    print("Failed to get download url")
+                    completion(.failure(StorageErrors.failedToGetDownloadUrl))
+                    return
+                }
+
+                let urlString = url.absoluteString
+                print("download url returned: \(urlString)")
+                completion(.success(urlString))
+            })
+        })
+    }
+    
+    public func uploadProfilePictureAndCertificate(with data: Data, certificateFile: Data, fileName: String, completion: @escaping UploadPictureCompletion, certificateCompletion: @escaping UploadPictureCompletion) {
+        
+        storage.child("profile_images/\(fileName)").putData(data, metadata: nil, completion: { [weak self] metadata, error in
+            guard let strongSelf = self else {
+                return
+            }
+
+            guard error == nil else {
+                // failed
+                print("failed to upload data to firebase for picture")
+                completion(.failure(StorageErrors.failedToUpload))
+                return
+            }
+
+            strongSelf.storage.child("profile_images/\(fileName)").downloadURL(completion: { profileImageUrl, error in
+                guard let profileImageUrl = profileImageUrl else {
+                    print("Failed to get profileImageUrl")
+                    completion(.failure(StorageErrors.failedToGetDownloadUrl))
+                    return
+                }
+
+                strongSelf.storage.child("proofOfService_images/\(fileName)").putData(certificateFile, metadata: nil, completion: { metadata, error in
+                    
+                    strongSelf.storage.child("proofOfService_images/\(fileName)").downloadURL(completion: { certificateFileUrl, error in
+                        guard let certificateFileUrl = certificateFileUrl else {
+                            print("Failed to get certificateFileUrl")
+                            certificateCompletion(.failure(StorageErrors.failedToGetDownloadUrl))
+                            return
+                        }
+
+                        let certificateFileUrlString = certificateFileUrl.absoluteString
+                        let profileImageUrlString = profileImageUrl.absoluteString
+                        print("download certificateFileUrlString returned: \(certificateFileUrlString)")
+                        print("download profileImageUrlString returned: \(profileImageUrlString)")
+                        completion(.success(profileImageUrlString))
+                        certificateCompletion(.success(certificateFileUrlString))
+                    })
+                    
+                })
+
             })
         })
     }

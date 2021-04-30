@@ -121,6 +121,8 @@ class TechnicianContinueSignUpVC: UIViewController, UITextViewDelegate {
 
     var yearsOfExp: String?
     var expertise: [String]?
+    var proofOfExpertise: Data?
+    var isProofOfExpertiseFileSelected = false
     var accountType: String?
     var hourlyRate: String?
     
@@ -194,15 +196,23 @@ class TechnicianContinueSignUpVC: UIViewController, UITextViewDelegate {
             
             guard let email = email else { return }
             guard let imageData = imageData else { return }
+            guard let proofOfExpertise = proofOfExpertise else { return }
             let filename = "\(email)_\(UUID().uuidString)"
-
-            StorageManager.shared.uploadProfilePicture(with: imageData, fileName: filename, completion: { result in
+            var urls = [String]()
+            StorageManager.shared.uploadProfilePictureAndCertificate(with: imageData, certificateFile: proofOfExpertise, fileName: filename, completion: { result in
                 switch result {
-                case .success(let downloadUrl):
-                    self.createUser(with: downloadUrl)
-
+                case .success(let profileImageUrl):
+                    urls.append(profileImageUrl)
                 case .failure(let error):
-                    print("Storage maanger error: \(error)")
+                    print("Storage manager error: \(error)")
+                }
+            }, certificateCompletion: { result in
+                switch result {
+                
+                case .success(let certificateUrl):
+                    self.createUser(with: urls[0], proofOfExpertise: certificateUrl)
+                case .failure(let error):
+                    print("Storage manager error: \(error)")
                 }
             })
         }
@@ -228,7 +238,7 @@ extension TechnicianContinueSignUpVC {
         print("setPersistedData: ", data)
     }
     
-    func createUser(with profileImage: String) {
+    func createUser(with profileImage: String, proofOfExpertise: String) {
 
         guard let email = email else { return }
         guard let password = password else { return }
@@ -266,6 +276,7 @@ extension TechnicianContinueSignUpVC {
                                                                   accountType: accountType,
                                                                   hourlyRate: hourlyRate,
                                                                   skills: expertise,
+                                                                  proofOfExpertise: proofOfExpertise,
                                                                   membershipDate: dateString)
                 
                 let technician = TechnicianModel(numberOfCompletedServices: 0,
@@ -453,9 +464,12 @@ extension TechnicianContinueSignUpVC: TableViewDataSourceAndDelegate {
             cell.selectionStyle = .default
         
         case 3:
-            let flatStrings = expertise?.joined(separator: ", ")
+
             cell.textLabel?.text = rowTitle[2]
-            cell.detailTextLabel?.text = flatStrings ?? "Choose"
+            var detailText = ""
+            isProofOfExpertiseFileSelected == false ? (detailText = "Choose") : (detailText = "File Selected")
+            cell.detailTextLabel?.text = detailText
+            
             cell.accessoryType = .detailDisclosureButton
             cell.selectionStyle = .default
             
@@ -530,7 +544,7 @@ extension TechnicianContinueSignUpVC: TableViewDataSourceAndDelegate {
             
         case 3:
             print("proof of expertise")
-//            clickFunction()
+            presentPhotoInputActionsheet()
         case 4:
             accountTypeDrowDown.show()
             
@@ -539,6 +553,37 @@ extension TechnicianContinueSignUpVC: TableViewDataSourceAndDelegate {
         default:
             break
         }
+    }
+    
+    private func presentPhotoInputActionsheet() {
+        let actionSheet = UIAlertController(title: nil,
+                                            message: "Select .pdf .docx .png .jpeg",
+                                            preferredStyle: .actionSheet)
+        actionSheet.addAction(UIAlertAction(title: "Camera", style: .default, handler: { [weak self] _ in
+            
+            let picker = UIImagePickerController()
+            picker.sourceType = .camera
+            picker.delegate = self
+//            picker.allowsEditing = true
+            self?.present(picker, animated: true)
+            
+        }))
+        
+        actionSheet.addAction(UIAlertAction(title: "Photo Library", style: .default, handler: { [weak self] _ in
+            
+            let picker = UIImagePickerController()
+            picker.sourceType = .photoLibrary
+            picker.delegate = self
+//            picker.allowsEditing = true
+            self?.present(picker, animated: true)
+        }))
+        
+        actionSheet.addAction(UIAlertAction(title: "File", style: .default, handler: nil))
+        actionSheet.actions[2].isEnabled = false
+        
+        actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        actionSheet.fixActionSheetConstraintsError()
+        present(actionSheet, animated: true)
     }
     
     fileprivate func presentEnterHourlyRateAlertController() {
@@ -605,6 +650,35 @@ extension TechnicianContinueSignUpVC: TableViewDataSourceAndDelegate {
         alertController.addAction(save)
         alertController.addAction(cancel)
         present(alertController, animated: true, completion: nil)
+    }
+    
+}
+
+// MARK: - UIImagePickerControllerDelegate Extension
+extension TechnicianContinueSignUpVC: UIImagePickerControllerDelegate {
+    
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        picker.dismiss(animated: true, completion: nil)
+    }
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        picker.dismiss(animated: true, completion: nil)
+
+        if let image = info[.originalImage] as? UIImage {
+//            guard let fileUrl = info[UIImagePickerController.InfoKey.imageURL] as? URL else { return }
+//            let fileName = fileUrl.lastPathComponent
+//            let fileType = fileUrl.pathExtension
+//            fileType == "jpeg" ? (selectedImage = image.jpegData(compressionQuality: 0.4)!) : (selectedImage = image.pngData()!)
+
+            // Convert selectedImage into Data type
+            if let selectedImage = image.jpegData(compressionQuality: 0.5) {//image.pngData()
+                proofOfExpertise = selectedImage
+                isProofOfExpertiseFileSelected = true
+                self.tableView.reloadData()
+                print("proofOfExpertise: ", proofOfExpertise, ", profileImage: ", imageData)
+            }
+           
+        }
     }
     
 }

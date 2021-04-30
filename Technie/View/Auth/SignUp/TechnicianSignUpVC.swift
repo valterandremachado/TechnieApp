@@ -370,7 +370,7 @@ extension TechnicianSignUpVC: SelectedLocationDelegate{
 extension TechnicianSignUpVC: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         
-        if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
+        if let image = info[.originalImage] as? UIImage {
             selectedImage = image
             profileImageViewPicker.image = image
             pickerLbl.text = "Great!!!"

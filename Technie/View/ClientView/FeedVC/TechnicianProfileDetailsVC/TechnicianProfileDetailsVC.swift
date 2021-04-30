@@ -1008,7 +1008,8 @@ extension TechnicianProfileDetailsVC: TableViewDataSourceAndDelegate {
             if indexPath.section == 2 {
                 tableView.deselectRow(at: indexPath, animated: true)
                 let vc = ProofOfExpertiseVC()
-                navigationController?.pushViewController(vc, animated: true)
+                vc.proofOfExpertiseUrl = technicianModel.profileInfo.proofOfExpertise
+                present(UINavigationController(rootViewController: vc), animated: true)
             }
         case 1:
             print("case 1")

@@ -2731,6 +2731,7 @@ struct TechnicianProfileInfo: Codable {
     let accountType: String
     let hourlyRate: String
     let skills: [String]
+    let proofOfExpertise: String
     let membershipDate: String
 }
 
