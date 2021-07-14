@@ -35,5 +35,5 @@ should perform in the client house."*
 
 ### Social Media
 [LinkedIn](https://www.linkedin.com/in/valter-a-machado/)
-[hey]::
+[hey]:
 [Twitter](https://twitter.com/valtermachadovm)
