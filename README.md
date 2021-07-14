@@ -1,9 +1,9 @@
 # Technie
 
-> "Technie is mobile app service that facilitates the job of 
-self-employed technicians (plumber, cable tv, stove repair and etc.) 
-by creating work orders that the technicians
-should perform in the client house."
+> *"Technie is mobile app service that facilitates the job of 
+> self-employed technicians (plumber, cable tv, stove repair and etc.) 
+> by creating work orders that the technicians
+> should perform in the client house."*
 
 *This was the final project of my bachelor degree.*
 
