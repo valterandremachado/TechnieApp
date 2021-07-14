@@ -1,9 +1,9 @@
 # Technie
 
 > *"Technie is mobile app service that facilitates the job of 
-> self-employed technicians (plumber, cable tv, stove repair and etc.) 
-> by creating work orders that the technicians
-> should perform in the client house."*
+self-employed technicians (plumber, cable tv, stove repair and etc.) 
+by creating work orders that the technicians
+should perform in the client house."*
 
 *This was the final project of my bachelor degree.*
 
@@ -33,3 +33,6 @@
     * Firebase Database
     * Firebase Storage
 
+### Social Media
+[LinkedIn](https://www.linkedin.com/in/valter-a-machado/) 
+[Twitter](https://twitter.com/valtermachadovm)
