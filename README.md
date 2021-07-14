@@ -34,5 +34,5 @@ should perform in the client house."*
     * Firebase Storage
 
 ### Social Media
-*[LinkedIn](https://www.linkedin.com/in/valter-a-machado/)
-*[Twitter](https://twitter.com/valtermachadovm)
+* [LinkedIn](https://www.linkedin.com/in/valter-a-machado/)
+* [Twitter](https://twitter.com/valtermachadovm)
